@@ -1,0 +1,32 @@
+[versions]
+compiler = "1.4.7"
+compose-bom = "2023.05.01"
+accompanist = "0.30.1"
+
+[libraries]
+bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+foundation = { module = "androidx.compose.foundation:foundation" }
+animation = { module = "androidx.compose.animation:animation" }
+animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
+ui = { module = "androidx.compose.ui:ui" }
+ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+ui-util = { module = "androidx.compose.ui:ui-util" }
+
+material3-core = { module = "androidx.compose.material3:material3" }
+material-icons-core = { module = "androidx.compose.material:material-icons-core" }
+material-icons = { module = "androidx.compose.material:material-icons-extended" }
+
+# Here until M3's swipeable became public https://issuetracker.google.com/issues/234640556
+material-core = { module = "androidx.compose.material:material" }
+
+accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+accompanist-themeadapter = { module = "com.google.accompanist:accompanist-themeadapter-material3", version.ref = "accompanist" }
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
+accompanist-flowlayout = { module = 'com.google.accompanist:accompanist-flowlayout', version.ref = "accompanist" }
+accompanist-navigation = { module = 'com.google.accompanist:accompanist-navigation-animation', version.ref = "accompanist" }
+
+[bundles]
+accompanist = ["accompanist-webview", "accompanist-permissions", "accompanist-themeadapter", "accompanist-systemuicontroller", "accompanist-flowlayout", "accompanist-navigation"]
+material = ["material-icons", "material-core", "material3-core", "material-icons-core"]
+baselibs = ["foundation", "ui", "ui-tooling", "ui-util"]
