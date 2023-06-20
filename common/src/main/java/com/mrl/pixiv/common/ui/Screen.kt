@@ -1,0 +1,68 @@
+package com.mrl.pixiv.common.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.primarySurface
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun BaseScreen(
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    isLoading: Boolean = false,
+    actions: @Composable() (RowScope.() -> Unit)? = null,
+    bottomBar: @Composable (() -> Unit)? = null,
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable (PaddingValues) -> Unit
+) {
+    val colors = if (darkTheme) {
+        DarkColors
+    } else {
+        LightColors
+    }
+    MaterialTheme(
+        colors = colors,
+        typography = MaterialTheme.typography,
+        shapes = MaterialTheme.shapes,
+    ) {
+        val scaffoldState = rememberScaffoldState()
+        Scaffold(
+            modifier = modifier,
+            scaffoldState = scaffoldState,
+            topBar = {
+                actions?.let {
+                    Column {
+                        Spacer(
+                            Modifier
+                                .background(MaterialTheme.colors.primarySurface)
+                                .windowInsetsTopHeight(WindowInsets.statusBars) // Match the height of the status bar
+                                .fillMaxWidth()
+                        )
+                        TopAppBar(
+                            title = { title?.let { Text(text = it) } },
+                            actions = it,
+                            elevation = 0.dp,
+                        )
+                    }
+                }
+            },
+            bottomBar = bottomBar ?: {},
+            content = content,
+        )
+    }
+}
