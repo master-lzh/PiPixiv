@@ -123,6 +123,11 @@ data class User(
     @SerialName("profile_image_urls")
     val profileImageUrls: ProfileImageUrls,
 
+    val comment: String = "",
+
     @SerialName("is_followed")
-    val isFollowed: Boolean
+    val isFollowed: Boolean,
+
+    @SerialName("is_access_blocking_user")
+    val isAccessBlockingUser: Boolean = false
 )

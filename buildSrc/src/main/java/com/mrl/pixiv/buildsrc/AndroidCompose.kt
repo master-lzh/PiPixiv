@@ -33,6 +33,7 @@ fun Project.configureAndroidCompose(
 ) {
     val compose = extensions.getByType<VersionCatalogsExtension>().named("compose")
     val androidx = extensions.getByType<VersionCatalogsExtension>().named("androidx")
+    val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
 
     commonExtension.apply {
         buildFeatures {
@@ -53,6 +54,10 @@ fun Project.configureAndroidCompose(
 
             add("implementation", compose.findBundle("material").get())
             add("implementation", compose.findBundle("baselibs").get())
+
+            add("implementation", libs.findLibrary("koin.compose").get())
+
+            add("implementation", project(":data"))
 //            add("androidTestImplementation", platform(bom))
         }
     }

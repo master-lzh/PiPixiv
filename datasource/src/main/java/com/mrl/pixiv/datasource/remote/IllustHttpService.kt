@@ -1,9 +1,9 @@
 package com.mrl.pixiv.datasource.remote
 
+import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
-import com.mrl.pixiv.api.IllustApi
 
 class IllustHttpService constructor(
     private val illustApi: IllustApi,

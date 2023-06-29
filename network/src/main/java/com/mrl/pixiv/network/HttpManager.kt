@@ -1,7 +1,7 @@
 package com.mrl.pixiv.network
 
-import com.coder.vincent.sharp_retrofit.call_adapter.flow.FlowCallAdapterFactory
-import com.mrl.pixiv.domain.GetUserAccessTokenUseCase
+import com.mrl.pixiv.repository.local.UserLocalRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Interceptor
@@ -17,7 +17,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class HttpManager(
-    private val getUserAccessTokenUseCase: GetUserAccessTokenUseCase,
+    private val userLocalRepository: UserLocalRepository,
     private val jsonConvertFactory: Converter.Factory,
 ) {
 
@@ -54,9 +54,7 @@ class HttpManager(
             var accessToken = ""
             runBlocking {
                 withTimeoutOrNull(100) {
-                    getUserAccessTokenUseCase().collect {
-                        accessToken = it
-                    }
+                    accessToken = userLocalRepository.userAccessToken.first()
                 }
             }
             val local = Locale.getDefault()
@@ -125,7 +123,6 @@ class HttpManager(
         Retrofit.Builder()
             .baseUrl("https://oauth.secure.pixiv.net")
             .addConverterFactory(jsonConvertFactory)
-            .addCallAdapterFactory(FlowCallAdapterFactory.create())
             .client(authHttpClient)
             .build()
     }
@@ -134,7 +131,6 @@ class HttpManager(
         Retrofit.Builder()
             .baseUrl("https://app-api.pixiv.net")
             .addConverterFactory(jsonConvertFactory)
-            .addCallAdapterFactory(FlowCallAdapterFactory.create())
             .client(commonOkHttpClient)
             .build()
     }

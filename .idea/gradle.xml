@@ -4,19 +4,10 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <compositeConfiguration>
-          <compositeBuild compositeDefinitionSource="SCRIPT">
-            <builds>
-              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
-                <projects>
-                  <project path="$PROJECT_DIR$/buildSrc" />
-                </projects>
-              </build>
-            </builds>
-          </compositeBuild>
-        </compositeConfiguration>
+        <option name="testRunner" value="GRADLE" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="zulu-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -26,8 +17,12 @@
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/datasource" />
+            <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/login" />
+            <option value="$PROJECT_DIR$/feature/profile" />
+            <option value="$PROJECT_DIR$/network" />
             <option value="$PROJECT_DIR$/repository" />
             <option value="$PROJECT_DIR$/util" />
           </set>

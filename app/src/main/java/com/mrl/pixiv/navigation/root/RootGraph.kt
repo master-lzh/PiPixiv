@@ -4,10 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.login.LoginScreen
 import com.mrl.pixiv.navigation.main.MainScreen
-import com.mrl.pixiv.common.router.Destination
 
 @Composable
 fun RootNavigationGraph(
@@ -20,10 +20,10 @@ fun RootNavigationGraph(
         startDestination = startDestination
     ) {
         composable(Destination.LoginScreen.route) {
-            LoginScreen()
+            LoginScreen(navHostController)
         }
         composable(route = Graph.MAIN) {
-            MainScreen(navHostController)
+            MainScreen()
         }
     }
 }

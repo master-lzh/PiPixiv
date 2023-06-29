@@ -2,6 +2,7 @@ package com.mrl.pixiv.common.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -18,7 +19,10 @@ import androidx.compose.material.primarySurface
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.mrl.pixiv.common.ui.components.LoadingDots
 
 @Composable
 fun BaseScreen(
@@ -35,6 +39,7 @@ fun BaseScreen(
     } else {
         LightColors
     }
+    rememberSystemUiController().setStatusBarColor(Color.Transparent)
     MaterialTheme(
         colors = colors,
         typography = MaterialTheme.typography,
@@ -62,7 +67,11 @@ fun BaseScreen(
                 }
             },
             bottomBar = bottomBar ?: {},
-            content = content,
-        )
+        ) {
+            Box {
+                content(it)
+                LoadingDots(isLoading = isLoading)
+            }
+        }
     }
 }

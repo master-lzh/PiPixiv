@@ -5,20 +5,35 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import androidx.core.content.getSystemService
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import com.mrl.pixiv.di.appModule
+import com.mrl.pixiv.di.dataSourceModule
+import com.mrl.pixiv.di.repositoryModule
+import com.mrl.pixiv.di.useCaseModule
+import com.mrl.pixiv.di.viewModelModule
+import com.mrl.pixiv.network.HttpManager
 import com.mrl.pixiv.util.AppUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
 class App : Application(), ImageLoaderFactory {
     companion object {
         lateinit var instance: App
     }
+
+    private val httpManager: HttpManager by inject()
 
 
     override fun attachBaseContext(base: Context?) {
@@ -29,6 +44,15 @@ class App : Application(), ImageLoaderFactory {
         super.onCreate()
         instance = this
         AppUtil.init(this)
+        startKoin {
+            androidLogger()
+            androidContext(this@App)
+            modules(appModule)
+            modules(viewModelModule)
+            modules(repositoryModule)
+            modules(dataSourceModule)
+            modules(useCaseModule)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -87,3 +111,7 @@ internal object CoilMemoryCache {
         }
     }
 }
+
+val Context.userAuthDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_auth")
+
+val Context.userInfoDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_info")

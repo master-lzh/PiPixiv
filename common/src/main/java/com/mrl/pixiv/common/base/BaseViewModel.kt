@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrl.pixiv.common.data.BaseUiState
+import com.mrl.pixiv.common.data.DispatcherEnum
 import com.mrl.pixiv.common.data.Rlt
-import com.mrl.pixiv.common.data.failed
 import com.mrl.pixiv.common.data.UiIntent
+import com.mrl.pixiv.common.data.failed
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,8 +22,11 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 
-abstract class BaseViewModel<S : BaseUiState, I : UiIntent> : ViewModel() {
+abstract class BaseViewModel<S : BaseUiState, I : UiIntent> : ViewModel(), KoinComponent {
     protected val TAG = this::class.java.simpleName
 
     private val _uiStateFlow by lazy { MutableStateFlow(initUiState()) }
@@ -29,6 +34,8 @@ abstract class BaseViewModel<S : BaseUiState, I : UiIntent> : ViewModel() {
 
     private val _userIntent = MutableSharedFlow<I>()
     protected val userIntent = _userIntent.asSharedFlow()
+
+    protected val ioDispatcher: CoroutineDispatcher by inject(named(DispatcherEnum.IO))
 
     init {
         viewModelScope.launch {
@@ -43,6 +50,19 @@ abstract class BaseViewModel<S : BaseUiState, I : UiIntent> : ViewModel() {
             }
         }
     }
+
+    protected fun launchIO(block: suspend () -> Unit) {
+        viewModelScope.launch(ioDispatcher) {
+            block()
+        }
+    }
+
+    protected fun launchUI(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            block()
+        }
+    }
+
 
     protected abstract fun handleUserIntent(intent: I)
     abstract fun initUiState(): S
@@ -63,7 +83,9 @@ abstract class BaseViewModel<S : BaseUiState, I : UiIntent> : ViewModel() {
     protected fun <T> requestHttpDataWithFlow(
         showLoading: Boolean = true,
         request: Flow<Rlt<T?>>,
-        failedCallback: suspend (Throwable) -> Unit = { updateUiState { apply { failure = it } } },
+        failedCallback: suspend (Throwable) -> Unit = {
+            updateUiState { apply { failure = it } }
+        },
         successCallback: (T?) -> Unit,
     ) {
         viewModelScope.launch {

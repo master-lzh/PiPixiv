@@ -20,6 +20,7 @@ android {
 dependencies {
     implementation(project(":data"))
     implementation(project(":api"))
+    implementation(project(":common"))
 
     implementation(androidx.datastore)
     implementation(androidx.datastore.preferences)
@@ -27,6 +28,7 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.com.google.android.material.material)
+
     testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

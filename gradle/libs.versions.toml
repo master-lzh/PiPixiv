@@ -114,6 +114,7 @@ kotlinter = "org.jmailen.gradle:kotlinter-gradle:3.13.0"
 mockk = "io.mockk:mockk:1.13.5"
 
 koin = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }

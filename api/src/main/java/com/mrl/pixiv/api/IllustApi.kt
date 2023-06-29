@@ -1,7 +1,7 @@
 package com.mrl.pixiv.api
 
+import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.data.EmptyResp
-import com.mrl.pixiv.data.Rlt
 import com.mrl.pixiv.data.illust.IllustRecommendedResp
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.*

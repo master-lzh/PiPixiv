@@ -1,6 +1,6 @@
 package com.mrl.pixiv.api
 
-import com.mrl.pixiv.data.Rlt
+import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.data.auth.AuthTokenResp
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.FieldMap

@@ -21,4 +21,6 @@ dependencies {
     implementation(androidx.appcompat)
     implementation(androidx.activity.compose)
     implementation(libs.bundles.lottie)
+    implementation(compose.accompanist.systemuicontroller)
+    implementation(libs.bundles.coil)
 }
