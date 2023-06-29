@@ -7,27 +7,27 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Profile(
     val webpage: String? = null,
-    val gender: String,
-    val birth: String,
+    val gender: Int? = null,
+    val birth: String? = null,
 
     @SerialName("birth_day")
-    val birthDay: String,
+    val birthDay: String? = null,
 
     @SerialName("birth_year")
-    val birthYear: Long,
+    val birthYear: Long? = null,
 
-    val region: String,
+    val region: String? = null,
 
     @SerialName("address_id")
-    val addressID: Long,
+    val addressID: Long? = null,
 
     @SerialName("country_code")
-    val countryCode: String,
+    val countryCode: String? = null,
 
-    val job: String,
+    val job: String? = null,
 
     @SerialName("job_id")
-    val jobID: Long,
+    val jobID: Long? = null,
 
     @SerialName("total_follow_users")
     val totalFollowUsers: Long,
@@ -44,9 +44,6 @@ data class Profile(
     @SerialName("total_novels")
     val totalNovels: Long,
 
-    @SerialName("total_illust_bookmarks_public")
-    val totalIllustBookmarksPublic: Long,
-
     @SerialName("total_illust_series")
     val totalIllustSeries: Long,
 
@@ -57,7 +54,7 @@ data class Profile(
     val backgroundImageURL: String? = null,
 
     @SerialName("twitter_account")
-    val twitterAccount: String,
+    val twitterAccount: String? = null,
 
     @SerialName("twitter_url")
     val twitterURL: String? = null,
@@ -74,17 +71,17 @@ data class Profile(
 
 @Serializable
 data class ProfilePublicity(
-    val gender: String,
-    val region: String,
+    val gender: Long? = null,
+    val region: Long? = null,
 
     @SerialName("birth_day")
-    val birthDay: String,
+    val birthDay: Long? = null,
 
     @SerialName("birth_year")
-    val birthYear: String,
+    val birthYear: Long? = null,
 
-    val job: String,
-    val pawoo: Boolean
+    val job: Long? = null,
+    val pawoo: Boolean? = null
 )
 
 @Serializable

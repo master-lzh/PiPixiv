@@ -18,6 +18,7 @@ android {
 
 dependencies {
     implementation(project(":data"))
+    implementation(project(":common"))
 
     implementation(libs.bundles.okhttp)
 

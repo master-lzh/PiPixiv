@@ -1,20 +1,22 @@
 package com.mrl.pixiv.repository.remote
 
-import com.mrl.pixiv.data.auth.AuthTokenFieldReq
-import com.mrl.pixiv.datasource.remote.UserAuthHttpService
-import com.mrl.pixiv.network.Dispatcher
-import com.mrl.pixiv.network.DispatcherEnum
+import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
+import com.mrl.pixiv.data.user.UserDetailQuery
+import com.mrl.pixiv.data.user.UserIllustsQuery
+import com.mrl.pixiv.datasource.remote.UserHttpService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
-import javax.inject.Inject
 
-class UserRemoteRepository @Inject constructor(
-    private val userAuthHttpService: UserAuthHttpService,
-    @Dispatcher(DispatcherEnum.IO) private val ioDispatcher: CoroutineDispatcher,
+class UserRemoteRepository(
+    private val userHttpService: UserHttpService,
+    private val ioDispatcher: CoroutineDispatcher,
 ) {
-    suspend fun login(
-        authTokenFieldReq: AuthTokenFieldReq
-    ) = userAuthHttpService.login(authTokenFieldReq)
-        .flowOn(ioDispatcher)
+    suspend fun getUserDetail(userDetailQuery: UserDetailQuery) =
+        userHttpService.getUserDetail(userDetailQuery).flowOn(ioDispatcher)
 
+    suspend fun getUserIllusts(userIllustsQuery: UserIllustsQuery) =
+        userHttpService.getUserIllusts(userIllustsQuery).flowOn(ioDispatcher)
+
+    suspend fun getUserBookmarksIllust(userBookmarksIllustQuery: UserBookmarksIllustQuery) =
+        userHttpService.getUserBookmarksIllust(userBookmarksIllustQuery).flowOn(ioDispatcher)
 }

@@ -1,4 +1,3 @@
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     id("pixiv.android.library.compose")
     id("pixiv.android.feature")
@@ -19,6 +18,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":repository"))
+    implementation(project(":domain"))
 
     implementation(libs.core.ktx)
     implementation(libs.appcompat)

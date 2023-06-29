@@ -1,8 +1,6 @@
-@file:JvmName("KotlinSerializationConverterFactory")
-
 package com.mrl.pixiv.network.converter
 
-import com.mrl.pixiv.data.Rlt
+import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.network.converter.Serializer.FromBytes
 import com.mrl.pixiv.network.converter.Serializer.FromString
 import kotlinx.coroutines.flow.Flow

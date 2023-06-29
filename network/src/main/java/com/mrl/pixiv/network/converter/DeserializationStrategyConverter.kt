@@ -1,8 +1,8 @@
 package com.mrl.pixiv.network.converter
 
-import com.mrl.pixiv.data.NetworkHttpParseError
-import com.mrl.pixiv.data.NetworkHttpResBodyNullError
-import com.mrl.pixiv.data.Rlt
+import com.mrl.pixiv.common.data.NetworkHttpParseError
+import com.mrl.pixiv.common.data.NetworkHttpResBodyNullError
+import com.mrl.pixiv.common.data.Rlt
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.DeserializationStrategy
