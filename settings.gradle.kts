@@ -23,6 +23,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven(url = "https://www.jitpack.io")
+        maven(url = "https://repo1.maven.org/")
+        maven(url = "https://maven.aliyun.com/repository/central")
     }
 }
 rootProject.name = "PiPixiv"

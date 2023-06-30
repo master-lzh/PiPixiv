@@ -127,6 +127,8 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 com-google-android-material-material = { group = "com.google.android.material", name = "material", version.ref = "com-google-android-material-material" }
 
+collapsing-toolbar = "me.onebone:toolbar-compose:2.3.5"
+
 [bundles]
 reactivex = ["rxandroid", "rxjava", "rxrelay"]
 okhttp = ["okhttp-core", "okhttp-logging", "okhttp-dnsoverhttps", "retrofit2"]
