@@ -87,9 +87,19 @@ class SplashViewModel(
                     if (it != null) {
                         setUserRefreshToken(it.refreshToken!!)
                         setUserAccessToken(it.accessToken!!)
-                        updateUiState { apply { isTokenExpired = false } }
+                        updateUiState {
+                            apply {
+                                isTokenExpired = false
+                                startDestination = Graph.MAIN
+                            }
+                        }
                     } else {
-                        updateUiState { apply { isTokenExpired = true } }
+                        updateUiState {
+                            apply {
+                                isTokenExpired = true
+                                startDestination = Destination.LoginScreen.route
+                            }
+                        }
                     }
                 }
             } else {
