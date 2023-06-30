@@ -21,6 +21,8 @@ dependencies {
     implementation(project(":repository"))
     implementation(project(":domain"))
 
+    implementation(libs.collapsing.toolbar)
+
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.com.google.android.material.material)

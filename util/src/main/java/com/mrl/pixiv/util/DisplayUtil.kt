@@ -12,7 +12,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import java.util.*
+import java.util.Locale
 
 object DisplayUtil {
 
@@ -77,6 +77,10 @@ object DisplayUtil {
     @JvmStatic
     fun getStatusBarHeight(activity: Activity): Int {
         return getStatusBarHeight(activity.window)
+    }
+
+    fun getStatusBarHeightDp(activity: Activity): Dp {
+        return px2dp(getStatusBarHeight(activity).toFloat()).dp
     }
 
     @JvmStatic

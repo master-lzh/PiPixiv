@@ -1,18 +1,25 @@
 package com.mrl.pixiv.profile
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -29,8 +36,10 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.mrl.pixiv.common.coil.BlurTransformation
-import com.mrl.pixiv.common.ui.BaseScreen
 import com.mrl.pixiv.util.DisplayUtil
+import me.onebone.toolbar.CollapsingToolbarScaffold
+import me.onebone.toolbar.ScrollStrategy
+import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -43,78 +52,100 @@ fun ProfileScreen(
     val userInfo = state.userInfo
 //    val userInfo = UserInfo()
     val backgroundHeight = DisplayUtil.getScreenWidthDp() / 3
-    BaseScreen {
-        Column {
+    val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
+    CollapsingToolbarScaffold(
+        modifier = Modifier,
+        state = collapsingToolbarScaffoldState,
+        toolbar = {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(DisplayUtil.getStatusBarHeightDp(LocalContext.current as ComponentActivity) + 50.dp)
+            )
+
             Box(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(backgroundHeight)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(backgroundHeight)
-                ) {
-                    val backgroundUrl = if (userInfo.backgroundImageURL?.isNotEmpty() == true) {
-                        userInfo.backgroundImageURL
-                    } else {
-                        userInfo.user?.profileImageUrls?.medium
+                val backgroundUrl = if (userInfo.backgroundImageURL?.isNotEmpty() == true) {
+                    userInfo.backgroundImageURL
+                } else {
+                    userInfo.user?.profileImageUrls?.medium
+                }
+                if (!backgroundUrl.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(backgroundUrl).allowRgb565(true)
+                            .transformations(BlurTransformation(LocalContext.current))
+                            .build(),
+                        contentScale = ContentScale.FillWidth,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+            }
+
+            var profilePhotoSize by remember { mutableStateOf(100.dp) }
+            Box(
+                modifier = Modifier
+                    .padding(start = 15.dp, top = backgroundHeight - 50.dp)
+                    .size(profilePhotoSize)
+                    .road(Alignment.BottomStart, Alignment.TopStart)
+                    .graphicsLayer {
+//                        size = Size(100f,100f)
                     }
-                    if (!backgroundUrl.isNullOrEmpty()) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(backgroundUrl).allowRgb565(true)
-                                .transformations(BlurTransformation(LocalContext.current))
-                                .build(),
-                            contentScale = ContentScale.FillWidth,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
+            ) {
+                userInfo.user?.profileImageUrls?.medium?.let {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(it).allowRgb565(true)
+                            .transformations(CircleCropTransformation())
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+            }
+        },
+        scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
+        enabled = true,
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp)
+                ) {
+                    userInfo.user?.name?.let { it1 ->
+                        Text(
+                            text = it1,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
                         )
                     }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .padding(start = 15.dp, top = backgroundHeight - 50.dp)
-                        .size(100.dp)
-
-                ) {
-                    userInfo.user?.profileImageUrls?.medium?.let {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(it).allowRgb565(true)
-                                .transformations(CircleCropTransformation())
-                                .build(),
-                            contentDescription = null,
+                    if (userInfo.isPremium) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .padding(start = 5.dp)
+                                .size(20.dp)
+                                .align(CenterVertically),
+                            contentDescription = null
                         )
                     }
                 }
             }
-
-            Row(
-                modifier = Modifier
-                    .padding(start = 15.dp, top = 10.dp)
-            ) {
-                userInfo.user?.name?.let { it1 ->
-                    Text(
-                        text = it1,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Medium,
-                        ),
-                    )
-                }
-                if (userInfo.isPremium) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(20.dp)
-                            .align(CenterVertically),
-                        contentDescription = null
-                    )
-                }
+            items(100) {
+                Text(text = "test")
             }
         }
     }
