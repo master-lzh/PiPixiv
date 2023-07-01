@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package com.mrl.pixiv.util
 
 import android.app.Activity
