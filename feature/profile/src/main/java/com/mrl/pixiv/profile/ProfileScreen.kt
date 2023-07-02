@@ -1,5 +1,6 @@
 package com.mrl.pixiv.profile
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -36,6 +38,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.mrl.pixiv.common.coil.BlurTransformation
+import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.util.DisplayUtil
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
@@ -81,9 +84,46 @@ fun ProfileScreen(
                             .build(),
                         contentScale = ContentScale.FillWidth,
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(DisplayUtil.getStatusBarHeightDp(LocalContext.current as ComponentActivity) + 50.dp)
+                    .graphicsLayer {
+                        alpha = 1 - collapsingToolbarScaffoldState.toolbarState.progress
+                    }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .align(BottomStart)
+                        .padding(start = 20.dp, end = 10.dp)
+                        .graphicsLayer {
+                            alpha = 1 - collapsingToolbarScaffoldState.toolbarState.progress
+                        },
+                ) {
+                    userInfo.user?.profileImageUrls?.medium?.let {
+                        UserAvatar(
+                            url = it,
+                            modifier = Modifier.size(50.dp),
+                            contentScale = ContentScale.FillWidth,
+                        )
+                    }
+                    userInfo.user?.name?.let { it1 ->
+                        Text(
+                            modifier = Modifier
+                                .align(CenterVertically)
+                                .padding(start = 10.dp),
+                            text = it1,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
+                    }
                 }
             }
 
@@ -94,6 +134,10 @@ fun ProfileScreen(
                     .size(profilePhotoSize)
                     .road(Alignment.BottomStart, Alignment.TopStart)
                     .graphicsLayer {
+                        alpha *= collapsingToolbarScaffoldState.toolbarState.progress
+//                        alpha.takeIf { it >= 0.5f }?.let {
+//                            profilePhotoSize *= it
+//                        }
 //                        size = Size(100f,100f)
                     }
             ) {
@@ -104,8 +148,7 @@ fun ProfileScreen(
                             .transformations(CircleCropTransformation())
                             .build(),
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
