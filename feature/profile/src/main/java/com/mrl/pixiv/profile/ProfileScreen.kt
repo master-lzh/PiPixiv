@@ -1,6 +1,5 @@
 package com.mrl.pixiv.profile
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -14,9 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -127,18 +123,13 @@ fun ProfileScreen(
                 }
             }
 
-            var profilePhotoSize by remember { mutableStateOf(100.dp) }
             Box(
                 modifier = Modifier
                     .padding(start = 15.dp, top = backgroundHeight - 50.dp)
-                    .size(profilePhotoSize)
+                    .size(100.dp)
                     .road(Alignment.BottomStart, Alignment.TopStart)
                     .graphicsLayer {
                         alpha *= collapsingToolbarScaffoldState.toolbarState.progress
-//                        alpha.takeIf { it >= 0.5f }?.let {
-//                            profilePhotoSize *= it
-//                        }
-//                        size = Size(100f,100f)
                     }
             ) {
                 userInfo.user?.profileImageUrls?.medium?.let {
