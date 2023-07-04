@@ -77,7 +77,11 @@ class HttpManager(
                 .addHeader("X-Client-Hash", encode("$isoDate$HashSalt"))
 
             val request = requestBuilder.build()
-            val response = chain.proceed(request)
+            val response = try {
+                chain.proceed(request)
+            } catch (e: Throwable) {
+                throw e
+            }
 
             response
         }
