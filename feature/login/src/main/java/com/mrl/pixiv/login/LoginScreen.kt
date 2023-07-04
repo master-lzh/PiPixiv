@@ -70,7 +70,9 @@ fun LoginScreen(
     var currUrl by rememberSaveable { mutableStateOf(generateWebviewUrl(true)) }
     val state by loginViewModel.uiStateFlow.collectAsStateWithLifecycle()
     if (state.loginResult) {
-        navHostController.navigate(Graph.MAIN)
+        LaunchedEffect(Unit) {
+            navHostController.navigate(Graph.MAIN)
+        }
     }
     BaseScreen(actions = {
         Button(onClick = {
