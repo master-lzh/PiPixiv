@@ -18,6 +18,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":util"))
+
     implementation(androidx.appcompat)
     implementation(androidx.activity.compose)
     implementation(libs.bundles.lottie)
