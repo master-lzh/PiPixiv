@@ -5,19 +5,23 @@ import android.util.Base64
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.accompanist.web.AccompanistWebViewClient
-import com.google.accompanist.web.WebContent
+import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
-import com.google.accompanist.web.WebViewState
+import com.google.accompanist.web.rememberWebViewState
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.ui.BaseScreen
 import org.koin.androidx.compose.koinViewModel
@@ -82,8 +86,18 @@ fun LoginScreen(
             Text(text = "注册")
         }
     }) {
+        val webViewState = rememberWebViewState(url = currUrl)
+        when (webViewState.loadingState) {
+            LoadingState.Finished -> {}
+
+            LoadingState.Initializing -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            is LoadingState.Loading -> LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+                progress = (webViewState.loadingState as LoadingState.Loading).progress
+            )
+        }
         WebView(
-            state = WebViewState(WebContent.Url(currUrl)),
+            state = webViewState,
             onCreated = {
                 it.settings.apply {
                     javaScriptEnabled = true
