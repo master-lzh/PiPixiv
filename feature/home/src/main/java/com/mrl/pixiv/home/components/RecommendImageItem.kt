@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -43,6 +44,7 @@ val recommendItemWidth =
 
 @Composable
 fun RecommendImageItem(
+    scaffoldState: ScaffoldState,
     item: RecommendImageItemState,
     onBookmarkClick: (id: Long, bookmark: Boolean) -> Unit
 ) {

@@ -9,8 +9,7 @@ import com.mrl.pixiv.home.state.RecommendImageItemState
 
 class HomeUiState : BaseUiState() {
     var recommendImageList = mutableStateListOf<RecommendImageItemState>()
-    var isRefresh: Boolean by mutableStateOf(false)
-    var nextUrl: String by mutableStateOf("")
+    var isRefresh: Boolean by mutableStateOf(true)
     var loadMore: Boolean by mutableStateOf(false)
     var refreshTokenResult: Boolean by mutableStateOf(false)
 }

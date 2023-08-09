@@ -12,6 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.mrl.pixiv.common.base.BaseActivity
 import com.mrl.pixiv.navigation.root.RootNavigationGraph
+import com.mrl.pixiv.splash.SplashUiIntent
 import com.mrl.pixiv.splash.SplashViewModel
 import com.mrl.pixiv.theme.PiPixivTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -41,5 +42,10 @@ class MainActivity : BaseActivity() {
             }
         }
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        splashViewModel.dispatch(SplashUiIntent.IsNeedRefreshTokenIntent)
     }
 }
