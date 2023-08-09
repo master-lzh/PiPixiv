@@ -8,6 +8,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -24,6 +25,7 @@ class HttpManager(
     private val logInterceptor by lazy { HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY } }
 
     companion object {
+        private const val TAG = "HttpManager"
         private const val HashSalt = "28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c"
     }
 
@@ -79,8 +81,9 @@ class HttpManager(
             val request = requestBuilder.build()
             val response = try {
                 chain.proceed(request)
-            } catch (e: Throwable) {
-                throw e
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                throw HttpException(e.code(), e.message(), e)
             }
 
             response
