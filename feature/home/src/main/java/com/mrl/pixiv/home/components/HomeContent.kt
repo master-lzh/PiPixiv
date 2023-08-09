@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +18,7 @@ import com.mrl.pixiv.util.ToastUtil
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
+    scaffoldState: ScaffoldState,
     viewModel: HomeViewModel,
     lazyStaggeredGridState: LazyStaggeredGridState,
     onBookmarkClick: (Long, Boolean) -> Unit,
@@ -26,7 +28,6 @@ fun HomeContent(
     val homeState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     SideEffect {
-        viewModel.nextUrl = homeState.nextUrl
         Log.d(TAG, "setComposePage: ${homeState.refreshTokenResult}")
     }
 
@@ -35,6 +36,7 @@ fun HomeContent(
     }
 
     RecommendGrid(
+        scaffoldState,
         lazyStaggeredGridState,
         homeState.recommendImageList,
         homeState.loadMore,

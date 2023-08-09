@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import com.mrl.pixiv.util.OnScrollToBottom
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecommendGrid(
+    scaffoldState: ScaffoldState,
     lazyStaggeredGridState: LazyStaggeredGridState,
     recommendImageList: List<RecommendImageItemState>,
     loadMore: Boolean,
@@ -34,7 +36,7 @@ fun RecommendGrid(
         verticalItemSpacing = 3.dp,
     ) {
         items(recommendImageList, key = { it.id }) {
-            RecommendImageItem(it, onBookmarkClick)
+            RecommendImageItem(scaffoldState, it, onBookmarkClick)
         }
         if (loadMore) {
             item(key = "loading", span = StaggeredGridItemSpan.FullLine) {

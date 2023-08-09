@@ -1,7 +1,9 @@
 package com.mrl.pixiv.navigation.main
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.height
@@ -41,6 +43,12 @@ fun MainScreen(
 ) {
     val bottomBarHeight = 56.dp
     val bottomBarOffsetHeightPx = remember { mutableStateOf(0f) }
+    val offsetAnimation by animateIntOffsetAsState(
+        targetValue = IntOffset(
+            x = 0,
+            y = -bottomBarOffsetHeightPx.value.roundToInt()
+        ), label = ""
+    )
     BaseScreen(
         modifier = Modifier.bottomBarAnimatedScroll(bottomBarHeight, bottomBarOffsetHeightPx),
         bottomBar = {
@@ -49,7 +57,7 @@ fun MainScreen(
                 bottomBarState = bottomBarVisibility(navHostController),
                 modifier = Modifier
                     .height(bottomBarHeight)
-                    .offset { IntOffset(x = 0, y = -bottomBarOffsetHeightPx.value.roundToInt()) }
+                    .offset { offsetAnimation }
             )
         }
     ) {
@@ -112,9 +120,14 @@ fun Modifier.bottomBarAnimatedScroll(
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y / 4
-                val newOffset = offsetHeightPx.value + delta
+                val delta = available.y
+                val newOffset = if (delta <= 0) {
+                    offsetHeightPx.value - height.value
+                } else {
+                    offsetHeightPx.value + height.value
+                }
                 offsetHeightPx.value = newOffset.coerceIn(-bottomBarHeightPx, 0f)
+                Log.d("TAG", "onPreScroll: ${available.y} ${offsetHeightPx.value}")
 
                 return Offset.Zero
             }

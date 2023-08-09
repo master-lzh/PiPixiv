@@ -2,23 +2,32 @@ package com.mrl.pixiv.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarResult
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Undo
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.BaseScreen
+import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.auth.GrantType
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
@@ -64,27 +73,75 @@ fun HomeViewModel.onBookmarkClick(id: Long, bookmark: Boolean) {
     }
 }
 
+internal enum class HomeSnackbar(val actionLabel: String) {
+    REVOKE_UNBOOKMARK("撤销取消收藏"),
+}
+
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     navHostController: NavHostController,
     homeViewModel: HomeViewModel = koinViewModel()
 ) {
-    var isRefreshing by rememberSaveable { mutableStateOf(true) }
+    val homeState by homeViewModel.uiStateFlow.collectAsStateWithLifecycle()
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val scope = rememberCoroutineScope()
-    val pullRefreshState = rememberPullRefreshState(refreshing = isRefreshing, onRefresh = {
-        isRefreshing = true
+    val pullRefreshState = rememberPullRefreshState(refreshing = homeState.isRefresh, onRefresh = {
+        homeState.isRefresh = true
         homeViewModel.onRefresh()
     })
+    val scaffoldState = rememberScaffoldState()
+    val onUnBookmark = { id: Long ->
+        scope.launch {
+            val result = scaffoldState.snackbarHostState.showSnackbar(
+                message = "撤销",
+                actionLabel = HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel,
+                duration = SnackbarDuration.Long,
+            )
+            when (result) {
+                SnackbarResult.Dismissed -> {}
+                SnackbarResult.ActionPerformed -> {
+                    homeViewModel.onBookmarkClick(id, true)
+                }
+            }
+        }
+    }
 
     BaseScreen(
         title = stringResource(R.string.app_name),
+        scaffoldState = scaffoldState,
         actions = {
             HomeTopBar(onRefresh = {
-                isRefreshing = true
+                homeState.isRefresh = true
                 homeViewModel.onRefresh()
             }, onRefreshToken = { homeViewModel.onRefreshToken() })
+        },
+        snackbarHost = {
+            SnackbarHost(it) {
+                when (it.actionLabel) {
+                    HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel -> {
+                        TextSnackbar(
+                            text = it.message,
+                            action = {
+                                Row {
+                                    IconButton(
+                                        onClick = { scaffoldState.snackbarHostState.currentSnackbarData?.performAction() },
+                                        modifier = Modifier.align(Alignment.CenterVertically)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Undo,
+                                            contentDescription = null
+                                        )
+                                    }
+                                    it.actionLabel?.let {
+                                        Text(text = it)
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            }
         }
     ) {
         Box(
@@ -93,16 +150,20 @@ fun HomeScreen(
                 .fillMaxSize()
         ) {
             HomeContent(
+                scaffoldState = scaffoldState,
                 viewModel = homeViewModel,
                 lazyStaggeredGridState,
                 onBookmarkClick = { id, bookmark ->
                     homeViewModel.onBookmarkClick(id, bookmark)
+                    if (!bookmark) {
+                        onUnBookmark(id)
+                    }
                 },
                 dismissRefresh = {
                     scope.launch {
                         lazyStaggeredGridState.scrollToItem(0)
                         delay(1.second)
-                        isRefreshing = false
+                        homeState.isRefresh = false
                     }
                 }
             ) {
@@ -115,7 +176,7 @@ fun HomeScreen(
                             fillMaxSize()
                         }
                     },
-                refreshing = isRefreshing,
+                refreshing = homeState.isRefresh,
                 state = pullRefreshState,
             )
         }

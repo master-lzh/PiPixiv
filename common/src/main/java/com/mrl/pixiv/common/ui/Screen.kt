@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.primarySurface
@@ -29,6 +31,8 @@ fun BaseScreen(
     modifier: Modifier = Modifier,
     title: String? = null,
     isLoading: Boolean = false,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    snackbarHost: @Composable (SnackbarHostState) -> Unit = {},
     actions: @Composable() (RowScope.() -> Unit)? = null,
     bottomBar: @Composable (() -> Unit)? = null,
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -45,10 +49,10 @@ fun BaseScreen(
         typography = MaterialTheme.typography,
         shapes = MaterialTheme.shapes,
     ) {
-        val scaffoldState = rememberScaffoldState()
         Scaffold(
             modifier = modifier,
             scaffoldState = scaffoldState,
+            snackbarHost = snackbarHost,
             topBar = {
                 actions?.let {
                     Column {
