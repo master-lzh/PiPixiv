@@ -9,4 +9,6 @@ plugins {
     kotlinx.plugins.serialization.get().let {
         id(it.pluginId) version it.version.requiredVersion apply false
     }
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
 }

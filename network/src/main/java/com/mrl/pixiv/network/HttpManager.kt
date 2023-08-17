@@ -8,7 +8,6 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -79,12 +78,7 @@ class HttpManager(
                 .addHeader("X-Client-Hash", encode("$isoDate$HashSalt"))
 
             val request = requestBuilder.build()
-            val response = try {
-                chain.proceed(request)
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                throw HttpException(e.code(), e.message(), e)
-            }
+            val response = chain.proceed(request)
 
             response
         }

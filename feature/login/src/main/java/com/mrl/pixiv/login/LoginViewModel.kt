@@ -23,7 +23,7 @@ class LoginViewModel(
         }
     }
 
-    private fun login(code: String, codeVerify: String) = launchIO {
+    private fun login(code: String, codeVerify: String) = launchNetwork {
         val req = AuthTokenFieldReq(
             grantType = GrantType.AUTHORIZATION_CODE.value,
             code = code,

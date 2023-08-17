@@ -23,6 +23,11 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.com.google.android.material.material)
+    implementation(libs.bundles.okhttp)
+
+    implementation(platform(libs.firebase.bom))
+    api(libs.bundles.firebase)
+
     implementation(compose.animation)
     implementation(compose.foundation)
     implementation(compose.ui)

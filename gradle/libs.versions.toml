@@ -20,9 +20,12 @@ androidx-test-ext-junit = "1.1.5"
 androidx-test-espresso-espresso-core = "3.5.1"
 appcompat = "1.6.1"
 com-google-android-material-material = "1.9.0"
-lottie = "6.0.0"
+lottie = "6.1.0"
 agp = "8.0.1"
 org-jetbrains-kotlin-android180 = "1.8.0"
+google-services = "4.3.15"
+firebase-bom = "32.2.2"
+firebase-crashlytics-gradle = "2.9.5"
 
 [libraries]
 desugar = "com.android.tools:desugar_jdk_libs:2.0.3"
@@ -129,6 +132,10 @@ com-google-android-material-material = { group = "com.google.android.material", 
 
 collapsing-toolbar = "me.onebone:toolbar-compose:2.3.5"
 
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+
 [bundles]
 reactivex = ["rxandroid", "rxjava", "rxrelay"]
 okhttp = ["okhttp-core", "okhttp-logging", "okhttp-dnsoverhttps", "retrofit2"]
@@ -140,6 +147,10 @@ voyager = ["voyager-navigator", "voyager-tab-navigator", "voyager-transitions"]
 richtext = ["richtext-commonmark", "richtext-m3"]
 test = ["junit", "kotest-assertions", "mockk"]
 lottie = ["lottie", "lottie-compose"]
+firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
+
 [plugins]
 com-android-library = { id = "com.android.library", version.ref = "agp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android180" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-gradle" }

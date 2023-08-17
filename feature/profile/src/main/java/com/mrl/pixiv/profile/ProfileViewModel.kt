@@ -24,7 +24,7 @@ class ProfileViewModel(
         }
     }
 
-    private fun getUserInfo() = launchIO {
+    private fun getUserInfo() = launchNetwork {
         val userId = userLocalRepository.userId.first()
         requestHttpDataWithFlow(
             request = userRemoteRepository.getUserDetail(UserDetailQuery(userId = userId))
