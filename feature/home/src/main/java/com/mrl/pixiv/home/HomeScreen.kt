@@ -19,6 +19,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -106,6 +107,13 @@ fun HomeScreen(
             }
         }
     }
+    LaunchedEffect(Unit) {
+        scope.launch {
+            homeViewModel.exception.collect {
+                scaffoldState.snackbarHostState.showSnackbar(it?.message ?: "未知错误")
+            }
+        }
+    }
 
     BaseScreen(
         title = stringResource(R.string.app_name),
@@ -139,6 +147,9 @@ fun HomeScreen(
                                 }
                             }
                         )
+                    }
+                    else -> {
+                        TextSnackbar(text = it.message)
                     }
                 }
             }

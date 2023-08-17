@@ -8,6 +8,7 @@ import com.mrl.pixiv.common.data.DispatcherEnum
 import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.common.data.UiIntent
 import com.mrl.pixiv.common.data.failed
+import com.mrl.pixiv.util.NetworkExceptionUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,9 @@ abstract class BaseViewModel<S : BaseUiState, I : UiIntent> : ViewModel(), KoinC
     private val _userIntent = MutableSharedFlow<I>()
     protected val userIntent = _userIntent.asSharedFlow()
 
+    private val _exception = MutableSharedFlow<Throwable?>()
+    val exception = _exception.asSharedFlow()
+
     protected val ioDispatcher: CoroutineDispatcher by inject(named(DispatcherEnum.IO))
 
     init {
@@ -51,10 +55,33 @@ abstract class BaseViewModel<S : BaseUiState, I : UiIntent> : ViewModel(), KoinC
         }
     }
 
-    protected fun launchIO(block: suspend () -> Unit) {
+    protected fun launchIO(
+        onError: (Throwable) -> Unit = { viewModelScope.launch { _exception.emit(it) } },
+        onComplete: () -> Unit = {},
+        block: suspend () -> Unit
+    ) {
         viewModelScope.launch(ioDispatcher) {
-            block()
+            try {
+                block()
+            } catch (e: Throwable) {
+                onError(e)
+            } finally {
+                onComplete()
+            }
         }
+    }
+
+    protected fun launchNetwork(
+        onError: (Throwable) -> Unit = {
+            viewModelScope.launch {
+                _exception.emit(it)
+            }
+            NetworkExceptionUtil.resolveException(it)
+        },
+        onComplete: () -> Unit = {},
+        block: suspend () -> Unit
+    ) {
+        launchIO(onError, onComplete, block)
     }
 
     protected fun launchUI(block: suspend () -> Unit) {

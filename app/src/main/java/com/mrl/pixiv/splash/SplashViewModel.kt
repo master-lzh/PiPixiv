@@ -76,7 +76,7 @@ class SplashViewModel(
     }
 
     private fun refreshAccessToken(grantType: GrantType) {
-        launchIO {
+        launchNetwork {
             if (userLocalRepository.isNeedRefreshToken.first()) {
                 val userRefreshToken = userLocalRepository.userRefreshToken.first()
                 val req = AuthTokenFieldReq(

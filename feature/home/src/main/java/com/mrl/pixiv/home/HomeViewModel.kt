@@ -42,7 +42,7 @@ class HomeViewModel(
     }
 
     private fun refreshToken(intent: HomeUiIntent.RefreshTokenIntent) {
-        launchIO {
+        launchNetwork {
             requestHttpDataWithFlow(
                 request = authRemoteRepository.login(
                     AuthTokenFieldReq(
@@ -60,10 +60,10 @@ class HomeViewModel(
     }
 
     private fun loadMoreIllustRecommended(intent: HomeUiIntent.LoadMoreIllustRecommendedIntent) {
-        launchIO {
+        launchNetwork {
             if (intent.queryMap == null) {
                 updateUiState { failed(Throwable("no next page")) }
-                return@launchIO
+                return@launchNetwork
             }
             updateUiState { apply { loadMore = true } }
             requestHttpDataWithFlow(
@@ -84,7 +84,7 @@ class HomeViewModel(
     }
 
     private fun refreshIllustRecommended(intent: HomeUiIntent.RefreshIllustRecommendedIntent) {
-        launchIO {
+        launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRemoteRepository.getIllustRecommended(intent.illustRecommendedQuery)
             ) {
@@ -130,7 +130,7 @@ class HomeViewModel(
     }
 
     private fun postIllustBookmarkDelete(intent: HomeUiIntent.IllustBookmarkDeleteIntent) {
-        launchIO {
+        launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRemoteRepository.postIllustBookmarkDelete(intent.illustBookmarkDeleteReq),
                 failedCallback = {
@@ -154,7 +154,7 @@ class HomeViewModel(
     }
 
     private fun postIllustBookmarkAdd(intent: HomeUiIntent.IllustBookmarkAddIntent) {
-        launchIO {
+        launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRemoteRepository.postIllustBookmarkAdd(intent.illustBookmarkAddReq),
                 failedCallback = {
