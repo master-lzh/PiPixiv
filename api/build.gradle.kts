@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.mrl.pixiv.common"
+    namespace = "com.mrl.pixiv.api"
 
     buildTypes {
         release {
