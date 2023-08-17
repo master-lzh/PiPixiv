@@ -3,6 +3,7 @@ package com.mrl.pixiv.home.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
@@ -34,6 +35,7 @@ fun RecommendGrid(
         contentPadding = PaddingValues(5.dp),
         columns = StaggeredGridCells.Fixed(SPAN_COUNT),
         verticalItemSpacing = 3.dp,
+        modifier = Modifier.fillMaxSize()
     ) {
         items(recommendImageList, key = { it.id }) {
             RecommendImageItem(scaffoldState, it, onBookmarkClick)
