@@ -6,18 +6,18 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AuthTokenResp(
     @SerialName("access_token")
-    val accessToken: String? = null,
+    val accessToken: String = "",
 
     @SerialName("expires_in")
-    val expiresIn: Long? = null,
+    val expiresIn: Long = 0,
 
     @SerialName("token_type")
-    val tokenType: String? = null,
+    val tokenType: String = "",
 
-    val scope: String? = null,
+    val scope: String = "",
 
     @SerialName("refresh_token")
-    val refreshToken: String? = null,
+    val refreshToken: String = "",
 
     val user: AuthUser? = null,
     val response: AuthTokenResp? = null
@@ -28,12 +28,12 @@ data class AuthUser(
     @SerialName("profile_image_urls")
     val profileImageUrls: ProfileImageUrls,
 
-    val id: String? = null,
-    val name: String? = null,
-    val account: String? = null,
+    val id: String = "",
+    val name: String = "",
+    val account: String = "",
 
     @SerialName("mail_address")
-    val mailAddress: String? = null,
+    val mailAddress: String = "",
 
     @SerialName("is_premium")
     val isPremium: Boolean,
@@ -51,11 +51,11 @@ data class AuthUser(
 @Serializable
 data class ProfileImageUrls(
     @SerialName("px_16x16")
-    val px16X16: String? = null,
+    val px16X16: String = "",
 
     @SerialName("px_50x50")
-    val px50X50: String? = null,
+    val px50X50: String = "",
 
     @SerialName("px_170x170")
-    val px170X170: String? = null
+    val px170X170: String = ""
 )

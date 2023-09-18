@@ -20,7 +20,7 @@ fun UserAvatar(
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
     onClick: () -> Unit = {},
-    contentDescription: String? = null,
+    contentDescription: String = "",
     contentScale: ContentScale = ContentScale.Fit,
     tint: Color = Color.Unspecified,
     transformations: List<Transformation> = listOf(CircleCropTransformation()),

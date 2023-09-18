@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.mrl.pixiv.home.HomeViewModel
 import com.mrl.pixiv.home.R
 import com.mrl.pixiv.home.TAG
@@ -18,6 +19,7 @@ import com.mrl.pixiv.util.ToastUtil
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
+    navHostController: NavHostController,
     scaffoldState: ScaffoldState,
     viewModel: HomeViewModel,
     lazyStaggeredGridState: LazyStaggeredGridState,
@@ -36,6 +38,7 @@ fun HomeContent(
     }
 
     RecommendGrid(
+        navHostController,
         scaffoldState,
         lazyStaggeredGridState,
         homeState.recommendImageList,

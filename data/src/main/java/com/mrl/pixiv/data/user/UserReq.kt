@@ -2,6 +2,7 @@ package com.mrl.pixiv.data.user
 
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.IBaseQueryMap
+import com.mrl.pixiv.data.Restrict
 
 data class UserDetailQuery(
     val filter: String = Filter.ANDROID.filter,
@@ -15,7 +16,8 @@ data class UserIllustsQuery(
 ) : IBaseQueryMap
 
 data class UserBookmarksIllustQuery(
+    @Restrict
     val restrict: String,
     val userId: Long,
-    val tag: String,
+    val tag: String = "",
 ) : IBaseQueryMap

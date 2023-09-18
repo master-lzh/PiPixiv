@@ -27,10 +27,12 @@ class MainActivity : BaseActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
-                RootNavigationGraph(
-                    navHostController = rememberNavController(),
-                    startDestination = state.startDestination
-                )
+                state.startDestination?.let {
+                    RootNavigationGraph(
+                        navHostController = rememberNavController(),
+                        startDestination = it
+                    )
+                }
             }
         }
     }

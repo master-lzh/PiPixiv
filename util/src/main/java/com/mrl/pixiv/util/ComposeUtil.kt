@@ -16,7 +16,7 @@ const val VIEW_CLICK_INTERVAL_TIME = 1000L//点击间隔时间
 inline fun Modifier.click(
     time: Long = VIEW_CLICK_INTERVAL_TIME,
     enabled: Boolean = true,//中间这三个是clickable自带的参数
-    onClickLabel: String? = null,
+    onClickLabel: String = "",
     role: Role? = null,
     crossinline onClick: () -> Unit
 ): Modifier = composed {

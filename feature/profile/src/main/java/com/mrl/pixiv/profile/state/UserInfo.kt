@@ -5,9 +5,9 @@ import com.mrl.pixiv.data.user.UserDetailResp
 
 data class UserInfo(
     val user: User? = null,
-    val gender: Int? = null,
-    val birth: String? = null,
-    val region: String? = null,
+    val gender: Int = 0,
+    val birth: String = "",
+    val region: String = "",
     val totalFollowUsers: Long = 0,
     val totalMypixivUsers: Long = 0,
     val totalIllusts: Long = 0,
@@ -15,9 +15,9 @@ data class UserInfo(
     val totalNovels: Long = 0,
     val totalIllustSeries: Long = 0,
     val totalNovelSeries: Long = 0,
-    val backgroundImageURL: String? = null,
-    val twitterAccount: String? = null,
-    val twitterURL: String? = null,
+    val backgroundImageURL: String = "",
+    val twitterAccount: String = "",
+    val twitterURL: String = "",
     val isPremium: Boolean = false,
     val isUsingCustomProfileImage: Boolean = false,
 )

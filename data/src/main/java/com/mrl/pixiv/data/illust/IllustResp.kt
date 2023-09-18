@@ -18,13 +18,13 @@ data class IllustRecommendedResp(
     val privacyPolicy: PrivacyPolicy,
 
     @SerialName("next_url")
-    val nextURL: String? = null,
+    val nextURL: String = "",
 )
 
 
 @Serializable
 data class PrivacyPolicy(
-    val version: String? = null,
-    val message: String? = null,
-    val url: String? = null
+    val version: String = "",
+    val message: String = "",
+    val url: String = ""
 )

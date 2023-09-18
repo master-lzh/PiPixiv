@@ -10,17 +10,17 @@ class EmptyResp
 
 @Serializable
 data class ProfileImageUrls(
-    val medium: String? = null
+    val medium: String = ""
 )
 
 @Serializable
 data class ImageUrls(
     @SerialName("square_medium")
-    val squareMedium: String? = null,
+    val squareMedium: String = "",
 
-    val medium: String? = null,
-    val large: String? = null,
-    val original: String? = null
+    val medium: String = "",
+    val large: String = "",
+    val original: String = ""
 )
 
 @Serializable
@@ -32,26 +32,26 @@ data class Illust(
     @SerialName("image_urls")
     val imageUrls: ImageUrls,
 
-    val caption: String? = null,
-    val restrict: Long? = null,
+    val caption: String = "",
+    val restrict: Long = 0,
     val user: User,
     val tags: List<Tag>? = null,
     val tools: List<String>? = null,
 
     @SerialName("create_date")
-    val createDate: String? = null,
+    val createDate: String = "",
 
     @SerialName("page_count")
-    val pageCount: Int? = null,
+    val pageCount: Int = 0,
 
     val width: Int,
     val height: Int,
 
     @SerialName("sanity_level")
-    val sanityLevel: Int? = null,
+    val sanityLevel: Int = 0,
 
     @SerialName("x_restrict")
-    val xRestrict: Int? = null,
+    val xRestrict: Int = 0,
 
     val series: JsonElement? = null,
 
@@ -76,10 +76,10 @@ data class Illust(
     val isMuted: Boolean? = null,
 
     @SerialName("illust_ai_type")
-    val illustAIType: Int? = null,
+    val illustAIType: Int = 0,
 
     @SerialName("illust_book_style")
-    val illustBookStyle: Int? = null
+    val illustBookStyle: Int = 0
 )
 
 @Serializable
@@ -91,15 +91,15 @@ data class MetaPage(
 @Serializable
 data class MetaSinglePage(
     @SerialName("original_image_url")
-    val originalImageURL: String? = null
+    val originalImageURL: String = ""
 )
 
 @Serializable
 data class Tag(
-    val name: String? = null,
+    val name: String = "",
 
     @SerialName("translated_name")
-    val translatedName: String? = null
+    val translatedName: String = ""
 )
 
 @Serializable
@@ -126,7 +126,7 @@ data class User(
     val comment: String = "",
 
     @SerialName("is_followed")
-    val isFollowed: Boolean,
+    val isFollowed: Boolean = false,
 
     @SerialName("is_access_blocking_user")
     val isAccessBlockingUser: Boolean = false

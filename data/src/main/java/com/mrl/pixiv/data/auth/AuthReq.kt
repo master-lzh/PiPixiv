@@ -8,14 +8,14 @@ data class AuthTokenFieldReq(
     val clientSecret: String = Constants.CLIENT_SECRET,
     val grantType: String,
 
-    val username: String? = null,
-    val password: String? = null,
+    val username: String = "",
+    val password: String = "",
 
-    val code: String? = null,
-    val redirectUri: String? = null,
-    val codeVerifier: String? = null,
+    val code: String = "",
+    val redirectUri: String = "",
+    val codeVerifier: String = "",
 
-    val refreshToken: String? = null,
+    val refreshToken: String = "",
 
     val getSecureUrl: Int = 1,
     val includePolicy: Boolean = true,

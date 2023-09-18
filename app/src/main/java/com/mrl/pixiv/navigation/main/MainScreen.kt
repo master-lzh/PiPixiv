@@ -50,7 +50,11 @@ fun MainScreen(
         ), label = ""
     )
     BaseScreen(
-        modifier = Modifier.bottomBarAnimatedScroll(bottomBarHeight, bottomBarOffsetHeightPx),
+        modifier = Modifier.bottomBarAnimatedScroll(
+            bottomBarHeight,
+            bottomBarOffsetHeightPx,
+            navHostController
+        ),
         bottomBar = {
             HomeBottomBar(
                 navController = navHostController,
@@ -111,7 +115,8 @@ fun HomeBottomBar(
 
 fun Modifier.bottomBarAnimatedScroll(
     height: Dp = 56.dp,
-    offsetHeightPx: MutableState<Float>
+    offsetHeightPx: MutableState<Float>,
+    navHostController: NavHostController
 ): Modifier = composed {
     val bottomBarHeightPx = with(LocalDensity.current) {
         height.roundToPx().toFloat()
@@ -120,6 +125,9 @@ fun Modifier.bottomBarAnimatedScroll(
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (navHostController.currentDestination?.route != Destination.HomeScreen.route) {
+                    return Offset.Zero
+                }
                 val delta = available.y
                 val newOffset = if (delta <= 0) {
                     offsetHeightPx.value - height.value

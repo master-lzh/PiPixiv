@@ -29,7 +29,7 @@ import com.mrl.pixiv.common.ui.components.LoadingDots
 @Composable
 fun BaseScreen(
     modifier: Modifier = Modifier,
-    title: String? = null,
+    title: String = "",
     isLoading: Boolean = false,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     snackbarHost: @Composable (SnackbarHostState) -> Unit = {},

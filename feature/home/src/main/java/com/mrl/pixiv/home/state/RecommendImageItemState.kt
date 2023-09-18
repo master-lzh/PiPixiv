@@ -3,6 +3,7 @@ package com.mrl.pixiv.home.state
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.mrl.pixiv.data.Illust
 
 class RecommendImageItemState {
     var id: Long by mutableStateOf(0)
@@ -16,6 +17,8 @@ class RecommendImageItemState {
     var totalView: Long by mutableStateOf(0)
     var totalBookmarks: Long by mutableStateOf(0)
     var isBookmarked: Boolean by mutableStateOf(false)
+    lateinit var illust: Illust
+
 
     override fun equals(other: Any?): Boolean {
         if (other is RecommendImageItemState) {

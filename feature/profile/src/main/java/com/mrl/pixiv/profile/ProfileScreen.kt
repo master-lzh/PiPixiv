@@ -3,16 +3,19 @@ package com.mrl.pixiv.profile
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -35,7 +38,10 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.mrl.pixiv.common.coil.BlurTransformation
 import com.mrl.pixiv.common.ui.components.UserAvatar
+import com.mrl.pixiv.profile.components.IllustBookmarkWidget
 import com.mrl.pixiv.util.DisplayUtil
+import com.mrl.pixiv.util.click
+import com.mrl.pixiv.util.copyToClipboard
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
@@ -47,11 +53,16 @@ fun ProfileScreen(
     navHostController: NavHostController = rememberNavController(),
     profileViewModel: ProfileViewModel = koinViewModel(),
 ) {
+    LaunchedEffect(Unit) {
+        profileViewModel.dispatch(ProfileUiIntent.GetUserInfoIntent)
+        profileViewModel.dispatch(ProfileUiIntent.GetUserBookmarksIllustIntent())
+    }
     val state by profileViewModel.uiStateFlow.collectAsStateWithLifecycle()
     val userInfo = state.userInfo
 //    val userInfo = UserInfo()
     val backgroundHeight = DisplayUtil.getScreenWidthDp() / 3
     val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
+    val scope = rememberCoroutineScope()
     CollapsingToolbarScaffold(
         modifier = Modifier,
         state = collapsingToolbarScaffoldState,
@@ -147,40 +158,77 @@ fun ProfileScreen(
         scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
         enabled = true,
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier.fillMaxWidth()
         ) {
+            Row(
+                modifier = Modifier
+                    .padding(start = 15.dp, top = 10.dp)
+            ) {
+                userInfo.user?.name?.let { it1 ->
+                    Text(
+                        text = it1,
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    )
+                }
+                if (userInfo.isPremium) {
+                    Image(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                            .size(20.dp)
+                            .align(CenterVertically),
+                        contentDescription = null
+                    )
+                }
+            }
 
 
-            item {
+            //id点击可复制
+            Row(
+                modifier = Modifier
+                    .padding(start = 15.dp, top = 10.dp)
+                    .click {
+                        userInfo.user?.id?.let { it1 -> copyToClipboard(it1.toString()) }
+                    }
+            ) {
+                Text(
+                    text = "ID: ${userInfo.user?.id}",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                    ),
+                )
+            }
+
+            // 个人简介
+            userInfo.user?.comment?.let {
                 Row(
                     modifier = Modifier
                         .padding(start = 15.dp, top = 10.dp)
                 ) {
-                    userInfo.user?.name?.let { it1 ->
-                        Text(
-                            text = it1,
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                        )
-                    }
-                    if (userInfo.isPremium) {
-                        Image(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
-                            modifier = Modifier
-                                .padding(start = 5.dp)
-                                .size(20.dp)
-                                .align(CenterVertically),
-                            contentDescription = null
-                        )
-                    }
+                    Text(
+                        text = it,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    )
                 }
+
             }
-            items(100) {
-                Text(text = "test")
-            }
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp))
+            Divider(modifier = Modifier.padding(horizontal = 15.dp))
+            // 插画、漫画收藏网格组件
+            IllustBookmarkWidget(
+                navHostController = navHostController,
+                illusts = state.userBookmarksIllusts
+            )
         }
     }
 }

@@ -161,6 +161,7 @@ fun HomeScreen(
                 .fillMaxSize()
         ) {
             HomeContent(
+                navHostController = navHostController,
                 scaffoldState = scaffoldState,
                 viewModel = homeViewModel,
                 lazyStaggeredGridState,

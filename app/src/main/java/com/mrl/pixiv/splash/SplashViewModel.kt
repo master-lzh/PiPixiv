@@ -1,7 +1,7 @@
 package com.mrl.pixiv.splash
 
 import androidx.lifecycle.viewModelScope
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.base.BaseScreenViewModel
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
@@ -20,7 +20,7 @@ class SplashViewModel(
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val userLocalRepository: UserLocalRepository,
     private val authRemoteRepository: AuthRemoteRepository,
-) : BaseViewModel<SplashUiState, SplashUiIntent>() {
+) : BaseScreenViewModel<SplashUiState, SplashUiIntent>() {
 
 
 
@@ -33,10 +33,16 @@ class SplashViewModel(
 
     private fun routeToHome() {
         updateUiState { apply { startDestination = Graph.MAIN } }
+        launchIO {
+            _isLoading.emit(false)
+        }
     }
 
     private fun routeToLogin() {
         updateUiState { apply { startDestination = Destination.LoginScreen.route } }
+        launchIO {
+            _isLoading.emit(false)
+        }
     }
 
     private fun isLogin() {
@@ -45,7 +51,6 @@ class SplashViewModel(
                 updateUiState { apply { isLogin = true } }
                 dispatch(SplashUiIntent.IsNeedRefreshTokenIntent)
             } else {
-                _isLoading.emit(false)
                 updateUiState { apply { isLogin = false } }
                 dispatch(SplashUiIntent.RouteToLoginScreenIntent)
             }
@@ -58,7 +63,6 @@ class SplashViewModel(
                 updateUiState { apply { isTokenExpired = true } }
                 dispatch(SplashUiIntent.RefreshAccessTokenIntent(GrantType.REFRESH_TOKEN))
             } else {
-                _isLoading.emit(false)
                 updateUiState { apply { isTokenExpired = false } }
                 dispatch(SplashUiIntent.RouteToHomeScreenIntent)
             }

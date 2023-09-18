@@ -6,28 +6,28 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Profile(
-    val webpage: String? = null,
-    val gender: Int? = null,
-    val birth: String? = null,
+    val webpage: String = "",
+    val gender: Int = 0,
+    val birth: String = "",
 
     @SerialName("birth_day")
-    val birthDay: String? = null,
+    val birthDay: String = "",
 
     @SerialName("birth_year")
-    val birthYear: Long? = null,
+    val birthYear: Long = 0,
 
-    val region: String? = null,
+    val region: String = "",
 
     @SerialName("address_id")
-    val addressID: Long? = null,
+    val addressID: Long = 0,
 
     @SerialName("country_code")
-    val countryCode: String? = null,
+    val countryCode: String = "",
 
-    val job: String? = null,
+    val job: String = "",
 
     @SerialName("job_id")
-    val jobID: Long? = null,
+    val jobID: Long = 0,
 
     @SerialName("total_follow_users")
     val totalFollowUsers: Long,
@@ -51,16 +51,16 @@ data class Profile(
     val totalNovelSeries: Long,
 
     @SerialName("background_image_url")
-    val backgroundImageURL: String? = null,
+    val backgroundImageURL: String = "",
 
     @SerialName("twitter_account")
-    val twitterAccount: String? = null,
+    val twitterAccount: String = "",
 
     @SerialName("twitter_url")
-    val twitterURL: String? = null,
+    val twitterURL: String = "",
 
     @SerialName("pawoo_url")
-    val pawooURL: String? = null,
+    val pawooURL: String = "",
 
     @SerialName("is_premium")
     val isPremium: Boolean,
@@ -71,16 +71,16 @@ data class Profile(
 
 @Serializable
 data class ProfilePublicity(
-    val gender: Long? = null,
-    val region: Long? = null,
+    val gender: Long = 0,
+    val region: Long = 0,
 
     @SerialName("birth_day")
-    val birthDay: Long? = null,
+    val birthDay: Long = 0,
 
     @SerialName("birth_year")
-    val birthYear: Long? = null,
+    val birthYear: Long = 0,
 
-    val job: Long? = null,
+    val job: Long = 0,
     val pawoo: Boolean? = null
 )
 
@@ -100,5 +100,5 @@ data class Workspace(
     val comment: String,
 
     @SerialName("workspace_image_url")
-    val workspaceImageURL: String? = null
+    val workspaceImageURL: String = ""
 )

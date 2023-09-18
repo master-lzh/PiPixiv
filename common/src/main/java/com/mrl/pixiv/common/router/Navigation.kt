@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 
 sealed class Destination(
     val route: String,
-    val title: String? = null,
+    val title: String = "",
     val icon: @Composable (() -> Unit)? = {},
 ) {
     object LoginScreen : Destination(route = "login_screen")
@@ -38,4 +38,8 @@ sealed class Destination(
             )
         }
     )
+
+    object PictureScreen : Destination(route = "picture_screen") {
+        const val illustParams = "illust"
+    }
 }

@@ -4,6 +4,7 @@ import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.common.data.DispatcherEnum
+import com.mrl.pixiv.common_viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
@@ -17,6 +18,7 @@ import com.mrl.pixiv.home.HomeViewModel
 import com.mrl.pixiv.login.LoginViewModel
 import com.mrl.pixiv.network.HttpManager
 import com.mrl.pixiv.network.converter.asConverterFactory
+import com.mrl.pixiv.picture.PictureViewModel
 import com.mrl.pixiv.profile.ProfileViewModel
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
@@ -39,8 +41,10 @@ enum class DataStoreEnum {
 }
 
 
-private val JSON = Json {
+val JSON = Json {
+    ignoreUnknownKeys = true
     coerceInputValues = true
+    isLenient = true
 }
 
 val appModule = module {
@@ -65,6 +69,10 @@ val viewModelModule = module {
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
 
     viewModel { ProfileViewModel(get(), get()) }
+
+    viewModel { PictureViewModel(get(), get()) }
+
+    viewModel { BookmarkViewModel(get(), get()) }
 }
 
 val repositoryModule = module {
