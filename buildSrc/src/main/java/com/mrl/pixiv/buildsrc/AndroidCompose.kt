@@ -29,7 +29,7 @@ import java.io.File
  * Configure Compose-specific options
  */
 fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension<*, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *>,
 ) {
     val compose = extensions.getByType<VersionCatalogsExtension>().named("compose")
     val androidx = extensions.getByType<VersionCatalogsExtension>().named("androidx")

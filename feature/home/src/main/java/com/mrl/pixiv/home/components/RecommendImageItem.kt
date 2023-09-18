@@ -27,13 +27,20 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
+import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.home.state.RecommendImageItemState
 import com.mrl.pixiv.util.DisplayUtil
+import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.dp_
 import com.mrl.pixiv.util.second
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 val SPACING_HORIZONTAL_DP = 5.dp_
 val SPACING_VERTICAL_DP = 5.dp_
@@ -42,8 +49,10 @@ const val INCLUDE_EDGE = true
 val recommendItemWidth =
     DisplayUtil.px2dp((DisplayUtil.getScreenWidth() - SPACING_HORIZONTAL_DP * (SPAN_COUNT + if (INCLUDE_EDGE) 1 else -1)) / SPAN_COUNT.toFloat())
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun RecommendImageItem(
+    navHostController: NavHostController,
     scaffoldState: ScaffoldState,
     item: RecommendImageItemState,
     onBookmarkClick: (id: Long, bookmark: Boolean) -> Unit
@@ -51,7 +60,10 @@ fun RecommendImageItem(
     Surface(
         modifier = Modifier
             .padding(horizontal = 5.dp)
-            .padding(bottom = 5.dp),
+            .padding(bottom = 5.dp)
+            .click {
+                navHostController.navigate("${Destination.PictureScreen.route}/${Base64.UrlSafe.encode(Json.encodeToString(item.illust).encodeToByteArray())}")
+            },
         shape = RoundedCornerShape(10.dp),
         elevation = 4.dp
     ) {

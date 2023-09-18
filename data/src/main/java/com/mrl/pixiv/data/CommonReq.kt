@@ -1,5 +1,6 @@
 package com.mrl.pixiv.data
 
+import androidx.annotation.StringDef
 import com.google.common.base.CaseFormat
 import kotlin.reflect.full.memberProperties
 
@@ -14,7 +15,7 @@ interface IBaseMap {
         this.javaClass.kotlin.memberProperties.forEach { field ->
             val name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field.name)
             val value = field.get(this)
-            if (value != null) {
+            if (value != null && value.toString().isNotEmpty()) {
                 map[name] = value.toString()
             }
         }
@@ -25,3 +26,12 @@ interface IBaseMap {
 interface IBaseQueryMap : IBaseMap
 
 interface IBaseFieldMap : IBaseMap
+
+@StringDef(Restrict.PUBLIC, Restrict.PRIVATE, Restrict.ALL)
+annotation class Restrict {
+    companion object {
+        const val PUBLIC = "public"
+        const val PRIVATE = "private"
+        const val ALL = "all"
+    }
+}

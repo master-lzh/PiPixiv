@@ -9,6 +9,7 @@ object DestinationsDeepLink {
 
     val HomePattern = "$BaseUri/${Destination.HomeScreen.route}"
     val ProfilePattern = "$BaseUri/${Destination.ProfileScreen.route}"
+    val PicturePattern = "$BaseUri/${Destination.PictureScreen.route}"
 
     fun getProfileUri(): Uri =
         ProfilePattern.toUri()

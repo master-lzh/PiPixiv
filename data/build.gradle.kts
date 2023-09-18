@@ -1,6 +1,7 @@
 plugins {
     id("pixiv.android.library")
     alias(kotlinx.plugins.serialization)
+    id("kotlin-parcelize")
 }
 
 android {

@@ -1,6 +1,6 @@
 package com.mrl.pixiv.login
 
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.base.BaseScreenViewModel
 import com.mrl.pixiv.data.Constants
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.AuthTokenResp
@@ -15,7 +15,7 @@ class LoginViewModel(
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val setUserIdUseCase: SetUserIdUseCase,
     private val authRemoteRepository: AuthRemoteRepository,
-) : BaseViewModel<LoginUiState, LoginUiIntent>() {
+) : BaseScreenViewModel<LoginUiState, LoginUiIntent>() {
 
     override fun handleUserIntent(intent: LoginUiIntent) {
         when (intent) {

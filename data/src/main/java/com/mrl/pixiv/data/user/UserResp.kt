@@ -7,11 +7,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserIllustsResp(
-    val user: User?,
+    val user: User? = null,
     val illusts: List<Illust>,
 
     @SerialName("next_url")
-    val nextURL: String
+    val nextURL: String = ""
 )
 
 @Serializable

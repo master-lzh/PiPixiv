@@ -3,19 +3,23 @@ package com.mrl.pixiv.navigation.main
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
+import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.di.JSON
 import com.mrl.pixiv.home.HomeScreen
+import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
-import com.mrl.pixiv.util.enterTransition
-import com.mrl.pixiv.util.exitTransition
-import com.mrl.pixiv.util.popEnterTransition
+import kotlinx.serialization.decodeFromString
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalEncodingApi::class)
 @Composable
 fun MainGraph(
     navHostController: NavHostController,
@@ -32,34 +36,8 @@ fun MainGraph(
                     uriPattern = DestinationsDeepLink.HomePattern
                 }
             ),
-            enterTransition = {
-                when (initialState.destination.route) {
-                    Destination.ProfileScreen.route -> {
-                        enterTransition
-                    }
 
-                    else -> null
-                }
-            },
-            exitTransition = {
-                when (targetState.destination.route) {
-                    Destination.ProfileScreen.route -> {
-                        exitTransition
-                    }
-
-                    else -> null
-                }
-            },
-            popEnterTransition = {
-                when (initialState.destination.route) {
-                    Destination.ProfileScreen.route -> {
-                        popEnterTransition
-                    }
-
-                    else -> null
-                }
-            }
-        ) {
+            ) {
             HomeScreen(navHostController)
         }
         composable(
@@ -69,35 +47,28 @@ fun MainGraph(
                     uriPattern = DestinationsDeepLink.ProfilePattern
                 }
             ),
-            enterTransition = {
-                when (initialState.destination.route) {
-                    Destination.HomeScreen.route -> {
-                        enterTransition
-                    }
 
-                    else -> null
-                }
-            },
-            exitTransition = {
-                when (targetState.destination.route) {
-                    Destination.HomeScreen.route -> {
-                        exitTransition
-                    }
-
-                    else -> null
-                }
-            },
-            popEnterTransition = {
-                when (initialState.destination.route) {
-                    Destination.HomeScreen.route -> {
-                        popEnterTransition
-                    }
-
-                    else -> null
-                }
-            }
-        ) {
+            ) {
             ProfileScreen(navHostController)
+        }
+        composable(
+            route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustParams}}",
+            arguments = listOf(
+                navArgument(Destination.PictureScreen.illustParams) {
+                    defaultValue = ""
+                }
+            ),
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = DestinationsDeepLink.PicturePattern
+                }
+            ),
+        ) {
+            val illustParams =
+                (it.arguments?.getString(Destination.PictureScreen.illustParams)) ?: ""
+            val illustDecode = Base64.UrlSafe.decode(illustParams).decodeToString()
+            val illust = JSON.decodeFromString<Illust>(illustDecode)
+            PictureScreen(illust, navHostController)
         }
     }
 }

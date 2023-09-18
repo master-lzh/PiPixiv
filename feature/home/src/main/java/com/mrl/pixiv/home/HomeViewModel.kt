@@ -1,7 +1,7 @@
 package com.mrl.pixiv.home
 
 import androidx.compose.runtime.toMutableStateList
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.base.BaseScreenViewModel
 import com.mrl.pixiv.common.data.failed
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.AuthTokenResp
@@ -24,8 +24,8 @@ class HomeViewModel(
     private val authRemoteRepository: AuthRemoteRepository,
     private val userLocalRepository: UserLocalRepository,
     private val illustRemoteRepository: IllustRemoteRepository,
-) : BaseViewModel<HomeUiState, HomeUiIntent>() {
-    var nextUrl: String? = null
+) : BaseScreenViewModel<HomeUiState, HomeUiIntent>() {
+    var nextUrl: String = ""
 
     init {
         dispatch(HomeUiIntent.RefreshIllustRecommendedIntent(initRecommendedQuery))
@@ -106,9 +106,7 @@ class HomeViewModel(
         return resp?.let { it.illusts + it.rankingIllusts }
             ?.map {
                 val thumbnail =
-                    it.imageUrls.original ?: it.imageUrls.large ?: it.imageUrls.medium
-                    ?: it.imageUrls.squareMedium
-                    ?: ""
+                    it.imageUrls.original.ifEmpty { it.imageUrls.large.ifEmpty { it.imageUrls.medium.ifEmpty { it.imageUrls.squareMedium } } }
                 RecommendImageItemState().apply {
                     // 宽高比
                     val scale = it.height * 1.0f / it.width
@@ -125,6 +123,7 @@ class HomeViewModel(
                     totalView = it.totalView
                     totalBookmarks = it.totalBookmarks
                     isBookmarked = it.isBookmarked
+                    illust = it
                 }
             } ?: emptyList()
     }
