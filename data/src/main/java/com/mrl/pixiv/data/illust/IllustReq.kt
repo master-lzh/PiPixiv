@@ -21,3 +21,7 @@ data class IllustBookmarkDeleteReq(
     val illustId: Long,
 ) : IBaseFieldMap
 
+data class IllustRelatedQuery(
+    val illustId: Long,
+    val filter: String,
+) : IBaseQueryMap

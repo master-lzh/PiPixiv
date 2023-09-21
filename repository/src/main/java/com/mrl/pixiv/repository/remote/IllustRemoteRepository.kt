@@ -3,6 +3,7 @@ package com.mrl.pixiv.repository.remote
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
+import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
@@ -25,5 +26,13 @@ class IllustRemoteRepository constructor(
 
     suspend fun postIllustBookmarkDelete(illustBookmarkDeleteReq: IllustBookmarkDeleteReq) =
         illustHttpService.postIllustBookmarkDelete(illustBookmarkDeleteReq)
+            .flowOn(ioDispatcher)
+
+    suspend fun getIllustRelated(illustRelatedQuery: IllustRelatedQuery) =
+        illustHttpService.getIllustRelated(illustRelatedQuery)
+            .flowOn(ioDispatcher)
+
+    suspend fun loadMoreIllustRelated(queryMap: Map<String, String>) =
+        illustHttpService.loadMoreIllustRelated(queryMap)
             .flowOn(ioDispatcher)
 }

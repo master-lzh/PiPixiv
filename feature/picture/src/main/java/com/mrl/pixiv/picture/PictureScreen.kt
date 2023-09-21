@@ -10,6 +10,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -28,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
@@ -39,6 +41,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -55,10 +58,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -74,6 +80,7 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
+import com.mrl.pixiv.util.queryParams
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -118,14 +125,26 @@ fun PictureScreen(
         }
     val isBarVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex <= illust.pageCount } }
     val isScrollToBottom = remember { mutableStateOf(false) }
+    val isScrollToRelatedBottom = remember { mutableStateOf(false) }
     var isBookmarked by remember { mutableStateOf(illust.isBookmarked) }
     val bookmarkStatus by bookmarkViewModel.bookmarkStatus.collectAsStateWithLifecycle()
+    val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     LaunchedEffect(Unit) {
         viewModel.dispatch(PictureUiIntent.GetUserIllustsIntent(illust.user.id))
     }
     LaunchedEffect(bookmarkStatus) {
         bookmarkStatus?.let {
             isBookmarked = it
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.dispatch(PictureUiIntent.GetIllustRelatedIntent(illust.id))
+    }
+    LaunchedEffect(isScrollToRelatedBottom.value) {
+        if (isScrollToRelatedBottom.value) {
+            viewModel.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
+                viewModel.dispatch(PictureUiIntent.LoadMoreIllustRelatedIntent(it))
+            }
         }
     }
     Scaffold(
@@ -186,7 +205,8 @@ fun PictureScreen(
                                 .build(),
                             contentDescription = null,
                             modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
+                            contentScale = ContentScale.FillWidth,
+                            placeholder = placeholder,
                         )
                     }
                 } else {
@@ -196,7 +216,8 @@ fun PictureScreen(
                             .build(),
                         contentDescription = null,
                         modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.FillWidth
+                        contentScale = ContentScale.FillWidth,
+                        placeholder = placeholder,
                     )
                 }
             }
@@ -289,10 +310,71 @@ fun PictureScreen(
                 }
             }
             item {
-                Divider(modifier = Modifier.padding(horizontal = 15.dp))
+                Divider(
+                    modifier = Modifier
+                        .padding(horizontal = 15.dp)
+                        .padding(top = 50.dp)
+                )
             }
             item {
-                Row {
+                //作者头像、名字、关注按钮
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 15.dp)
+                        .padding(top = 10.dp)
+                ) {
+                    UserAvatar(
+                        url = illust.user.profileImageUrls.medium,
+                        size = 30.dp,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically),
+                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 10.dp)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        Text(
+                            text = illust.user.name,
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
+                        Text(
+                            text = "ID: ${illust.user.id}",
+                            style = TextStyle(
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    //todo 点击关注按钮
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .border(
+                                width = 1.dp,
+                                color = Color(0xFF2B7592),
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            .padding(horizontal = 10.dp, vertical = 8.dp),
+                        text = "关注",
+                        style = TextStyle(
+                            color = Color(0xFF2B7592),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    )
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 15.dp)
+                        .padding(top = 10.dp)
+                ) {
                     state.userIllusts.subList(0, minOf(USER_ILLUSTS_COUNT, state.userIllusts.size))
                         .forEach {
                             AsyncImage(
@@ -301,7 +383,7 @@ fun PictureScreen(
                                     .build(),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .size(DisplayUtil.getScreenWidthDp() / USER_ILLUSTS_COUNT)
+                                    .size((DisplayUtil.getScreenWidthDp() - 30.dp) / USER_ILLUSTS_COUNT)
                                     .padding(5.dp)
                                     .clip(MaterialTheme.shapes.medium)
                                     .click {
@@ -321,10 +403,75 @@ fun PictureScreen(
                 }
             }
             item {
-                Spacer(modifier = Modifier.height(50.dp))
+                //相关作品文字，显示在中间
+                Text(
+                    text = "相关作品",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 50.dp),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
+            item(key = "${illust.id}_related") {
+                // 相关作品
+                // 由于不能在LazyColumn中嵌套LazyColumn，所以这里用FlowRow代替
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = 50.dp,
+                            bottom = if (isScrollToRelatedBottom.value) 0.dp else 100.dp
+                        ),
+                    maxItemsInEachRow = 2
+                ) {
+                    state.illustRelated.forEach {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(it.imageUrls.squareMedium)
+                                .build(),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(LocalConfiguration.current.screenWidthDp.dp / 2)
+                                .padding(5.dp)
+                                .clip(MaterialTheme.shapes.medium)
+                                .click {
+                                    navHostController.navigate(
+                                        "${Destination.PictureScreen.route}/${
+                                            Base64.UrlSafe.encode(
+                                                Json
+                                                    .encodeToString(it)
+                                                    .encodeToByteArray()
+                                            )
+                                        }"
+                                    )
+                                },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+            item(key = "loading") {
+                if (isScrollToRelatedBottom.value) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 100.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         }
         lazyListState.OnScrollToBottom(isScrollToBottom, illust.pageCount, illust.id)
+        lazyListState.OnScrollToRelatedBottom(
+            isScrollToBottom = isScrollToRelatedBottom,
+            id = illust.id,
+        )
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
@@ -436,18 +583,52 @@ private fun LazyListState.OnScrollToBottom(
         derivedStateOf {
             val lastVisibleItem =
                 layoutInfo.visibleItemsInfo.find { it.key == "${id}_${pageCount - 1}" }
-            layoutInfo.visibleItemsInfo.forEachIndexed { i, it ->
-                Log.d(
-                    "TAG",
-                    "OnScrollToBottom: ${it.index} ${
-                        it.let { "${it.offset} ${it.size} ${layoutInfo.viewportStartOffset} ${layoutInfo.viewportEndOffset}" }
-                    }"
-                )
-            }
+//            layoutInfo.visibleItemsInfo.forEachIndexed { i, it ->
+//                Log.d(
+//                    "TAG",
+//                    "OnScrollToBottom: ${it.index} ${
+//                        it.let { "${it.offset} ${it.size} ${layoutInfo.viewportStartOffset} ${layoutInfo.viewportEndOffset}" }
+//                    }"
+//                )
+//            }
 
 
             if (lastVisibleItem != null) {
                 return@derivedStateOf lastVisibleItem.index == pageCount - 1
+                        && lastVisibleItem.let { it.offset + it.size } <= layoutInfo.let { it.viewportEndOffset - it.viewportStartOffset }
+            } else {
+                return@derivedStateOf false
+            }
+        }
+    }
+    LaunchedEffect(isToBottom) {
+        Log.d("TAG", "OnScrollToBottom: $isToBottom")
+        isScrollToBottom.value = isToBottom
+        Log.d("TAG", "OnScrollToBottom: $isScrollToBottom")
+    }
+}
+
+@Composable
+private fun LazyListState.OnScrollToRelatedBottom(
+    isScrollToBottom: MutableState<Boolean>,
+    id: Long,
+) {
+    // 判断是否滚动到相关作品最底部
+    val isToBottom by remember {
+        derivedStateOf {
+            val lastVisibleItem =
+                layoutInfo.visibleItemsInfo.find { it.key == "${id}_related" }
+//            layoutInfo.visibleItemsInfo.forEachIndexed { i, it ->
+//                Log.d(
+//                    "TAG",
+//                    "OnScrollToBottom: ${it.index} ${
+//                        it.let { "${it.offset} ${it.size} ${layoutInfo.viewportStartOffset} ${layoutInfo.viewportEndOffset}" }
+//                    }"
+//                )
+//            }
+
+            if (lastVisibleItem != null) {
+                return@derivedStateOf lastVisibleItem.index == layoutInfo.totalItemsCount - 2
                         && lastVisibleItem.let { it.offset + it.size } <= layoutInfo.let { it.viewportEndOffset - it.viewportStartOffset }
             } else {
                 return@derivedStateOf false

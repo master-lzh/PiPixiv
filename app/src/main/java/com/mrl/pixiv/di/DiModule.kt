@@ -70,7 +70,7 @@ val viewModelModule = module {
 
     viewModel { ProfileViewModel(get(), get()) }
 
-    viewModel { PictureViewModel(get(), get()) }
+    viewModel { PictureViewModel(get(), get(), get()) }
 
     viewModel { BookmarkViewModel(get(), get()) }
 }
