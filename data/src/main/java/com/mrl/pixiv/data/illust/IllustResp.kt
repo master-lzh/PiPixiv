@@ -21,6 +21,14 @@ data class IllustRecommendedResp(
     val nextURL: String = "",
 )
 
+@Serializable
+data class IllustRelatedResp(
+    val illusts: List<Illust>,
+
+    @SerialName("next_url")
+    val nextURL: String = "",
+)
+
 
 @Serializable
 data class PrivacyPolicy(

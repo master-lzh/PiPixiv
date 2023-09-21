@@ -8,6 +8,6 @@ import com.mrl.pixiv.common.data.BaseUiState
 import com.mrl.pixiv.data.Illust
 
 class PictureUiState : BaseUiState() {
-    var illust by mutableStateOf<Illust?>(null)
+    var illustRelated = mutableStateListOf<Illust>()
     var userIllusts = mutableStateListOf<Illust>()
 }
