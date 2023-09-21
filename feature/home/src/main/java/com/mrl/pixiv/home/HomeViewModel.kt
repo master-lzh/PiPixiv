@@ -70,12 +70,12 @@ class HomeViewModel(
                 request = illustRemoteRepository.loadMoreIllustRecommended(intent.queryMap)
             ) {
                 val imageList = handleRecommendResp(it)
-                updateUiState {
-                    apply {
-                        recommendImageList += imageList
-                        isRefresh = false
-                        if (it?.nextURL != null) {
-                            nextUrl = it.nextURL!!
+                if (it != null) {
+                    updateUiState {
+                        apply {
+                            recommendImageList += imageList
+                            isRefresh = false
+                            nextUrl = it.nextURL
                         }
                     }
                 }
@@ -89,18 +89,19 @@ class HomeViewModel(
                 request = illustRemoteRepository.getIllustRecommended(intent.illustRecommendedQuery)
             ) {
                 val imageList = handleRecommendResp(it)
-                updateUiState {
-                    apply {
-                        recommendImageList = imageList.toMutableStateList()
-                        isRefresh = true
-                        if (it?.nextURL != null) {
-                            nextUrl = it.nextURL!!
+                if (it != null) {
+                    updateUiState {
+                        apply {
+                            recommendImageList = imageList.toMutableStateList()
+                            isRefresh = true
+                            nextUrl = it.nextURL
                         }
                     }
                 }
             }
         }
     }
+
 
     private fun handleRecommendResp(resp: IllustRecommendedResp?): List<RecommendImageItemState> {
         return resp?.let { it.illusts + it.rankingIllusts }
