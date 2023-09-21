@@ -61,7 +61,7 @@ fun HomeViewModel.onRefreshToken() {
 fun HomeViewModel.onScrollToBottom() {
     dispatch(
         HomeUiIntent.LoadMoreIllustRecommendedIntent(
-            queryMap = nextUrl?.queryParams
+            queryMap = nextUrl.queryParams
         )
     )
 }
