@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomStart
@@ -27,18 +25,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.mrl.pixiv.common.coil.BlurTransformation
+import com.mrl.pixiv.common.compose.OnLifecycle
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.profile.components.IllustBookmarkWidget
+import com.mrl.pixiv.profile.viewmodel.ProfileState
+import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.copyToClipboard
@@ -48,21 +47,37 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-@Preview
 fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController,
+    profileViewModel: ProfileViewModel = koinViewModel(),
+) {
+    OnLifecycle(onLifecycle = profileViewModel::onStart)
+    ProfileScreen(
+        modifier = modifier,
+        state = profileViewModel.state,
+        navHostController = navHostController,
+        profileViewModel = profileViewModel,
+    )
+}
+
+@Composable
+internal fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    state: ProfileState,
     navHostController: NavHostController = rememberNavController(),
     profileViewModel: ProfileViewModel = koinViewModel(),
 ) {
-    LaunchedEffect(Unit) {
-        profileViewModel.dispatch(ProfileUiIntent.GetUserInfoIntent)
-        profileViewModel.dispatch(ProfileUiIntent.GetUserBookmarksIllustIntent())
-    }
-    val state by profileViewModel.uiStateFlow.collectAsStateWithLifecycle()
+//    LaunchedEffect(Unit) {
+//        profileViewModel.dispatch(ProfileAction.GetUserInfoIntent)
+//        profileViewModel.dispatch(ProfileAction.GetUserBookmarksIllustIntent)
+//    }
     val userInfo = state.userInfo
 //    val userInfo = UserInfo()
     val backgroundHeight = DisplayUtil.getScreenWidthDp() / 3
     val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
     val scope = rememberCoroutineScope()
+
     CollapsingToolbarScaffold(
         modifier = Modifier,
         state = collapsingToolbarScaffoldState,
@@ -78,9 +93,7 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .height(backgroundHeight)
             ) {
-                val backgroundUrl = if (userInfo.backgroundImageURL?.isNotEmpty() == true) {
-                    userInfo.backgroundImageURL
-                } else {
+                val backgroundUrl = userInfo.backgroundImageURL.ifEmpty {
                     userInfo.user?.profileImageUrls?.medium
                 }
                 if (!backgroundUrl.isNullOrEmpty()) {
@@ -220,9 +233,11 @@ fun ProfileScreen(
                 }
 
             }
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
             Divider(modifier = Modifier.padding(horizontal = 15.dp))
             // 插画、漫画收藏网格组件
             IllustBookmarkWidget(

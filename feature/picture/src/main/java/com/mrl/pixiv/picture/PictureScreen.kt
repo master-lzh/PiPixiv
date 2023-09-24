@@ -68,15 +68,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.mrl.pixiv.common.compose.OnLifecycle
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.ui.components.UserAvatar
-import com.mrl.pixiv.common_viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.picture.viewmodel.PictureAction
+import com.mrl.pixiv.picture.viewmodel.PictureState
+import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
@@ -90,16 +96,41 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 private const val USER_ILLUSTS_COUNT = 3
 
+@Composable
+fun PictureScreen(
+    modifier: Modifier = Modifier,
+    illust: Illust,
+    navHostController: NavHostController,
+    viewModel: PictureViewModel = koinViewModel(),
+    bookmarkViewModel: BookmarkViewModel = koinViewModel()
+) {
+    OnLifecycle(onLifecycle = viewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
+    LaunchedEffect(Unit) {
+        bookmarkViewModel.dispatch(BookmarkAction.UpdateState(state = BookmarkState(isBookmark = illust.isBookmarked)))
+    }
+    PictureScreen(
+        modifier = modifier,
+        illust = illust,
+        state = viewModel.state,
+        bookmarkState = bookmarkViewModel.state,
+        navHostController = navHostController,
+        viewModel = viewModel,
+        bookmarkViewModel = bookmarkViewModel,
+    )
+}
+
 @OptIn(ExperimentalLayoutApi::class, ExperimentalEncodingApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun PictureScreen(
+internal fun PictureScreen(
+    modifier: Modifier = Modifier,
+    state: PictureState,
+    bookmarkState: BookmarkState,
     illust: Illust,
     navHostController: NavHostController = rememberNavController(),
-    viewModel: PictureViewModel = koinViewModel(),
-    bookmarkViewModel: BookmarkViewModel = koinViewModel(),
+    viewModel: PictureViewModel,
+    bookmarkViewModel: BookmarkViewModel,
 ) {
-    val state by viewModel.uiStateFlow.collectAsStateWithLifecycle()
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val shareLauncher =
@@ -127,23 +158,20 @@ fun PictureScreen(
     val isScrollToBottom = remember { mutableStateOf(false) }
     val isScrollToRelatedBottom = remember { mutableStateOf(false) }
     var isBookmarked by remember { mutableStateOf(illust.isBookmarked) }
-    val bookmarkStatus by bookmarkViewModel.bookmarkStatus.collectAsStateWithLifecycle()
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     LaunchedEffect(Unit) {
-        viewModel.dispatch(PictureUiIntent.GetUserIllustsIntent(illust.user.id))
+        viewModel.dispatch(PictureAction.GetUserIllustsIntent(illust.user.id))
     }
-    LaunchedEffect(bookmarkStatus) {
-        bookmarkStatus?.let {
-            isBookmarked = it
-        }
+    LaunchedEffect(bookmarkState) {
+        isBookmarked = bookmarkState.isBookmark
     }
     LaunchedEffect(Unit) {
-        viewModel.dispatch(PictureUiIntent.GetIllustRelatedIntent(illust.id))
+        viewModel.dispatch(PictureAction.GetIllustRelatedIntent(illust.id))
     }
     LaunchedEffect(isScrollToRelatedBottom.value) {
         if (isScrollToRelatedBottom.value) {
-            viewModel.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
-                viewModel.dispatch(PictureUiIntent.LoadMoreIllustRelatedIntent(it))
+            state.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
+                viewModel.dispatch(PictureAction.LoadMoreIllustRelatedIntent(it))
             }
         }
     }
@@ -164,9 +192,13 @@ fun PictureScreen(
                 Modifier
                     .click {
                         if (isBookmarked) {
-                            bookmarkViewModel.deleteBookmarkIllust(illust.id)
+                            bookmarkViewModel.dispatch(
+                                BookmarkAction.IllustBookmarkDeleteIntent(
+                                    illust.id
+                                )
+                            )
                         } else {
-                            bookmarkViewModel.bookmarkIllust(illust.id)
+                            bookmarkViewModel.dispatch(BookmarkAction.IllustBookmarkAddIntent(illust.id))
                         }
                     }
                     .shadow(5.dp, CircleShape)
