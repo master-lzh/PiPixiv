@@ -20,7 +20,7 @@ fun RootNavigationGraph(
         startDestination = startDestination
     ) {
         composable(Destination.LoginScreen.route) {
-            LoginScreen(navHostController)
+            LoginScreen(navHostController = navHostController)
         }
         composable(route = Graph.MAIN) {
             MainScreen()

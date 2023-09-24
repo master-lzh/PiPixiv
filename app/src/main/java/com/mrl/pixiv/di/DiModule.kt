@@ -3,8 +3,13 @@ package com.mrl.pixiv.di
 import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
+import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
 import com.mrl.pixiv.common.data.DispatcherEnum
-import com.mrl.pixiv.common_viewmodel.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.middleware.auth.AuthMiddleware
+import com.mrl.pixiv.common.middleware.auth.AuthReducer
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkMiddleware
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkReducer
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
@@ -14,20 +19,33 @@ import com.mrl.pixiv.domain.GetUserIdUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
 import com.mrl.pixiv.domain.SetUserIdUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
-import com.mrl.pixiv.home.HomeViewModel
-import com.mrl.pixiv.login.LoginViewModel
+import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
+import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
+import com.mrl.pixiv.domain.bookmark.UnBookmarkUseCase
+import com.mrl.pixiv.home.viewmodel.HomeMiddleware
+import com.mrl.pixiv.home.viewmodel.HomeReducer
+import com.mrl.pixiv.home.viewmodel.HomeViewModel
+import com.mrl.pixiv.login.viewmodel.LoginViewModel
 import com.mrl.pixiv.network.HttpManager
 import com.mrl.pixiv.network.converter.asConverterFactory
-import com.mrl.pixiv.picture.PictureViewModel
-import com.mrl.pixiv.profile.ProfileViewModel
+import com.mrl.pixiv.picture.viewmodel.PictureMiddleware
+import com.mrl.pixiv.picture.viewmodel.PictureReducer
+import com.mrl.pixiv.picture.viewmodel.PictureViewModel
+import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
+import com.mrl.pixiv.profile.viewmodel.ProfileReducer
+import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
-import com.mrl.pixiv.splash.SplashViewModel
+import com.mrl.pixiv.splash.viewmodel.SplashMiddleware
+import com.mrl.pixiv.splash.viewmodel.SplashReducer
+import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import com.mrl.pixiv.userAuthDataStore
 import com.mrl.pixiv.userInfoDataStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainCoroutineDispatcher
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.android.ext.koin.androidContext
@@ -59,18 +77,20 @@ val appModule = module {
     single { HttpManager(get(), get()) }
 
     single(named(DispatcherEnum.IO)) { Dispatchers.IO }
+
+    single(named(DispatcherEnum.MAIN)) { Dispatchers.Main.immediate }
 }
 
 val viewModelModule = module {
-    viewModel { SplashViewModel(get(), get(), get(), get()) }
+    viewModel { SplashViewModel(get(), get()) }
 
-    viewModel { LoginViewModel(get(), get(), get(), get()) }
+    viewModel { LoginViewModel(get(), get()) }
 
-    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get()) }
 
     viewModel { ProfileViewModel(get(), get()) }
 
-    viewModel { PictureViewModel(get(), get(), get()) }
+    viewModel { PictureViewModel(get(), get()) }
 
     viewModel { BookmarkViewModel(get(), get()) }
 }
@@ -98,6 +118,41 @@ val useCaseModule = module {
     single { SetUserAccessTokenUseCase(get()) }
     single { GetUserIdUseCase(get()) }
     single { SetUserIdUseCase(get()) }
+    single { RefreshUserAccessTokenUseCase(get(), get(), get(), get(), get()) }
+    single { BookmarkUseCase(get()) }
+    single { UnBookmarkUseCase(get()) }
+}
+
+val middlewareModule = module {
+    factory {
+        CloseableCoroutineScope(
+            SupervisorJob() + get<MainCoroutineDispatcher>(
+                named(
+                    DispatcherEnum.MAIN
+                )
+            )
+        )
+    }
+    single { SplashMiddleware(get(), get(), get(), get(), get()) }
+
+    single { HomeMiddleware(get(), get(), get(), get()) }
+
+    single { BookmarkMiddleware(get()) }
+
+    single { AuthMiddleware(get(), get(), get(), get(), get(), get()) }
+
+    single { ProfileMiddleware(get(), get()) }
+
+    single { PictureMiddleware(get(), get()) }
+}
+
+val reducerModule = module {
+    single { SplashReducer() }
+    single { HomeReducer() }
+    single { BookmarkReducer() }
+    single { AuthReducer() }
+    single { ProfileReducer() }
+    single { PictureReducer() }
 }
 
 fun provideAuthService(

@@ -19,4 +19,6 @@ android {
 dependencies {
     implementation(project(":repository"))
     implementation(project(":util"))
+    implementation(project(":common"))
+    implementation(project(":data"))
 }

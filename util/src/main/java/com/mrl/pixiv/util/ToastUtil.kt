@@ -2,15 +2,22 @@ package com.mrl.pixiv.util
 
 import android.widget.Toast
 import androidx.annotation.StringRes
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
-object ToastUtil {
-    fun shortToast(@StringRes strId: Int) {
-        val text = AppUtil.appContext.getString(strId)
-        Toast.makeText(AppUtil.appContext, text, Toast.LENGTH_SHORT).show()
+object ToastUtil : CoroutineScope by MainScope() {
+    fun safeShortToast(@StringRes strId: Int) {
+        launch {
+            val text = AppUtil.appContext.getString(strId)
+            Toast.makeText(AppUtil.appContext, text, Toast.LENGTH_SHORT).show()
+        }
     }
 
-    fun longToast(@StringRes strId: Int) {
-        val text = AppUtil.appContext.getString(strId)
-        Toast.makeText(AppUtil.appContext, text, Toast.LENGTH_LONG).show()
+    fun safeLongToast(@StringRes strId: Int) {
+        launch {
+            val text = AppUtil.appContext.getString(strId)
+            Toast.makeText(AppUtil.appContext, text, Toast.LENGTH_LONG).show()
+        }
     }
 }

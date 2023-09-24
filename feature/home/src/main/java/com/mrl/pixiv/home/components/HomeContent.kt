@@ -7,12 +7,10 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.mrl.pixiv.home.HomeViewModel
 import com.mrl.pixiv.home.R
 import com.mrl.pixiv.home.TAG
+import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.util.ToastUtil
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -27,14 +25,14 @@ fun HomeContent(
     dismissRefresh: () -> Unit,
     onScrollToBottom: () -> Unit,
 ) {
-    val homeState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+    val homeState = viewModel.state
 
     SideEffect {
         Log.d(TAG, "setComposePage: ${homeState.refreshTokenResult}")
     }
 
     if (homeState.refreshTokenResult) {
-        ToastUtil.shortToast(R.string.refresh_token_success)
+        ToastUtil.safeShortToast(R.string.refresh_token_success)
     }
 
     RecommendGrid(

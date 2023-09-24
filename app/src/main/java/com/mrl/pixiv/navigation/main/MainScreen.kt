@@ -15,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import androidx.navigation.compose.rememberNavController
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.ui.BaseScreen
 import kotlin.math.roundToInt
@@ -39,14 +40,14 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(
-    navHostController: NavHostController = rememberAnimatedNavController()
+    navHostController: NavHostController = rememberNavController()
 ) {
     val bottomBarHeight = 56.dp
-    val bottomBarOffsetHeightPx = remember { mutableStateOf(0f) }
+    val bottomBarOffsetHeightPx = remember { mutableFloatStateOf(0f) }
     val offsetAnimation by animateIntOffsetAsState(
         targetValue = IntOffset(
             x = 0,
-            y = -bottomBarOffsetHeightPx.value.roundToInt()
+            y = -bottomBarOffsetHeightPx.floatValue.roundToInt()
         ), label = ""
     )
     BaseScreen(
@@ -95,16 +96,18 @@ fun HomeBottomBar(
                 BottomNavigationItem(
                     icon = screen.icon!!,
                     label = {
-                        Text(text = screen.title!!)
+                        Text(text = screen.title)
                     },
                     selected = currentRoute == screen.route,
                     onClick = {
-                        navController.navigate(screen.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+                        if (currentRoute != screen.route) {
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
                     }
                 )

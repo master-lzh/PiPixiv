@@ -2,7 +2,11 @@ package com.mrl.pixiv.util
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import java.net.URL
 import java.net.URLDecoder
 
@@ -46,6 +50,9 @@ val String.queryParams: Map<String, String>
             mapOf()
         }
     }
+
+val Any.TAG: String
+    get() = this::class.java.simpleName
 
 @OptIn(ExperimentalFoundationApi::class)
 val LazyStaggeredGridState.isScrollToTop: Boolean

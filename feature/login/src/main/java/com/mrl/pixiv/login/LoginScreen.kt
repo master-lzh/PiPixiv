@@ -1,5 +1,6 @@
 package com.mrl.pixiv.login
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Base64
 import android.webkit.WebResourceRequest
@@ -16,14 +17,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
+import com.mrl.pixiv.common.compose.OnLifecycle
+import com.mrl.pixiv.common.middleware.auth.AuthAction
+import com.mrl.pixiv.common.middleware.auth.AuthState
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.ui.BaseScreen
+import com.mrl.pixiv.login.viewmodel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.security.MessageDigest
 import kotlin.random.Random
@@ -46,7 +50,7 @@ private fun getCodeChallenge(): String {
     ).replace("=", "")
 }
 
-fun generateWebviewUrl(create: Boolean) =
+fun generateWebViewUrl(create: Boolean) =
     if (create) {
         "https://app-api.pixiv.net/web/v1/provisional-accounts/create?code_challenge=${getCodeChallenge()}&code_challenge_method=S256&client=pixiv-android"
     } else {
@@ -56,7 +60,7 @@ fun generateWebviewUrl(create: Boolean) =
 private fun checkUri(viewModel: LoginViewModel, uri: Uri): Boolean {
     if (uri.scheme == "pixiv" && uri.host == "account") {
         val code = uri.getQueryParameter("code")
-        code?.let { viewModel.dispatch(LoginUiIntent.LoginIntent(code, codeVerifier)) }
+        code?.let { viewModel.dispatch(AuthAction.Login(code, codeVerifier)) }
         return true
     }
     return false
@@ -64,12 +68,29 @@ private fun checkUri(viewModel: LoginViewModel, uri: Uri): Boolean {
 
 @Composable
 fun LoginScreen(
+    modifier: Modifier = Modifier,
+    loginViewModel: LoginViewModel = koinViewModel(),
     navHostController: NavHostController,
-    loginViewModel: LoginViewModel = koinViewModel()
 ) {
-    var currUrl by rememberSaveable { mutableStateOf(generateWebviewUrl(true)) }
-    val state by loginViewModel.uiStateFlow.collectAsStateWithLifecycle()
-    if (state.loginResult) {
+    OnLifecycle(onLifecycle = loginViewModel::onStart)
+    LoginScreen(
+        modifier = modifier,
+        state = loginViewModel.state,
+        loginViewModel = loginViewModel,
+        navHostController = navHostController,
+    )
+}
+
+@SuppressLint("SetJavaScriptEnabled")
+@Composable
+internal fun LoginScreen(
+    modifier: Modifier = Modifier,
+    state: AuthState,
+    navHostController: NavHostController,
+    loginViewModel: LoginViewModel = koinViewModel(),
+) {
+    var currUrl by rememberSaveable { mutableStateOf(generateWebViewUrl(true)) }
+    if (state.isLogin) {
         LaunchedEffect(Unit) {
             navHostController.navigate(Graph.MAIN)
         }
@@ -77,13 +98,13 @@ fun LoginScreen(
     BaseScreen(actions = {
         Button(onClick = {
             getCodeVer()
-            currUrl = generateWebviewUrl(false)
+            currUrl = generateWebViewUrl(false)
         }) {
             Text(text = "登录")
         }
         Button(onClick = {
             getCodeVer()
-            currUrl = generateWebviewUrl(true)
+            currUrl = generateWebViewUrl(true)
         }) {
             Text(text = "注册")
         }

@@ -15,7 +15,6 @@ import com.mrl.pixiv.di.JSON
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
-import kotlinx.serialization.decodeFromString
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -38,7 +37,7 @@ fun MainGraph(
             ),
 
             ) {
-            HomeScreen(navHostController)
+            HomeScreen(navHostController = navHostController)
         }
         composable(
             route = Destination.ProfileScreen.route,
@@ -49,7 +48,7 @@ fun MainGraph(
             ),
 
             ) {
-            ProfileScreen(navHostController)
+            ProfileScreen(navHostController = navHostController)
         }
         composable(
             route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustParams}}",
@@ -68,7 +67,7 @@ fun MainGraph(
                 (it.arguments?.getString(Destination.PictureScreen.illustParams)) ?: ""
             val illustDecode = Base64.UrlSafe.decode(illustParams).decodeToString()
             val illust = JSON.decodeFromString<Illust>(illustDecode)
-            PictureScreen(illust, navHostController)
+            PictureScreen(illust = illust, navHostController = navHostController)
         }
     }
 }

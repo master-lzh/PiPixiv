@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bookmark_add_failed">收藏失败</string>
+    <string name="bookmark_add_success">收藏成功</string>
+    <string name="bookmark_delete_success">取消收藏成功</string>
+    <string name="bookmark_delete_failed">取消收藏失败</string>
+</resources>

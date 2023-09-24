@@ -13,9 +13,9 @@ sealed class Destination(
     val title: String = "",
     val icon: @Composable (() -> Unit)? = {},
 ) {
-    object LoginScreen : Destination(route = "login_screen")
+    data object LoginScreen : Destination(route = "login_screen")
 
-    object HomeScreen : Destination(
+    data object HomeScreen : Destination(
         route = "home_screen",
         title = "首页",
         icon = {
@@ -27,7 +27,7 @@ sealed class Destination(
         }
     )
 
-    object ProfileScreen : Destination(
+    data object ProfileScreen : Destination(
         route = "profile_screen",
         title = "我的",
         icon = {
@@ -39,7 +39,7 @@ sealed class Destination(
         }
     )
 
-    object PictureScreen : Destination(route = "picture_screen") {
+    data object PictureScreen : Destination(route = "picture_screen") {
         const val illustParams = "illust"
     }
 }

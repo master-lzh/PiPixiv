@@ -16,6 +16,8 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.mrl.pixiv.di.appModule
 import com.mrl.pixiv.di.dataSourceModule
+import com.mrl.pixiv.di.middlewareModule
+import com.mrl.pixiv.di.reducerModule
 import com.mrl.pixiv.di.repositoryModule
 import com.mrl.pixiv.di.useCaseModule
 import com.mrl.pixiv.di.viewModelModule
@@ -52,6 +54,8 @@ class App : Application(), ImageLoaderFactory {
             modules(repositoryModule)
             modules(dataSourceModule)
             modules(useCaseModule)
+            modules(middlewareModule)
+            modules(reducerModule)
         }
     }
 
