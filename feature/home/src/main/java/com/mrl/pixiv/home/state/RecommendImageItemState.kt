@@ -1,21 +1,23 @@
 package com.mrl.pixiv.home.state
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.mrl.pixiv.data.Illust
 
 class RecommendImageItemState {
-    var id: Long by mutableStateOf(0)
+    var id: Long by mutableLongStateOf(0)
     var thumbnail: String by mutableStateOf("")
     var originImageUrl: String? by mutableStateOf(null)
     var originImageUrls: List<String>? by mutableStateOf(null)
     var title: String by mutableStateOf("")
     var author: String by mutableStateOf("")
-    var width: Int by mutableStateOf(0)
-    var height: Int by mutableStateOf(0)
-    var totalView: Long by mutableStateOf(0)
-    var totalBookmarks: Long by mutableStateOf(0)
+    var width: Int by mutableIntStateOf(0)
+    var height: Int by mutableIntStateOf(0)
+    var totalView: Long by mutableLongStateOf(0)
+    var totalBookmarks: Long by mutableLongStateOf(0)
     var isBookmarked: Boolean by mutableStateOf(false)
     lateinit var illust: Illust
 
