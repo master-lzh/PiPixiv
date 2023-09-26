@@ -77,17 +77,19 @@ class HomeMiddleware(
         state: HomeState,
         action: HomeAction.IllustBookmarkDeleteIntent
     ) {
-        unBookmarkUseCase(action.illustBookmarkDeleteReq) {
-            state.recommendImageList.indexOfFirst { it.id == action.illustBookmarkDeleteReq.illustId }
-                .takeIf {
-                    it != -1
-                }?.let { index ->
-                    dispatch(HomeAction.UpdateState(state.copy(
-                        recommendImageList = state.recommendImageList.apply {
-                            set(index, get(index).copy(isBookmarked = false))
-                        }
-                    )))
-                }
+        launchNetwork {
+            unBookmarkUseCase(action.illustBookmarkDeleteReq) {
+                state.recommendImageList.indexOfFirst { it.id == action.illustBookmarkDeleteReq.illustId }
+                    .takeIf {
+                        it != -1
+                    }?.let { index ->
+                        dispatch(HomeAction.UpdateState(state.copy(
+                            recommendImageList = state.recommendImageList.apply {
+                                set(index, get(index).copy(isBookmarked = false))
+                            }
+                        )))
+                    }
+            }
         }
     }
 
@@ -95,17 +97,19 @@ class HomeMiddleware(
         state: HomeState,
         action: HomeAction.IllustBookmarkAddIntent
     ) {
-        bookmarkUseCase(action.illustBookmarkAddReq) {
-            state.recommendImageList.indexOfFirst { it.id == action.illustBookmarkAddReq.illustId }
-                .takeIf {
-                    it != -1
-                }?.let { index ->
-                    dispatch(HomeAction.UpdateState(state.copy(
-                        recommendImageList = state.recommendImageList.apply {
-                            set(index, get(index).copy(isBookmarked = true))
-                        }
-                    )))
-                }
+        launchNetwork {
+            bookmarkUseCase(action.illustBookmarkAddReq) {
+                state.recommendImageList.indexOfFirst { it.id == action.illustBookmarkAddReq.illustId }
+                    .takeIf {
+                        it != -1
+                    }?.let { index ->
+                        dispatch(HomeAction.UpdateState(state.copy(
+                            recommendImageList = state.recommendImageList.apply {
+                                set(index, get(index).copy(isBookmarked = true))
+                            }
+                        )))
+                    }
+            }
         }
     }
 

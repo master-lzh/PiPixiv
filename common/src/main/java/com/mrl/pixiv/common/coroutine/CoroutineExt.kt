@@ -16,6 +16,20 @@ fun launchIO(block: suspend CoroutineScope.() -> Unit) {
     ioScope.launch(start = CoroutineStart.DEFAULT, block = block)
 }
 
+fun launchNetwork(
+    onError: (Throwable) -> Unit = {},
+    onComplete: () -> Unit = {},
+    block: suspend CoroutineScope.() -> Unit,
+) {
+    try {
+        launchIO(block)
+    } catch (e: Throwable) {
+        onError(e)
+    } finally {
+        onComplete()
+    }
+}
+
 fun launchUI(block: suspend CoroutineScope.() -> Unit): Job =
     mainScope.launch(start = CoroutineStart.DEFAULT, block = block)
 
