@@ -3,6 +3,7 @@ package com.mrl.pixiv.util
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -21,7 +22,7 @@ inline fun Modifier.click(
     crossinline onClick: () -> Unit
 ): Modifier = composed {
     composed {
-        var lastClickTime by remember { mutableStateOf(value = 0L) }//使用remember函数记录上次点击的时间
+        var lastClickTime by remember { mutableLongStateOf(value = 0L) }//使用remember函数记录上次点击的时间
         clickable(enabled, onClickLabel, role) {
             val currentTimeMillis = System.currentTimeMillis()
             if (currentTimeMillis - time >= lastClickTime) {//判断点击间隔,如果在间隔内则不回调
@@ -38,7 +39,7 @@ inline fun composeClick(
     crossinline onClick: () -> Unit
 ): () -> Unit {
     //使用remember函数记录上次点击的时间
-    var lastClickTime by remember { mutableStateOf(value = 0L) }
+    var lastClickTime by remember { mutableLongStateOf(value = 0L) }
     return {
         val currentTimeMillis = System.currentTimeMillis()
         //判断点击间隔,如果在间隔内则不回调
