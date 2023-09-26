@@ -19,6 +19,8 @@ import org.koin.core.qualifier.named
 
 interface Dispatcher<A : Action> {
     fun dispatch(action: A)
+
+    fun dispatchError(throwable: Throwable?)
 }
 
 abstract class Middleware<S : State, A : Action>(
@@ -32,6 +34,8 @@ abstract class Middleware<S : State, A : Action>(
     abstract suspend fun process(state: S, action: A)
 
     protected fun dispatch(action: A) = dispatcher.dispatch(action)
+
+    protected fun dispatchError(throwable: Throwable?) = dispatcher.dispatchError(throwable)
 
     internal fun setDispatcher(
         dispatcher: Dispatcher<A>,
@@ -57,6 +61,7 @@ abstract class Middleware<S : State, A : Action>(
 
     protected fun launchNetwork(
         onError: (Throwable) -> Unit = {
+            dispatchError(it)
             NetworkExceptionUtil.resolveException(it)
         },
         onComplete: () -> Unit = {},

@@ -28,4 +28,6 @@ sealed class HomeAction : Action {
 
     data object DismissLoading : HomeAction()
     data class UpdateState(val state: HomeState) : HomeAction()
+
+    data class Exception(val e: Throwable) : HomeAction()
 }
