@@ -1,5 +1,6 @@
 package com.mrl.pixiv.home.viewmodel
 
+import androidx.compose.runtime.toMutableStateList
 import com.mrl.pixiv.common.data.Middleware
 import com.mrl.pixiv.data.illust.IllustRecommendedResp
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
@@ -7,6 +8,7 @@ import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
 import com.mrl.pixiv.domain.bookmark.UnBookmarkUseCase
 import com.mrl.pixiv.home.components.recommendItemWidth
 import com.mrl.pixiv.home.state.RecommendImageItemState
+import com.mrl.pixiv.home.state.toRecommendImageItemState
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 
 class HomeMiddleware(
@@ -52,7 +54,7 @@ class HomeMiddleware(
                     dispatch(
                         HomeAction.UpdateState(
                             state.copy(
-                                recommendImageList = imageList,
+                                recommendImageList = imageList.toMutableStateList(),
                                 isRefresh = false,
                                 nextUrl = it.nextURL
                             )
@@ -66,26 +68,7 @@ class HomeMiddleware(
     private fun handleRecommendResp(resp: IllustRecommendedResp?): List<RecommendImageItemState> {
         return resp?.let { it.illusts + it.rankingIllusts }
             ?.map {
-                val thumbnail =
-                    it.imageUrls.original.ifEmpty { it.imageUrls.large.ifEmpty { it.imageUrls.medium.ifEmpty { it.imageUrls.squareMedium } } }
-                RecommendImageItemState().apply {
-                    // 宽高比
-                    val scale = it.height * 1.0f / it.width
-                    id = it.id
-                    this.thumbnail = thumbnail
-                    originImageUrl = it.metaSinglePage.originalImageURL
-                    originImageUrls = it.metaPages?.mapNotNull { it3 ->
-                        it3.imageUrls?.original
-                    }
-                    title = it.title
-                    author = it.user.name
-                    width = recommendItemWidth
-                    height = (width * scale).toInt()
-                    totalView = it.totalView
-                    totalBookmarks = it.totalBookmarks
-                    isBookmarked = it.isBookmarked
-                    illust = it
-                }
+                it.toRecommendImageItemState(recommendItemWidth)
             } ?: emptyList()
     }
 
@@ -95,14 +78,16 @@ class HomeMiddleware(
         action: HomeAction.IllustBookmarkDeleteIntent
     ) {
         unBookmarkUseCase(action.illustBookmarkDeleteReq) {
-            dispatch(HomeAction.UpdateState(state.copy(
-                recommendImageList = state.recommendImageList.map {
-                    if (it.id == action.illustBookmarkDeleteReq.illustId) {
-                        it.isBookmarked = false
-                    }
-                    it
+            state.recommendImageList.indexOfFirst { it.id == action.illustBookmarkDeleteReq.illustId }
+                .takeIf {
+                    it != -1
+                }?.let { index ->
+                    dispatch(HomeAction.UpdateState(state.copy(
+                        recommendImageList = state.recommendImageList.apply {
+                            set(index, get(index).copy(isBookmarked = false))
+                        }
+                    )))
                 }
-            )))
         }
     }
 
@@ -111,14 +96,16 @@ class HomeMiddleware(
         action: HomeAction.IllustBookmarkAddIntent
     ) {
         bookmarkUseCase(action.illustBookmarkAddReq) {
-            dispatch(HomeAction.UpdateState(state.copy(
-                recommendImageList = state.recommendImageList.map {
-                    if (it.id == action.illustBookmarkAddReq.illustId) {
-                        it.isBookmarked = true
-                    }
-                    it
+            state.recommendImageList.indexOfFirst { it.id == action.illustBookmarkAddReq.illustId }
+                .takeIf {
+                    it != -1
+                }?.let { index ->
+                    dispatch(HomeAction.UpdateState(state.copy(
+                        recommendImageList = state.recommendImageList.apply {
+                            set(index, get(index).copy(isBookmarked = true))
+                        }
+                    )))
                 }
-            )))
         }
     }
 
@@ -139,7 +126,9 @@ class HomeMiddleware(
                     dispatch(
                         HomeAction.UpdateState(
                             state.copy(
-                                recommendImageList = state.recommendImageList + imageList,
+                                recommendImageList = state.recommendImageList.apply {
+                                    addAll(imageList)
+                                },
                                 isRefresh = false,
                                 nextUrl = it.nextURL
                             )

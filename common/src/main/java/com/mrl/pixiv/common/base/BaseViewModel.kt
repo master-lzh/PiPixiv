@@ -62,6 +62,12 @@ abstract class BaseViewModel<S : State, A : Action>(
         if (!success) error("MVI action buffer overflow")
     }
 
+    override fun dispatchError(throwable: Throwable?) {
+        viewModelScope.launch {
+            _exception.emit(throwable)
+        }
+    }
+
     open fun onCreate() {
 
     }

@@ -180,8 +180,8 @@ internal fun HomeScreen(
             HomeContent(
                 navHostController = navHostController,
                 scaffoldState = scaffoldState,
-                viewModel = homeViewModel,
-                lazyStaggeredGridState,
+                state = state,
+                lazyStaggeredGridState = lazyStaggeredGridState,
                 onBookmarkClick = { id, bookmark ->
                     homeViewModel.onBookmarkClick(id, bookmark)
                     if (!bookmark) {

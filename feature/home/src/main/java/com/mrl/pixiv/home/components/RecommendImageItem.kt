@@ -35,19 +35,18 @@ import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.home.state.RecommendImageItemState
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
-import com.mrl.pixiv.util.dp_
 import com.mrl.pixiv.util.second
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-val SPACING_HORIZONTAL_DP = 5.dp_
-val SPACING_VERTICAL_DP = 5.dp_
+val SPACING_HORIZONTAL_DP = 5.dp
+val SPACING_VERTICAL_DP = 5.dp
 const val SPAN_COUNT = 2
 const val INCLUDE_EDGE = true
 val recommendItemWidth =
-    DisplayUtil.px2dp((DisplayUtil.getScreenWidth() - SPACING_HORIZONTAL_DP * (SPAN_COUNT + if (INCLUDE_EDGE) 1 else -1)) / SPAN_COUNT.toFloat())
+    (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (SPAN_COUNT + if (INCLUDE_EDGE) 1 else -1))/ SPAN_COUNT
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
@@ -62,7 +61,15 @@ fun RecommendImageItem(
             .padding(horizontal = 5.dp)
             .padding(bottom = 5.dp)
             .click {
-                navHostController.navigate("${Destination.PictureScreen.route}/${Base64.UrlSafe.encode(Json.encodeToString(item.illust).encodeToByteArray())}")
+                navHostController.navigate(
+                    "${Destination.PictureScreen.route}/${
+                        Base64.UrlSafe.encode(
+                            Json
+                                .encodeToString(item.illust)
+                                .encodeToByteArray()
+                        )
+                    }"
+                )
             },
         shape = RoundedCornerShape(10.dp),
         elevation = 4.dp
@@ -71,8 +78,8 @@ fun RecommendImageItem(
             val radius = DisplayUtil.dp2px(10f).toFloat()
             Box(
                 modifier = Modifier
-                    .width(item.width.dp)
-                    .height(item.height.dp)
+                    .width(item.width)
+                    .height(item.height)
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -88,8 +95,8 @@ fun RecommendImageItem(
                         .build(),
                     contentDescription = null,
                     modifier = Modifier
-                        .width(item.width.dp)
-                        .height(item.height.dp),
+                        .width(item.width)
+                        .height(item.height),
                     filterQuality = FilterQuality.None
                 )
             }
