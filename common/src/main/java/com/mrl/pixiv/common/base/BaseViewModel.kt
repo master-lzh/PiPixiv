@@ -41,6 +41,7 @@ abstract class BaseViewModel<S : State, A : Action>(
     init {
         middlewares.forEach { middleware ->
             middleware.setDispatcher(this)
+            middleware.setScope(viewModelScope)
         }
         viewModelScope.launch {
             actions.onEach {

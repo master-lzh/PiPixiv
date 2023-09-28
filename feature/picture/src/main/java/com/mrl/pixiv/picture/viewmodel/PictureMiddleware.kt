@@ -3,6 +3,8 @@ package com.mrl.pixiv.picture.viewmodel
 import com.mrl.pixiv.common.data.Middleware
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Type
+import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
+import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
@@ -22,7 +24,65 @@ class PictureMiddleware(
                 action.queryMap
             )
 
+            is PictureAction.BookmarkIllust -> bookmark(state, action.illustId)
+
+            is PictureAction.UnBookmarkIllust -> unBookmark(state, action.illustId)
+
             else -> {}
+        }
+    }
+
+    private fun unBookmark(state: PictureState, illustId: Long) {
+        launchNetwork {
+            requestHttpDataWithFlow(
+                request = illustRemoteRepository.postIllustBookmarkDelete(
+                    IllustBookmarkDeleteReq(
+                        illustId
+                    )
+                )
+            ) {
+                if (it != null) {
+                    dispatch(
+                        PictureAction.UpdateIsBookmarkState(
+                            userIllusts = state.userIllusts.apply {
+                                indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
+                                    set(it, get(it).copy(isBookmarked = false))
+                                }
+                            },
+                            illustRelated = state.illustRelated.apply {
+                                indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
+                                    set(it, get(it).copy(isBookmarked = false))
+                                }
+                            }
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun bookmark(state: PictureState, illustId: Long) {
+        launchNetwork {
+            requestHttpDataWithFlow(
+                request = illustRemoteRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
+            ) {
+                if (it != null) {
+                    dispatch(
+                        PictureAction.UpdateIsBookmarkState(
+                            userIllusts = state.userIllusts.apply {
+                                indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
+                                    set(it, get(it).copy(isBookmarked = true))
+                                }
+                            },
+                            illustRelated = state.illustRelated.apply {
+                                indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
+                                    set(it, get(it).copy(isBookmarked = true))
+                                }
+                            }
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -35,11 +95,9 @@ class PictureMiddleware(
             ) {
                 if (it != null) {
                     dispatch(
-                        PictureAction.UpdateState(
-                            state.copy(
-                                illustRelated = state.illustRelated + it.illusts,
-                                nextUrl = it.nextURL
-                            )
+                        PictureAction.UpdateIllustRelatedState(
+                            illustRelated = state.illustRelated + it.illusts,
+                            nextUrl = it.nextURL
                         )
                     )
                 }
@@ -58,11 +116,9 @@ class PictureMiddleware(
             ) {
                 if (it != null) {
                     dispatch(
-                        PictureAction.UpdateState(
-                            state.copy(
-                                illustRelated = it.illusts,
-                                nextUrl = it.nextURL
-                            )
+                        PictureAction.UpdateIllustRelatedState(
+                            illustRelated = it.illusts,
+                            nextUrl = it.nextURL
                         )
                     )
                 }
@@ -81,11 +137,7 @@ class PictureMiddleware(
             ) {
                 if (it != null) {
                     dispatch(
-                        PictureAction.UpdateState(
-                            state.copy(
-                                userIllusts = it.illusts,
-                            )
-                        )
+                        PictureAction.UpdateUserIllustsState(userIllusts = it.illusts)
                     )
                 }
             }

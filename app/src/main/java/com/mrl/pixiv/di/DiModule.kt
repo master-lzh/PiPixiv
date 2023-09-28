@@ -3,7 +3,6 @@ package com.mrl.pixiv.di
 import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
-import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
 import com.mrl.pixiv.common.data.DispatcherEnum
 import com.mrl.pixiv.common.middleware.auth.AuthMiddleware
 import com.mrl.pixiv.common.middleware.auth.AuthReducer
@@ -44,8 +43,6 @@ import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import com.mrl.pixiv.userAuthDataStore
 import com.mrl.pixiv.userInfoDataStore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainCoroutineDispatcher
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.android.ext.koin.androidContext
@@ -124,15 +121,6 @@ val useCaseModule = module {
 }
 
 val middlewareModule = module {
-    factory {
-        CloseableCoroutineScope(
-            SupervisorJob() + get<MainCoroutineDispatcher>(
-                named(
-                    DispatcherEnum.MAIN
-                )
-            )
-        )
-    }
     single { SplashMiddleware(get(), get(), get(), get(), get()) }
 
     single { HomeMiddleware(get(), get(), get(), get()) }

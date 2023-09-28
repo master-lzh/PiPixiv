@@ -23,8 +23,10 @@ dependencies {
 
     implementation(libs.com.google.android.material.material)
     implementation(libs.bundles.coil)
+    implementation(androidx.constraintlayout.compose)
 
     implementation(project(mapOf("path" to ":util")))
+    implementation(project(mapOf("path" to ":common")))
 
     testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
