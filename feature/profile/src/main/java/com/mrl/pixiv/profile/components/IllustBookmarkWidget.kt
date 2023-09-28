@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.router.Destination
-import com.mrl.pixiv.common_ui.item.IllustItem
+import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.data.Illust
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -72,12 +72,15 @@ fun IllustBookmarkWidget(
             columns = GridCells.Fixed(SPAN_COUNT),
             contentPadding = PaddingValues(5.dp),
         ) {
-            items(if (illusts.size > MAX_ILLUST_COUNT) MAX_ILLUST_COUNT else illusts.size, key = { illusts[it].id }) {
+            items(
+                if (illusts.size > MAX_ILLUST_COUNT) MAX_ILLUST_COUNT else illusts.size,
+                key = { illusts[it].id }) {
                 val illust = illusts[it]
-                IllustItem(
+                SquareIllustItem(
+                    isBookmark = illust.isBookmarked,
                     spanCount = SPAN_COUNT,
-                    url = illust.imageUrls.squareMedium ?: return@items,
-                    imageCount = illust.pageCount ?: 0,
+                    url = illust.imageUrls.squareMedium,
+                    imageCount = illust.pageCount,
                 ) {
                     navHostController.navigate(
                         "${Destination.PictureScreen.route}/${

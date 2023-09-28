@@ -1,7 +1,6 @@
 package com.mrl.pixiv.common.data
 
 import android.util.Log
-import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
 import com.mrl.pixiv.util.NetworkExceptionUtil
 import com.mrl.pixiv.util.TAG
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,7 +26,7 @@ abstract class Middleware<S : State, A : Action>(
     vararg closeables: Closeable,
 ) : KoinComponent {
     private lateinit var dispatcher: Dispatcher<A>
-    private val scope by inject<CloseableCoroutineScope>()
+    private lateinit var scope : CoroutineScope
     private val ioDispatcher by inject<CoroutineDispatcher>(named(DispatcherEnum.IO))
     private val closeables: Set<Closeable> = setOf(*closeables)
 
@@ -100,9 +99,12 @@ abstract class Middleware<S : State, A : Action>(
                 closeable.close()
             } catch (ex: IOException) {
                 Log.e(TAG, "Exception closing closeable")
-                Log.e(TAG, "${ex.stackTrace}")
+                Log.e(TAG, ex.stackTraceToString())
             }
         }
-        scope.close()
+    }
+
+    fun setScope(viewModelScope: CoroutineScope) {
+        scope = viewModelScope
     }
 }

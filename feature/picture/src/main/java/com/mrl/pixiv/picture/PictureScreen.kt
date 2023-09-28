@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalEncodingApi::class)
+
 package com.mrl.pixiv.picture
 
 import android.annotation.SuppressLint
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -60,7 +63,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -79,11 +81,11 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.ui.components.UserAvatar
+import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
-import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
 import com.mrl.pixiv.util.queryParams
@@ -119,7 +121,7 @@ fun PictureScreen(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalEncodingApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
@@ -409,28 +411,20 @@ internal fun PictureScreen(
                 ) {
                     state.userIllusts.subList(0, minOf(USER_ILLUSTS_COUNT, state.userIllusts.size))
                         .forEach {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(it.imageUrls.squareMedium)
-                                    .build(),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size((DisplayUtil.getScreenWidthDp() - 30.dp) / USER_ILLUSTS_COUNT)
-                                    .padding(5.dp)
-                                    .clip(MaterialTheme.shapes.medium)
-                                    .click {
-                                        navHostController.navigate(
-                                            "${Destination.PictureScreen.route}/${
-                                                Base64.UrlSafe.encode(
-                                                    Json
-                                                        .encodeToString(it)
-                                                        .encodeToByteArray()
-                                                )
-                                            }"
-                                        )
-                                    },
-                                contentScale = ContentScale.Crop
-                            )
+                            SquareIllustItem(
+                                isBookmark = it.isBookmarked,
+                                spanCount = minOf(USER_ILLUSTS_COUNT, state.userIllusts.size),
+                                url = it.imageUrls.squareMedium,
+                                imageCount = it.pageCount,
+                                horizontalPadding = 15.dp,
+                                paddingValues = PaddingValues(2.dp),
+                                elevation = 1.dp,
+                                onBookmarkClick = {
+                                    bookmarkIllust(viewModel, it.id, it.isBookmarked)
+                                }
+                            ) {
+                                navigateToPictureScreen(navHostController, it)
+                            }
                         }
                 }
             }
@@ -461,28 +455,19 @@ internal fun PictureScreen(
                     maxItemsInEachRow = 2
                 ) {
                     state.illustRelated.forEach {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(it.imageUrls.squareMedium)
-                                .build(),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(LocalConfiguration.current.screenWidthDp.dp / 2)
-                                .padding(5.dp)
-                                .clip(MaterialTheme.shapes.medium)
-                                .click {
-                                    navHostController.navigate(
-                                        "${Destination.PictureScreen.route}/${
-                                            Base64.UrlSafe.encode(
-                                                Json
-                                                    .encodeToString(it)
-                                                    .encodeToByteArray()
-                                            )
-                                        }"
-                                    )
-                                },
-                            contentScale = ContentScale.Crop
-                        )
+                        SquareIllustItem(
+                            isBookmark = it.isBookmarked,
+                            spanCount = 2,
+                            url = it.imageUrls.squareMedium,
+                            imageCount = it.pageCount,
+                            paddingValues = PaddingValues(5.dp),
+                            elevation = 5.dp,
+                            onBookmarkClick = {
+                                bookmarkIllust(viewModel, it.id, it.isBookmarked)
+                            }
+                        ) {
+                            navigateToPictureScreen(navHostController, it)
+                        }
                     }
                 }
             }
@@ -672,4 +657,28 @@ private fun LazyListState.OnScrollToRelatedBottom(
         isScrollToBottom.value = isToBottom
         Log.d("TAG", "OnScrollToBottom: $isScrollToBottom")
     }
+}
+
+private fun bookmarkIllust(
+    viewModel: PictureViewModel,
+    id: Long,
+    isBookmarked: Boolean
+) {
+    if (isBookmarked) {
+        viewModel.dispatch(PictureAction.UnBookmarkIllust(id))
+    } else {
+        viewModel.dispatch(PictureAction.BookmarkIllust(id))
+    }
+}
+
+private fun navigateToPictureScreen(navHostController: NavHostController, illust: Illust) {
+    navHostController.navigate(
+        "${Destination.PictureScreen.route}/${
+            Base64.UrlSafe.encode(
+                Json
+                    .encodeToString(illust)
+                    .encodeToByteArray()
+            )
+        }"
+    )
 }
