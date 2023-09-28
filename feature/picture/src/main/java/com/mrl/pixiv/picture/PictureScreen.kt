@@ -5,8 +5,11 @@ package com.mrl.pixiv.picture
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.os.Environment
 import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -24,6 +27,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -34,6 +38,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -42,19 +47,25 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,19 +74,25 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.Coil
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mrl.pixiv.common.compose.OnLifecycle
+import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
@@ -86,13 +103,20 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
+import com.mrl.pixiv.util.AppUtil
+import com.mrl.pixiv.util.DOWNLOAD_DIR
+import com.mrl.pixiv.util.calculateImageSize
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
+import com.mrl.pixiv.util.isFileExists
 import com.mrl.pixiv.util.queryParams
+import com.mrl.pixiv.util.saveToAlbum
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
+import java.io.File
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -121,7 +145,10 @@ fun PictureScreen(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(
+    ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterialApi::class
+)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
@@ -161,6 +188,13 @@ internal fun PictureScreen(
     val isScrollToRelatedBottom = remember { mutableStateOf(false) }
     var isBookmarked by remember { mutableStateOf(illust.isBookmarked) }
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
+    var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var skipPartiallyExpanded by remember { mutableStateOf(false) }
+    val bottomSheetState =
+        rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+    var currLongClickPic by remember { mutableStateOf(Pair(0, "")) }
+    var currLongClickPicSize by remember { mutableFloatStateOf(0f) }
+    var loading by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         viewModel.dispatch(PictureAction.GetUserIllustsIntent(illust.user.id))
     }
@@ -174,6 +208,13 @@ internal fun PictureScreen(
         if (isScrollToRelatedBottom.value) {
             state.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
                 viewModel.dispatch(PictureAction.LoadMoreIllustRelatedIntent(it))
+            }
+        }
+    }
+    LaunchedEffect(currLongClickPic.second) {
+        if (currLongClickPic.second.isNotEmpty()) {
+            launchNetwork {
+                currLongClickPicSize = calculateImageSize(currLongClickPic.second)
             }
         }
     }
@@ -230,15 +271,22 @@ internal fun PictureScreen(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            items(illust.pageCount, key = { "${illust.id}_$it" }) {
+            items(illust.pageCount, key = { "${illust.id}_$it" }) { index ->
                 if (illust.pageCount > 1) {
-                    illust.metaPages?.get(it)?.let {
+                    illust.metaPages?.get(index)?.let {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(it.imageUrls?.original)
+                                .data(it.imageUrls?.large)
                                 .build(),
                             contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .click(
+                                    onLongClick = {
+                                        currLongClickPic = Pair(index, it.imageUrls?.original ?: "")
+                                        openBottomSheet = true
+                                    }
+                                ),
                             contentScale = ContentScale.FillWidth,
                             placeholder = placeholder,
                         )
@@ -246,10 +294,18 @@ internal fun PictureScreen(
                 } else {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(illust.metaSinglePage.originalImageURL)
+                            .data(illust.imageUrls.large)
                             .build(),
                         contentDescription = null,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .click(
+                                onLongClick = {
+                                    currLongClickPic =
+                                        Pair(0, illust.metaSinglePage.originalImageURL)
+                                    openBottomSheet = true
+                                }
+                            ),
                         contentScale = ContentScale.FillWidth,
                         placeholder = placeholder,
                     )
@@ -580,7 +636,124 @@ internal fun PictureScreen(
                 }
             }
         }
+        if (openBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    openBottomSheet = false
+                },
+                modifier = Modifier
+                    .heightIn(LocalConfiguration.current.screenHeightDp.dp / 2),
+                sheetState = bottomSheetState,
+                containerColor = MaterialTheme.colors.background,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .click {
+                                loading = true
+                                // 下载原始图片
+                                viewModel.dispatch(
+                                    PictureAction.DownloadIllust(
+                                        illust.id,
+                                        currLongClickPic.first,
+                                        currLongClickPic.second
+                                    ) {
+                                        loading = false
+                                        scope.launch {
+                                            scaffoldState.snackbarHostState.showSnackbar("下载成功")
+                                        }
+                                    })
+                                openBottomSheet = false
+                            }
+                            .padding(vertical = 10.dp)
+                    ) {
+                        Icon(imageVector = Icons.Rounded.Download, contentDescription = null)
+                        Text(
+                            text = stringResource(
+                                R.string.download_with_size,
+                                currLongClickPicSize
+                            ),
+                            modifier = Modifier.padding(start = 10.dp)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .click {
+                                scope.launch(Dispatchers.IO) {
+                                    loading = true
+                                    if (createShareImage(
+                                            currLongClickPic,
+                                            illust,
+                                            shareLauncher
+                                        )
+                                    ) return@launch
+                                    loading = false
+                                    currLongClickPic = Pair(0, "")
+                                }
+                                openBottomSheet = false
+                            }
+                            .padding(vertical = 10.dp)
+                    ) {
+                        Icon(imageVector = Icons.Rounded.Share, contentDescription = null)
+                        Text(
+                            text = "分享",
+                            modifier = Modifier.padding(start = 10.dp)
+                        )
+                    }
+                }
+            }
+        }
+        if (loading) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
     }
+}
+
+private suspend fun createShareImage(
+    currLongClickPic: Pair<Int, String>,
+    illust: Illust,
+    shareLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+): Boolean {
+    val file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+        .absolutePath.let {
+            File("${it}/${DOWNLOAD_DIR}", "${illust.id}_${currLongClickPic.first}.png")
+        }
+    if (!isFileExists(file)) {
+        val imageLoader = Coil.imageLoader(AppUtil.appContext)
+        val request = ImageRequest
+            .Builder(AppUtil.appContext)
+            .data(currLongClickPic.second)
+            .build()
+        val result = imageLoader.execute(request)
+        result.drawable
+            ?.toBitmap()
+            ?.saveToAlbum(file.name)
+            ?: return true
+    }
+    val uri = FileProvider.getUriForFile(
+        AppUtil.appContext,
+        "${AppUtil.appContext.packageName}.fileprovider",
+        file
+    )
+    // 分享图片
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.type = "image/*"
+    intent.putExtra(Intent.EXTRA_STREAM, uri)
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    shareLauncher.launch(intent)
+    return false
 }
 
 private fun createShareIntent(text: String): Intent {

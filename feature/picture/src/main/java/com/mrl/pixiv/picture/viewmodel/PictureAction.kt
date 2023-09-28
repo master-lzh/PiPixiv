@@ -32,4 +32,11 @@ sealed class PictureAction : Action {
         val userIllusts: List<Illust>,
         val illustRelated: List<Illust>
     ) : PictureAction()
+
+    data class DownloadIllust(
+        val illustId: Long,
+        val index: Int,
+        val originalUrl: String,
+        val downloadCallback: () -> Unit
+    ) : PictureAction()
 }

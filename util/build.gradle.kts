@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.com.google.android.material.material)
     implementation(libs.bundles.okhttp)
+    implementation(libs.okio)
 
     implementation(platform(libs.firebase.bom))
     api(libs.bundles.firebase)
