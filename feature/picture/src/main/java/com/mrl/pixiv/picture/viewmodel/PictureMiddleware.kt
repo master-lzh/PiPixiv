@@ -1,5 +1,8 @@
 package com.mrl.pixiv.picture.viewmodel
 
+import androidx.core.graphics.drawable.toBitmap
+import coil.Coil
+import coil.request.ImageRequest
 import com.mrl.pixiv.common.data.Middleware
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Type
@@ -9,6 +12,8 @@ import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
+import com.mrl.pixiv.util.AppUtil
+import com.mrl.pixiv.util.saveToAlbum
 
 
 class PictureMiddleware(
@@ -27,8 +32,34 @@ class PictureMiddleware(
             is PictureAction.BookmarkIllust -> bookmark(state, action.illustId)
 
             is PictureAction.UnBookmarkIllust -> unBookmark(state, action.illustId)
+            is PictureAction.DownloadIllust -> downloadIllust(
+                action.illustId,
+                action.index,
+                action.originalUrl,
+                action.downloadCallback
+            )
 
             else -> {}
+        }
+    }
+
+    private fun downloadIllust(
+        illustId: Long,
+        index: Int,
+        originalUrl: String,
+        downloadCallback: () -> Unit
+    ) {
+        launchNetwork {
+            // 使用coil下载图片
+            val imageLoader = Coil.imageLoader(AppUtil.appContext)
+            val request = ImageRequest.Builder(AppUtil.appContext)
+                .data(originalUrl)
+                .build()
+            val result = imageLoader.execute(request)
+            val file = result.drawable?.toBitmap()?.saveToAlbum("${illustId}_$index")
+            if (file != null) {
+                downloadCallback()
+            }
         }
     }
 

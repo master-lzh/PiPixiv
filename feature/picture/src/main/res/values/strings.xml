@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="download_with_size">下载 (%1$.2fMB)</string>
+</resources>
