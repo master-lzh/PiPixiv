@@ -26,7 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.BaseScreen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
+import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Filter
+import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
@@ -87,7 +89,7 @@ fun HomeScreen(
     HomeScreen(
         modifier = modifier,
         state = homeViewModel.state,
-        navHostController = navHostController,
+        navToPictureScreen = navHostController::navigateToPictureScreen,
         homeViewModel = homeViewModel
     )
 }
@@ -97,7 +99,7 @@ fun HomeScreen(
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     state: HomeState,
-    navHostController: NavHostController,
+    navToPictureScreen: (Illust) -> Unit,
     homeViewModel: HomeViewModel = koinViewModel()
 ) {
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
@@ -178,7 +180,7 @@ internal fun HomeScreen(
                 .fillMaxSize()
         ) {
             HomeContent(
-                navHostController = navHostController,
+                navToPictureScreen = navToPictureScreen,
                 scaffoldState = scaffoldState,
                 state = state,
                 lazyStaggeredGridState = lazyStaggeredGridState,
