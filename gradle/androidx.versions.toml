@@ -5,7 +5,7 @@ lifecycle_version = "2.6.2"
 [libraries]
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp_version" }
 
-activity-compose = "androidx.activity:activity-compose:1.7.2"
+activity-compose = "androidx.activity:activity-compose:1.8.0"
 annotation = "androidx.annotation:annotation:1.7.0"
 appcompat = "androidx.appcompat:appcompat:1.6.1"
 biometricktx = "androidx.biometric:biometric-ktx:1.2.0-alpha05"
@@ -27,12 +27,12 @@ lifecycle-viewmodelktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx"
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle_version" }
 
 work-runtime = "androidx.work:work-runtime-ktx:2.8.1"
-guava = "com.google.guava:guava:31.1-android"
+guava = "com.google.guava:guava:31.1-jre"
 
 paging-runtime = "androidx.paging:paging-runtime:3.2.1"
 paging-compose = "androidx.paging:paging-compose:3.2.1"
 
-navigation-compose = "androidx.navigation:navigation-compose:2.7.2"
+navigation-compose = "androidx.navigation:navigation-compose:2.7.4"
 
 datastore = "androidx.datastore:datastore:1.0.0"
 datastore-preferences = "androidx.datastore:datastore-preferences:1.0.0"
