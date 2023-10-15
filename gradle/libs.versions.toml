@@ -26,6 +26,8 @@ org-jetbrains-kotlin-android180 = "1.8.0"
 google-services = "4.3.15"
 firebase-bom = "32.2.2"
 firebase-crashlytics-gradle = "2.9.5"
+uiautomator = "2.2.0"
+benchmark-macro-junit4 = "1.2.0-rc02"
 
 [libraries]
 desugar = "com.android.tools:desugar_jdk_libs:2.0.3"
@@ -137,6 +139,8 @@ firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analy
 firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
 
 metadata-extractor = "com.drewnoakes:metadata-extractor:2.18.0"
+uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
+benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark-macro-junit4" }
 
 [bundles]
 reactivex = ["rxandroid", "rxjava", "rxrelay"]
@@ -156,3 +160,4 @@ com-android-library = { id = "com.android.library", version.ref = "agp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android180" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-gradle" }
+androidTest = { id = "com.android.test", version.ref = "agp" }
