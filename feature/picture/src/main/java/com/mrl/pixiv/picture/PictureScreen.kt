@@ -87,7 +87,6 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.Coil
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -96,9 +95,9 @@ import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
-import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
+import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureState
@@ -113,11 +112,8 @@ import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.saveToAlbum
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 private const val USER_ILLUSTS_COUNT = 3
@@ -139,9 +135,9 @@ fun PictureScreen(
         illust = illust,
         state = viewModel.state,
         bookmarkState = bookmarkViewModel.state,
-        navHostController = navHostController,
-        viewModel = viewModel,
-        bookmarkViewModel = bookmarkViewModel,
+        navToPictureScreen = navHostController::navigateToPictureScreen,
+        popBackStack = navHostController::popBackStack,
+        dispatch = viewModel::dispatch,
     )
 }
 
@@ -156,9 +152,10 @@ internal fun PictureScreen(
     state: PictureState,
     bookmarkState: BookmarkState,
     illust: Illust,
-    navHostController: NavHostController = rememberNavController(),
-    viewModel: PictureViewModel,
-    bookmarkViewModel: BookmarkViewModel,
+    navToPictureScreen: (Illust) -> Unit = {},
+    popBackStack: () -> Unit = {},
+    dispatch: (PictureAction) -> Unit = {},
+    bookmarkDispatch: (BookmarkAction) -> Unit = {},
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -196,18 +193,18 @@ internal fun PictureScreen(
     var currLongClickPicSize by remember { mutableFloatStateOf(0f) }
     var loading by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        viewModel.dispatch(PictureAction.GetUserIllustsIntent(illust.user.id))
+        dispatch(PictureAction.GetUserIllustsIntent(illust.user.id))
     }
     LaunchedEffect(bookmarkState) {
         isBookmarked = bookmarkState.isBookmark
     }
     LaunchedEffect(Unit) {
-        viewModel.dispatch(PictureAction.GetIllustRelatedIntent(illust.id))
+        dispatch(PictureAction.GetIllustRelatedIntent(illust.id))
     }
     LaunchedEffect(isScrollToRelatedBottom.value) {
         if (isScrollToRelatedBottom.value) {
             state.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
-                viewModel.dispatch(PictureAction.LoadMoreIllustRelatedIntent(it))
+                dispatch(PictureAction.LoadMoreIllustRelatedIntent(it))
             }
         }
     }
@@ -235,13 +232,13 @@ internal fun PictureScreen(
                 Modifier
                     .click {
                         if (isBookmarked) {
-                            bookmarkViewModel.dispatch(
+                            bookmarkDispatch(
                                 BookmarkAction.IllustBookmarkDeleteIntent(
                                     illust.id
                                 )
                             )
                         } else {
-                            bookmarkViewModel.dispatch(BookmarkAction.IllustBookmarkAddIntent(illust.id))
+                            bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(illust.id))
                         }
                     }
                     .shadow(5.dp, CircleShape)
@@ -476,10 +473,10 @@ internal fun PictureScreen(
                                 paddingValues = PaddingValues(2.dp),
                                 elevation = 1.dp,
                                 onBookmarkClick = {
-                                    bookmarkIllust(viewModel, it.id, it.isBookmarked)
+                                    bookmarkIllust(dispatch, it.id, it.isBookmarked)
                                 }
                             ) {
-                                navigateToPictureScreen(navHostController, it)
+                                navToPictureScreen(it)
                             }
                         }
                 }
@@ -519,10 +516,10 @@ internal fun PictureScreen(
                             paddingValues = PaddingValues(5.dp),
                             elevation = 5.dp,
                             onBookmarkClick = {
-                                bookmarkIllust(viewModel, it.id, it.isBookmarked)
+                                bookmarkIllust(dispatch, it.id, it.isBookmarked)
                             }
                         ) {
-                            navigateToPictureScreen(navHostController, it)
+                            navToPictureScreen(it)
                         }
                     }
                 }
@@ -570,7 +567,7 @@ internal fun PictureScreen(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .click {
-                                navHostController.popBackStack()
+                                popBackStack()
                             },
                     )
                     // 分享按钮
@@ -657,7 +654,7 @@ internal fun PictureScreen(
                             .click {
                                 loading = true
                                 // 下载原始图片
-                                viewModel.dispatch(
+                                dispatch(
                                     PictureAction.DownloadIllust(
                                         illust.id,
                                         currLongClickPic.first,
@@ -833,25 +830,13 @@ private fun LazyListState.OnScrollToRelatedBottom(
 }
 
 private fun bookmarkIllust(
-    viewModel: PictureViewModel,
+    dispatch: (PictureAction) -> Unit,
     id: Long,
     isBookmarked: Boolean
 ) {
     if (isBookmarked) {
-        viewModel.dispatch(PictureAction.UnBookmarkIllust(id))
+        dispatch(PictureAction.UnBookmarkIllust(id))
     } else {
-        viewModel.dispatch(PictureAction.BookmarkIllust(id))
+        dispatch(PictureAction.BookmarkIllust(id))
     }
-}
-
-private fun navigateToPictureScreen(navHostController: NavHostController, illust: Illust) {
-    navHostController.navigate(
-        "${Destination.PictureScreen.route}/${
-            Base64.UrlSafe.encode(
-                Json
-                    .encodeToString(illust)
-                    .encodeToByteArray()
-            )
-        }"
-    )
 }

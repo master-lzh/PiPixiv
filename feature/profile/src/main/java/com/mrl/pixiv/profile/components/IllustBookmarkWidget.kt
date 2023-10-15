@@ -20,13 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.data.Illust
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 private const val SPAN_COUNT = 3
@@ -35,7 +30,7 @@ private const val MAX_ILLUST_COUNT = 6
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun IllustBookmarkWidget(
-    navHostController: NavHostController,
+    navToPictureScreen: (Illust) -> Unit,
     illusts: List<Illust>,
 ) {
     Column(
@@ -82,13 +77,7 @@ fun IllustBookmarkWidget(
                     url = illust.imageUrls.squareMedium,
                     imageCount = illust.pageCount,
                 ) {
-                    navHostController.navigate(
-                        "${Destination.PictureScreen.route}/${
-                            Base64.UrlSafe.encode(
-                                Json.encodeToString(illust).encodeToByteArray()
-                            )
-                        }"
-                    )
+                    navToPictureScreen(illust)
                 }
             }
         }

@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.com.google.android.material.material)
     implementation(libs.bundles.coil)
     implementation(androidx.constraintlayout.compose)
+    implementation(kotlinx.bundles.serialization)
 
     implementation(project(mapOf("path" to ":util")))
     implementation(project(mapOf("path" to ":common")))

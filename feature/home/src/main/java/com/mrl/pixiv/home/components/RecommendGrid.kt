@@ -17,14 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.home.state.RecommendImageItemState
 import com.mrl.pixiv.util.OnScrollToBottom
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecommendGrid(
-    navHostController: NavHostController,
+    navToPictureScreen: (Illust) -> Unit,
     scaffoldState: ScaffoldState,
     lazyStaggeredGridState: LazyStaggeredGridState,
     recommendImageList: List<RecommendImageItemState>,
@@ -40,7 +40,7 @@ fun RecommendGrid(
         modifier = Modifier.fillMaxSize()
     ) {
         items(recommendImageList, key = { it.id }) {
-            RecommendImageItem(navHostController, scaffoldState, it, onBookmarkClick)
+            RecommendImageItem(navToPictureScreen, scaffoldState, it, onBookmarkClick)
         }
         if (loadMore) {
             item(key = "loading", span = StaggeredGridItemSpan.FullLine) {

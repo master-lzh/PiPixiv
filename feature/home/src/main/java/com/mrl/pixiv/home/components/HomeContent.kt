@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.navigation.NavHostController
+import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.home.R
 import com.mrl.pixiv.home.TAG
 import com.mrl.pixiv.home.viewmodel.HomeState
@@ -15,7 +15,7 @@ import com.mrl.pixiv.util.ToastUtil
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun HomeContent(
-    navHostController: NavHostController,
+    navToPictureScreen: (Illust) -> Unit,
     scaffoldState: ScaffoldState,
     state: HomeState,
     lazyStaggeredGridState: LazyStaggeredGridState,
@@ -32,13 +32,13 @@ fun HomeContent(
     }
 
     RecommendGrid(
-        navHostController,
-        scaffoldState,
-        lazyStaggeredGridState,
-        state.recommendImageList,
-        state.loadMore,
-        onBookmarkClick,
-        onScrollToBottom,
+        navToPictureScreen = navToPictureScreen,
+        scaffoldState = scaffoldState,
+        lazyStaggeredGridState = lazyStaggeredGridState,
+        recommendImageList = state.recommendImageList,
+        loadMore = state.loadMore,
+        onBookmarkClick = onBookmarkClick,
+        onScrollToBottom = onScrollToBottom,
     )
 
 

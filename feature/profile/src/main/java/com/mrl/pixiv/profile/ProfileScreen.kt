@@ -28,14 +28,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.mrl.pixiv.common.coil.BlurTransformation
 import com.mrl.pixiv.common.compose.OnLifecycle
 import com.mrl.pixiv.common.ui.components.UserAvatar
+import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
+import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.profile.components.IllustBookmarkWidget
+import com.mrl.pixiv.profile.viewmodel.ProfileAction
 import com.mrl.pixiv.profile.viewmodel.ProfileState
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.util.DisplayUtil
@@ -56,8 +58,8 @@ fun ProfileScreen(
     ProfileScreen(
         modifier = modifier,
         state = profileViewModel.state,
-        navHostController = navHostController,
-        profileViewModel = profileViewModel,
+        navToPictureScreen = navHostController::navigateToPictureScreen,
+        dispatch = profileViewModel::dispatch,
     )
 }
 
@@ -65,8 +67,8 @@ fun ProfileScreen(
 internal fun ProfileScreen(
     modifier: Modifier = Modifier,
     state: ProfileState,
-    navHostController: NavHostController = rememberNavController(),
-    profileViewModel: ProfileViewModel = koinViewModel(),
+    navToPictureScreen: (Illust) -> Unit = {},
+    dispatch: (ProfileAction) -> Unit,
 ) {
 //    LaunchedEffect(Unit) {
 //        profileViewModel.dispatch(ProfileAction.GetUserInfoIntent)
@@ -241,7 +243,7 @@ internal fun ProfileScreen(
             Divider(modifier = Modifier.padding(horizontal = 15.dp))
             // 插画、漫画收藏网格组件
             IllustBookmarkWidget(
-                navHostController = navHostController,
+                navToPictureScreen = navToPictureScreen,
                 illusts = state.userBookmarksIllusts
             )
         }

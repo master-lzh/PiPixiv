@@ -57,10 +57,10 @@ fun generateWebViewUrl(create: Boolean) =
         "https://app-api.pixiv.net/web/v1/login?code_challenge=${getCodeChallenge()}&code_challenge_method=S256&client=pixiv-android"
     }
 
-private fun checkUri(viewModel: LoginViewModel, uri: Uri): Boolean {
+private fun checkUri(dispatch: (AuthAction) -> Unit, uri: Uri): Boolean {
     if (uri.scheme == "pixiv" && uri.host == "account") {
         val code = uri.getQueryParameter("code")
-        code?.let { viewModel.dispatch(AuthAction.Login(code, codeVerifier)) }
+        code?.let { dispatch(AuthAction.Login(code, codeVerifier)) }
         return true
     }
     return false
@@ -76,8 +76,8 @@ fun LoginScreen(
     LoginScreen(
         modifier = modifier,
         state = loginViewModel.state,
-        loginViewModel = loginViewModel,
-        navHostController = navHostController,
+        navToMainGraph = { navHostController.navigate(Graph.MAIN) },
+        dispatch = loginViewModel::dispatch,
     )
 }
 
@@ -86,13 +86,13 @@ fun LoginScreen(
 internal fun LoginScreen(
     modifier: Modifier = Modifier,
     state: AuthState,
-    navHostController: NavHostController,
-    loginViewModel: LoginViewModel = koinViewModel(),
+    navToMainGraph: () -> Unit = {},
+    dispatch: (AuthAction) -> Unit,
 ) {
     var currUrl by rememberSaveable { mutableStateOf(generateWebViewUrl(true)) }
     if (state.isLogin) {
         LaunchedEffect(Unit) {
-            navHostController.navigate(Graph.MAIN)
+            navToMainGraph()
         }
     }
     BaseScreen(actions = {
@@ -133,7 +133,7 @@ internal fun LoginScreen(
                     view: WebView?,
                     request: WebResourceRequest?
                 ): Boolean {
-                    if (checkUri(loginViewModel, request?.url!!)) {
+                    if (checkUri(dispatch, request?.url!!)) {
                         return true
                     }
                     return super.shouldOverrideUrlLoading(view, request)
