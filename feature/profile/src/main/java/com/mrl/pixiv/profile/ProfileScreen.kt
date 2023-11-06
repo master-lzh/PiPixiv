@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -78,7 +77,6 @@ internal fun ProfileScreen(
 //    val userInfo = UserInfo()
     val backgroundHeight = DisplayUtil.getScreenWidthDp() / 3
     val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
-    val scope = rememberCoroutineScope()
 
     CollapsingToolbarScaffold(
         modifier = Modifier,
