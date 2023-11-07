@@ -35,7 +35,6 @@ import com.mrl.pixiv.home.state.RecommendImageItemState
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.second
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 val SPACING_HORIZONTAL_DP = 5.dp
 val SPACING_VERTICAL_DP = 5.dp
@@ -44,7 +43,6 @@ const val INCLUDE_EDGE = true
 val recommendItemWidth =
     (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (SPAN_COUNT + if (INCLUDE_EDGE) 1 else -1))/ SPAN_COUNT
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun RecommendImageItem(
     navToPictureScreen: (Illust) -> Unit,

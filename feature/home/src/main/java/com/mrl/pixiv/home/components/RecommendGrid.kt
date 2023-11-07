@@ -1,6 +1,5 @@
 package com.mrl.pixiv.home.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +20,6 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.home.state.RecommendImageItemState
 import com.mrl.pixiv.util.OnScrollToBottom
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecommendGrid(
     navToPictureScreen: (Illust) -> Unit,

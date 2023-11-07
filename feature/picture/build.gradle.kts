@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.com.google.android.material.material)
     implementation(project(":common-middleware"))
+    implementation(project(":feature:home"))
     testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

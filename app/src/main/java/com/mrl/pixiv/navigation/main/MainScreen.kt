@@ -2,7 +2,6 @@ package com.mrl.pixiv.navigation.main
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -37,7 +36,6 @@ import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.ui.BaseScreen
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(
     navHostController: NavHostController = rememberNavController()

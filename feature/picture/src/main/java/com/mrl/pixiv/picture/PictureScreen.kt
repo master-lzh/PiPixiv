@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalEncodingApi::class)
-
 package com.mrl.pixiv.picture
 
 import android.annotation.SuppressLint
@@ -99,6 +97,8 @@ import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.home.viewmodel.HomeAction
+import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
@@ -114,7 +114,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 private const val USER_ILLUSTS_COUNT = 3
 
@@ -124,7 +123,8 @@ fun PictureScreen(
     illust: Illust,
     navHostController: NavHostController,
     viewModel: PictureViewModel = koinViewModel(),
-    bookmarkViewModel: BookmarkViewModel = koinViewModel()
+    bookmarkViewModel: BookmarkViewModel = koinViewModel(),
+    homeViewModel: HomeViewModel,
 ) {
     OnLifecycle(onLifecycle = viewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
     LaunchedEffect(Unit) {
@@ -138,6 +138,8 @@ fun PictureScreen(
         navToPictureScreen = navHostController::navigateToPictureScreen,
         popBackStack = navHostController::popBackStack,
         dispatch = viewModel::dispatch,
+        bookmarkDispatch = bookmarkViewModel::dispatch,
+        homeDispatch = homeViewModel::dispatch,
     )
 }
 
@@ -156,6 +158,7 @@ internal fun PictureScreen(
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
+    homeDispatch: (HomeAction) -> Unit = {},
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -194,12 +197,13 @@ internal fun PictureScreen(
     var loading by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         dispatch(PictureAction.GetUserIllustsIntent(illust.user.id))
+        dispatch(PictureAction.GetIllustRelatedIntent(illust.id))
     }
     LaunchedEffect(bookmarkState) {
         isBookmarked = bookmarkState.isBookmark
     }
-    LaunchedEffect(Unit) {
-        dispatch(PictureAction.GetIllustRelatedIntent(illust.id))
+    LaunchedEffect(isBookmarked) {
+        homeDispatch(HomeAction.UpdateIllustBookmark(illust.id, isBookmarked))
     }
     LaunchedEffect(isScrollToRelatedBottom.value) {
         if (isScrollToRelatedBottom.value) {

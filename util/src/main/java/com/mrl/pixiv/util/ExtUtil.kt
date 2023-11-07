@@ -1,6 +1,5 @@
 package com.mrl.pixiv.util
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,15 +53,12 @@ val String.queryParams: Map<String, String>
 val Any.TAG: String
     get() = this::class.java.simpleName
 
-@OptIn(ExperimentalFoundationApi::class)
 val LazyStaggeredGridState.isScrollToTop: Boolean
     get() = firstVisibleItemIndex == 0 && firstVisibleItemScrollOffset == 0
 
-@OptIn(ExperimentalFoundationApi::class)
 val LazyStaggeredGridState.isScrollToBottom: Boolean
     get() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyStaggeredGridState.OnScrollToBottom(block: () -> Unit) {
     val shouldLoadMore by remember {
