@@ -30,4 +30,5 @@ sealed class HomeAction : Action {
     data class UpdateState(val state: HomeState) : HomeAction()
 
     data class Exception(val e: Throwable) : HomeAction()
+    data class UpdateIllustBookmark(val id: Long, val bookmarked: Boolean) : HomeAction()
 }

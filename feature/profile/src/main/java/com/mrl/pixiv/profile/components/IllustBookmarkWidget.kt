@@ -22,12 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.data.Illust
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 private const val SPAN_COUNT = 3
 private const val MAX_ILLUST_COUNT = 6
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun IllustBookmarkWidget(
     navToPictureScreen: (Illust) -> Unit,
