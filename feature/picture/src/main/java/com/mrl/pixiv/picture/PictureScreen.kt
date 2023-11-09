@@ -104,10 +104,12 @@ import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import com.mrl.pixiv.util.AppUtil
 import com.mrl.pixiv.util.DOWNLOAD_DIR
+import com.mrl.pixiv.util.PictureType
 import com.mrl.pixiv.util.calculateImageSize
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
 import com.mrl.pixiv.util.isFileExists
+import com.mrl.pixiv.util.joinPaths
 import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.saveToAlbum
 import kotlinx.coroutines.Dispatchers
@@ -666,7 +668,9 @@ internal fun PictureScreen(
                                     ) {
                                         loading = false
                                         scope.launch {
-                                            scaffoldState.snackbarHostState.showSnackbar("下载成功")
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                if (it) "下载成功" else "下载失败"
+                                            )
                                         }
                                     })
                                 openBottomSheet = false
@@ -729,7 +733,13 @@ private suspend fun createShareImage(
 ): Boolean {
     val file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
         .absolutePath.let {
-            File("${it}/${DOWNLOAD_DIR}", "${illust.id}_${currLongClickPic.first}.png")
+            File(
+                joinPaths(
+                    it,
+                    DOWNLOAD_DIR,
+                    "${illust.id}_${currLongClickPic.first}${PictureType.PNG.extension}"
+                )
+            )
         }
     if (!isFileExists(file)) {
         val imageLoader = Coil.imageLoader(AppUtil.appContext)
@@ -740,7 +750,7 @@ private suspend fun createShareImage(
         val result = imageLoader.execute(request)
         result.drawable
             ?.toBitmap()
-            ?.saveToAlbum(file.name)
+            ?.saveToAlbum(file.nameWithoutExtension, PictureType.PNG)
             ?: return true
     }
     val uri = FileProvider.getUriForFile(

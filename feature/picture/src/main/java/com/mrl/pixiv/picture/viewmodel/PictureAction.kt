@@ -37,6 +37,6 @@ sealed class PictureAction : Action {
         val illustId: Long,
         val index: Int,
         val originalUrl: String,
-        val downloadCallback: () -> Unit
+        val downloadCallback: (result: Boolean) -> Unit
     ) : PictureAction()
 }

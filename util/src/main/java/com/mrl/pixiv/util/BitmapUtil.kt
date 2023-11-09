@@ -10,15 +10,36 @@ import javax.net.ssl.HttpsURLConnection
 
 // 下载文件夹为DCIM/PiPixiv
 const val DOWNLOAD_DIR = "PiPixiv"
-fun Bitmap.saveToAlbum(fileName: String): File? {
+
+enum class PictureType(val extension: String) {
+    PNG(".png"),
+    JPG(".jpg"),
+    JPEG(".jpeg");
+
+    fun parseType(extension: String): PictureType {
+        return when (extension) {
+            ".png" -> PNG
+            ".jpg" -> JPG
+            ".jpeg" -> JPEG
+            else -> PNG
+        }
+    }
+}
+
+fun Bitmap.saveToAlbum(fileName: String, type: PictureType): File? {
+    val compressFormat = when (type) {
+        PictureType.PNG -> Bitmap.CompressFormat.PNG
+        PictureType.JPEG -> Bitmap.CompressFormat.JPEG
+        PictureType.JPG -> Bitmap.CompressFormat.JPEG
+    }
     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
         .absolutePath
         .let { path ->
-            val dir = "$path/$DOWNLOAD_DIR"
+            val dir = joinPaths(path, DOWNLOAD_DIR)
             createOrExistsDir(dir)
-            val file = "$dir/$fileName.png"
+            val file = joinPaths(dir, "$fileName${type.extension}")
             FileOutputStream(file).use { out ->
-                if (compress(Bitmap.CompressFormat.PNG, 100, out)) {
+                if (compress(compressFormat, 100, out)) {
                     return File(file)
                 }
             }

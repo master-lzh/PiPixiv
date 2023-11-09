@@ -13,7 +13,10 @@ import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
 import com.mrl.pixiv.util.AppUtil
+import com.mrl.pixiv.util.PictureType
 import com.mrl.pixiv.util.saveToAlbum
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.seconds
 
 
 class PictureMiddleware(
@@ -47,7 +50,7 @@ class PictureMiddleware(
         illustId: Long,
         index: Int,
         originalUrl: String,
-        downloadCallback: () -> Unit
+        downloadCallback: (result: Boolean) -> Unit
     ) {
         launchNetwork {
             // 使用coil下载图片
@@ -55,10 +58,17 @@ class PictureMiddleware(
             val request = ImageRequest.Builder(AppUtil.appContext)
                 .data(originalUrl)
                 .build()
-            val result = imageLoader.execute(request)
-            val file = result.drawable?.toBitmap()?.saveToAlbum("${illustId}_$index")
+            val result = withTimeoutOrNull(10.seconds) {
+                   imageLoader.execute(request)
+            }
+            result ?: run {
+                downloadCallback(false)
+                return@launchNetwork
+            }
+            val file =
+                result.drawable?.toBitmap()?.saveToAlbum("${illustId}_$index", PictureType.PNG)
             if (file != null) {
-                downloadCallback()
+                downloadCallback(true)
             }
         }
     }

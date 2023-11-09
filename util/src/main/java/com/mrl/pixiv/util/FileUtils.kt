@@ -594,3 +594,11 @@ fun generateFileNameByCurrentTime(
 fun getFileSizeBytes(file: File): Long {
     return if (!file.exists()) 0 else file.length()
 }
+
+fun joinPaths(vararg paths: String): String {
+    var file = File(paths[0])
+    for (i in 1 until paths.size) {
+        file = file.resolve(paths[i])
+    }
+    return file.path
+}
