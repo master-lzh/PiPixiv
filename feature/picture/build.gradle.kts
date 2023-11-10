@@ -23,8 +23,8 @@ dependencies {
     implementation(project(":domain"))
     implementation(androidx.constraintlayout.compose)
 
-    implementation(libs.core.ktx)
-    implementation(libs.appcompat)
+    implementation(androidx.core.ktx)
+    implementation(androidx.appcompat)
     implementation(libs.com.google.android.material.material)
     implementation(project(":common-middleware"))
     implementation(project(":feature:home"))

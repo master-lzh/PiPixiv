@@ -20,8 +20,8 @@ android {
 
 dependencies {
 
-    implementation(libs.core.ktx)
-    implementation(libs.appcompat)
+    implementation(androidx.core.ktx)
+    implementation(androidx.appcompat)
     implementation(libs.com.google.android.material.material)
     implementation(libs.bundles.okhttp)
     implementation(libs.okio)

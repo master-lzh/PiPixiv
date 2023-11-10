@@ -49,7 +49,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 }
             }
             dependencies {
-                add("implementation", androidx.findLibrary("corektx").get())
+                add("implementation", androidx.findLibrary("core-ktx").get())
 
                 add("androidTestImplementation", kotlin("test"))
                 add("testImplementation", kotlin("test"))
