@@ -81,7 +81,7 @@ abstract class Middleware<S : State, A : Action>(
         successCallback: (T?) -> Unit,
     ) {
         scope.launch {
-            request.flowOn(Dispatchers.Default)
+            request.flowOn(Dispatchers.Main)
                 .catch {
                     failedCallback(it)
                 }.collect {
