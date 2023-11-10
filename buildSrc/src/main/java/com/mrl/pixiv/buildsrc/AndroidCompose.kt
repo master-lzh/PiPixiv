@@ -48,7 +48,7 @@ fun Project.configureAndroidCompose(
             val bom = compose.findLibrary("bom").get()
             add("implementation", platform(bom))
 
-            add("implementation", androidx.findLibrary("corektx").get())
+            add("implementation", androidx.findLibrary("core-ktx").get())
             add("implementation", androidx.findBundle("lifecycle").get())
             add("implementation", androidx.findLibrary("navigation.compose").get())
 
