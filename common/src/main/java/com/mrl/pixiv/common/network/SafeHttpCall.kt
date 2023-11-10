@@ -12,7 +12,7 @@ suspend fun <T> safeHttpCall(
     failedCallback: suspend (Throwable) -> Unit = { NetworkExceptionUtil.resolveException(it) },
     successCallback: (T?) -> Unit,
 ) {
-    request.flowOn(Dispatchers.Default)
+    request.flowOn(Dispatchers.Main)
         .catch {
             failedCallback(it)
         }.collect {
