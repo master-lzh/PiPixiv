@@ -3,15 +3,20 @@ package com.mrl.pixiv.home
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Undo
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -23,6 +28,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.BaseScreen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
@@ -83,14 +90,16 @@ internal enum class HomeSnackbar(val actionLabel: String) {
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    homeViewModel: HomeViewModel = koinViewModel()
+    homeViewModel: HomeViewModel = koinViewModel(),
+    offsetAnimation: IntOffset,
 ) {
 //    OnLifecycle(onLifecycle = homeViewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
     HomeScreen(
         modifier = modifier,
         state = homeViewModel.state,
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        homeViewModel = homeViewModel
+        homeViewModel = homeViewModel,
+        offsetAnimation = offsetAnimation
     )
 }
 
@@ -100,7 +109,8 @@ internal fun HomeScreen(
     modifier: Modifier = Modifier,
     state: HomeState,
     navToPictureScreen: (Illust) -> Unit,
-    homeViewModel: HomeViewModel = koinViewModel()
+    homeViewModel: HomeViewModel = koinViewModel(),
+    offsetAnimation: IntOffset,
 ) {
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val scope = rememberCoroutineScope()
@@ -170,6 +180,26 @@ internal fun HomeScreen(
                     else -> {
                         TextSnackbar(text = it.message)
                     }
+                }
+            }
+        },
+        floatingActionButton = {
+            if (state.recommendImageList.isNotEmpty()) {
+                FloatingActionButton(
+                    modifier = Modifier
+                        .padding(bottom = 56.dp)
+                        .offset { offsetAnimation },
+                    onClick = {
+                        scope.launch {
+                            lazyStaggeredGridState.scrollToItem(0)
+                        }
+                    },
+                    backgroundColor = MaterialTheme.colors.background,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.ArrowUpward,
+                        contentDescription = null
+                    )
                 }
             }
         }

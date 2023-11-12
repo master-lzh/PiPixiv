@@ -35,6 +35,7 @@ fun BaseScreen(
     snackbarHost: @Composable (SnackbarHostState) -> Unit = {},
     actions: @Composable() (RowScope.() -> Unit)? = null,
     bottomBar: @Composable (() -> Unit)? = null,
+    floatingActionButton: @Composable (() -> Unit)? = null,
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -63,7 +64,7 @@ fun BaseScreen(
                                 .fillMaxWidth()
                         )
                         TopAppBar(
-                            title = { title?.let { Text(text = it) } },
+                            title = { Text(text = title) },
                             actions = it,
                             elevation = 0.dp,
                         )
@@ -71,6 +72,7 @@ fun BaseScreen(
                 }
             },
             bottomBar = bottomBar ?: {},
+            floatingActionButton = floatingActionButton ?: {}
         ) {
             Box {
                 content(it)

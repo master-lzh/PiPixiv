@@ -1,6 +1,7 @@
 package com.mrl.pixiv.navigation.main
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,6 +24,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @Composable
 fun MainGraph(
     navHostController: NavHostController,
+    offsetAnimation: IntOffset,
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
     NavHost(
@@ -39,7 +41,11 @@ fun MainGraph(
             ),
 
             ) {
-            HomeScreen(navHostController = navHostController, homeViewModel = homeViewModel)
+            HomeScreen(
+                navHostController = navHostController,
+                homeViewModel = homeViewModel,
+                offsetAnimation = offsetAnimation
+            )
         }
         composable(
             route = Destination.ProfileScreen.route,
