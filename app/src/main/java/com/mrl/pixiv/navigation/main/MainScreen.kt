@@ -64,7 +64,7 @@ fun MainScreen(
             )
         }
     ) {
-        MainGraph(navHostController)
+        MainGraph(navHostController, offsetAnimation)
     }
 }
 
