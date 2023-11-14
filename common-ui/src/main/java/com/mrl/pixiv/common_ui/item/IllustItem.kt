@@ -1,5 +1,6 @@
 package com.mrl.pixiv.common_ui.item
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -28,7 +30,6 @@ import androidx.compose.ui.unit.times
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
 
 @Composable
@@ -52,13 +53,21 @@ fun SquareIllustItem(
             .click { onClick() }
     ) {
         val (image, imageCountText, bookmark) = createRefs()
+        val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+        Log.d(
+            "TAG",
+            "SquareIllustItem: screenWidth = $screenWidth, horizontalPadding = $horizontalPadding, spanCount = $spanCount, paddingValues = ${
+                paddingValues.calculateLeftPadding(LayoutDirection.Ltr)
+            }"
+        )
+        val size =
+            (screenWidth - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
+                LayoutDirection.Ltr
+            ) - 1.dp) / spanCount
+        Log.d("TAG", "SquareIllustItem: size = $size")
         AsyncImage(
             modifier = Modifier
-                .size(
-                    (DisplayUtil.getScreenWidthDp() - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
-                        LayoutDirection.Ltr
-                    )) / spanCount
-                )
+                .size(size)
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)

@@ -3,13 +3,13 @@ package com.mrl.pixiv.profile
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +36,7 @@ import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.profile.components.IllustBookmarkWidget
+import com.mrl.pixiv.profile.components.NovelBookmarkWidget
 import com.mrl.pixiv.profile.viewmodel.ProfileAction
 import com.mrl.pixiv.profile.viewmodel.ProfileState
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
@@ -82,10 +83,11 @@ internal fun ProfileScreen(
         modifier = Modifier,
         state = collapsingToolbarScaffoldState,
         toolbar = {
+            val toolbarHeight = DisplayUtil.getStatusBarHeightDp(LocalContext.current as ComponentActivity) + 60.dp
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(DisplayUtil.getStatusBarHeightDp(LocalContext.current as ComponentActivity) + 50.dp)
+                    .height(toolbarHeight)
             )
 
             Box(
@@ -112,7 +114,7 @@ internal fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(DisplayUtil.getStatusBarHeightDp(LocalContext.current as ComponentActivity) + 50.dp)
+                    .height(toolbarHeight)
                     .graphicsLayer {
                         alpha = 1 - collapsingToolbarScaffoldState.toolbarState.progress
                     }
@@ -121,6 +123,7 @@ internal fun ProfileScreen(
                     modifier = Modifier
                         .align(BottomStart)
                         .padding(start = 20.dp, end = 10.dp)
+                        .padding(bottom = 10.dp)
                         .graphicsLayer {
                             alpha = 1 - collapsingToolbarScaffoldState.toolbarState.progress
                         },
@@ -171,79 +174,92 @@ internal fun ProfileScreen(
         scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
         enabled = true,
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth(),
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(start = 15.dp, top = 10.dp)
-            ) {
-                userInfo.user?.name?.let { it1 ->
-                    Text(
-                        text = it1,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Medium,
-                        ),
-                    )
-                }
-                if (userInfo.isPremium) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(20.dp)
-                            .align(CenterVertically),
-                        contentDescription = null
-                    )
-                }
-            }
-
-
-            //id点击可复制
-            Row(
-                modifier = Modifier
-                    .padding(start = 15.dp, top = 10.dp)
-                    .click {
-                        userInfo.user?.id?.let { it1 -> copyToClipboard(it1.toString()) }
-                    }
-            ) {
-                Text(
-                    text = "ID: ${userInfo.user?.id}",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                    ),
-                )
-            }
-
-            // 个人简介
-            userInfo.user?.comment?.let {
+            item(key = "user_info") {
                 Row(
                     modifier = Modifier
                         .padding(start = 15.dp, top = 10.dp)
                 ) {
+                    userInfo.user?.name?.let { it1 ->
+                        Text(
+                            text = it1,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
+                    }
+                    if (userInfo.isPremium) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
+                            modifier = Modifier
+                                .padding(start = 5.dp)
+                                .size(20.dp)
+                                .align(CenterVertically),
+                            contentDescription = null
+                        )
+                    }
+                }
+                //id点击可复制
+                Row(
+                    modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp)
+                        .click {
+                            userInfo.user?.id?.let { it1 -> copyToClipboard(it1.toString()) }
+                        }
+                ) {
                     Text(
-                        text = it,
+                        text = "ID: ${userInfo.user?.id}",
                         style = TextStyle(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                         ),
                     )
                 }
-
+                // 个人简介
+                userInfo.user?.comment?.let {
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 15.dp, top = 10.dp)
+                    ) {
+                        Text(
+                            text = it,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                    Divider(modifier = Modifier.padding(horizontal = 15.dp))
+                }
             }
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-            Divider(modifier = Modifier.padding(horizontal = 15.dp))
-            // 插画、漫画收藏网格组件
-            IllustBookmarkWidget(
-                navToPictureScreen = navToPictureScreen,
-                illusts = state.userBookmarksIllusts
-            )
+            item(key = "user_bookmarks_illusts") {
+                // 插画、漫画收藏网格组件
+                IllustBookmarkWidget(
+                    navToPictureScreen = navToPictureScreen,
+                    illusts = state.userBookmarksIllusts
+                )
+            }
+            item(key = "user_bookmarks_novels") {
+                NovelBookmarkWidget(
+                    novels = state.userBookmarksNovels
+                )
+            }
+            item(key = "space") {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+            }
         }
     }
 }

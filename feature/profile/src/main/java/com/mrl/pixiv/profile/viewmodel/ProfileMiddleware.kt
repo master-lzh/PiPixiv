@@ -3,6 +3,7 @@ package com.mrl.pixiv.profile.viewmodel
 import com.mrl.pixiv.common.data.Middleware
 import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
+import com.mrl.pixiv.data.user.UserBookmarksNovelQuery
 import com.mrl.pixiv.data.user.UserDetailQuery
 import com.mrl.pixiv.profile.state.toUserInfo
 import com.mrl.pixiv.repository.local.UserLocalRepository
@@ -18,11 +19,26 @@ class ProfileMiddleware(
         when (action) {
             is ProfileAction.GetUserInfoIntent -> getUserInfo(state)
             is ProfileAction.GetUserBookmarksIllustIntent -> getUserBookmarksIllust(state)
+            is ProfileAction.GetUserBookmarksNovelIntent -> getUserBookmarksNovel(state)
             is ProfileAction.GetUserIllustsIntent -> TODO()
 
             else -> {}
         }
     }
+
+    private fun getUserBookmarksNovel(state: ProfileState) =
+        launchNetwork {
+            val userId = userLocalRepository.userId.first()
+            requestHttpDataWithFlow(
+                request = userRemoteRepository.getUserBookmarksNovels(
+                    UserBookmarksNovelQuery(restrict = Restrict.PUBLIC, userId = userId)
+                )
+            ) {
+                if (it != null) {
+                    dispatch(ProfileAction.UpdateUserBookmarksNovels(it.novels))
+                }
+            }
+        }
 
     private fun getUserBookmarksIllust(state: ProfileState) =
         launchNetwork {
@@ -33,7 +49,7 @@ class ProfileMiddleware(
                 )
             ) {
                 if (it != null) {
-                    dispatch(ProfileAction.UpdateUserIllusts(it.illusts))
+                    dispatch(ProfileAction.UpdateUserBookmarksIllusts(it.illusts))
                 }
             }
         }

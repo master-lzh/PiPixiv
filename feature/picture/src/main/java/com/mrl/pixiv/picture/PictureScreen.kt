@@ -452,7 +452,10 @@ internal fun PictureScreen(
                                 color = Color(0xFF2B7592),
                                 shape = MaterialTheme.shapes.medium
                             )
-                            .padding(horizontal = 10.dp, vertical = 8.dp),
+                            .padding(horizontal = 10.dp, vertical = 8.dp)
+                            .click {
+
+                            },
                         text = "关注",
                         style = TextStyle(
                             color = Color(0xFF2B7592),

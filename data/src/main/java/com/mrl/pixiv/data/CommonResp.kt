@@ -99,7 +99,10 @@ data class Tag(
     val name: String = "",
 
     @SerialName("translated_name")
-    val translatedName: String = ""
+    val translatedName: String = "",
+
+    @SerialName("added_by_uploaded_user")
+    val addedByUploadedUser: Boolean = false
 )
 
 @Serializable
@@ -130,4 +133,68 @@ data class User(
 
     @SerialName("is_access_blocking_user")
     val isAccessBlockingUser: Boolean = false
+)
+
+@Serializable
+data class Novel (
+    val id: Long,
+    val title: String,
+    val caption: String,
+    val restrict: Long,
+
+    @SerialName("x_restrict")
+    val xRestrict: Long,
+
+    @SerialName("is_original")
+    val isOriginal: Boolean,
+
+    @SerialName("image_urls")
+    val imageUrls: ImageUrls,
+
+    @SerialName("create_date")
+    val createDate: String,
+
+    val tags: List<Tag>,
+
+    @SerialName("page_count")
+    val pageCount: Long,
+
+    @SerialName("text_length")
+    val textLength: Long,
+
+    val user: User,
+    val series: Series,
+
+    @SerialName("is_bookmarked")
+    val isBookmarked: Boolean,
+
+    @SerialName("total_bookmarks")
+    val totalBookmarks: Long,
+
+    @SerialName("total_view")
+    val totalView: Long,
+
+    val visible: Boolean,
+
+    @SerialName("total_comments")
+    val totalComments: Long,
+
+    @SerialName("is_muted")
+    val isMuted: Boolean,
+
+    @SerialName("is_mypixiv_only")
+    val isMypixivOnly: Boolean,
+
+    @SerialName("is_x_restricted")
+    val isXRestricted: Boolean,
+
+    @SerialName("novel_ai_type")
+    val novelAiType: Long
+)
+
+
+@Serializable
+data class Series (
+    val id: Long? = null,
+    val title: String? = null
 )

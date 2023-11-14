@@ -3,6 +3,7 @@ package com.mrl.pixiv.api
 import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.data.user.UserDetailResp
 import com.mrl.pixiv.data.user.UserIllustsResp
+import com.mrl.pixiv.data.user.UserNovelsResp
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.GET
 import retrofit2.http.QueryMap
@@ -22,4 +23,9 @@ interface UserApi {
     suspend fun getUserBookmarksIllust(
         @QueryMap userBookmarksIllustQuery: Map<String, String>,
     ): Flow<Rlt<UserIllustsResp>>
+
+    @GET("v1/user/bookmarks/novel")
+    suspend fun getUserBookmarksNovel(
+        @QueryMap userBookmarksNovelQuery: Map<String, String>,
+    ): Flow<Rlt<UserNovelsResp>>
 }
