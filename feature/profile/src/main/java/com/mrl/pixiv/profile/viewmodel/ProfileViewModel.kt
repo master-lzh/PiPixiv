@@ -13,5 +13,6 @@ class ProfileViewModel(
     override fun onStart() {
         dispatch(ProfileAction.GetUserInfoIntent)
         dispatch(ProfileAction.GetUserBookmarksIllustIntent)
+        dispatch(ProfileAction.GetUserBookmarksNovelIntent)
     }
 }

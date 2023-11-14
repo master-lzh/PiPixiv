@@ -21,3 +21,10 @@ data class UserBookmarksIllustQuery(
     val userId: Long,
     val tag: String = "",
 ) : IBaseQueryMap
+
+data class UserBookmarksNovelQuery(
+    @Restrict
+    val restrict: String,
+    val userId: Long,
+    val tag: String = "",
+) : IBaseQueryMap

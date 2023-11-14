@@ -1,9 +1,11 @@
 package com.mrl.pixiv.data.user
 
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.Novel
 import com.mrl.pixiv.data.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class UserIllustsResp(
@@ -32,4 +34,13 @@ data class UserBookmarksIllustResp(
     @SerialName("next_url")
     val nextURL: String
 )
+
+@Serializable
+data class UserNovelsResp (
+    val novels: List<Novel>,
+
+    @SerialName("next_url")
+    val nextUrl: JsonElement? = null
+)
+
 

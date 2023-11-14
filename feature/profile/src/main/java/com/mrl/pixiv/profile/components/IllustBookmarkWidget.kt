@@ -2,13 +2,12 @@ package com.mrl.pixiv.profile.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -24,17 +23,19 @@ import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.data.Illust
 
 private const val SPAN_COUNT = 3
-private const val MAX_ILLUST_COUNT = 6
+private const val MAX_SHOW_ILLUST_COUNT = 6
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun IllustBookmarkWidget(
     navToPictureScreen: (Illust) -> Unit,
     illusts: List<Illust>,
 ) {
+    val horizontalPadding = 16.dp
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp)
+            .padding(horizontal = horizontalPadding)
     ) {
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -61,19 +62,18 @@ fun IllustBookmarkWidget(
             }
 
         }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(SPAN_COUNT),
-            contentPadding = PaddingValues(5.dp),
+        FlowRow(
+            Modifier.padding(top = 10.dp),
+            maxItemsInEachRow = SPAN_COUNT,
         ) {
-            items(
-                if (illusts.size > MAX_ILLUST_COUNT) MAX_ILLUST_COUNT else illusts.size,
-                key = { illusts[it].id }) {
-                val illust = illusts[it]
+            illusts.take(MAX_SHOW_ILLUST_COUNT).forEach {
+                val illust = it
                 SquareIllustItem(
                     isBookmark = illust.isBookmarked,
                     spanCount = SPAN_COUNT,
                     url = illust.imageUrls.squareMedium,
                     imageCount = illust.pageCount,
+                    horizontalPadding = horizontalPadding,
                 ) {
                     navToPictureScreen(illust)
                 }
