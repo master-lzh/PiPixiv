@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 
 suspend fun <T> safeHttpCall(
-    request: Flow<Rlt<T?>>,
+    request: Flow<Rlt<T>>,
     failedCallback: suspend (Throwable) -> Unit = { NetworkExceptionUtil.resolveException(it) },
-    successCallback: (T?) -> Unit,
+    successCallback: (T) -> Unit,
 ) {
     request.flowOn(Dispatchers.Main)
         .catch {

@@ -1,6 +1,7 @@
 plugins {
     id("pixiv.android.library.compose")
     id("pixiv.android.library")
+    alias(kotlinx.plugins.serialization)
 }
 
 android {
@@ -27,6 +28,7 @@ dependencies {
 
     implementation(androidx.core.ktx)
     implementation(androidx.appcompat)
+    implementation(kotlinx.bundles.serialization)
     implementation(libs.com.google.android.material.material)
 
     testImplementation(libs.junit.junit)

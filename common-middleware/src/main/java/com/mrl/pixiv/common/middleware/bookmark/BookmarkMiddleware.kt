@@ -33,9 +33,7 @@ class BookmarkMiddleware(
                     )
                 )
             ) {
-                if (it != null) {
-                    dispatch(BookmarkAction.UpdateState(state.copy(isBookmark = false)))
-                }
+                dispatch(BookmarkAction.UpdateState(state.copy(isBookmark = false)))
             }
         }
     }
@@ -45,9 +43,7 @@ class BookmarkMiddleware(
             requestHttpDataWithFlow(
                 request = illustRemoteRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
             ) {
-                if (it != null) {
-                    dispatch(BookmarkAction.UpdateState(state.copy(isBookmark = true)))
-                }
+                dispatch(BookmarkAction.UpdateState(state.copy(isBookmark = true)))
             }
         }
     }

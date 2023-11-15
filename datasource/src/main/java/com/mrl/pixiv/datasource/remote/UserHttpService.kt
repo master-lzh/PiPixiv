@@ -4,6 +4,8 @@ import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
 import com.mrl.pixiv.data.user.UserBookmarksNovelQuery
 import com.mrl.pixiv.data.user.UserDetailQuery
+import com.mrl.pixiv.data.user.UserFollowAddReq
+import com.mrl.pixiv.data.user.UserFollowDeleteReq
 import com.mrl.pixiv.data.user.UserIllustsQuery
 
 class UserHttpService(
@@ -20,4 +22,10 @@ class UserHttpService(
 
     suspend fun getUserBookmarksNovels(userBookmarksNovelQuery: UserBookmarksNovelQuery) =
         userApi.getUserBookmarksNovel(userBookmarksNovelQuery.toMap())
+
+    suspend fun followUser(userFollowAddReq: UserFollowAddReq) =
+        userApi.followUser(userFollowAddReq.toMap())
+
+    suspend fun unFollowUser(userFollowDeleteReq: UserFollowDeleteReq) =
+        userApi.unFollowUser(userFollowDeleteReq.toMap())
 }

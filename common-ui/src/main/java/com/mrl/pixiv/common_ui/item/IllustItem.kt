@@ -1,6 +1,5 @@
 package com.mrl.pixiv.common_ui.item
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -54,17 +53,10 @@ fun SquareIllustItem(
     ) {
         val (image, imageCountText, bookmark) = createRefs()
         val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-        Log.d(
-            "TAG",
-            "SquareIllustItem: screenWidth = $screenWidth, horizontalPadding = $horizontalPadding, spanCount = $spanCount, paddingValues = ${
-                paddingValues.calculateLeftPadding(LayoutDirection.Ltr)
-            }"
-        )
         val size =
             (screenWidth - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
                 LayoutDirection.Ltr
             ) - 1.dp) / spanCount
-        Log.d("TAG", "SquareIllustItem: size = $size")
         AsyncImage(
             modifier = Modifier
                 .size(size)

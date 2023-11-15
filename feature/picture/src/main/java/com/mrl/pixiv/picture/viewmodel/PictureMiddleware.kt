@@ -82,22 +82,20 @@ class PictureMiddleware(
                     )
                 )
             ) {
-                if (it != null) {
-                    dispatch(
-                        PictureAction.UpdateIsBookmarkState(
-                            userIllusts = state.userIllusts.apply {
-                                indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
-                                    set(it, get(it).copy(isBookmarked = false))
-                                }
-                            },
-                            illustRelated = state.illustRelated.apply {
-                                indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
-                                    set(it, get(it).copy(isBookmarked = false))
-                                }
+                dispatch(
+                    PictureAction.UpdateIsBookmarkState(
+                        userIllusts = state.userIllusts.apply {
+                            indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
+                                set(it, get(it).copy(isBookmarked = false))
                             }
-                        )
+                        },
+                        illustRelated = state.illustRelated.apply {
+                            indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
+                                set(it, get(it).copy(isBookmarked = false))
+                            }
+                        }
                     )
-                }
+                )
             }
         }
     }
@@ -107,22 +105,20 @@ class PictureMiddleware(
             requestHttpDataWithFlow(
                 request = illustRemoteRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
             ) {
-                if (it != null) {
-                    dispatch(
-                        PictureAction.UpdateIsBookmarkState(
-                            userIllusts = state.userIllusts.apply {
-                                indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
-                                    set(it, get(it).copy(isBookmarked = true))
-                                }
-                            },
-                            illustRelated = state.illustRelated.apply {
-                                indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
-                                    set(it, get(it).copy(isBookmarked = true))
-                                }
+                dispatch(
+                    PictureAction.UpdateIsBookmarkState(
+                        userIllusts = state.userIllusts.apply {
+                            indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
+                                set(it, get(it).copy(isBookmarked = true))
                             }
-                        )
+                        },
+                        illustRelated = state.illustRelated.apply {
+                            indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
+                                set(it, get(it).copy(isBookmarked = true))
+                            }
+                        }
                     )
-                }
+                )
             }
         }
     }
@@ -134,14 +130,12 @@ class PictureMiddleware(
                     queryMap ?: return@launchNetwork
                 )
             ) {
-                if (it != null) {
-                    dispatch(
-                        PictureAction.UpdateIllustRelatedState(
-                            illustRelated = state.illustRelated + it.illusts,
-                            nextUrl = it.nextURL
-                        )
+                dispatch(
+                    PictureAction.UpdateIllustRelatedState(
+                        illustRelated = state.illustRelated + it.illusts,
+                        nextUrl = it.nextURL
                     )
-                }
+                )
             }
         }
 
@@ -155,14 +149,12 @@ class PictureMiddleware(
                     )
                 )
             ) {
-                if (it != null) {
-                    dispatch(
-                        PictureAction.UpdateIllustRelatedState(
-                            illustRelated = it.illusts,
-                            nextUrl = it.nextURL
-                        )
+                dispatch(
+                    PictureAction.UpdateIllustRelatedState(
+                        illustRelated = it.illusts,
+                        nextUrl = it.nextURL
                     )
-                }
+                )
             }
         }
 
@@ -176,11 +168,9 @@ class PictureMiddleware(
                     )
                 )
             ) {
-                if (it != null) {
-                    dispatch(
-                        PictureAction.UpdateUserIllustsState(userIllusts = it.illusts)
-                    )
-                }
+                dispatch(
+                    PictureAction.UpdateUserIllustsState(userIllusts = it.illusts)
+                )
             }
         }
     }

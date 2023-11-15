@@ -36,7 +36,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -93,6 +92,9 @@ import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.middleware.follow.FollowAction
+import com.mrl.pixiv.common.middleware.follow.FollowState
+import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
@@ -126,6 +128,7 @@ fun PictureScreen(
     navHostController: NavHostController,
     viewModel: PictureViewModel = koinViewModel(),
     bookmarkViewModel: BookmarkViewModel = koinViewModel(),
+    followViewModel: FollowViewModel = koinViewModel(),
     homeViewModel: HomeViewModel,
 ) {
     OnLifecycle(onLifecycle = viewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
@@ -134,20 +137,23 @@ fun PictureScreen(
     }
     PictureScreen(
         modifier = modifier,
-        illust = illust,
         state = viewModel.state,
         bookmarkState = bookmarkViewModel.state,
+        followState = followViewModel.state.apply {
+            followStatus[illust.user.id] = illust.user.isFollowed
+        },
+        illust = illust,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         popBackStack = navHostController::popBackStack,
         dispatch = viewModel::dispatch,
         bookmarkDispatch = bookmarkViewModel::dispatch,
         homeDispatch = homeViewModel::dispatch,
+        followDispatch = followViewModel::dispatch,
     )
 }
 
 @OptIn(
-    ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterialApi::class
+    ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class
 )
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -155,12 +161,14 @@ internal fun PictureScreen(
     modifier: Modifier = Modifier,
     state: PictureState,
     bookmarkState: BookmarkState,
+    followState: FollowState,
     illust: Illust,
     navToPictureScreen: (Illust) -> Unit = {},
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
     homeDispatch: (HomeAction) -> Unit = {},
+    followDispatch: (FollowAction) -> Unit = {},
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -191,9 +199,7 @@ internal fun PictureScreen(
     var isBookmarked by remember { mutableStateOf(illust.isBookmarked) }
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var skipPartiallyExpanded by remember { mutableStateOf(false) }
-    val bottomSheetState =
-        rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+    val bottomSheetState = rememberModalBottomSheetState()
     var currLongClickPic by remember { mutableStateOf(Pair(0, "")) }
     var currLongClickPicSize by remember { mutableFloatStateOf(0f) }
     var loading by remember { mutableStateOf(false) }
@@ -443,26 +449,48 @@ internal fun PictureScreen(
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
-                    //todo 点击关注按钮
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .border(
-                                width = 1.dp,
-                                color = Color(0xFF2B7592),
-                                shape = MaterialTheme.shapes.medium
+                    followState.followStatus[illust.user.id]?.let {
+                        if (it) {
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .background(
+                                        color = Color(0xFF03A9F4),
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                                    .click {
+                                        followDispatch(FollowAction.UnFollowUser(illust.user.id))
+                                    },
+                                text = "已关注",
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
                             )
-                            .padding(horizontal = 10.dp, vertical = 8.dp)
-                            .click {
-
-                            },
-                        text = "关注",
-                        style = TextStyle(
-                            color = Color(0xFF2B7592),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                        ),
-                    )
+                        } else {
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color(0xFF2B7592),
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                                    .click {
+                                        followDispatch(FollowAction.FollowUser(illust.user.id))
+                                    },
+                                text = "关注",
+                                style = TextStyle(
+                                    color = Color(0xFF2B7592),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                            )
+                        }
+                    }
                 }
             }
             item {

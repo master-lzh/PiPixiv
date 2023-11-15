@@ -28,3 +28,12 @@ data class UserBookmarksNovelQuery(
     val userId: Long,
     val tag: String = "",
 ) : IBaseQueryMap
+
+data class UserFollowAddReq(
+    val userId: Long,
+    val restrict: String,
+) : IBaseQueryMap
+
+data class UserFollowDeleteReq(
+    val userId: Long,
+) : IBaseQueryMap

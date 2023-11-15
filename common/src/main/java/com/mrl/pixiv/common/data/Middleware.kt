@@ -76,9 +76,9 @@ abstract class Middleware<S : State, A : Action>(
     }
 
     protected fun <T> requestHttpDataWithFlow(
-        request: Flow<Rlt<T?>>,
+        request: Flow<Rlt<T>>,
         failedCallback: suspend (Throwable) -> Unit = {},
-        successCallback: (T?) -> Unit,
+        successCallback: (T) -> Unit,
     ) {
         scope.launch {
             request.flowOn(Dispatchers.Main)

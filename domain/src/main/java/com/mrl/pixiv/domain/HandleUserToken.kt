@@ -6,7 +6,7 @@ import com.mrl.pixiv.util.hour
 class SetUserAccessTokenUseCase(
     private val userLocalRepository: UserLocalRepository
 ) {
-    suspend operator fun invoke(accessToken: String) {
+    operator fun invoke(accessToken: String) {
         userLocalRepository.setAccessTokenExpiresTime(System.currentTimeMillis() + 1.hour)
         userLocalRepository.setUserAccessToken(accessToken)
     }
@@ -15,7 +15,7 @@ class SetUserAccessTokenUseCase(
 class SetUserRefreshTokenUseCase(
     private val userLocalRepository: UserLocalRepository
 ) {
-    suspend operator fun invoke(refreshToken: String) {
+    operator fun invoke(refreshToken: String) {
         userLocalRepository.setUserRefreshToken(refreshToken)
     }
 }
