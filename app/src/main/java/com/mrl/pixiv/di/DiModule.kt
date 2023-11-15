@@ -9,14 +9,17 @@ import com.mrl.pixiv.common.middleware.auth.AuthReducer
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkMiddleware
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkReducer
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.middleware.follow.FollowMiddleware
+import com.mrl.pixiv.common.middleware.follow.FollowReducer
+import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.UserAuthHttpService
 import com.mrl.pixiv.datasource.remote.UserHttpService
-import com.mrl.pixiv.domain.GetUserIdUseCase
+import com.mrl.pixiv.domain.GetUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
-import com.mrl.pixiv.domain.SetUserIdUseCase
+import com.mrl.pixiv.domain.SetUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
@@ -76,6 +79,8 @@ val appModule = module {
     single(named(DispatcherEnum.IO)) { Dispatchers.IO }
 
     single(named(DispatcherEnum.MAIN)) { Dispatchers.Main.immediate }
+
+    single { JSON }
 }
 
 val viewModelModule = module {
@@ -90,6 +95,8 @@ val viewModelModule = module {
     viewModel { PictureViewModel(get(), get()) }
 
     viewModel { BookmarkViewModel(get(), get()) }
+
+    viewModel { FollowViewModel(get(), get()) }
 }
 
 val repositoryModule = module {
@@ -113,8 +120,8 @@ val dataSourceModule = module {
 val useCaseModule = module {
     single { SetUserRefreshTokenUseCase(get()) }
     single { SetUserAccessTokenUseCase(get()) }
-    single { GetUserIdUseCase(get()) }
-    single { SetUserIdUseCase(get()) }
+    single { GetUserInfoUseCase(get()) }
+    single { SetUserInfoUseCase(get()) }
     single { RefreshUserAccessTokenUseCase(get(), get(), get(), get(), get()) }
     single { BookmarkUseCase(get()) }
     single { UnBookmarkUseCase(get()) }
@@ -132,6 +139,8 @@ val middlewareModule = module {
     single { ProfileMiddleware(get(), get()) }
 
     single { PictureMiddleware(get(), get()) }
+
+    single { FollowMiddleware(get(), get()) }
 }
 
 val reducerModule = module {
@@ -141,6 +150,7 @@ val reducerModule = module {
     single { AuthReducer() }
     single { ProfileReducer() }
     single { PictureReducer() }
+    single { FollowReducer() }
 }
 
 fun provideAuthService(

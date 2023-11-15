@@ -42,14 +42,15 @@ class SplashMiddleware(
                     grantType = grantType.value,
                     refreshToken = userRefreshToken
                 )
-                requestHttpDataWithFlow(request = authRemoteRepository.login(req)) {
-                    if (it != null) {
-                        setUserRefreshToken(it.refreshToken)
-                        setUserAccessToken(it.accessToken)
-                        dispatch(SplashAction.RouteToHomeScreenIntent)
-                    } else {
+                requestHttpDataWithFlow(
+                    request = authRemoteRepository.login(req),
+                    failedCallback = {
                         dispatch(SplashAction.RouteToLoginScreenIntent)
                     }
+                ) {
+                    setUserRefreshToken(it.refreshToken)
+                    setUserAccessToken(it.accessToken)
+                    dispatch(SplashAction.RouteToHomeScreenIntent)
                 }
             } else {
                 dispatch(SplashAction.RouteToHomeScreenIntent)
@@ -77,12 +78,6 @@ class SplashMiddleware(
         }
     }
 
-    private fun setUserRefreshToken(refreshToken: String) = launchIO {
-        setUserRefreshTokenUseCase(refreshToken)
-    }
-
-    private fun setUserAccessToken(accessToken: String) = launchIO {
-        setUserAccessTokenUseCase(accessToken)
-    }
-
+    private fun setUserRefreshToken(refreshToken: String) = setUserRefreshTokenUseCase(refreshToken)
+    private fun setUserAccessToken(accessToken: String) = setUserAccessTokenUseCase(accessToken)
 }

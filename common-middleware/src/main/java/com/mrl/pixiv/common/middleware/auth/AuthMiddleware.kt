@@ -6,7 +6,7 @@ import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.AuthTokenResp
 import com.mrl.pixiv.data.auth.GrantType
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
-import com.mrl.pixiv.domain.SetUserIdUseCase
+import com.mrl.pixiv.domain.SetUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.repository.local.UserLocalRepository
@@ -19,7 +19,7 @@ class AuthMiddleware(
     private val setUserAccessTokenUseCase: SetUserAccessTokenUseCase,
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
-    private val setUserIdUseCase: SetUserIdUseCase,
+    private val setUserInfoUseCase: SetUserInfoUseCase,
 ) : Middleware<AuthState, AuthAction>() {
     override suspend fun process(state: AuthState, action: AuthAction) {
         when (action) {
@@ -39,9 +39,7 @@ class AuthMiddleware(
                 refreshToken = refreshToken,
             )
             requestHttpDataWithFlow(request = authRemoteRepository.login(req)) {
-                if (it != null) {
-                    setUserInfo(it)
-                }
+                setUserInfo(it)
             }
         }
     }
@@ -55,16 +53,14 @@ class AuthMiddleware(
                 redirectUri = Constants.PIXIV_LOGIN_REDIRECT_URL,
             )
             requestHttpDataWithFlow(request = authRemoteRepository.login(req)) {
-                if (it != null) {
-                    setUserInfo(it)
-                    dispatch(AuthAction.LoginSuccess)
-                }
+                setUserInfo(it)
+                dispatch(AuthAction.LoginSuccess)
             }
         }
 
     private fun setUserInfo(authTokenResp: AuthTokenResp) = launchIO {
         authTokenResp.apply {
-            user?.id?.let { setUserIdUseCase(it.toLong()) }
+            user?.let { setUserInfoUseCase(it) }
             setUserAccessTokenUseCase(accessToken)
             setUserRefreshTokenUseCase(refreshToken)
         }

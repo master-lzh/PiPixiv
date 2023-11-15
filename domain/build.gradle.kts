@@ -21,4 +21,7 @@ dependencies {
     implementation(project(":util"))
     implementation(project(":common"))
     implementation(project(":data"))
+
+    implementation(kotlinx.bundles.serialization)
+    implementation(libs.koin)
 }

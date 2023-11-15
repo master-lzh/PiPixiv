@@ -8,7 +8,6 @@ import com.mrl.pixiv.data.user.UserDetailQuery
 import com.mrl.pixiv.profile.state.toUserInfo
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
-import kotlinx.coroutines.flow.first
 
 
 class ProfileMiddleware(
@@ -28,41 +27,35 @@ class ProfileMiddleware(
 
     private fun getUserBookmarksNovel(state: ProfileState) =
         launchNetwork {
-            val userId = userLocalRepository.userId.first()
+            val userId = userLocalRepository.getUserId()
             requestHttpDataWithFlow(
                 request = userRemoteRepository.getUserBookmarksNovels(
                     UserBookmarksNovelQuery(restrict = Restrict.PUBLIC, userId = userId)
                 )
             ) {
-                if (it != null) {
-                    dispatch(ProfileAction.UpdateUserBookmarksNovels(it.novels))
-                }
+                dispatch(ProfileAction.UpdateUserBookmarksNovels(it.novels))
             }
         }
 
     private fun getUserBookmarksIllust(state: ProfileState) =
         launchNetwork {
-            val userId = userLocalRepository.userId.first()
+            val userId = userLocalRepository.getUserId()
             requestHttpDataWithFlow(
                 request = userRemoteRepository.getUserBookmarksIllust(
                     UserBookmarksIllustQuery(restrict = Restrict.PUBLIC, userId = userId)
                 )
             ) {
-                if (it != null) {
-                    dispatch(ProfileAction.UpdateUserBookmarksIllusts(it.illusts))
-                }
+                dispatch(ProfileAction.UpdateUserBookmarksIllusts(it.illusts))
             }
         }
 
 
     private fun getUserInfo(state: ProfileState) = launchNetwork {
-        val userId = userLocalRepository.userId.first()
+        val userId = userLocalRepository.getUserId()
         requestHttpDataWithFlow(
             request = userRemoteRepository.getUserDetail(UserDetailQuery(userId = userId))
         ) {
-            if (it != null) {
-                dispatch(ProfileAction.UpdateUserInfo(it.toUserInfo()))
-            }
+            dispatch(ProfileAction.UpdateUserInfo(it.toUserInfo()))
         }
     }
 }

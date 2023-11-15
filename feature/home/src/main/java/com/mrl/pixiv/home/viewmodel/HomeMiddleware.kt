@@ -50,17 +50,15 @@ class HomeMiddleware(
                 request = illustRemoteRepository.getIllustRecommended(action.illustRecommendedQuery)
             ) {
                 val imageList = handleRecommendResp(it)
-                if (it != null) {
-                    dispatch(
-                        HomeAction.UpdateState(
-                            state.copy(
-                                recommendImageList = imageList.toMutableStateList(),
-                                isRefresh = false,
-                                nextUrl = it.nextURL
-                            )
+                dispatch(
+                    HomeAction.UpdateState(
+                        state.copy(
+                            recommendImageList = imageList.toMutableStateList(),
+                            isRefresh = false,
+                            nextUrl = it.nextURL
                         )
                     )
-                }
+                )
             }
         }
     }
@@ -126,19 +124,17 @@ class HomeMiddleware(
                 request = illustRemoteRepository.loadMoreIllustRecommended(action.queryMap)
             ) {
                 val imageList = handleRecommendResp(it)
-                if (it != null) {
-                    dispatch(
-                        HomeAction.UpdateState(
-                            state.copy(
-                                recommendImageList = state.recommendImageList.apply {
-                                    addAll(imageList)
-                                },
-                                isRefresh = false,
-                                nextUrl = it.nextURL
-                            )
+                dispatch(
+                    HomeAction.UpdateState(
+                        state.copy(
+                            recommendImageList = state.recommendImageList.apply {
+                                addAll(imageList)
+                            },
+                            isRefresh = false,
+                            nextUrl = it.nextURL
                         )
                     )
-                }
+                )
             }
         }
     }

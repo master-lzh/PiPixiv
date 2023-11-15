@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 
-class UserAuthDataSource constructor(
+class UserAuthDataSource(
     userAuthDataStore: DataStore<Preferences>,
 ) : BaseDataSource(userAuthDataStore) {
     companion object {
@@ -14,15 +14,9 @@ class UserAuthDataSource constructor(
         val KEY_ACCESS_TOKEN_EXPIRES_TIME = longPreferencesKey("access_token_expires_time")
     }
 
-    val userRefreshToken = get(KEY_USER_REFRESH_TOKEN)
+    val userRefreshToken = createFiled(KEY_USER_REFRESH_TOKEN)
 
-    val userAccessToken = get(KEY_USER_ACCESS_TOKEN)
+    val userAccessToken = createFiled(KEY_USER_ACCESS_TOKEN)
 
-    val accessTokenExpiresTime = get(KEY_ACCESS_TOKEN_EXPIRES_TIME)
-
-    suspend fun setUserRefreshToken(refreshToken: String) = set(KEY_USER_REFRESH_TOKEN, refreshToken)
-
-    suspend fun setUserAccessToken(accessToken: String) = set(KEY_USER_ACCESS_TOKEN, accessToken)
-
-    suspend fun setAccessTokenExpiresTime(expiresTime: Long) = set(KEY_ACCESS_TOKEN_EXPIRES_TIME, expiresTime)
+    val accessTokenExpiresTime = createFiled(KEY_ACCESS_TOKEN_EXPIRES_TIME)
 }
