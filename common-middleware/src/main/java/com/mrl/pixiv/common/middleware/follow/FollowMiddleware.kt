@@ -4,13 +4,11 @@ import com.mrl.pixiv.common.data.Middleware
 import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.user.UserFollowAddReq
 import com.mrl.pixiv.data.user.UserFollowDeleteReq
-import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
 
 
 class FollowMiddleware(
     private val userRemoteRepository: UserRemoteRepository,
-    private val userLocalRepository: UserLocalRepository,
 ) : Middleware<FollowState, FollowAction>() {
     override suspend fun process(state: FollowState, action: FollowAction) {
         when (action) {

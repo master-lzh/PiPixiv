@@ -140,7 +140,7 @@ val middlewareModule = module {
 
     single { PictureMiddleware(get(), get()) }
 
-    single { FollowMiddleware(get(), get()) }
+    single { FollowMiddleware(get()) }
 }
 
 val reducerModule = module {
