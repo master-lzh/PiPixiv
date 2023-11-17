@@ -26,7 +26,7 @@ abstract class Middleware<S : State, A : Action>(
     vararg closeables: Closeable,
 ) : KoinComponent {
     private lateinit var dispatcher: Dispatcher<A>
-    private lateinit var scope : CoroutineScope
+    private lateinit var scope: CoroutineScope
     private val ioDispatcher by inject<CoroutineDispatcher>(named(DispatcherEnum.IO))
     private val closeables: Set<Closeable> = setOf(*closeables)
 
