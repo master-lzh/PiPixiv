@@ -3,6 +3,7 @@ package com.mrl.pixiv.di
 import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
+import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
 import com.mrl.pixiv.common.data.DispatcherEnum
 import com.mrl.pixiv.common.middleware.auth.AuthMiddleware
 import com.mrl.pixiv.common.middleware.auth.AuthReducer
@@ -12,6 +13,7 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowMiddleware
 import com.mrl.pixiv.common.middleware.follow.FollowReducer
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
+import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
@@ -46,6 +48,8 @@ import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import com.mrl.pixiv.userAuthDataStore
 import com.mrl.pixiv.userInfoDataStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainCoroutineDispatcher
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.android.ext.koin.androidContext
@@ -81,6 +85,10 @@ val appModule = module {
     single(named(DispatcherEnum.MAIN)) { Dispatchers.Main.immediate }
 
     single { JSON }
+
+    factory {
+        CloseableCoroutineScope(SupervisorJob() + get<MainCoroutineDispatcher>(named(DispatcherEnum.MAIN)))
+    }
 }
 
 val viewModelModule = module {
@@ -92,11 +100,11 @@ val viewModelModule = module {
 
     viewModel { ProfileViewModel(get(), get()) }
 
-    viewModel { PictureViewModel(get(), get()) }
+    viewModel { (illust: Illust) -> PictureViewModel(illust, get(), get()) }
 
-    viewModel { BookmarkViewModel(get(), get()) }
+    viewModel { (illust: Illust) -> BookmarkViewModel(illust, get(), get()) }
 
-    viewModel { FollowViewModel(get(), get()) }
+    viewModel { (illust: Illust) -> FollowViewModel(illust, get(), get()) }
 }
 
 val repositoryModule = module {
@@ -128,19 +136,19 @@ val useCaseModule = module {
 }
 
 val middlewareModule = module {
-    single { SplashMiddleware(get(), get(), get(), get(), get()) }
+    factory { SplashMiddleware(get(), get(), get(), get(), get()) }
 
-    single { HomeMiddleware(get(), get(), get(), get()) }
+    factory { HomeMiddleware(get(), get(), get(), get()) }
 
-    single { BookmarkMiddleware(get()) }
+    factory { BookmarkMiddleware(get()) }
 
-    single { AuthMiddleware(get(), get(), get(), get(), get(), get()) }
+    factory { AuthMiddleware(get(), get(), get(), get(), get(), get()) }
 
-    single { ProfileMiddleware(get(), get()) }
+    factory { ProfileMiddleware(get(), get()) }
 
-    single { PictureMiddleware(get(), get()) }
+    factory { PictureMiddleware(get(), get()) }
 
-    single { FollowMiddleware(get()) }
+    factory { FollowMiddleware(get()) }
 }
 
 val reducerModule = module {

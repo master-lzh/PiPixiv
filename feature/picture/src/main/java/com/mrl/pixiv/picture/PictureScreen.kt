@@ -117,6 +117,7 @@ import com.mrl.pixiv.util.saveToAlbum
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import java.io.File
 
 private const val USER_ILLUSTS_COUNT = 3
@@ -126,22 +127,17 @@ fun PictureScreen(
     modifier: Modifier = Modifier,
     illust: Illust,
     navHostController: NavHostController,
-    viewModel: PictureViewModel = koinViewModel(),
-    bookmarkViewModel: BookmarkViewModel = koinViewModel(),
-    followViewModel: FollowViewModel = koinViewModel(),
+    viewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
+    bookmarkViewModel: BookmarkViewModel = koinViewModel { parametersOf(illust) },
+    followViewModel: FollowViewModel = koinViewModel { parametersOf(illust) },
     homeViewModel: HomeViewModel,
 ) {
     OnLifecycle(onLifecycle = viewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
-    LaunchedEffect(Unit) {
-        bookmarkViewModel.dispatch(BookmarkAction.UpdateState(state = BookmarkState(isBookmark = illust.isBookmarked)))
-    }
     PictureScreen(
         modifier = modifier,
         state = viewModel.state,
         bookmarkState = bookmarkViewModel.state,
-        followState = followViewModel.state.apply {
-            followStatus[illust.user.id] = illust.user.isFollowed
-        },
+        followState = followViewModel.state,
         illust = illust,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         popBackStack = navHostController::popBackStack,
@@ -194,19 +190,15 @@ internal fun PictureScreen(
             }
         }
     val isBarVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex <= illust.pageCount } }
-    val isScrollToBottom = remember { mutableStateOf(false) }
-    val isScrollToRelatedBottom = remember { mutableStateOf(false) }
-    var isBookmarked by remember { mutableStateOf(illust.isBookmarked) }
+    val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
+    val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
+    var isBookmarked by rememberSaveable { mutableStateOf(illust.isBookmarked) }
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
-    var currLongClickPic by remember { mutableStateOf(Pair(0, "")) }
-    var currLongClickPicSize by remember { mutableFloatStateOf(0f) }
-    var loading by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        dispatch(PictureAction.GetUserIllustsIntent(illust.user.id))
-        dispatch(PictureAction.GetIllustRelatedIntent(illust.id))
-    }
+    var currLongClickPic by rememberSaveable { mutableStateOf(Pair(0, "")) }
+    var currLongClickPicSize by rememberSaveable { mutableFloatStateOf(0f) }
+    var loading by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(bookmarkState) {
         isBookmarked = bookmarkState.isBookmark
     }

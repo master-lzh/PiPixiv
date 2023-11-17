@@ -11,11 +11,13 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @OptIn(ExperimentalEncodingApi::class)
 fun NavHostController.navigateToPictureScreen(illust: Illust) {
     navigate(
-        "${Destination.PictureScreen.route}/${
+        route = "${Destination.PictureScreen.route}/${
             Base64.UrlSafe.encode(
                 Json.encodeToString(illust)
                     .encodeToByteArray()
             )
         }"
-    )
+    ) {
+        restoreState = true
+    }
 }
