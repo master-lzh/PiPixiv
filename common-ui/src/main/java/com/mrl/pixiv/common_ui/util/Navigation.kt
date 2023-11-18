@@ -21,3 +21,9 @@ fun NavHostController.navigateToPictureScreen(illust: Illust) {
         restoreState = true
     }
 }
+
+fun NavHostController.navigateToSearchScreen() {
+    navigate(route = Destination.SearchScreen.route) {
+        restoreState = true
+    }
+}

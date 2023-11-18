@@ -24,8 +24,6 @@ sealed class HomeAction : Action {
 
     data object RefreshTokenIntent : HomeAction()
 
-    data object ShowLoading : HomeAction()
-
     data object DismissLoading : HomeAction()
     data class UpdateState(val state: HomeState) : HomeAction()
 

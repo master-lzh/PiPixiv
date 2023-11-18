@@ -34,6 +34,7 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.BaseScreen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
+import com.mrl.pixiv.common_ui.util.navigateToSearchScreen
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
@@ -60,10 +61,6 @@ fun HomeViewModel.onRefresh() {
     dispatch(
         HomeAction.RefreshIllustRecommendedIntent(initRecommendedQuery)
     )
-}
-
-fun HomeViewModel.onRefreshToken() {
-    dispatch(HomeAction.RefreshTokenIntent)
 }
 
 fun HomeViewModel.onScrollToBottom() {
@@ -98,7 +95,9 @@ fun HomeScreen(
         modifier = modifier,
         state = homeViewModel.state,
         navToPictureScreen = navHostController::navigateToPictureScreen,
+        navToSearchScreen = navHostController::navigateToSearchScreen,
         homeViewModel = homeViewModel,
+        dispatch = homeViewModel::dispatch,
         offsetAnimation = offsetAnimation
     )
 }
@@ -109,15 +108,15 @@ internal fun HomeScreen(
     modifier: Modifier = Modifier,
     state: HomeState,
     navToPictureScreen: (Illust) -> Unit,
+    navToSearchScreen: () -> Unit,
     homeViewModel: HomeViewModel = koinViewModel(),
+    dispatch: (HomeAction) -> Unit = {},
     offsetAnimation: IntOffset,
 ) {
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val scope = rememberCoroutineScope()
-    val pullRefreshState = rememberPullRefreshState(refreshing = state.isRefresh, onRefresh = {
-        homeViewModel.dispatch(HomeAction.ShowLoading)
-        homeViewModel.onRefresh()
-    })
+    val pullRefreshState =
+        rememberPullRefreshState(refreshing = state.isRefresh, onRefresh = homeViewModel::onRefresh)
     val scaffoldState = rememberScaffoldState()
     val onUnBookmark = { id: Long ->
         scope.launch {
@@ -147,10 +146,16 @@ internal fun HomeScreen(
         title = stringResource(R.string.app_name),
         scaffoldState = scaffoldState,
         actions = {
-            HomeTopBar(onRefresh = {
-                homeViewModel.dispatch(HomeAction.ShowLoading)
-                homeViewModel.onRefresh()
-            }, onRefreshToken = { homeViewModel.onRefreshToken() })
+            HomeTopBar(
+                navigateToSearchScreen = navToSearchScreen,
+                onRefreshToken = { dispatch(HomeAction.RefreshTokenIntent) }
+            ) {
+                dispatch(
+                    HomeAction.RefreshIllustRecommendedIntent(
+                        initRecommendedQuery
+                    )
+                )
+            }
         },
         snackbarHost = {
             SnackbarHost(it) {
@@ -224,12 +229,11 @@ internal fun HomeScreen(
                     scope.launch {
                         lazyStaggeredGridState.scrollToItem(0)
                         delay(1.second)
-                        homeViewModel.dispatch(HomeAction.DismissLoading)
+                        dispatch(HomeAction.DismissLoading)
                     }
-                }
-            ) {
-                homeViewModel.onScrollToBottom()
-            }
+                },
+                onScrollToBottom = homeViewModel::onScrollToBottom,
+            )
             PullRefreshIndicator(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
