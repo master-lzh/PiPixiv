@@ -42,4 +42,6 @@ sealed class Destination(
     data object PictureScreen : Destination(route = "picture_screen") {
         const val illustParams = "illust"
     }
+
+    data object SearchScreen : Destination(route = "search_screen")
 }
