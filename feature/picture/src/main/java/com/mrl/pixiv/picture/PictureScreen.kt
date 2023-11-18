@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
@@ -56,9 +57,11 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -110,6 +113,7 @@ import com.mrl.pixiv.util.PictureType
 import com.mrl.pixiv.util.calculateImageSize
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
+import com.mrl.pixiv.util.isEven
 import com.mrl.pixiv.util.isFileExists
 import com.mrl.pixiv.util.joinPaths
 import com.mrl.pixiv.util.queryParams
@@ -198,6 +202,7 @@ internal fun PictureScreen(
     val bottomSheetState = rememberModalBottomSheetState()
     var currLongClickPic by rememberSaveable { mutableStateOf(Pair(0, "")) }
     var currLongClickPicSize by rememberSaveable { mutableFloatStateOf(0f) }
+    val lastRelatedPic = remember { mutableStateListOf<Illust>() }
     var loading by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(bookmarkState) {
         isBookmarked = bookmarkState.isBookmark
@@ -218,6 +223,16 @@ internal fun PictureScreen(
                 currLongClickPicSize = calculateImageSize(currLongClickPic.second)
             }
         }
+    }
+    SideEffect {
+        lastRelatedPic.clear()
+        lastRelatedPic.addAll(
+            if (isEven(state.illustRelated.size)) {
+                state.illustRelated.takeLast(2)
+            } else {
+                state.illustRelated.takeLast(1)
+            }
+        )
     }
     Scaffold(
         scaffoldState = scaffoldState,
@@ -524,19 +539,18 @@ internal fun PictureScreen(
                     ),
                 )
             }
-            item(key = "${illust.id}_related") {
+            val illustRelated = state.illustRelated.chunked(2)
+            items(illustRelated, key = {
+                "${illust.id}_related_${
+                    it.joinToString(separator = "_") { it.id.toString() }
+                }"
+            }) {
                 // 相关作品
-                // 由于不能在LazyColumn中嵌套LazyColumn，所以这里用FlowRow代替
-                FlowRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            top = 50.dp,
-                            bottom = if (isScrollToRelatedBottom.value) 0.dp else 100.dp
-                        ),
-                    maxItemsInEachRow = 2
+                // 由于不能在LazyColumn中嵌套LazyColumn，所以这里拆分成每个Row两张图片
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    state.illustRelated.forEach {
+                    it.forEach {
                         SquareIllustItem(
                             isBookmark = it.isBookmarked,
                             spanCount = 2,
@@ -546,12 +560,15 @@ internal fun PictureScreen(
                             elevation = 5.dp,
                             onBookmarkClick = {
                                 bookmarkIllust(dispatch, it.id, it.isBookmarked)
-                            }
+                            },
                         ) {
                             navToPictureScreen(it)
                         }
                     }
                 }
+            }
+            item(key = "spacer") {
+                Spacer(modifier = Modifier.height(if (isScrollToRelatedBottom.value) 0.dp else 100.dp))
             }
             item(key = "loading") {
                 if (isScrollToRelatedBottom.value) {
@@ -570,6 +587,7 @@ internal fun PictureScreen(
         lazyListState.OnScrollToRelatedBottom(
             isScrollToBottom = isScrollToRelatedBottom,
             id = illust.id,
+            lastTwoRelated = lastRelatedPic,
         )
         ConstraintLayout(
             modifier = Modifier
@@ -836,12 +854,17 @@ private fun LazyListState.OnScrollToBottom(
 private fun LazyListState.OnScrollToRelatedBottom(
     isScrollToBottom: MutableState<Boolean>,
     id: Long,
+    lastTwoRelated: List<Illust>,
 ) {
     // 判断是否滚动到相关作品最底部
     val isToBottom by remember {
         derivedStateOf {
             val lastVisibleItem =
-                layoutInfo.visibleItemsInfo.find { it.key == "${id}_related" }
+                layoutInfo.visibleItemsInfo.find {
+                    it.key == "${id}_related_${
+                        lastTwoRelated.joinToString(separator = "_") { it.id.toString() }
+                    }"
+                }
 //            layoutInfo.visibleItemsInfo.forEachIndexed { i, it ->
 //                Log.d(
 //                    "TAG",
@@ -852,7 +875,7 @@ private fun LazyListState.OnScrollToRelatedBottom(
 //            }
 
             if (lastVisibleItem != null) {
-                return@derivedStateOf lastVisibleItem.index == layoutInfo.totalItemsCount - 2
+                return@derivedStateOf lastVisibleItem.index == layoutInfo.totalItemsCount - 3
                         && lastVisibleItem.let { it.offset + it.size } <= layoutInfo.let { it.viewportEndOffset - it.viewportStartOffset }
             } else {
                 return@derivedStateOf false
