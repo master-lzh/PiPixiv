@@ -59,7 +59,7 @@ class PictureMiddleware(
                 .data(originalUrl)
                 .build()
             val result = withTimeoutOrNull(10.seconds) {
-                   imageLoader.execute(request)
+                imageLoader.execute(request)
             }
             result ?: run {
                 downloadCallback(false)

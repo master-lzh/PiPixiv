@@ -1,13 +1,15 @@
 package com.mrl.pixiv.common.middleware.bookmark
 
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.mrl.pixiv.common.data.State
 
 data class BookmarkState(
-    val isBookmark: Boolean,
+    val bookmarkStatus: SnapshotStateMap<Long, Boolean>,
 ) : State {
     companion object {
         val INITIAL = BookmarkState(
-            isBookmark = false
+            bookmarkStatus = mutableStateMapOf()
         )
     }
 }

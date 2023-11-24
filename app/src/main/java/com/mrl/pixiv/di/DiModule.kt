@@ -102,7 +102,7 @@ val viewModelModule = module {
 
     viewModel { (illust: Illust) -> PictureViewModel(illust, get(), get()) }
 
-    viewModel { (illust: Illust) -> BookmarkViewModel(illust, get(), get()) }
+    viewModel { BookmarkViewModel(get(), get()) }
 
     viewModel { (illust: Illust) -> FollowViewModel(illust, get(), get()) }
 }

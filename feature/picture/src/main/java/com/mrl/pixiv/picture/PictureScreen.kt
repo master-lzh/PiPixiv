@@ -132,8 +132,8 @@ fun PictureScreen(
     illust: Illust,
     navHostController: NavHostController,
     viewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
-    bookmarkViewModel: BookmarkViewModel = koinViewModel { parametersOf(illust) },
-    followViewModel: FollowViewModel = koinViewModel { parametersOf(illust) },
+    bookmarkViewModel: BookmarkViewModel,
+    followViewModel: FollowViewModel,
     homeViewModel: HomeViewModel,
 ) {
     OnLifecycle(onLifecycle = viewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
@@ -196,7 +196,16 @@ internal fun PictureScreen(
     val isBarVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex <= illust.pageCount } }
     val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
     val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
-    var isBookmarked by rememberSaveable { mutableStateOf(illust.isBookmarked) }
+    var isBookmarked by rememberSaveable {
+        mutableStateOf(
+            bookmarkState.bookmarkStatus[illust.id] ?: false
+        )
+    }
+    var isFollowed by rememberSaveable {
+        mutableStateOf(
+            followState.followStatus[illust.user.id] ?: false
+        )
+    }
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
@@ -204,11 +213,12 @@ internal fun PictureScreen(
     var currLongClickPicSize by rememberSaveable { mutableFloatStateOf(0f) }
     val lastRelatedPic = remember { mutableStateListOf<Illust>() }
     var loading by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(bookmarkState) {
-        isBookmarked = bookmarkState.isBookmark
-    }
-    LaunchedEffect(isBookmarked) {
+    LaunchedEffect(bookmarkState.bookmarkStatus[illust.id]) {
+        isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: false
         homeDispatch(HomeAction.UpdateIllustBookmark(illust.id, isBookmarked))
+    }
+    LaunchedEffect(followState.followStatus[illust.user.id]) {
+        isFollowed = followState.followStatus[illust.user.id] ?: false
     }
     LaunchedEffect(isScrollToRelatedBottom.value) {
         if (isScrollToRelatedBottom.value) {
@@ -456,47 +466,45 @@ internal fun PictureScreen(
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
-                    followState.followStatus[illust.user.id]?.let {
-                        if (it) {
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .background(
-                                        color = Color(0xFF03A9F4),
-                                        shape = MaterialTheme.shapes.medium
-                                    )
-                                    .padding(horizontal = 10.dp, vertical = 8.dp)
-                                    .click {
-                                        followDispatch(FollowAction.UnFollowUser(illust.user.id))
-                                    },
-                                text = "已关注",
-                                style = TextStyle(
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
-                                ),
-                            )
-                        } else {
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .border(
-                                        width = 1.dp,
-                                        color = Color(0xFF2B7592),
-                                        shape = MaterialTheme.shapes.medium
-                                    )
-                                    .padding(horizontal = 10.dp, vertical = 8.dp)
-                                    .click {
-                                        followDispatch(FollowAction.FollowUser(illust.user.id))
-                                    },
-                                text = "关注",
-                                style = TextStyle(
+                    if (isFollowed) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .background(
+                                    color = Color(0xFF03A9F4),
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(horizontal = 10.dp, vertical = 8.dp)
+                                .click {
+                                    followDispatch(FollowAction.UnFollowUser(illust.user.id))
+                                },
+                            text = "已关注",
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
+                    } else {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .border(
+                                    width = 1.dp,
                                     color = Color(0xFF2B7592),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
-                                ),
-                            )
-                        }
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(horizontal = 10.dp, vertical = 8.dp)
+                                .click {
+                                    followDispatch(FollowAction.FollowUser(illust.user.id))
+                                },
+                            text = "关注",
+                            style = TextStyle(
+                                color = Color(0xFF2B7592),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
                     }
                 }
             }
