@@ -13,10 +13,11 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun StatusBarSpacer(
+    modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.background
 ) {
     Spacer(
-        Modifier
+        modifier
             .background(color)
             .windowInsetsTopHeight(WindowInsets.statusBars) // Match the height of the status bar
             .fillMaxWidth()
