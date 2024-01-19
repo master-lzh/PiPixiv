@@ -95,4 +95,4 @@ class BlurTransformation @JvmOverloads constructor(
 }
 
 internal val Bitmap.safeConfig: Bitmap.Config
-    get() = config ?: Bitmap.Config.ARGB_8888
+    get() = config

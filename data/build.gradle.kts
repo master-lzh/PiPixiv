@@ -22,6 +22,8 @@ dependencies {
     implementation(libs.guava)
     implementation(kotlinx.reflect)
     implementation(kotlinx.bundles.serialization)
+    implementation(platform(compose.bom))
+    implementation(compose.runtime.android)
 
     implementation(androidx.core.ktx)
     implementation(androidx.appcompat)

@@ -4,7 +4,7 @@ import com.mrl.pixiv.data.auth.AuthUser
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import kotlinx.coroutines.flow.first
 
-class GetUserInfoUseCase(
+class GetLocalUserInfoUseCase(
     private val userLocalRepository: UserLocalRepository
 ) {
     suspend operator fun invoke(): AuthUser {
@@ -12,7 +12,7 @@ class GetUserInfoUseCase(
     }
 }
 
-class SetUserInfoUseCase(
+class SetLocalUserInfoUseCase(
     private val userLocalRepository: UserLocalRepository
 ) {
     operator fun invoke(userInfo: AuthUser) {

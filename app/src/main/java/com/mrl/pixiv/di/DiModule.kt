@@ -1,6 +1,7 @@
 package com.mrl.pixiv.di
 
 import com.mrl.pixiv.api.IllustApi
+import com.mrl.pixiv.api.SearchApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
@@ -17,11 +18,12 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
+import com.mrl.pixiv.datasource.remote.SearchHttpService
 import com.mrl.pixiv.datasource.remote.UserAuthHttpService
 import com.mrl.pixiv.datasource.remote.UserHttpService
-import com.mrl.pixiv.domain.GetUserInfoUseCase
+import com.mrl.pixiv.domain.GetLocalUserInfoUseCase
+import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
-import com.mrl.pixiv.domain.SetUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
@@ -41,7 +43,11 @@ import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
+import com.mrl.pixiv.repository.remote.SearchRemoteRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
+import com.mrl.pixiv.search.viewmodel.SearchMiddleware
+import com.mrl.pixiv.search.viewmodel.SearchReducer
+import com.mrl.pixiv.search.viewmodel.SearchViewModel
 import com.mrl.pixiv.splash.viewmodel.SplashMiddleware
 import com.mrl.pixiv.splash.viewmodel.SplashReducer
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
@@ -104,7 +110,9 @@ val viewModelModule = module {
 
     viewModel { BookmarkViewModel(get(), get()) }
 
-    viewModel { (illust: Illust) -> FollowViewModel(illust, get(), get()) }
+    viewModel { FollowViewModel(get(), get()) }
+
+    viewModel { SearchViewModel(get(), get()) }
 }
 
 val repositoryModule = module {
@@ -114,22 +122,24 @@ val repositoryModule = module {
     single { AuthRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
     single { IllustRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
     single { UserRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
+    single { SearchRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
 }
 
 val dataSourceModule = module {
     single { UserAuthDataSource(get(named(DataStoreEnum.USER_AUTH))) }
     single { UserInfoDataSource(get(named(DataStoreEnum.USER_INFO))) }
 
-    single { IllustHttpService(provideIllustService(get())) }
+    single { IllustHttpService(provideCommonService(get(), IllustApi::class.java)) }
     single { UserAuthHttpService(provideAuthService(get())) }
-    single { UserHttpService(provideUserService(get())) }
+    single { UserHttpService(provideCommonService(get(), UserApi::class.java)) }
+    single { SearchHttpService(provideCommonService(get(), SearchApi::class.java)) }
 }
 
 val useCaseModule = module {
     single { SetUserRefreshTokenUseCase(get()) }
     single { SetUserAccessTokenUseCase(get()) }
-    single { GetUserInfoUseCase(get()) }
-    single { SetUserInfoUseCase(get()) }
+    single { GetLocalUserInfoUseCase(get()) }
+    single { SetLocalUserInfoUseCase(get()) }
     single { RefreshUserAccessTokenUseCase(get(), get(), get(), get(), get()) }
     single { BookmarkUseCase(get()) }
     single { UnBookmarkUseCase(get()) }
@@ -149,6 +159,8 @@ val middlewareModule = module {
     factory { PictureMiddleware(get(), get()) }
 
     factory { FollowMiddleware(get()) }
+
+    factory { SearchMiddleware(get()) }
 }
 
 val reducerModule = module {
@@ -159,17 +171,15 @@ val reducerModule = module {
     single { ProfileReducer() }
     single { PictureReducer() }
     single { FollowReducer() }
+    single { SearchReducer() }
 }
 
 fun provideAuthService(
     httpManager: HttpManager,
 ): UserAuthApi = httpManager.getAuthService(UserAuthApi::class.java)
 
-fun provideUserService(
+fun <T> provideCommonService(
     httpManager: HttpManager,
-): UserApi = httpManager.getCommonService(UserApi::class.java)
-
-fun provideIllustService(
-    httpManager: HttpManager,
-): IllustApi = httpManager.getCommonService(IllustApi::class.java)
+    clazz: Class<T>,
+): T = httpManager.getCommonService(clazz)
 

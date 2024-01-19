@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 val initRecommendedQuery = IllustRecommendedQuery(
-    filter = Filter.ANDROID.filter,
+    filter = Filter.ANDROID.value,
     includeRankingIllusts = true,
     includePrivacyPolicy = true
 )

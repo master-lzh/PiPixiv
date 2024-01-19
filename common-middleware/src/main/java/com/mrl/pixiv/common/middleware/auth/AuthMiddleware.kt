@@ -5,8 +5,8 @@ import com.mrl.pixiv.data.Constants
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.AuthTokenResp
 import com.mrl.pixiv.data.auth.GrantType
+import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
-import com.mrl.pixiv.domain.SetUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.repository.local.UserLocalRepository
@@ -19,7 +19,7 @@ class AuthMiddleware(
     private val setUserAccessTokenUseCase: SetUserAccessTokenUseCase,
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
-    private val setUserInfoUseCase: SetUserInfoUseCase,
+    private val setLocalUserInfoUseCase: SetLocalUserInfoUseCase,
 ) : Middleware<AuthState, AuthAction>() {
     override suspend fun process(state: AuthState, action: AuthAction) {
         when (action) {
@@ -60,7 +60,7 @@ class AuthMiddleware(
 
     private fun setUserInfo(authTokenResp: AuthTokenResp) = launchIO {
         authTokenResp.apply {
-            user?.let { setUserInfoUseCase(it) }
+            user?.let { setLocalUserInfoUseCase(it) }
             setUserAccessTokenUseCase(accessToken)
             setUserRefreshTokenUseCase(refreshToken)
         }

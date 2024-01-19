@@ -7,6 +7,7 @@ accompanist = "0.32.0"
 bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 foundation = { module = "androidx.compose.foundation:foundation" }
 animation = { module = "androidx.compose.animation:animation" }
+runtime-android = { module = "androidx.compose.runtime:runtime-android" }
 animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }

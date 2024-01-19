@@ -51,6 +51,7 @@ fun Project.configureAndroidCompose(
             add("implementation", androidx.findLibrary("core-ktx").get())
             add("implementation", androidx.findBundle("lifecycle").get())
             add("implementation", androidx.findLibrary("navigation.compose").get())
+            add("implementation", androidx.findLibrary("constraintlayout.compose").get())
 
             add("implementation", compose.findBundle("material").get())
             add("implementation", compose.findBundle("baselibs").get())
