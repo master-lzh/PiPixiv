@@ -35,8 +35,8 @@ enum class SearchAiType(override val value: Int) : IBaseEnum {
 }
 
 enum class SearchSort(override val value: String) : IBaseEnum {
-    DESC("date_desc"),
-    ASC("date_asc"),
+    DATE_DESC("date_desc"),
+    DATE_ASC("date_asc"),
     POPULAR_DESC("popular_desc"),
     POPULAR_MALE_DESC("popular_male_desc"),
     POPULAR_FEMALE_DESC("popular_female_desc");

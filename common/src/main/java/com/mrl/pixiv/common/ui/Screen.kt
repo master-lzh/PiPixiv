@@ -51,7 +51,7 @@ fun BaseScreen(
     } else {
         LightColors
     }
-    rememberSystemUiController().setStatusBarColor(Color.Transparent)
+    rememberSystemUiController().setStatusBarColor(Color.Transparent, darkIcons = !darkTheme)
     MaterialTheme(
         colors = colors,
         typography = MaterialTheme.typography,
@@ -115,7 +115,7 @@ fun Screen(
     } else {
         LightColors
     }
-    rememberSystemUiController().setStatusBarColor(Color.Transparent)
+    rememberSystemUiController().setStatusBarColor(Color.Transparent, darkIcons = !isSystemInDarkTheme())
     MaterialTheme(
         colors = colors,
         typography = MaterialTheme.typography,

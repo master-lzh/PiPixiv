@@ -5,9 +5,12 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Tag
 
 sealed class SearchAction : Action {
+    data object ClearSearchResult : SearchAction()
+
     data class UpdateSearchWords(
         val searchWords: String,
     ) : SearchAction()
+
     data class SearchAutoComplete(
         val searchWords: String,
         val mergePlainKeywordResults: Boolean = true,
@@ -19,16 +22,19 @@ sealed class SearchAction : Action {
 
     data class SearchIllust(
         val searchWords: String,
-        val searchFilter: SearchState.SearchFilter,
     ) : SearchAction()
 
     data class SearchIllustNext(
         val nextUrl: String,
-        val callback: () -> Unit,
+        val callback: () -> Unit = {},
     ) : SearchAction()
 
     data class UpdateSearchIllustsResult(
         val illusts: List<Illust>,
         val nextUrl: String,
+    ) : SearchAction()
+
+    data class UpdateFilter(
+        val searchFilter: SearchState.SearchFilter,
     ) : SearchAction()
 }

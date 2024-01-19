@@ -99,6 +99,7 @@ import com.mrl.pixiv.common.middleware.follow.FollowAction
 import com.mrl.pixiv.common.middleware.follow.FollowState
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.ui.components.UserAvatar
+import com.mrl.pixiv.common.ui.deepBlue
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
@@ -413,7 +414,7 @@ internal fun PictureScreen(
                             modifier = Modifier
                                 .padding(vertical = 2.5.dp)
                                 .padding(end = 5.dp),
-                            style = TextStyle(fontSize = 12.sp, color = Color(0xFF2B7592)),
+                            style = TextStyle(fontSize = 12.sp, color = deepBlue),
                         )
                         Text(
                             text = it.translatedName,
@@ -471,7 +472,7 @@ internal fun PictureScreen(
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
                                 .background(
-                                    color = Color(0xFF03A9F4),
+                                    color = MaterialTheme.colors.primary,
                                     shape = MaterialTheme.shapes.medium
                                 )
                                 .padding(horizontal = 10.dp, vertical = 8.dp)
@@ -491,7 +492,7 @@ internal fun PictureScreen(
                                 .align(Alignment.CenterVertically)
                                 .border(
                                     width = 1.dp,
-                                    color = Color(0xFF2B7592),
+                                    color = deepBlue,
                                     shape = MaterialTheme.shapes.medium
                                 )
                                 .padding(horizontal = 10.dp, vertical = 8.dp)
@@ -500,7 +501,7 @@ internal fun PictureScreen(
                                 },
                             text = "关注",
                             style = TextStyle(
-                                color = Color(0xFF2B7592),
+                                color = deepBlue,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                             ),
