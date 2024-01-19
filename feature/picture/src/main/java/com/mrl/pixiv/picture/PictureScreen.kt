@@ -21,15 +21,12 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -41,7 +38,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -98,9 +94,11 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowAction
 import com.mrl.pixiv.common.middleware.follow.FollowState
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
+import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.deepBlue
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
+import com.mrl.pixiv.common_ui.util.StatusBarSpacer
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.home.viewmodel.HomeAction
@@ -245,18 +243,8 @@ internal fun PictureScreen(
             }
         )
     }
-    Scaffold(
+    Screen(
         scaffoldState = scaffoldState,
-        topBar = {
-            Column {
-                Spacer(
-                    Modifier
-                        .background(Color.Black)
-                        .windowInsetsTopHeight(WindowInsets.statusBars) // Match the height of the status bar
-                        .fillMaxWidth()
-                )
-            }
-        },
         floatingActionButton = {
             Box(
                 Modifier
@@ -608,41 +596,47 @@ internal fun PictureScreen(
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
-                Box(
-                    modifier = Modifier
-                        .constrainAs(appbar) {
-                            top.linkTo(parent.top)
-                        }
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp)
-                        .padding(top = 10.dp)
+                Column(
+                    modifier = Modifier.constrainAs(appbar) {
+                        top.linkTo(parent.top)
+                    }
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
-                        contentDescription = null,
+                    StatusBarSpacer(
+                        color = Color.Transparent
+                    )
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .click {
-                                popBackStack()
-                            },
-                    )
-                    // 分享按钮
-                    Icon(
-                        imageVector = Icons.Rounded.Share,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .click {
-                                val shareIntent = createShareIntent(
-                                    "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
-                                )
-                                shareLauncher.launch(shareIntent)
-                            },
-                    )
-                    Text(
-                        text = "${currPage.value + 1}/${illust.pageCount}",
-                        modifier = Modifier.align(Alignment.Center),
-                    )
+                            .fillMaxWidth()
+                            .padding(horizontal = 15.dp)
+                            .padding(top = 10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .click {
+                                    popBackStack()
+                                },
+                        )
+                        // 分享按钮
+                        Icon(
+                            imageVector = Icons.Rounded.Share,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .click {
+                                    val shareIntent = createShareIntent(
+                                        "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
+                                    )
+                                    shareLauncher.launch(shareIntent)
+                                },
+                        )
+                        Text(
+                            text = "${currPage.value + 1}/${illust.pageCount}",
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    }
                 }
             }
             AnimatedVisibility(

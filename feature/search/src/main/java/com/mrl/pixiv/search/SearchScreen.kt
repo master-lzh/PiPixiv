@@ -263,7 +263,7 @@ internal fun SearchResultScreen(
     Screen(
         topBar = {
             Column {
-                StatusBarSpacer(MaterialTheme.colors.primarySurface)
+                StatusBarSpacer(color = MaterialTheme.colors.primarySurface)
                 TopAppBar(
                     title = {
                         Text(
