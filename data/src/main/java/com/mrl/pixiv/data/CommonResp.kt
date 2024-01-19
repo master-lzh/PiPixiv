@@ -1,5 +1,8 @@
 package com.mrl.pixiv.data
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
@@ -79,8 +82,10 @@ data class Illust(
     val illustAIType: Int = 0,
 
     @SerialName("illust_book_style")
-    val illustBookStyle: Int = 0
-)
+    val illustBookStyle: Int = 0,
+) {
+    var isBookmarkedReal by mutableStateOf(isBookmarked)
+}
 
 @Serializable
 data class MetaPage(

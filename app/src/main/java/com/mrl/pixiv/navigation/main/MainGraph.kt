@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
@@ -19,7 +20,9 @@ import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
-import com.mrl.pixiv.search.SearchScreen
+import com.mrl.pixiv.search.SearchResultScreen1
+import com.mrl.pixiv.search.SearchScreen1
+import com.mrl.pixiv.search.viewmodel.SearchViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -94,6 +97,34 @@ fun MainGraph(
                 followViewModel = followViewModel,
                 bookmarkViewModel = bookmarkViewModel,
             )
+        }
+        composable(
+            route = Graph.SEARCH,
+        ) {
+            val searchViewModel: SearchViewModel = koinViewModel(viewModelStoreOwner = it)
+            val searchNavHostController = rememberNavController()
+            NavHost(
+                navController = searchNavHostController,
+                route = Graph.SEARCH,
+                startDestination = Destination.SearchScreen.route
+            ) {
+                composable(
+                    route = Destination.SearchScreen.route,
+                ) {
+                    SearchScreen1(
+                        navHostController = searchNavHostController,
+                        searchViewModel = searchViewModel
+                    )
+                }
+                composable(
+                    route = Destination.SearchResultsScreen.route,
+                ) {
+                    SearchResultScreen1(
+                        navHostController = searchNavHostController,
+                        searchViewModel = searchViewModel
+                    )
+                }
+            }
         }
     }
 }

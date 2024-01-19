@@ -44,4 +44,6 @@ sealed class Destination(
     }
 
     data object SearchScreen : Destination(route = "search_screen")
+
+    data object SearchResultsScreen : Destination(route = "search_results_screen")
 }

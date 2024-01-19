@@ -145,7 +145,7 @@ class PictureMiddleware(
                 request = illustRemoteRepository.getIllustRelated(
                     IllustRelatedQuery(
                         illustId = illustId,
-                        filter = Filter.ANDROID.filter
+                        filter = Filter.ANDROID.value
                     )
                 )
             ) {

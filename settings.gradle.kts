@@ -29,16 +29,20 @@ rootProject.name = "PiPixiv"
 include(":app")
 include(":common")
 include(":util")
-include(":feature:login")
 include(":repository")
 include(":datasource")
 include(":data")
 include(":api")
 include(":network")
 include(":domain")
-include(":feature:home")
-include(":feature:profile")
 include(":common-ui")
-include(":feature:picture")
 include(":common-middleware")
 include(":benchmark")
+
+// include modules in feature folder
+file("./feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
+    // 使用目录名称构建模块路径
+    val moduleName = ":feature:${moduleDir.name}"
+    println("module name: $moduleName")
+    include(moduleName)
+}

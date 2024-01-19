@@ -5,12 +5,12 @@ import com.mrl.pixiv.data.IBaseQueryMap
 import com.mrl.pixiv.data.Restrict
 
 data class UserDetailQuery(
-    val filter: String = Filter.ANDROID.filter,
+    val filter: String = Filter.ANDROID.value,
     val userId: Long,
 ) : IBaseQueryMap
 
 data class UserIllustsQuery(
-    val filter: String = Filter.ANDROID.filter,
+    val filter: String = Filter.ANDROID.value,
     val userId: Long,
     val type: String,
 ) : IBaseQueryMap

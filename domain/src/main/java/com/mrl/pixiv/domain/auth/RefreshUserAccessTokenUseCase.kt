@@ -4,8 +4,8 @@ import com.mrl.pixiv.common.coroutine.launchIO
 import com.mrl.pixiv.common.network.safeHttpCall
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.GrantType
+import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
-import com.mrl.pixiv.domain.SetUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
@@ -16,7 +16,7 @@ class RefreshUserAccessTokenUseCase(
     private val userLocalRepository: UserLocalRepository,
     private val setUserAccessTokenUseCase: SetUserAccessTokenUseCase,
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
-    private val setUserInfoUseCase: SetUserInfoUseCase,
+    private val setLocalUserInfoUseCase: SetLocalUserInfoUseCase,
 ) {
     suspend operator fun invoke(onSuccess: () -> Unit = {}) {
         val userRefreshToken = userLocalRepository.userRefreshToken.first()
@@ -29,7 +29,7 @@ class RefreshUserAccessTokenUseCase(
         ) {
             onSuccess()
             launchIO {
-                it.user?.let { setUserInfoUseCase(it) }
+                it.user?.let { setLocalUserInfoUseCase(it) }
                 setUserAccessTokenUseCase(it.accessToken)
                 setUserRefreshTokenUseCase(it.refreshToken)
             }

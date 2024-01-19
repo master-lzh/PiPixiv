@@ -12,8 +12,8 @@ import com.mrl.pixiv.util.TAG
 
 @Composable
 fun OnLifecycle(
+    lifecycleEvent: Lifecycle.Event = Lifecycle.Event.ON_START,
     onLifecycle: () -> Unit,
-    lifecycleEvent: Lifecycle.Event = Lifecycle.Event.ON_START
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val onLifecycle by rememberUpdatedState(newValue = onLifecycle::invoke)
@@ -24,22 +24,22 @@ fun OnLifecycle(
             }
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {
-                    Log.d(TAG, "onCreate")
+                    Log.d(TAG, "$lifecycleOwner onCreate")
                 }
                 Lifecycle.Event.ON_START -> {
-                    Log.d(TAG, "On Start")
+                    Log.d(TAG, "$lifecycleOwner On Start")
                 }
                 Lifecycle.Event.ON_RESUME -> {
-                    Log.d(TAG, "On Resume")
+                    Log.d(TAG, "$lifecycleOwner On Resume")
                 }
                 Lifecycle.Event.ON_PAUSE -> {
-                    Log.d(TAG, "On Pause")
+                    Log.d(TAG, "$lifecycleOwner On Pause")
                 }
                 Lifecycle.Event.ON_STOP -> {
-                    Log.d(TAG, "On Stop")
+                    Log.d(TAG, "$lifecycleOwner On Stop")
                 }
                 Lifecycle.Event.ON_DESTROY -> {
-                    Log.d(TAG, "On Destroy")
+                    Log.d(TAG, "$lifecycleOwner On Destroy")
                 }
                 else -> {}
             }

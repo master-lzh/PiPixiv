@@ -2,6 +2,7 @@ package com.mrl.pixiv.common_ui.util
 
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.router.Destination
+import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.data.Illust
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -23,7 +24,13 @@ fun NavHostController.navigateToPictureScreen(illust: Illust) {
 }
 
 fun NavHostController.navigateToSearchScreen() {
-    navigate(route = Destination.SearchScreen.route) {
-        restoreState = true
+    navigate(route = Graph.SEARCH) {
+        launchSingleTop = true
+    }
+}
+
+fun NavHostController.navigateToSearchResultScreen() {
+    navigate(route = Destination.SearchResultsScreen.route) {
+        launchSingleTop = true
     }
 }
