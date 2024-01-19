@@ -34,3 +34,9 @@ fun NavHostController.navigateToSearchResultScreen() {
         launchSingleTop = true
     }
 }
+
+fun NavHostController.navigateToMainScreen() {
+    navigate(route = Graph.MAIN) {
+        launchSingleTop = true
+    }
+}

@@ -59,9 +59,9 @@ class SearchMiddleware(
                 request = searchRemoteRepository.searchIllust(
                     SearchIllustQuery(
                         word = action.searchWords,
-                        sort = action.searchFilter.sort,
-                        searchTarget = action.searchFilter.searchTarget,
-                        searchAiType = action.searchFilter.searchAiType,
+                        sort = state.searchFilter.sort,
+                        searchTarget = state.searchFilter.searchTarget,
+                        searchAiType = state.searchFilter.searchAiType,
                     )
                 ),
             ) {

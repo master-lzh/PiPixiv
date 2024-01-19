@@ -112,7 +112,8 @@ fun MainGraph(
                     route = Destination.SearchScreen.route,
                 ) {
                     SearchScreen1(
-                        navHostController = searchNavHostController,
+                        searchNavHostController = searchNavHostController,
+                        navHostController = navHostController,
                         searchViewModel = searchViewModel
                     )
                 }
@@ -120,8 +121,10 @@ fun MainGraph(
                     route = Destination.SearchResultsScreen.route,
                 ) {
                     SearchResultScreen1(
-                        navHostController = searchNavHostController,
-                        searchViewModel = searchViewModel
+                        searchNavHostController = searchNavHostController,
+                        navHostController = navHostController,
+                        searchViewModel = searchViewModel,
+                        bookmarkViewModel = bookmarkViewModel
                     )
                 }
             }
