@@ -1,13 +1,13 @@
 [versions]
-agp_version = "8.2.0-rc03"
-lifecycle_version = "2.6.2"
+agp_version = "8.2.1"
+lifecycle_version = "2.7.0"
 appcompat_version = "1.6.1"
 
 [libraries]
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp_version" }
 
-activity-compose = "androidx.activity:activity-compose:1.8.0"
-annotation = "androidx.annotation:annotation:1.7.0"
+activity-compose = "androidx.activity:activity-compose:1.8.2"
+annotation = "androidx.annotation:annotation:1.7.1"
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat_version" }
 biometricktx = "androidx.biometric:biometric-ktx:1.2.0-alpha05"
 constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
@@ -27,18 +27,18 @@ lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-com
 lifecycle-viewmodelktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle_version" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle_version" }
 
-work-runtime = "androidx.work:work-runtime-ktx:2.8.1"
+work-runtime = "androidx.work:work-runtime-ktx:2.9.0"
 guava = "com.google.guava:guava:31.1-jre"
 
 paging-runtime = "androidx.paging:paging-runtime:3.2.1"
 paging-compose = "androidx.paging:paging-compose:3.2.1"
 
-navigation-compose = "androidx.navigation:navigation-compose:2.7.5"
+navigation-compose = "androidx.navigation:navigation-compose:2.7.6"
 
 datastore = "androidx.datastore:datastore:1.0.0"
 datastore-preferences = "androidx.datastore:datastore-preferences:1.0.0"
 
-benchmark-macro = "androidx.benchmark:benchmark-macro-junit4:1.2.0"
+benchmark-macro = "androidx.benchmark:benchmark-macro-junit4:1.2.2"
 test-ext = "androidx.test.ext:junit-ktx:1.1.5"
 test-espresso-core = "androidx.test.espresso:espresso-core:3.5.1"
 test-uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
