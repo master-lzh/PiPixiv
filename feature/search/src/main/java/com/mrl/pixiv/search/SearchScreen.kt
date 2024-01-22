@@ -314,30 +314,13 @@ internal fun SearchResultScreen(
             ) { illusts ->
                 Row {
                     illusts.forEach { illust ->
-                        val isBookmarked = bookmarkState.bookmarkStatus[illust.id]
-                            ?: illust.isBookmarked
                         SquareIllustItem(
-                            isBookmark = isBookmarked,
+                            illust = illust,
+                            bookmarkState = bookmarkState,
+                            dispatch = bookmarkDispatch,
                             spanCount = SPAN_COUNT,
-                            url = illust.imageUrls.squareMedium,
-                            imageCount = illust.pageCount,
                             paddingValues = PaddingValues(2.dp),
-                            onBookmarkClick = {
-                                if (isBookmarked) {
-                                    bookmarkDispatch(
-                                        BookmarkAction.IllustBookmarkDeleteIntent(
-                                            illustId = illust.id,
-                                        )
-                                    )
-                                } else {
-                                    bookmarkDispatch(
-                                        BookmarkAction.IllustBookmarkAddIntent(
-                                            illustId = illust.id,
-                                        )
-                                    )
-                                }
-                            },
-                            onClick = { naviToPic(illust) },
+                            navToPictureScreen = naviToPic,
                         )
                     }
                 }

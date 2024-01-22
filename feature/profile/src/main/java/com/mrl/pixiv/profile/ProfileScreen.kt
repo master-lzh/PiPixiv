@@ -32,6 +32,9 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.mrl.pixiv.common.coil.BlurTransformation
 import com.mrl.pixiv.common.compose.OnLifecycle
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
@@ -52,12 +55,15 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
+    bookmarkViewModel: BookmarkViewModel,
     profileViewModel: ProfileViewModel = koinViewModel(),
 ) {
     OnLifecycle(onLifecycle = profileViewModel::onStart)
     ProfileScreen(
         modifier = modifier,
         state = profileViewModel.state,
+        bookmarkState = bookmarkViewModel.state,
+        bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         dispatch = profileViewModel::dispatch,
     )
@@ -67,6 +73,8 @@ fun ProfileScreen(
 internal fun ProfileScreen(
     modifier: Modifier = Modifier,
     state: ProfileState,
+    bookmarkState: BookmarkState,
+    bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust) -> Unit = {},
     dispatch: (ProfileAction) -> Unit,
 ) {
@@ -154,7 +162,7 @@ internal fun ProfileScreen(
                 modifier = Modifier
                     .padding(start = 15.dp, top = backgroundHeight - 50.dp)
                     .size(100.dp)
-                    .road(Alignment.BottomStart, Alignment.TopStart)
+                    .road(BottomStart, Alignment.TopStart)
                     .graphicsLayer {
                         alpha *= collapsingToolbarScaffoldState.toolbarState.progress
                     }
@@ -244,6 +252,8 @@ internal fun ProfileScreen(
             item(key = "user_bookmarks_illusts") {
                 // 插画、漫画收藏网格组件
                 IllustBookmarkWidget(
+                    bookmarkState = bookmarkState,
+                    bookmarkDispatch = bookmarkDispatch,
                     navToPictureScreen = navToPictureScreen,
                     illusts = state.userBookmarksIllusts
                 )

@@ -7,21 +7,8 @@ class HomeReducer : Reducer<HomeState, HomeAction> {
         return when (action) {
             is HomeAction.UpdateState -> action.state
             is HomeAction.DismissLoading -> state.copy(isRefresh = false)
-            is HomeAction.UpdateIllustBookmark -> updateRecommendList(state, action)
             is HomeAction.RefreshIllustRecommendedIntent -> state.copy(isRefresh = true)
             else -> state
         }
-    }
-
-    private fun updateRecommendList(
-        state: HomeState,
-        action: HomeAction.UpdateIllustBookmark
-    ): HomeState {
-        val imageList = state.recommendImageList
-        val index = imageList.indexOfFirst { it.illust.id == action.id }
-        if (index != -1) {
-            imageList[index] = imageList[index].copy(isBookmarked = action.bookmarked)
-        }
-        return state
     }
 }

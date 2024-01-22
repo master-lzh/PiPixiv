@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.data.Illust
 
@@ -28,6 +30,8 @@ private const val MAX_SHOW_ILLUST_COUNT = 6
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun IllustBookmarkWidget(
+    bookmarkState: BookmarkState,
+    bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust) -> Unit,
     illusts: List<Illust>,
 ) {
@@ -69,14 +73,13 @@ fun IllustBookmarkWidget(
             illusts.take(MAX_SHOW_ILLUST_COUNT).forEach {
                 val illust = it
                 SquareIllustItem(
-                    isBookmark = illust.isBookmarked,
+                    illust = illust,
+                    bookmarkState = bookmarkState,
+                    dispatch = bookmarkDispatch,
                     spanCount = SPAN_COUNT,
-                    url = illust.imageUrls.squareMedium,
-                    imageCount = illust.pageCount,
                     horizontalPadding = horizontalPadding,
-                ) {
-                    navToPictureScreen(illust)
-                }
+                    navToPictureScreen = navToPictureScreen,
+                )
             }
         }
     }

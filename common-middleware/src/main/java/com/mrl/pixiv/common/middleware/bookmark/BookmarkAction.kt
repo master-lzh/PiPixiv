@@ -7,5 +7,4 @@ sealed class BookmarkAction : Action {
     data class IllustBookmarkDeleteIntent(val illustId: Long) : BookmarkAction()
 
     data class UpdateBookmarkState(val illustId: Long, val isBookmarked: Boolean) : BookmarkAction()
-    data class UpdateState(val state: BookmarkState) : BookmarkAction()
 }

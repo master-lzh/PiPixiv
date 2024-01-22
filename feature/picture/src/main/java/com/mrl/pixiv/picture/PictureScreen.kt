@@ -101,8 +101,6 @@ import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.StatusBarSpacer
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.home.viewmodel.HomeAction
-import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
@@ -133,7 +131,6 @@ fun PictureScreen(
     viewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
     bookmarkViewModel: BookmarkViewModel,
     followViewModel: FollowViewModel,
-    homeViewModel: HomeViewModel,
 ) {
     OnLifecycle(onLifecycle = viewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
     PictureScreen(
@@ -146,7 +143,6 @@ fun PictureScreen(
         popBackStack = navHostController::popBackStack,
         dispatch = viewModel::dispatch,
         bookmarkDispatch = bookmarkViewModel::dispatch,
-        homeDispatch = homeViewModel::dispatch,
         followDispatch = followViewModel::dispatch,
     )
 }
@@ -166,7 +162,6 @@ internal fun PictureScreen(
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
-    homeDispatch: (HomeAction) -> Unit = {},
     followDispatch: (FollowAction) -> Unit = {},
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -195,11 +190,7 @@ internal fun PictureScreen(
     val isBarVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex <= illust.pageCount } }
     val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
     val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
-    var isBookmarked by rememberSaveable {
-        mutableStateOf(
-            bookmarkState.bookmarkStatus[illust.id] ?: false
-        )
-    }
+
     var isFollowed by rememberSaveable {
         mutableStateOf(
             followState.followStatus[illust.user.id] ?: false
@@ -212,10 +203,6 @@ internal fun PictureScreen(
     var currLongClickPicSize by rememberSaveable { mutableFloatStateOf(0f) }
     val lastRelatedPic = remember { mutableStateListOf<Illust>() }
     var loading by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(bookmarkState.bookmarkStatus[illust.id]) {
-        isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: false
-        homeDispatch(HomeAction.UpdateIllustBookmark(illust.id, isBookmarked))
-    }
     LaunchedEffect(followState.followStatus[illust.user.id]) {
         isFollowed = followState.followStatus[illust.user.id] ?: false
     }
@@ -249,7 +236,7 @@ internal fun PictureScreen(
             Box(
                 Modifier
                     .click {
-                        if (isBookmarked) {
+                        if (bookmarkState.bookmarkStatus[illust.id] == true) {
                             bookmarkDispatch(
                                 BookmarkAction.IllustBookmarkDeleteIntent(
                                     illust.id
@@ -268,6 +255,7 @@ internal fun PictureScreen(
                     .padding(10.dp)
 
             ) {
+                val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
                 Icon(
                     imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                     contentDescription = null,
@@ -506,19 +494,15 @@ internal fun PictureScreen(
                     state.userIllusts.subList(0, minOf(USER_ILLUSTS_COUNT, state.userIllusts.size))
                         .forEach {
                             SquareIllustItem(
-                                isBookmark = it.isBookmarked,
+                                illust = it,
+                                bookmarkState = bookmarkState,
+                                dispatch = bookmarkDispatch,
                                 spanCount = minOf(USER_ILLUSTS_COUNT, state.userIllusts.size),
-                                url = it.imageUrls.squareMedium,
-                                imageCount = it.pageCount,
                                 horizontalPadding = 15.dp,
                                 paddingValues = PaddingValues(2.dp),
                                 elevation = 1.dp,
-                                onBookmarkClick = {
-                                    bookmarkIllust(dispatch, it.id, it.isBookmarked)
-                                }
-                            ) {
-                                navToPictureScreen(it)
-                            }
+                                navToPictureScreen = navToPictureScreen
+                            )
                         }
                 }
             }
@@ -549,18 +533,14 @@ internal fun PictureScreen(
                 ) {
                     it.forEach {
                         SquareIllustItem(
-                            isBookmark = it.isBookmarked,
+                            illust = it,
+                            bookmarkState = bookmarkState,
+                            dispatch = bookmarkDispatch,
                             spanCount = 2,
-                            url = it.imageUrls.squareMedium,
-                            imageCount = it.pageCount,
                             paddingValues = PaddingValues(5.dp),
                             elevation = 5.dp,
-                            onBookmarkClick = {
-                                bookmarkIllust(dispatch, it.id, it.isBookmarked)
-                            },
-                        ) {
-                            navToPictureScreen(it)
-                        }
+                            navToPictureScreen = navToPictureScreen
+                        )
                     }
                 }
             }
@@ -889,17 +869,5 @@ private fun LazyListState.OnScrollToRelatedBottom(
         Log.d("TAG", "OnScrollToBottom: $isToBottom")
         isScrollToBottom.value = isToBottom
         Log.d("TAG", "OnScrollToBottom: $isScrollToBottom")
-    }
-}
-
-private fun bookmarkIllust(
-    dispatch: (PictureAction) -> Unit,
-    id: Long,
-    isBookmarked: Boolean
-) {
-    if (isBookmarked) {
-        dispatch(PictureAction.UnBookmarkIllust(id))
-    } else {
-        dispatch(PictureAction.BookmarkIllust(id))
     }
 }

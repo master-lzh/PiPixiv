@@ -8,7 +8,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.router.Destination
@@ -53,6 +52,7 @@ fun MainGraph(
             HomeScreen(
                 navHostController = navHostController,
                 homeViewModel = homeViewModel,
+                bookmarkViewModel = bookmarkViewModel,
                 offsetAnimation = offsetAnimation
             )
         }
@@ -65,7 +65,10 @@ fun MainGraph(
             ),
 
             ) {
-            ProfileScreen(navHostController = navHostController)
+            ProfileScreen(
+                navHostController = navHostController,
+                bookmarkViewModel = bookmarkViewModel
+            )
         }
         composable(
             route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustParams}}",
@@ -84,18 +87,11 @@ fun MainGraph(
                 (it.arguments?.getString(Destination.PictureScreen.illustParams)) ?: ""
             val illustDecode = Base64.UrlSafe.decode(illustParams).decodeToString()
             val illust = JSON.decodeFromString<Illust>(illustDecode)
-            bookmarkViewModel.dispatch(
-                BookmarkAction.UpdateBookmarkState(
-                    illust.id,
-                    illust.isBookmarked
-                )
-            )
             PictureScreen(
                 illust = illust,
                 navHostController = navHostController,
-                homeViewModel = homeViewModel,
-                followViewModel = followViewModel,
                 bookmarkViewModel = bookmarkViewModel,
+                followViewModel = followViewModel,
             )
         }
         composable(

@@ -11,21 +11,20 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.home.state.RecommendImageItemState
 import com.mrl.pixiv.util.OnScrollToBottom
 
 @Composable
 fun RecommendGrid(
     navToPictureScreen: (Illust) -> Unit,
-    scaffoldState: ScaffoldState,
+    bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,
-    recommendImageList: List<RecommendImageItemState>,
+    recommendImageList: List<Illust>,
     loadMore: Boolean,
     onBookmarkClick: (Long, Boolean) -> Unit,
     onScrollToBottom: () -> Unit,
@@ -38,7 +37,7 @@ fun RecommendGrid(
         modifier = Modifier.fillMaxSize()
     ) {
         items(recommendImageList, key = { it.id }) {
-            RecommendImageItem(navToPictureScreen, scaffoldState, it, onBookmarkClick)
+            RecommendImageItem(navToPictureScreen, it, bookmarkState, onBookmarkClick)
         }
         if (loadMore) {
             item(key = "loading", span = StaggeredGridItemSpan.FullLine) {
