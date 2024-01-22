@@ -10,21 +10,14 @@ class BookmarkMiddleware(
 ) : Middleware<BookmarkState, BookmarkAction>() {
     override suspend fun process(state: BookmarkState, action: BookmarkAction) {
         when (action) {
-            is BookmarkAction.IllustBookmarkAddIntent -> bookmarkIllust(
-                state,
-                action.illustId
-            )
-
-            is BookmarkAction.IllustBookmarkDeleteIntent -> deleteBookmarkIllust(
-                state,
-                action.illustId
-            )
+            is BookmarkAction.IllustBookmarkAddIntent -> bookmarkIllust(action.illustId)
+            is BookmarkAction.IllustBookmarkDeleteIntent -> deleteBookmarkIllust(action.illustId)
 
             else -> {}
         }
     }
 
-    private fun deleteBookmarkIllust(state: BookmarkState, illustId: Long) {
+    private fun deleteBookmarkIllust(illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRemoteRepository.postIllustBookmarkDelete(
@@ -33,21 +26,17 @@ class BookmarkMiddleware(
                     )
                 )
             ) {
-                dispatch(BookmarkAction.UpdateState(state.apply {
-                    bookmarkStatus[illustId] = false
-                }))
+                dispatch(BookmarkAction.UpdateBookmarkState(illustId, false))
             }
         }
     }
 
-    private fun bookmarkIllust(state: BookmarkState, illustId: Long) {
+    private fun bookmarkIllust(illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRemoteRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
             ) {
-                dispatch(BookmarkAction.UpdateState(state.apply {
-                    bookmarkStatus[illustId] = true
-                }))
+                dispatch(BookmarkAction.UpdateBookmarkState(illustId, true))
             }
         }
     }

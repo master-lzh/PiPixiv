@@ -3,9 +3,9 @@ package com.mrl.pixiv.home.components
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.home.R
 import com.mrl.pixiv.home.TAG
@@ -16,8 +16,8 @@ import com.mrl.pixiv.util.ToastUtil
 @Composable
 fun HomeContent(
     navToPictureScreen: (Illust) -> Unit,
-    scaffoldState: ScaffoldState,
     state: HomeState,
+    bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,
     onBookmarkClick: (Long, Boolean) -> Unit,
     dismissRefresh: () -> Unit,
@@ -33,7 +33,7 @@ fun HomeContent(
 
     RecommendGrid(
         navToPictureScreen = navToPictureScreen,
-        scaffoldState = scaffoldState,
+        bookmarkState = bookmarkState,
         lazyStaggeredGridState = lazyStaggeredGridState,
         recommendImageList = state.recommendImageList,
         loadMore = state.loadMore,

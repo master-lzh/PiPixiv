@@ -31,14 +31,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.ui.BaseScreen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.common_ui.util.navigateToSearchScreen
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
-import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import com.mrl.pixiv.home.components.HomeContent
 import com.mrl.pixiv.home.components.HomeTopBar
@@ -71,13 +72,6 @@ fun HomeViewModel.onScrollToBottom() {
     )
 }
 
-fun HomeViewModel.onBookmarkClick(id: Long, bookmark: Boolean) {
-    if (bookmark) {
-        dispatch(HomeAction.IllustBookmarkAddIntent(IllustBookmarkAddReq(id)))
-    } else {
-        dispatch(HomeAction.IllustBookmarkDeleteIntent(IllustBookmarkDeleteReq(id)))
-    }
-}
 
 internal enum class HomeSnackbar(val actionLabel: String) {
     REVOKE_UNBOOKMARK("撤销取消收藏"),
@@ -88,12 +82,15 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
     homeViewModel: HomeViewModel = koinViewModel(),
+    bookmarkViewModel: BookmarkViewModel,
     offsetAnimation: IntOffset,
 ) {
 //    OnLifecycle(onLifecycle = homeViewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
     HomeScreen(
         modifier = modifier,
         state = homeViewModel.state,
+        bookmarkState = bookmarkViewModel.state,
+        bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         navToSearchScreen = navHostController::navigateToSearchScreen,
         homeViewModel = homeViewModel,
@@ -107,6 +104,8 @@ fun HomeScreen(
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     state: HomeState,
+    bookmarkState: BookmarkState,
+    bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust) -> Unit,
     navToSearchScreen: () -> Unit,
     homeViewModel: HomeViewModel = koinViewModel(),
@@ -129,7 +128,7 @@ internal fun HomeScreen(
                 SnackbarResult.Dismissed -> {}
 
                 SnackbarResult.ActionPerformed -> {
-                    homeViewModel.onBookmarkClick(id, true)
+                    bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
                 }
             }
         }
@@ -216,11 +215,15 @@ internal fun HomeScreen(
         ) {
             HomeContent(
                 navToPictureScreen = navToPictureScreen,
-                scaffoldState = scaffoldState,
                 state = state,
+                bookmarkState = bookmarkState,
                 lazyStaggeredGridState = lazyStaggeredGridState,
                 onBookmarkClick = { id, bookmark ->
-                    homeViewModel.onBookmarkClick(id, bookmark)
+                    if (bookmark) {
+                        bookmarkDispatch(BookmarkAction.IllustBookmarkDeleteIntent(id))
+                    } else {
+                        bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
+                    }
                     if (!bookmark) {
                         onUnBookmark(id)
                     }

@@ -29,21 +29,35 @@ import androidx.compose.ui.unit.times
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.click
 
 @Composable
 fun SquareIllustItem(
-    isBookmark: Boolean,
+    illust: Illust,
+    bookmarkState: BookmarkState,
+    dispatch: (BookmarkAction) -> Unit,
     spanCount: Int,
-    url: String,
-    imageCount: Int,
     horizontalPadding: Dp = 0.dp,
     paddingValues: PaddingValues = PaddingValues(1.dp),
     elevation: Dp = 0.dp,
-    onBookmarkClick: () -> Unit = {},
-    onClick: () -> Unit = {},
+    navToPictureScreen: (Illust) -> Unit,
 ) {
-
+    val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
+    val onBookmarkClick: () -> Unit = {
+        dispatch(
+            if (isBookmarked) {
+                BookmarkAction.IllustBookmarkDeleteIntent(illust.id)
+            } else {
+                BookmarkAction.IllustBookmarkAddIntent(illust.id)
+            }
+        )
+    }
+    val onClick = {
+        navToPictureScreen(illust.copy(isBookmarked = isBookmarked))
+    }
     ConstraintLayout(
         modifier = Modifier
             .padding(paddingValues)
@@ -67,11 +81,11 @@ fun SquareIllustItem(
                     bottom.linkTo(parent.bottom)
                 },
             model = ImageRequest.Builder(LocalContext.current)
-                .data(url).allowRgb565(true).build(),
+                .data(illust.imageUrls.squareMedium).allowRgb565(true).build(),
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
-        if (imageCount > 1) {
+        if (illust.pageCount > 1) {
             Row(
                 modifier = Modifier
                     .constrainAs(imageCountText) {
@@ -87,7 +101,7 @@ fun SquareIllustItem(
                     tint = Color.White,
                     modifier = Modifier.size(10.dp)
                 )
-                Text(text = "$imageCount", color = Color.White, fontSize = 10.sp)
+                Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
             }
         }
         IconButton(
@@ -99,10 +113,10 @@ fun SquareIllustItem(
             onClick = { onBookmarkClick() }
         ) {
             Icon(
-                imageVector = if (isBookmark) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                 contentDescription = "",
                 modifier = Modifier.size(24.dp),
-                tint = if (isBookmark) Color.Red else Color.Gray
+                tint = if (isBookmarked) Color.Red else Color.Gray
             )
         }
     }

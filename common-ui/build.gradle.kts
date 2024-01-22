@@ -26,8 +26,10 @@ dependencies {
     implementation(androidx.constraintlayout.compose)
     implementation(kotlinx.bundles.serialization)
 
-    implementation(project(mapOf("path" to ":util")))
-    implementation(project(mapOf("path" to ":common")))
+    implementation(project(":util"))
+    implementation(project(":common"))
+    implementation(project(":common-middleware"))
+    
 
     testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

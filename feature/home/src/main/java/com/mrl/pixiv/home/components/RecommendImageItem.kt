@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -30,8 +29,8 @@ import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.home.state.RecommendImageItemState
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.second
@@ -41,21 +40,25 @@ val SPACING_VERTICAL_DP = 5.dp
 const val SPAN_COUNT = 2
 const val INCLUDE_EDGE = true
 val recommendItemWidth =
-    (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (SPAN_COUNT + if (INCLUDE_EDGE) 1 else -1))/ SPAN_COUNT
+    (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (SPAN_COUNT + if (INCLUDE_EDGE) 1 else -1)) / SPAN_COUNT
 
 @Composable
 fun RecommendImageItem(
     navToPictureScreen: (Illust) -> Unit,
-    scaffoldState: ScaffoldState,
-    item: RecommendImageItemState,
+    illust: Illust,
+    bookmarkState: BookmarkState,
     onBookmarkClick: (id: Long, bookmark: Boolean) -> Unit
 ) {
+    val scale = illust.height * 1.0f / illust.width
+    val width = recommendItemWidth
+    val height = recommendItemWidth * scale
+    val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
     Surface(
         modifier = Modifier
             .padding(horizontal = 5.dp)
             .padding(bottom = 5.dp)
             .click {
-                navToPictureScreen(item.illust)
+                navToPictureScreen(illust)
             },
         shape = RoundedCornerShape(10.dp),
         elevation = 4.dp
@@ -64,12 +67,12 @@ fun RecommendImageItem(
             val radius = DisplayUtil.dp2px(10f).toFloat()
             Box(
                 modifier = Modifier
-                    .width(item.width)
-                    .height(item.height)
+                    .width(width)
+                    .height(height)
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(item.thumbnail).allowRgb565(true)
+                        .data(illust.imageUrls.medium).allowRgb565(true)
                         .transformations(
                             RoundedCornersTransformation(
                                 topLeft = radius,
@@ -81,8 +84,8 @@ fun RecommendImageItem(
                         .build(),
                     contentDescription = null,
                     modifier = Modifier
-                        .width(item.width)
-                        .height(item.height),
+                        .width(width)
+                        .height(height),
                     filterQuality = FilterQuality.None
                 )
             }
@@ -105,7 +108,7 @@ fun RecommendImageItem(
                         }
                 ) {
                     Text(
-                        text = item.title,
+                        text = illust.title,
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier,
                         maxLines = 1,
@@ -113,7 +116,7 @@ fun RecommendImageItem(
                     )
 
                     Text(
-                        text = item.author,
+                        text = illust.user.name,
                         style = MaterialTheme.typography.body2,
                         modifier = Modifier,
                         maxLines = 1,
@@ -128,14 +131,14 @@ fun RecommendImageItem(
                             end.linkTo(parent.end)
                         },
                     onClick = {
-                        onBookmarkClick(item.id, !item.isBookmarked)
+                        onBookmarkClick(illust.id, isBookmarked)
                     },
                 ) {
                     Icon(
-                        imageVector = if (item.isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                        imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                         contentDescription = "",
                         modifier = Modifier.size(24.dp),
-                        tint = if (item.isBookmarked) Color.Red else Color.Gray
+                        tint = if (isBookmarked) Color.Red else Color.Gray
                     )
                 }
             }

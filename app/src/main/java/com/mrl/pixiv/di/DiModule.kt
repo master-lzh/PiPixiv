@@ -148,7 +148,7 @@ val useCaseModule = module {
 val middlewareModule = module {
     factory { SplashMiddleware(get(), get(), get(), get(), get()) }
 
-    factory { HomeMiddleware(get(), get(), get(), get()) }
+    factory { HomeMiddleware(get(), get()) }
 
     factory { BookmarkMiddleware(get()) }
 
