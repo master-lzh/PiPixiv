@@ -38,6 +38,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -235,6 +236,30 @@ fun SearchResultScreen1(
         state = searchViewModel.state,
         bookmarkState = bookmarkViewModel.state,
         popBack = searchNavHostController::popBackStack,
+        naviToPic = navHostController::navigateToPictureScreen,
+        dispatch = searchViewModel::dispatch,
+        bookmarkDispatch = bookmarkViewModel::dispatch,
+    )
+}
+
+@Composable
+fun OutsideSearchResultsScreen(
+    modifier: Modifier = Modifier,
+    searchWord: String,
+    bookmarkViewModel: BookmarkViewModel,
+    searchViewModel: SearchViewModel = koinViewModel(),
+    navHostController: NavHostController,
+) {
+    val searchWord by remember { mutableStateOf(searchWord) }
+    LaunchedEffect(searchWord) {
+        searchViewModel.dispatch(SearchAction.UpdateSearchWords(searchWord))
+        searchViewModel.dispatch(SearchAction.SearchIllust(searchWords = searchWord))
+    }
+    SearchResultScreen(
+        modifier = modifier,
+        state = searchViewModel.state,
+        bookmarkState = bookmarkViewModel.state,
+        popBack = navHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
         dispatch = searchViewModel::dispatch,
         bookmarkDispatch = bookmarkViewModel::dispatch,

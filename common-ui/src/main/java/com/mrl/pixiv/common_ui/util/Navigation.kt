@@ -35,6 +35,12 @@ fun NavHostController.navigateToSearchResultScreen() {
     }
 }
 
+fun NavHostController.navigateToOutsideSearchResultScreen(searchWord: String) {
+    navigate(route = "${Destination.SearchResultsScreen.route}/$searchWord") {
+
+    }
+}
+
 fun NavHostController.navigateToMainScreen() {
     navigate(route = Graph.MAIN) {
         launchSingleTop = true

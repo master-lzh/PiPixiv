@@ -99,6 +99,7 @@ import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.deepBlue
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.StatusBarSpacer
+import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.picture.viewmodel.PictureAction
@@ -144,6 +145,7 @@ fun PictureScreen(
         dispatch = viewModel::dispatch,
         bookmarkDispatch = bookmarkViewModel::dispatch,
         followDispatch = followViewModel::dispatch,
+        navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
     )
 }
 
@@ -163,6 +165,7 @@ internal fun PictureScreen(
     dispatch: (PictureAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
     followDispatch: (FollowAction) -> Unit = {},
+    navToSearchResultScreen: (String) -> Unit = {},
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -389,7 +392,10 @@ internal fun PictureScreen(
                             text = "#" + it.name,
                             modifier = Modifier
                                 .padding(vertical = 2.5.dp)
-                                .padding(end = 5.dp),
+                                .padding(end = 5.dp)
+                                .click {
+                                    navToSearchResultScreen(it.name)
+                                },
                             style = TextStyle(fontSize = 12.sp, color = deepBlue),
                         )
                         Text(
