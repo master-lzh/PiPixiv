@@ -1,5 +1,6 @@
 package com.mrl.pixiv.util
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.runtime.Composable
@@ -14,6 +15,7 @@ import androidx.compose.ui.semantics.Role
 
 const val VIEW_CLICK_INTERVAL_TIME = 1000L//点击间隔时间
 
+@SuppressLint("ModifierFactoryUnreferencedReceiver")
 @OptIn(ExperimentalFoundationApi::class)
 inline fun Modifier.click(
     time: Long = VIEW_CLICK_INTERVAL_TIME,

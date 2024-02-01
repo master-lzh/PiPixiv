@@ -19,6 +19,7 @@ import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
+import com.mrl.pixiv.search.OutsideSearchResultsScreen
 import com.mrl.pixiv.search.SearchResultScreen1
 import com.mrl.pixiv.search.SearchScreen1
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
@@ -118,12 +119,29 @@ fun MainGraph(
                 ) {
                     SearchResultScreen1(
                         searchNavHostController = searchNavHostController,
-                        navHostController = navHostController,
+                        bookmarkViewModel = bookmarkViewModel,
                         searchViewModel = searchViewModel,
-                        bookmarkViewModel = bookmarkViewModel
+                        navHostController = navHostController
                     )
                 }
             }
+        }
+        composable(
+            route = "${Destination.SearchResultsScreen.route}/{${Destination.SearchResultsScreen.searchWord}}",
+            arguments = listOf(
+                navArgument(Destination.SearchResultsScreen.searchWord) {
+                    defaultValue = ""
+                }
+            ),
+        ) {
+            val searchWord =
+                (it.arguments?.getString(Destination.SearchResultsScreen.searchWord))
+                    ?: ""
+            OutsideSearchResultsScreen(
+                searchWord = searchWord,
+                bookmarkViewModel = bookmarkViewModel,
+                navHostController = navHostController,
+            )
         }
     }
 }
