@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.mrl.pixiv.common.ui.components.LoadingDots
 
 @Composable
@@ -51,7 +50,6 @@ fun BaseScreen(
     } else {
         LightColors
     }
-    rememberSystemUiController().setStatusBarColor(Color.Transparent, darkIcons = !darkTheme)
     MaterialTheme(
         colors = colors,
         typography = MaterialTheme.typography,
@@ -115,7 +113,6 @@ fun Screen(
     } else {
         LightColors
     }
-    rememberSystemUiController().setStatusBarColor(Color.Transparent, darkIcons = !isSystemInDarkTheme())
     MaterialTheme(
         colors = colors,
         typography = MaterialTheme.typography,
