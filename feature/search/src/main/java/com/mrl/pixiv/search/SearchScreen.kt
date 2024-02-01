@@ -30,7 +30,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterAlt
 import androidx.compose.material.primarySurface
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -132,7 +132,7 @@ internal fun SearchScreen(
                     IconButton(onClick = {
                         popBack()
                     }) {
-                        Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                     }
                     Surface(
                         modifier = Modifier
@@ -303,7 +303,7 @@ internal fun SearchResultScreen(
                         IconButton(onClick = {
                             popBack()
                         }) {
-                            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Back")
+                            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                         }
                     },
                     actions = {
