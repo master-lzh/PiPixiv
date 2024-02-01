@@ -1,7 +1,7 @@
 [versions]
 compiler = "1.5.8"
-compose-bom = "2023.10.01"
-accompanist = "0.32.0"
+compose-bom = "2024.01.00"
+accompanist = "0.34.0"
 
 [libraries]
 bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
