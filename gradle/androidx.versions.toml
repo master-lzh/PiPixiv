@@ -1,5 +1,5 @@
 [versions]
-agp_version = "8.2.1"
+agp_version = "8.2.2"
 lifecycle_version = "2.7.0"
 appcompat_version = "1.6.1"
 
@@ -38,7 +38,7 @@ navigation-compose = "androidx.navigation:navigation-compose:2.7.6"
 datastore = "androidx.datastore:datastore:1.0.0"
 datastore-preferences = "androidx.datastore:datastore-preferences:1.0.0"
 
-benchmark-macro = "androidx.benchmark:benchmark-macro-junit4:1.2.2"
+benchmark-macro = "androidx.benchmark:benchmark-macro-junit4:1.2.3"
 test-ext = "androidx.test.ext:junit-ktx:1.1.5"
 test-espresso-core = "androidx.test.espresso:espresso-core:3.5.1"
 test-uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
