@@ -36,21 +36,21 @@ import com.mrl.pixiv.util.second
 
 val SPACING_HORIZONTAL_DP = 5.dp
 val SPACING_VERTICAL_DP = 5.dp
-const val SPAN_COUNT = 2
 const val INCLUDE_EDGE = true
-val recommendItemWidth =
-    (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (SPAN_COUNT + if (INCLUDE_EDGE) 1 else -1)) / SPAN_COUNT
+
 
 @Composable
 fun RecommendImageItem(
     navToPictureScreen: (Illust) -> Unit,
     illust: Illust,
     bookmarkState: BookmarkState,
-    onBookmarkClick: (id: Long, bookmark: Boolean) -> Unit
+    onBookmarkClick: (id: Long, bookmark: Boolean) -> Unit,
+    spanCount: Int,
 ) {
+    val width =
+        (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (spanCount + if (INCLUDE_EDGE) 1 else -1)) / spanCount
     val scale = illust.height * 1.0f / illust.width
-    val width = recommendItemWidth
-    val height = recommendItemWidth * scale
+    val height = width * scale
     val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
     Surface(
         modifier = Modifier

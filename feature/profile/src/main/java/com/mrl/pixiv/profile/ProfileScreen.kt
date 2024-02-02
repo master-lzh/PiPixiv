@@ -1,5 +1,6 @@
 package com.mrl.pixiv.profile
 
+import android.content.res.Configuration
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -84,14 +86,19 @@ internal fun ProfileScreen(
 //    }
     val userInfo = state.userInfo
 //    val userInfo = UserInfo()
-    val backgroundHeight = DisplayUtil.getScreenWidthDp() / 3
+    val backgroundHeight = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_PORTRAIT -> DisplayUtil.getScreenWidthDp() / 3
+        Configuration.ORIENTATION_LANDSCAPE -> DisplayUtil.getScreenHeightDp() / 3
+        else -> DisplayUtil.getScreenWidthDp() / 3
+    }
     val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
 
     CollapsingToolbarScaffold(
         modifier = Modifier,
         state = collapsingToolbarScaffoldState,
         toolbar = {
-            val toolbarHeight = DisplayUtil.getStatusBarHeightDp(LocalContext.current as ComponentActivity) + 60.dp
+            val toolbarHeight =
+                DisplayUtil.getStatusBarHeightDp(LocalContext.current as ComponentActivity) + 60.dp
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
