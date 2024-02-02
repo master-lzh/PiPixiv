@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -132,7 +133,10 @@ internal fun SearchScreen(
                     IconButton(onClick = {
                         popBack()
                     }) {
-                        Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                     Surface(
                         modifier = Modifier
@@ -285,6 +289,11 @@ internal fun SearchResultScreen(
     val showBottomSheet = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState()
+    val spanCount = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_PORTRAIT -> 2
+        Configuration.ORIENTATION_LANDSCAPE -> 4
+        else -> 2
+    }
     Screen(
         topBar = {
             Column {
@@ -303,7 +312,10 @@ internal fun SearchResultScreen(
                         IconButton(onClick = {
                             popBack()
                         }) {
-                            Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
                     },
                     actions = {
@@ -330,7 +342,7 @@ internal fun SearchResultScreen(
             contentPadding = it,
         ) {
             items(
-                state.searchResults.chunked(SPAN_COUNT),
+                state.searchResults.chunked(spanCount),
                 key = {
                     it.joinToString("_") { illust ->
                         illust.id.toString()
@@ -343,7 +355,7 @@ internal fun SearchResultScreen(
                             illust = illust,
                             bookmarkState = bookmarkState,
                             dispatch = bookmarkDispatch,
-                            spanCount = SPAN_COUNT,
+                            spanCount = spanCount,
                             paddingValues = PaddingValues(2.dp),
                             navToPictureScreen = naviToPic,
                         )
