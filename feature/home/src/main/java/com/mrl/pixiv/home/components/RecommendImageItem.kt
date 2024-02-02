@@ -1,7 +1,9 @@
 package com.mrl.pixiv.home.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,9 +25,6 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ChainStyle
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
@@ -89,24 +88,13 @@ fun RecommendImageItem(
                     filterQuality = FilterQuality.None
                 )
             }
-
-            ConstraintLayout(
+            Row(
                 modifier = Modifier
                     .padding(start = 5.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val (titleAuthor, bookmark) = createRefs()
-                val barrier = createStartBarrier(bookmark)
-                createHorizontalChain(titleAuthor, bookmark, chainStyle = ChainStyle.SpreadInside)
-                Column(
-                    modifier = Modifier
-                        .constrainAs(titleAuthor) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(barrier)
-                            this.width = Dimension.preferredWrapContent
-                        }
-                ) {
+                Column {
                     Text(
                         text = illust.title,
                         style = MaterialTheme.typography.body1,
@@ -125,11 +113,6 @@ fun RecommendImageItem(
                 }
 
                 IconButton(
-                    modifier = Modifier
-                        .constrainAs(bookmark) {
-                            top.linkTo(parent.top)
-                            end.linkTo(parent.end)
-                        },
                     onClick = {
                         onBookmarkClick(illust.id, isBookmarked)
                     },
