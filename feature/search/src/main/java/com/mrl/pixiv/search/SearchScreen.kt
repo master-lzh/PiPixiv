@@ -85,7 +85,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-private const val SPAN_COUNT = 2
 
 @Composable
 fun SearchScreen1(
@@ -254,10 +253,10 @@ fun OutsideSearchResultsScreen(
     searchViewModel: SearchViewModel = koinViewModel(),
     navHostController: NavHostController,
 ) {
-    val searchWord by remember { mutableStateOf(searchWord) }
-    LaunchedEffect(searchWord) {
-        searchViewModel.dispatch(SearchAction.UpdateSearchWords(searchWord))
-        searchViewModel.dispatch(SearchAction.SearchIllust(searchWords = searchWord))
+    val currentSearch by remember { mutableStateOf(searchWord) }
+    LaunchedEffect(currentSearch) {
+        searchViewModel.dispatch(SearchAction.UpdateSearchWords(currentSearch))
+        searchViewModel.dispatch(SearchAction.SearchIllust(searchWords = currentSearch))
     }
     SearchResultScreen(
         modifier = modifier,
