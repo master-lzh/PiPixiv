@@ -64,8 +64,7 @@ fun MainGraph(
                     uriPattern = DestinationsDeepLink.ProfilePattern
                 }
             ),
-
-            ) {
+        ) {
             ProfileScreen(
                 navHostController = navHostController,
                 bookmarkViewModel = bookmarkViewModel

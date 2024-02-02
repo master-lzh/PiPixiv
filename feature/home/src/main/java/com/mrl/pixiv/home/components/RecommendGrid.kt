@@ -22,7 +22,6 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.OnScrollToBottom
 
-private const val SPAN_COUNT = 2
 
 @Composable
 fun RecommendGrid(
