@@ -1,5 +1,6 @@
 package com.mrl.pixiv.home.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,26 +10,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.FileCopy
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.ui.components.Surface
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.click
@@ -60,7 +65,8 @@ fun RecommendImageItem(
                 navToPictureScreen(illust)
             },
         shape = RoundedCornerShape(10.dp),
-        elevation = 4.dp
+        elevation = 4.dp,
+        propagateMinConstraints = false,
     ) {
         Column {
             val radius = DisplayUtil.dp2px(10f).toFloat()
@@ -124,6 +130,24 @@ fun RecommendImageItem(
                         tint = if (isBookmarked) Color.Red else Color.Gray
                     )
                 }
+            }
+        }
+        if (illust.pageCount > 1) {
+            Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .padding(horizontal = 5.dp)
+                    .align(Alignment.TopEnd),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.FileCopy,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(10.dp)
+                )
+                Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
             }
         }
     }

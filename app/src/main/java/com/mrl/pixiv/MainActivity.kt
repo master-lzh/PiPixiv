@@ -1,7 +1,6 @@
 package com.mrl.pixiv
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -48,7 +47,6 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         installSplashScreen().apply {
             setKeepOnScreenCondition {
                 splashViewModel.state.isLoading

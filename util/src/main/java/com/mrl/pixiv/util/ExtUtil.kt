@@ -9,12 +9,6 @@ import androidx.compose.runtime.remember
 import java.net.URL
 import java.net.URLDecoder
 
-val Number.dp_: Int
-    get() = DisplayUtil.dp2px(this.toFloat())
-
-val Number.sp_: Int
-    get() = DisplayUtil.sp2px(this.toFloat())
-
 val Number.second: Long
     get() = this.toLong() * 1000
 
