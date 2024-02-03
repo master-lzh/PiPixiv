@@ -14,6 +14,7 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.FileCopy
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -93,7 +94,8 @@ fun SquareIllustItem(
                         end.linkTo(image.end)
                     }
                     .background(Color.Black.copy(alpha = 0.5f))
-                    .padding(5.dp)
+                    .padding(horizontal = 5.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Rounded.FileCopy,

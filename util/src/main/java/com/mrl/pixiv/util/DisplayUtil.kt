@@ -1,4 +1,5 @@
 @file:Suppress("DEPRECATION")
+
 package com.mrl.pixiv.util
 
 import android.app.Activity
@@ -13,6 +14,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.mrl.pixiv.util.TestDeviceInfo.toPx
 import java.util.Locale
 
 object DisplayUtil {
@@ -35,18 +37,29 @@ object DisplayUtil {
     }
 
     fun getDisplayMetrics(): DisplayMetrics {
-        return getResources().displayMetrics
+        return try {
+            getResources().displayMetrics
+        } catch (e: Exception) {
+            DisplayMetrics().apply {
+                density = TestDeviceInfo.density
+                densityDpi = TestDeviceInfo.screenDpi.toInt()
+                scaledDensity = TestDeviceInfo.density
+                widthPixels = TestDeviceInfo.screenWidth.toPx().toInt()
+                heightPixels = TestDeviceInfo.screenHeight.toPx().toInt()
+            }
+        }
     }
 
     @JvmStatic
     fun dp2px(dpValue: Float): Int {
-        val scale: Float = getDisplayMetrics().density
+        val scale = getDisplayMetrics().density
         return (dpValue * scale + 0.5f).toInt()
     }
 
     @JvmStatic
     fun sp2px(sp: Float): Int {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, getDisplayMetrics()).toInt()
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, getDisplayMetrics())
+            .toInt()
     }
 
     @JvmStatic
@@ -115,13 +128,11 @@ object DisplayUtil {
     @JvmStatic
     fun getActionBarHeight(context: Context): Int {
         val tv = TypedValue()
-        return if (context.theme.resolveAttribute(16843499,
-                tv,
-                true)
-        ) TypedValue.complexToDimensionPixelSize(
-            tv.data,
-            context.resources.displayMetrics
-        ) else 0
+        return if (context.theme.resolveAttribute(16843499, tv, true)) {
+            TypedValue.complexToDimensionPixelSize(tv.data, context.resources.displayMetrics)
+        } else {
+            0
+        }
     }
 
     @JvmStatic
@@ -134,7 +145,7 @@ object DisplayUtil {
         return getResources().configuration.orientation == 1
     }
 
-    fun getOrientation() : Int {
+    fun getOrientation(): Int {
         return getConfiguration().orientation
     }
 
