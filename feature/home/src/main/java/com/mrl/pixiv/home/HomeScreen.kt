@@ -16,8 +16,8 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.ArrowUpward
-import androidx.compose.material.icons.rounded.Undo
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -169,7 +169,7 @@ internal fun HomeScreen(
                                         modifier = Modifier.align(Alignment.CenterVertically)
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Rounded.Undo,
+                                            imageVector = Icons.AutoMirrored.Rounded.Undo,
                                             contentDescription = null
                                         )
                                     }

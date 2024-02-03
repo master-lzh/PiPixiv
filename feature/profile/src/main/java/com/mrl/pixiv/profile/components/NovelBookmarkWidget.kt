@@ -11,7 +11,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -51,7 +51,7 @@ fun NovelBookmarkWidget(
                     fontSize = 12.sp,
                 )
                 Icon(
-                    imageVector = Icons.Rounded.ArrowForwardIos,
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
