@@ -12,6 +12,8 @@ import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.Window
 import android.view.WindowManager
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.util.TestDeviceInfo.toPx
@@ -73,9 +75,10 @@ object DisplayUtil {
         return getDisplayMetrics().heightPixels
     }
 
+    @Composable
     @JvmStatic
     fun getScreenHeightDp(): Dp {
-        return px2dp(getScreenHeight().toFloat()).dp
+        return LocalConfiguration.current.screenHeightDp.dp
     }
 
     @JvmStatic
@@ -84,8 +87,9 @@ object DisplayUtil {
     }
 
     @JvmStatic
+    @Composable
     fun getScreenWidthDp(): Dp {
-        return px2dp(getScreenWidth().toFloat()).dp
+        return LocalConfiguration.current.screenWidthDp.dp
     }
 
     @JvmStatic

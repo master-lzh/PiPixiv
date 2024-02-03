@@ -14,6 +14,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.rememberScaffoldState
@@ -76,6 +78,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -101,6 +104,7 @@ import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.StatusBarSpacer
 import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
+import com.mrl.pixiv.common_ui.util.popBackToMainScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureState
@@ -146,12 +150,11 @@ fun PictureScreen(
         bookmarkDispatch = bookmarkViewModel::dispatch,
         followDispatch = followViewModel::dispatch,
         navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
+        popBackToHomeScreen = navHostController::popBackToMainScreen,
     )
 }
 
-@OptIn(
-    ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
@@ -166,6 +169,7 @@ internal fun PictureScreen(
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
     followDispatch: (FollowAction) -> Unit = {},
     navToSearchResultScreen: (String) -> Unit = {},
+    popBackToHomeScreen: () -> Unit = {},
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -577,50 +581,66 @@ internal fun PictureScreen(
                 .fillMaxSize()
         ) {
             val (appbar, picInfo) = createRefs()
-            AnimatedVisibility(
-                visible = isBarVisible,
-                enter = fadeIn(),
-                exit = fadeOut(),
+//            AnimatedVisibility(
+//                visible = isBarVisible,
+//                enter = fadeIn(),
+//                exit = fadeOut(),
+//            ) {
+//
+//            }
+            Column(
+                modifier = Modifier.constrainAs(appbar) {
+                    top.linkTo(parent.top)
+                }
             ) {
-                Column(
-                    modifier = Modifier.constrainAs(appbar) {
-                        top.linkTo(parent.top)
-                    }
+                StatusBarSpacer(
+                    color = Color.Transparent
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp)
+                        .padding(top = 10.dp)
                 ) {
-                    StatusBarSpacer(
-                        color = Color.Transparent
-                    )
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 15.dp)
-                            .padding(top = 10.dp)
+                            .align(Alignment.CenterStart),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = null,
-                            modifier = Modifier
-                                .align(Alignment.CenterStart)
-                                .click {
-                                    popBackStack()
-                                },
+                            modifier = Modifier.click { popBackStack() },
                         )
-                        // 分享按钮
                         Icon(
-                            imageVector = Icons.Rounded.Share,
+                            imageVector = Icons.Rounded.Home,
                             contentDescription = null,
                             modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .click {
-                                    val shareIntent = createShareIntent(
-                                        "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
-                                    )
-                                    shareLauncher.launch(shareIntent)
-                                },
+                                .padding(start = 15.dp)
+                                .click { popBackToHomeScreen() }
                         )
+                    }
+                    // 分享按钮
+                    Icon(
+                        imageVector = Icons.Rounded.Share,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .click {
+                                val shareIntent = createShareIntent(
+                                    "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
+                                )
+                                shareLauncher.launch(shareIntent)
+                            },
+                    )
+                    this@Column.AnimatedVisibility(
+                        modifier = Modifier.align(Alignment.Center),
+                        visible = isBarVisible,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                    ) {
                         Text(
                             text = "${currPage.value + 1}/${illust.pageCount}",
-                            modifier = Modifier.align(Alignment.Center),
                         )
                     }
                 }
