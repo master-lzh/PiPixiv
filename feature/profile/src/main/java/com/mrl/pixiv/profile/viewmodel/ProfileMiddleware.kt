@@ -16,16 +16,16 @@ class ProfileMiddleware(
 ) : Middleware<ProfileState, ProfileAction>() {
     override suspend fun process(state: ProfileState, action: ProfileAction) {
         when (action) {
-            is ProfileAction.GetUserInfoIntent -> getUserInfo(state)
-            is ProfileAction.GetUserBookmarksIllustIntent -> getUserBookmarksIllust(state)
-            is ProfileAction.GetUserBookmarksNovelIntent -> getUserBookmarksNovel(state)
+            is ProfileAction.GetUserInfoIntent -> getUserInfo()
+            is ProfileAction.GetUserBookmarksIllustIntent -> getUserBookmarksIllust()
+            is ProfileAction.GetUserBookmarksNovelIntent -> getUserBookmarksNovel()
             is ProfileAction.GetUserIllustsIntent -> TODO()
 
             else -> {}
         }
     }
 
-    private fun getUserBookmarksNovel(state: ProfileState) =
+    private fun getUserBookmarksNovel() =
         launchNetwork {
             val userId = userLocalRepository.getUserId()
             requestHttpDataWithFlow(
@@ -37,7 +37,7 @@ class ProfileMiddleware(
             }
         }
 
-    private fun getUserBookmarksIllust(state: ProfileState) =
+    private fun getUserBookmarksIllust() =
         launchNetwork {
             val userId = userLocalRepository.getUserId()
             requestHttpDataWithFlow(
@@ -50,7 +50,7 @@ class ProfileMiddleware(
         }
 
 
-    private fun getUserInfo(state: ProfileState) = launchNetwork {
+    private fun getUserInfo() = launchNetwork {
         val userId = userLocalRepository.getUserId()
         requestHttpDataWithFlow(
             request = userRemoteRepository.getUserDetail(UserDetailQuery(userId = userId))
