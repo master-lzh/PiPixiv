@@ -46,3 +46,7 @@ fun NavHostController.navigateToMainScreen() {
         launchSingleTop = true
     }
 }
+
+fun NavHostController.popBackToMainScreen() {
+    popBackStack(route = Destination.HomeScreen.route, inclusive = false)
+}
