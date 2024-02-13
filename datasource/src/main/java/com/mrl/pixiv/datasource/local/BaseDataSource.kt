@@ -9,7 +9,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
@@ -32,9 +31,9 @@ abstract class BaseDataSource(
     }
 
 
-    fun <T> get(key: Preferences.Key<T>): Flow<T> =
-        dataStore.data.mapNotNull {
-            it[key]
+    fun <T> get(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
+        dataStore.data.map {
+            it[key] ?: defaultValue
         }.flowOn(ioDispatcher)
 
     protected fun <T> createFiled(key: Preferences.Key<T>) = Filed(key)
@@ -42,12 +41,12 @@ abstract class BaseDataSource(
     protected fun createObjectFiled(key: Preferences.Key<String>) = ObjectFiled(key)
 
     open inner class Filed<T>(private val key: Preferences.Key<T>) {
-        open fun get(): Flow<T> = get(key)
+        open fun get(defaultValue: T): Flow<T> = get(key, defaultValue)
         open fun set(value: T) = set(key, value)
     }
 
     open inner class ObjectFiled(val key: Preferences.Key<String>) {
-        inline fun <reified T> get(): Flow<T> = get(key).map {
+        inline fun <reified T> get(): Flow<T> = get(key, "{}").map {
             json.decodeFromString<T>(it)
         }
 
