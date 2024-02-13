@@ -7,7 +7,6 @@ data class HomeState(
     val recommendImageList: List<Illust>,
     val isRefresh: Boolean,
     val nextUrl: String,
-    val refreshTokenResult: Boolean,
     val loadMore: Boolean
 ) : State {
     companion object {
@@ -15,7 +14,6 @@ data class HomeState(
             recommendImageList = emptyList(),
             isRefresh = true,
             nextUrl = "",
-            refreshTokenResult = false,
             loadMore = false,
         )
     }

@@ -4,7 +4,9 @@ import com.mrl.pixiv.common.data.Middleware
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.illust.IllustRecommendedResp
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
+import com.mrl.pixiv.home.R
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
+import com.mrl.pixiv.util.ToastUtil
 
 class HomeMiddleware(
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
@@ -27,7 +29,7 @@ class HomeMiddleware(
     private fun refreshToken(state: HomeState) {
         launchNetwork {
             refreshUserAccessTokenUseCase {
-                dispatch(HomeAction.UpdateState(state.copy(refreshTokenResult = true)))
+                ToastUtil.safeShortToast(R.string.refresh_token_success)
             }
         }
     }
