@@ -13,14 +13,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.FileCopy
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,7 +67,7 @@ fun RecommendImageItem(
                 navToPictureScreen(illust)
             },
         shape = RoundedCornerShape(10.dp),
-        elevation = 4.dp,
+        shadowElevation = 4.dp,
         propagateMinConstraints = false,
     ) {
         Column {
@@ -103,10 +103,13 @@ fun RecommendImageItem(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = width - 40.dp)
+                ) {
                     Text(
                         text = illust.title,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier,
                         maxLines = 1,
                         overflow = TextOverflow.Clip,
@@ -114,7 +117,7 @@ fun RecommendImageItem(
 
                     Text(
                         text = illust.user.name,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier,
                         maxLines = 1,
                         overflow = TextOverflow.Clip,

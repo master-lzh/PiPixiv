@@ -2,8 +2,8 @@ package com.mrl.pixiv
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -34,7 +34,7 @@ class MainActivity : BaseActivity() {
         PiPixivTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
+                color = MaterialTheme.colorScheme.background
             ) {
                 splashViewModel.state.startDestination?.let {
                     RootNavigationGraph(

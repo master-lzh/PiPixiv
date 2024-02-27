@@ -1,8 +1,9 @@
 package com.mrl.pixiv.common.ui
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
@@ -11,14 +12,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.alpha
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
-import com.mrl.pixiv.common.R
 
 /**
  * 绘制阴影范围
@@ -125,7 +124,7 @@ fun ShadowLayout(
     offsetX: Dp = 0.dp,
     offsetY: Dp = 0.dp,
     alpha: Float = 0.5f,
-    content: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -144,10 +143,8 @@ fun ShadowLayout(
                 offsetY = offsetY,
                 roundedRect = true
             ),
-        elevation = 0.dp,
         shape = RoundedCornerShape(0.dp),
         content = content,
-        backgroundColor = Color.Transparent
     )
 }
 

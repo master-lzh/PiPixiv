@@ -14,6 +14,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,13 +34,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Download
@@ -48,9 +42,17 @@ import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Share
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -101,7 +103,6 @@ import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.deepBlue
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
-import com.mrl.pixiv.common_ui.util.StatusBarSpacer
 import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.common_ui.util.popBackToMainScreen
@@ -171,14 +172,14 @@ internal fun PictureScreen(
     navToSearchResultScreen: (String) -> Unit = {},
     popBackToHomeScreen: () -> Unit = {},
 ) {
-    val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     val shareLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             // 处理分享结果
             if (result.resultCode == Activity.RESULT_OK) {
                 scope.launch {
-                    scaffoldState.snackbarHostState.showSnackbar("分享成功")
+                    snackbarHostState.showSnackbar("分享成功")
                 }
             } else {
                 // 分享失败或取消
@@ -238,7 +239,62 @@ internal fun PictureScreen(
         )
     }
     Screen(
-        scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(
+                title = {},
+                actions = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 15.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = null,
+                                modifier = Modifier.click { popBackStack() },
+                            )
+                            Icon(
+                                imageVector = Icons.Rounded.Home,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(start = 15.dp)
+                                    .click { popBackToHomeScreen() }
+                            )
+                        }
+                        // 分享按钮
+                        Icon(
+                            imageVector = Icons.Rounded.Share,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .click {
+                                    val shareIntent = createShareIntent(
+                                        "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
+                                    )
+                                    shareLauncher.launch(shareIntent)
+                                },
+                        )
+                        this@TopAppBar.AnimatedVisibility(
+                            modifier = Modifier.align(Alignment.Center),
+                            visible = isBarVisible,
+                            enter = fadeIn(),
+                            exit = fadeOut(),
+                        ) {
+                            Text(
+                                text = "${currPage.value + 1}/${illust.pageCount}",
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors()
+                    .copy(containerColor = Color.Transparent)
+            )
+        },
         floatingActionButton = {
             Box(
                 Modifier
@@ -255,7 +311,7 @@ internal fun PictureScreen(
                     }
                     .shadow(5.dp, CircleShape)
                     .background(
-                        if (MaterialTheme.colors.isLight) Color.White else Color.DarkGray,
+                        if (!isSystemInDarkTheme()) Color.White else Color.DarkGray,
                         shape = CircleShape
                     )
                     .clip(CircleShape)
@@ -266,9 +322,7 @@ internal fun PictureScreen(
                 Icon(
                     imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                     contentDescription = null,
-                    tint = if (isBookmarked) Color.Red else LocalContentColor.current.copy(
-                        alpha = LocalContentAlpha.current
-                    ),
+                    tint = if (isBookmarked) Color.Red else LocalContentColor.current,
                     modifier = Modifier
                         .size(35.dp)
                         .clip(CircleShape)
@@ -326,7 +380,7 @@ internal fun PictureScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(MaterialTheme.colors.background)
+                            .background(MaterialTheme.colorScheme.background)
                             .padding(vertical = 10.dp)
                     ) {
                         UserAvatar(
@@ -391,7 +445,6 @@ internal fun PictureScreen(
                     Modifier.padding(start = 20.dp, top = 10.dp)
                 ) {
                     illust.tags?.forEach {
-                        //todo 点击tag搜索
                         Text(
                             text = "#" + it.name,
                             modifier = Modifier
@@ -413,7 +466,7 @@ internal fun PictureScreen(
                 }
             }
             item {
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .padding(horizontal = 15.dp)
                         .padding(top = 50.dp)
@@ -458,7 +511,7 @@ internal fun PictureScreen(
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
                                 .background(
-                                    color = MaterialTheme.colors.primary,
+                                    color = MaterialTheme.colorScheme.primary,
                                     shape = MaterialTheme.shapes.medium
                                 )
                                 .padding(horizontal = 10.dp, vertical = 8.dp)
@@ -510,7 +563,7 @@ internal fun PictureScreen(
                                 spanCount = minOf(USER_ILLUSTS_COUNT, state.userIllusts.size),
                                 horizontalPadding = 15.dp,
                                 paddingValues = PaddingValues(2.dp),
-                                elevation = 1.dp,
+                                elevation = 5.dp,
                                 navToPictureScreen = navToPictureScreen
                             )
                         }
@@ -588,63 +641,7 @@ internal fun PictureScreen(
 //            ) {
 //
 //            }
-            Column(
-                modifier = Modifier.constrainAs(appbar) {
-                    top.linkTo(parent.top)
-                }
-            ) {
-                StatusBarSpacer(
-                    color = Color.Transparent
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp)
-                        .padding(top = 10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = null,
-                            modifier = Modifier.click { popBackStack() },
-                        )
-                        Icon(
-                            imageVector = Icons.Rounded.Home,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(start = 15.dp)
-                                .click { popBackToHomeScreen() }
-                        )
-                    }
-                    // 分享按钮
-                    Icon(
-                        imageVector = Icons.Rounded.Share,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .click {
-                                val shareIntent = createShareIntent(
-                                    "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
-                                )
-                                shareLauncher.launch(shareIntent)
-                            },
-                    )
-                    this@Column.AnimatedVisibility(
-                        modifier = Modifier.align(Alignment.Center),
-                        visible = isBarVisible,
-                        enter = fadeIn(),
-                        exit = fadeOut(),
-                    ) {
-                        Text(
-                            text = "${currPage.value + 1}/${illust.pageCount}",
-                        )
-                    }
-                }
-            }
+
             AnimatedVisibility(
                 visible = !isScrollToBottom.value,
                 enter = fadeIn(),
@@ -657,7 +654,7 @@ internal fun PictureScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colors.background)
+                        .background(MaterialTheme.colorScheme.background)
                         .padding(vertical = 10.dp)
                 ) {
                     UserAvatar(
@@ -697,7 +694,7 @@ internal fun PictureScreen(
                 modifier = Modifier
                     .heightIn(LocalConfiguration.current.screenHeightDp.dp / 2),
                 sheetState = bottomSheetState,
-                containerColor = MaterialTheme.colors.background,
+                containerColor = MaterialTheme.colorScheme.background,
             ) {
                 Column(
                     modifier = Modifier
@@ -718,7 +715,7 @@ internal fun PictureScreen(
                                     ) {
                                         loading = false
                                         scope.launch {
-                                            scaffoldState.snackbarHostState.showSnackbar(
+                                            snackbarHostState.showSnackbar(
                                                 if (it) "下载成功" else "下载失败"
                                             )
                                         }

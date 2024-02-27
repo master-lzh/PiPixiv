@@ -7,10 +7,11 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -36,6 +37,7 @@ import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.ui.BaseScreen
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navHostController: NavHostController = rememberNavController()
@@ -83,15 +85,15 @@ fun HomeBottomBar(
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
     ) {
-        BottomNavigation(
+        NavigationBar(
             modifier = modifier,
-            backgroundColor = MaterialTheme.colors.background,
+            containerColor = MaterialTheme.colorScheme.background,
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             screens.forEach { screen ->
                 screen.icon
-                BottomNavigationItem(
+                NavigationBarItem(
                     icon = screen.icon!!,
                     label = {
                         Text(text = screen.title)

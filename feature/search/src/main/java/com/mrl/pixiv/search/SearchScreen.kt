@@ -17,25 +17,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterAlt
-import androidx.compose.material.primarySurface
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,7 +68,6 @@ import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.TextField
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.OnScrollToBottom
-import com.mrl.pixiv.common_ui.util.StatusBarSpacer
 import com.mrl.pixiv.common_ui.util.navigateToMainScreen
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.common_ui.util.navigateToSearchResultScreen
@@ -102,7 +99,7 @@ fun SearchScreen1(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 internal fun SearchScreen(
@@ -120,70 +117,72 @@ internal fun SearchScreen(
     }
     Screen(
         topBar = {
-            Column {
-                StatusBarSpacer()
-                Row(
-                    modifier = Modifier
-                        .height(56.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = {
-                        popBack()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                    Surface(
+            TopAppBar(
+                title = {},
+                actions = {
+                    Row(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(vertical = 4.dp, horizontal = 8.dp),
-                        shape = MaterialTheme.shapes.small
+                            .height(56.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextField(
-                            value = textState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .focusRequester(focusRequester)
-                                .click {
-                                    focusRequester.requestFocus()
-                                },
-                            onValueChange = {
-                                textState = it
-                                dispatch(SearchAction.UpdateSearchWords(it.text))
-                                dispatch(SearchAction.SearchAutoComplete(it.text))
-                            },
-                            placeholder = { Text("输入关键字") },
-                            minHeight = 40.dp,
-                            contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
-                                top = 2.dp,
-                                bottom = 2.dp
-                            ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                unfocusedIndicatorColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                            ),
-                            singleLine = true,
-                            shape = MaterialTheme.shapes.medium,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                            keyboardActions = KeyboardActions(
-                                onSearch = {
-                                    dispatch(SearchAction.ClearSearchResult)
-                                    dispatch(
-                                        SearchAction.SearchIllust(
-                                            searchWords = textState.text,
-                                        )
-                                    )
-                                    navigateToResult()
-                                }
+                        IconButton(onClick = {
+                            popBack()
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = "Back"
                             )
-                        )
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = 4.dp, horizontal = 8.dp),
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            TextField(
+                                value = textState,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(focusRequester)
+                                    .click {
+                                        focusRequester.requestFocus()
+                                    },
+                                onValueChange = {
+                                    textState = it
+                                    dispatch(SearchAction.UpdateSearchWords(it.text))
+                                    dispatch(SearchAction.SearchAutoComplete(it.text))
+                                },
+                                placeholder = { Text("输入关键字") },
+                                minHeight = 40.dp,
+                                contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
+                                    top = 2.dp,
+                                    bottom = 2.dp
+                                ),
+                                colors = TextFieldDefaults.textFieldColors(
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                ),
+                                singleLine = true,
+                                shape = MaterialTheme.shapes.medium,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                                keyboardActions = KeyboardActions(
+                                    onSearch = {
+                                        dispatch(SearchAction.ClearSearchResult)
+                                        dispatch(
+                                            SearchAction.SearchIllust(
+                                                searchWords = textState.text,
+                                            )
+                                        )
+                                        navigateToResult()
+                                    }
+                                )
+                            )
+                        }
                     }
                 }
-            }
+            )
         }
     ) {
         // 用LazyColumn构造自动补全列表，点击跳转搜索结果页面
@@ -212,12 +211,12 @@ internal fun SearchScreen(
                 ) {
                     Text(
                         text = word.name,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 4.dp),
                     )
                     Text(
                         text = word.translatedName,
-                        style = MaterialTheme.typography.caption,
+                        style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(bottom = 8.dp),
                     )
                 }
@@ -295,42 +294,38 @@ internal fun SearchResultScreen(
     }
     Screen(
         topBar = {
-            Column {
-                StatusBarSpacer(color = MaterialTheme.colors.primarySurface)
-                TopAppBar(
-                    title = {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .click { popBack() },
-                            text = state.searchWords
+            TopAppBar(
+                title = {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .click { popBack() },
+                        text = state.searchWords
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        popBack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back"
                         )
-                    },
-                    elevation = 0.dp,
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            popBack()
-                        }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                                contentDescription = "Back"
-                            )
-                        }
-                    },
-                    actions = {
-                        //筛选按钮
-                        IconButton(onClick = {
-                            showBottomSheet.value = true
-                            scope.launch { bottomSheetState.show() }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Rounded.FilterAlt,
-                                contentDescription = "Back"
-                            )
-                        }
                     }
-                )
-            }
+                },
+                actions = {
+                    //筛选按钮
+                    IconButton(onClick = {
+                        showBottomSheet.value = true
+                        scope.launch { bottomSheetState.show() }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Rounded.FilterAlt,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
         }
     ) {
         val lazyListState = rememberLazyListState()
@@ -402,7 +397,7 @@ private fun FilterBottomSheet(
             scope.launch { bottomSheetState.hide() }
         },
         sheetState = bottomSheetState,
-        containerColor = MaterialTheme.colors.background,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         val filter = state.searchFilter
         val searchTargetMap = remember {
@@ -427,10 +422,9 @@ private fun FilterBottomSheet(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "筛选", color = MaterialTheme.colors.primary)
+            Text(text = "筛选")
             Text(
                 text = "应用",
-                color = MaterialTheme.colors.primary,
                 modifier = Modifier.clickable {
                     dispatch(SearchAction.ClearSearchResult)
                     dispatch(
@@ -502,14 +496,15 @@ private fun SelectedTabRow(
     ) {
         TabRow(
             selectedTabIndex = selectedIndex,
-            backgroundColor = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
+            containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+            contentColor = MaterialTheme.colorScheme.onSurface,
             indicator = {
                 Surface(
                     modifier = Modifier
                         .tabIndicatorOffset(it[selectedIndex])
                         .height(textHeight),
                     shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                 ) {}
             },
             divider = {}
