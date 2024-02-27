@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomStart
@@ -253,7 +253,7 @@ internal fun ProfileScreen(
                             .fillMaxWidth()
                             .height(200.dp)
                     )
-                    Divider(modifier = Modifier.padding(horizontal = 15.dp))
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 15.dp))
                 }
             }
             item(key = "user_bookmarks_illusts") {

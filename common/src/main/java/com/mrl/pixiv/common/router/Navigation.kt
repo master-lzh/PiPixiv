@@ -1,11 +1,9 @@
 package com.mrl.pixiv.common.router
 
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 
 sealed class Destination(
@@ -22,7 +20,6 @@ sealed class Destination(
             Icon(
                 imageVector = Icons.Rounded.Home,
                 contentDescription = null,
-                tint = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
             )
         }
     )
@@ -34,7 +31,6 @@ sealed class Destination(
             Icon(
                 imageVector = Icons.Rounded.AccountCircle,
                 contentDescription = null,
-                tint = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
             )
         }
     )

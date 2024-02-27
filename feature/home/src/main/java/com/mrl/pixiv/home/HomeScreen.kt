@@ -6,24 +6,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.ArrowUpward
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
+import androidx.compose.material3.pullrefresh.PullRefreshIndicator
+import androidx.compose.material3.pullrefresh.pullRefresh
+import androidx.compose.material3.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -99,7 +100,7 @@ fun HomeScreen(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -116,10 +117,10 @@ internal fun HomeScreen(
     val scope = rememberCoroutineScope()
     val pullRefreshState =
         rememberPullRefreshState(refreshing = state.isRefresh, onRefresh = homeViewModel::onRefresh)
-    val scaffoldState = rememberScaffoldState()
+    val snackBarHostState = remember { SnackbarHostState() }
     val onUnBookmark = { id: Long ->
         scope.launch {
-            val result = scaffoldState.snackbarHostState.showSnackbar(
+            val result = snackBarHostState.showSnackbar(
                 message = "撤销",
                 actionLabel = HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel,
                 duration = SnackbarDuration.Long,
@@ -136,14 +137,13 @@ internal fun HomeScreen(
     LaunchedEffect(Unit) {
         scope.launch {
             homeViewModel.exception.collect {
-                scaffoldState.snackbarHostState.showSnackbar(it?.message ?: "未知错误")
+                snackBarHostState.showSnackbar(it?.message ?: "未知错误")
             }
         }
     }
 
     BaseScreen(
         title = stringResource(R.string.app_name),
-        scaffoldState = scaffoldState,
         actions = {
             HomeTopBar(
                 navigateToSearchScreen = navToSearchScreen,
@@ -156,16 +156,16 @@ internal fun HomeScreen(
                 )
             }
         },
-        snackbarHost = {
-            SnackbarHost(it) {
-                when (it.actionLabel) {
+        snackBarHost = {
+            SnackbarHost(snackBarHostState) {
+                when (it.visuals.actionLabel) {
                     HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel -> {
                         TextSnackbar(
-                            text = it.message,
+                            text = it.visuals.message,
                             action = {
                                 Row {
                                     IconButton(
-                                        onClick = { scaffoldState.snackbarHostState.currentSnackbarData?.performAction() },
+                                        onClick = { snackBarHostState.currentSnackbarData?.performAction() },
                                         modifier = Modifier.align(Alignment.CenterVertically)
                                     ) {
                                         Icon(
@@ -173,7 +173,7 @@ internal fun HomeScreen(
                                             contentDescription = null
                                         )
                                     }
-                                    it.actionLabel?.let {
+                                    it.visuals.actionLabel?.let {
                                         Text(text = it)
                                     }
                                 }
@@ -182,7 +182,7 @@ internal fun HomeScreen(
                     }
 
                     else -> {
-                        TextSnackbar(text = it.message)
+                        TextSnackbar(text = it.visuals.message)
                     }
                 }
             }
@@ -198,7 +198,7 @@ internal fun HomeScreen(
                             lazyStaggeredGridState.scrollToItem(0)
                         }
                     },
-                    backgroundColor = MaterialTheme.colors.background,
+                    containerColor = MaterialTheme.colorScheme.background,
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.ArrowUpward,
@@ -212,6 +212,7 @@ internal fun HomeScreen(
             modifier = Modifier
                 .pullRefresh(pullRefreshState)
                 .fillMaxSize()
+                .padding(it)
         ) {
             HomeContent(
                 navToPictureScreen = navToPictureScreen,
