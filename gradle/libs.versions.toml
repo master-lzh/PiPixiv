@@ -10,7 +10,7 @@ shizuku_version = "12.2.0"
 sqlite = "2.4.0"
 sqldelight = "1.5.5"
 leakcanary = "2.13"
-ui = "1.5.4"
+ui = "1.6.2"
 voyager = "1.0.0-rc08"
 richtext = "0.20.0"
 koin = "3.4.0"
@@ -21,15 +21,15 @@ com-google-android-material-material = "1.11.0"
 lottie = "6.1.0"
 #noinspection GradleDependency
 google-services = "4.3.15"
-firebase-bom = "32.7.1"
+firebase-bom = "32.7.2"
 firebase-crashlytics-gradle = "2.9.9"
-uiautomator = "2.2.0"
-benchmark-macro-junit4 = "1.2.2"
+uiautomator = "2.3.0"
+benchmark-macro-junit4 = "1.2.3"
 
 [libraries]
 desugar = "com.android.tools:desugar_jdk_libs:2.0.4"
 android-shortcut-gradle = "com.github.zellius:android-shortcut-gradle-plugin:0.1.2"
-google-services-gradle = "com.google.gms:google-services:4.4.0"
+google-services-gradle = "com.google.gms:google-services:4.4.1"
 
 junit-junit = { module = "junit:junit", version.ref = "junit" }
 rxandroid = "io.reactivex:rxandroid:1.2.1"
@@ -88,7 +88,7 @@ compose-simpleicons = "br.com.devsrsouza.compose.icons.android:simple-icons:1.0.
 logcat = "com.squareup.logcat:logcat:0.1"
 
 acra-http = "ch.acra:acra-http:5.11.3"
-firebase-analytics = "com.google.firebase:firebase-analytics-ktx:21.5.0"
+firebase-analytics = "com.google.firebase:firebase-analytics-ktx:21.5.1"
 
 aboutLibraries-gradle = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutlib_version" }
 aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlib_version" }
