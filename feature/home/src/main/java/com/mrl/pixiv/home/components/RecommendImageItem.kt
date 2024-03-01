@@ -27,8 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -38,6 +38,7 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.ui.components.Surface
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.DisplayUtil
+import com.mrl.pixiv.util.TestDeviceInfo
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.second
 
@@ -71,7 +72,7 @@ fun RecommendImageItem(
         propagateMinConstraints = false,
     ) {
         Column {
-            val radius = DisplayUtil.dp2px(10f).toFloat()
+            val radius = with(LocalDensity.current) { 10.dp.toPx() }
             Box(
                 modifier = Modifier
                     .width(width)
