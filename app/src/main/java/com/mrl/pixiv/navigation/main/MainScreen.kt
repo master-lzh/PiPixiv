@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -51,11 +52,12 @@ fun MainScreen(
         ), label = ""
     )
     BaseScreen(
-        modifier = Modifier.bottomBarAnimatedScroll(
-            bottomBarHeight,
-            bottomBarOffsetHeightPx,
-            navHostController
-        ),
+        modifier = Modifier.navigationBarsPadding()
+            .bottomBarAnimatedScroll(
+                bottomBarHeight,
+                bottomBarOffsetHeightPx,
+                navHostController
+            ),
         bottomBar = {
             HomeBottomBar(
                 navController = navHostController,
