@@ -12,11 +12,14 @@ import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.Window
 import android.view.WindowManager
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.mrl.pixiv.util.TestDeviceInfo.toPx
 import java.util.Locale
 
 object DisplayUtil {
@@ -39,17 +42,7 @@ object DisplayUtil {
     }
 
     fun getDisplayMetrics(): DisplayMetrics {
-        return try {
-            getResources().displayMetrics
-        } catch (e: Exception) {
-            DisplayMetrics().apply {
-                density = TestDeviceInfo.density
-                densityDpi = TestDeviceInfo.screenDpi.toInt()
-                scaledDensity = TestDeviceInfo.density
-                widthPixels = TestDeviceInfo.screenWidth.toPx().toInt()
-                heightPixels = TestDeviceInfo.screenHeight.toPx().toInt()
-            }
-        }
+        return getResources().displayMetrics
     }
 
     @JvmStatic
@@ -97,8 +90,15 @@ object DisplayUtil {
         return getStatusBarHeight(activity.window)
     }
 
-    fun getStatusBarHeightDp(activity: Activity): Dp {
-        return px2dp(getStatusBarHeight(activity).toFloat()).dp
+    @JvmStatic
+    @Composable
+    fun getStatusBarHeight(): Dp {
+        // 使用LocalDensity来获取当前屏幕密度
+        val density = LocalDensity.current
+        // 获取状态栏的PaddingValues
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+        // 计算状态栏高度
+        return with(density) { statusBarPadding.calculateTopPadding() }
     }
 
     @JvmStatic

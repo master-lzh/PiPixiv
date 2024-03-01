@@ -1,7 +1,6 @@
 package com.mrl.pixiv.profile
 
 import android.content.res.Configuration
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -97,8 +96,7 @@ internal fun ProfileScreen(
         modifier = Modifier,
         state = collapsingToolbarScaffoldState,
         toolbar = {
-            val toolbarHeight =
-                DisplayUtil.getStatusBarHeightDp(LocalContext.current as ComponentActivity) + 60.dp
+            val toolbarHeight = DisplayUtil.getStatusBarHeight() + 60.dp
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
