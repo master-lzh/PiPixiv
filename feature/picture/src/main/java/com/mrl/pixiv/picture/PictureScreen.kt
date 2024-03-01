@@ -633,7 +633,7 @@ internal fun PictureScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            val (appbar, picInfo) = createRefs()
+            val picInfo = createRef()
 //            AnimatedVisibility(
 //                visible = isBarVisible,
 //                enter = fadeIn(),
