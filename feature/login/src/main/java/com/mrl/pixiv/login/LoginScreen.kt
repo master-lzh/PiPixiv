@@ -6,7 +6,9 @@ import android.util.Base64
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
@@ -77,7 +79,10 @@ fun LoginScreen(
     LoginScreen(
         modifier = modifier,
         state = loginViewModel.state,
-        navToMainGraph = { navHostController.navigate(Graph.MAIN) },
+        navToMainGraph = {
+            navHostController.popBackStack()
+            navHostController.navigate(Graph.MAIN)
+        },
         dispatch = loginViewModel::dispatch,
     )
 }
@@ -92,25 +97,26 @@ internal fun LoginScreen(
     dispatch: (AuthAction) -> Unit,
 ) {
     var currUrl by rememberSaveable { mutableStateOf(generateWebViewUrl(true)) }
-    if (state.isLogin) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(state.isLogin) {
+        if (state.isLogin) {
             navToMainGraph()
         }
     }
-    BaseScreen(actions = {
-        Button(onClick = {
-            getCodeVer()
-            currUrl = generateWebViewUrl(false)
+    BaseScreen(
+        actions = {
+            Button(onClick = {
+                getCodeVer()
+                currUrl = generateWebViewUrl(false)
+            }) {
+                Text(text = "登录")
+            }
+            Button(onClick = {
+                getCodeVer()
+                currUrl = generateWebViewUrl(true)
+            }) {
+                Text(text = "注册")
+            }
         }) {
-            Text(text = "登录")
-        }
-        Button(onClick = {
-            getCodeVer()
-            currUrl = generateWebViewUrl(true)
-        }) {
-            Text(text = "注册")
-        }
-    }) {
         val webViewState = rememberWebViewState(url = currUrl)
         when (webViewState.loadingState) {
             LoadingState.Finished -> {}
@@ -122,6 +128,9 @@ internal fun LoginScreen(
             )
         }
         WebView(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
             state = webViewState,
             onCreated = {
                 it.settings.apply {
