@@ -50,6 +50,7 @@ import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.second
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -94,8 +95,10 @@ fun HomeScreen(
         bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         navToSearchScreen = navHostController::navigateToSearchScreen,
-        homeViewModel = homeViewModel,
+        onRefresh = homeViewModel::onRefresh,
+        onScrollToBottom = homeViewModel::onScrollToBottom,
         dispatch = homeViewModel::dispatch,
+        exception = homeViewModel.exception,
         offsetAnimation = offsetAnimation
     )
 }
@@ -109,14 +112,16 @@ internal fun HomeScreen(
     bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust) -> Unit,
     navToSearchScreen: () -> Unit,
-    homeViewModel: HomeViewModel = koinViewModel(),
+    onRefresh: () -> Unit,
+    onScrollToBottom: () -> Unit,
+    exception: SharedFlow<Throwable?>,
     dispatch: (HomeAction) -> Unit = {},
     offsetAnimation: IntOffset,
 ) {
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val scope = rememberCoroutineScope()
     val pullRefreshState =
-        rememberPullRefreshState(refreshing = state.isRefresh, onRefresh = homeViewModel::onRefresh)
+        rememberPullRefreshState(refreshing = state.isRefresh, onRefresh = onRefresh)
     val snackBarHostState = remember { SnackbarHostState() }
     val onUnBookmark = { id: Long ->
         scope.launch {
@@ -136,7 +141,7 @@ internal fun HomeScreen(
     }
     LaunchedEffect(Unit) {
         scope.launch {
-            homeViewModel.exception.collect {
+            exception.collect {
                 snackBarHostState.showSnackbar(it?.message ?: "未知错误")
             }
         }
@@ -236,7 +241,7 @@ internal fun HomeScreen(
                         dispatch(HomeAction.DismissLoading)
                     }
                 },
-                onScrollToBottom = homeViewModel::onScrollToBottom,
+                onScrollToBottom = onScrollToBottom,
             )
             PullRefreshIndicator(
                 modifier = Modifier
