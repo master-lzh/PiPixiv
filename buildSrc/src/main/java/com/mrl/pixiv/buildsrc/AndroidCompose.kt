@@ -59,7 +59,7 @@ fun Project.configureAndroidCompose(
             add("implementation", libs.findLibrary("koin.compose").get())
 
             add("implementation", project(":data"))
-//            add("androidTestImplementation", platform(bom))
+            add("androidTestImplementation", compose.findLibrary("ui-test-junit4").get())
         }
     }
 

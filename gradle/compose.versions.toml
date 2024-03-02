@@ -12,6 +12,7 @@ animation-graphics = { module = "androidx.compose.animation:animation-graphics" 
 ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-util = { module = "androidx.compose.ui:ui-util" }
+ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 
 material3-core = { module = "androidx.compose.material3:material3" }
 material-icons-core = { module = "androidx.compose.material:material-icons-core" }

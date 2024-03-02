@@ -38,7 +38,6 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.ui.components.Surface
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.DisplayUtil
-import com.mrl.pixiv.util.TestDeviceInfo
 import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.second
 
