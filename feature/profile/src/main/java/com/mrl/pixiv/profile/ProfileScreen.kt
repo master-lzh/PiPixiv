@@ -2,13 +2,7 @@ package com.mrl.pixiv.profile
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -45,8 +39,8 @@ import com.mrl.pixiv.profile.viewmodel.ProfileAction
 import com.mrl.pixiv.profile.viewmodel.ProfileState
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.util.DisplayUtil
-import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.copyToClipboard
+import com.mrl.pixiv.util.throttleClick
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
@@ -220,7 +214,7 @@ internal fun ProfileScreen(
                 Row(
                     modifier = Modifier
                         .padding(start = 15.dp, top = 10.dp)
-                        .click {
+                        .throttleClick {
                             userInfo.user?.id?.let { it1 -> copyToClipboard(it1.toString()) }
                         }
                 ) {

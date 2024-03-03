@@ -15,20 +15,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -36,24 +23,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Download
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Share
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -109,17 +80,7 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
-import com.mrl.pixiv.util.AppUtil
-import com.mrl.pixiv.util.DOWNLOAD_DIR
-import com.mrl.pixiv.util.PictureType
-import com.mrl.pixiv.util.calculateImageSize
-import com.mrl.pixiv.util.click
-import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
-import com.mrl.pixiv.util.isEven
-import com.mrl.pixiv.util.isFileExists
-import com.mrl.pixiv.util.joinPaths
-import com.mrl.pixiv.util.queryParams
-import com.mrl.pixiv.util.saveToAlbum
+import com.mrl.pixiv.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -255,14 +216,14 @@ internal fun PictureScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                                 contentDescription = null,
-                                modifier = Modifier.click { popBackStack() },
+                                modifier = Modifier.throttleClick { popBackStack() },
                             )
                             Icon(
                                 imageVector = Icons.Rounded.Home,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .padding(start = 15.dp)
-                                    .click { popBackToHomeScreen() }
+                                    .throttleClick { popBackToHomeScreen() }
                             )
                         }
                         // 分享按钮
@@ -271,7 +232,7 @@ internal fun PictureScreen(
                             contentDescription = null,
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
-                                .click {
+                                .throttleClick {
                                     val shareIntent = createShareIntent(
                                         "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
                                     )
@@ -297,7 +258,7 @@ internal fun PictureScreen(
         floatingActionButton = {
             Box(
                 Modifier
-                    .click {
+                    .throttleClick {
                         if (bookmarkState.bookmarkStatus[illust.id] == true) {
                             bookmarkDispatch(
                                 BookmarkAction.IllustBookmarkDeleteIntent(
@@ -344,7 +305,7 @@ internal fun PictureScreen(
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .click(
+                                .throttleClick(
                                     onLongClick = {
                                         currLongClickPic = Pair(index, it.imageUrls?.original ?: "")
                                         openBottomSheet = true
@@ -362,7 +323,7 @@ internal fun PictureScreen(
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .click(
+                            .throttleClick(
                                 onLongClick = {
                                     currLongClickPic =
                                         Pair(0, illust.metaSinglePage.originalImageURL)
@@ -449,7 +410,7 @@ internal fun PictureScreen(
                             modifier = Modifier
                                 .padding(vertical = 2.5.dp)
                                 .padding(end = 5.dp)
-                                .click {
+                                .throttleClick {
                                     navToSearchResultScreen(it.name)
                                 },
                             style = TextStyle(fontSize = 12.sp, color = deepBlue),
@@ -514,7 +475,7 @@ internal fun PictureScreen(
                                     shape = MaterialTheme.shapes.medium
                                 )
                                 .padding(horizontal = 10.dp, vertical = 8.dp)
-                                .click {
+                                .throttleClick {
                                     followDispatch(FollowAction.UnFollowUser(illust.user.id))
                                 },
                             text = "已关注",
@@ -534,7 +495,7 @@ internal fun PictureScreen(
                                     shape = MaterialTheme.shapes.medium
                                 )
                                 .padding(horizontal = 10.dp, vertical = 8.dp)
-                                .click {
+                                .throttleClick {
                                     followDispatch(FollowAction.FollowUser(illust.user.id))
                                 },
                             text = "关注",
@@ -703,7 +664,7 @@ internal fun PictureScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .click {
+                            .throttleClick {
                                 loading = true
                                 // 下载原始图片
                                 dispatch(
@@ -735,7 +696,7 @@ internal fun PictureScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .click {
+                            .throttleClick {
                                 scope.launch(Dispatchers.IO) {
                                     loading = true
                                     if (createShareImage(

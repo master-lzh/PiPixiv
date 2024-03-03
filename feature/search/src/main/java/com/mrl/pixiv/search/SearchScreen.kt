@@ -1,17 +1,10 @@
 package com.mrl.pixiv.search
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,22 +12,10 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.FilterAlt
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -50,6 +31,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -77,7 +60,8 @@ import com.mrl.pixiv.data.search.SearchTarget
 import com.mrl.pixiv.search.viewmodel.SearchAction
 import com.mrl.pixiv.search.viewmodel.SearchState
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
-import com.mrl.pixiv.util.click
+import com.mrl.pixiv.util.DebounceUtil
+import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -90,6 +74,9 @@ fun SearchScreen1(
     searchViewModel: SearchViewModel = koinViewModel(),
     navHostController: NavHostController,
 ) {
+    OnLifecycle(Lifecycle.Event.ON_CREATE) {
+        searchViewModel.dispatch(SearchAction.LoadSearchHistory)
+    }
     SearchScreen(
         modifier = modifier,
         state = searchViewModel.state,
@@ -99,7 +86,9 @@ fun SearchScreen1(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
+    ExperimentalLayoutApi::class
+)
 @Preview
 @Composable
 internal fun SearchScreen(
@@ -112,10 +101,22 @@ internal fun SearchScreen(
     var textState by remember { mutableStateOf(TextFieldValue(state.searchWords)) }
     val focusRequester = remember { FocusRequester() }
     OnLifecycle(Lifecycle.Event.ON_RESUME) {
-        focusRequester.requestFocus()
+        try {
+            focusRequester.requestFocus()
+        } catch (_: Exception) {
+        }
         textState = textState.copy(selection = TextRange(textState.text.length))
     }
+    val softwareKeyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     Screen(
+        modifier = modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+        ) {
+            focusManager.clearFocus()
+            softwareKeyboardController?.hide()
+        },
         topBar = {
             TopAppBar(
                 title = {},
@@ -146,21 +147,27 @@ internal fun SearchScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .focusRequester(focusRequester)
-                                    .click {
+                                    .throttleClick {
                                         focusRequester.requestFocus()
                                     },
                                 onValueChange = {
                                     textState = it
                                     dispatch(SearchAction.UpdateSearchWords(it.text))
-                                    dispatch(SearchAction.SearchAutoComplete(it.text))
+                                    if (it.text.isNotBlank() && it.text != state.searchWords) {
+                                        DebounceUtil.debounce {
+                                            dispatch(SearchAction.SearchAutoComplete(it.text))
+                                        }
+                                    } else {
+                                        dispatch(SearchAction.ClearAutoCompleteSearchWords)
+                                    }
                                 },
                                 placeholder = { Text("输入关键字") },
                                 minHeight = 40.dp,
-                                contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
+                                contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
                                     top = 2.dp,
-                                    bottom = 2.dp
+                                    bottom = 2.dp,
                                 ),
-                                colors = TextFieldDefaults.textFieldColors(
+                                colors = TextFieldDefaults.colors(
                                     unfocusedIndicatorColor = Color.Transparent,
                                     focusedIndicatorColor = Color.Transparent,
                                 ),
@@ -175,6 +182,8 @@ internal fun SearchScreen(
                                                 searchWords = textState.text,
                                             )
                                         )
+                                        dispatch(SearchAction.AddSearchHistory(textState.text))
+                                        focusRequester.freeFocus()
                                         navigateToResult()
                                     }
                                 )
@@ -189,25 +198,71 @@ internal fun SearchScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 8.dp),
+                .padding(top = 8.dp)
+                .padding(WindowInsets.ime.asPaddingValues()),
             contentPadding = it,
         ) {
-            items(state.autoCompleteSearchWords) { word ->
+            stickyHeader {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = if (state.searchWords.isEmpty()) "搜索历史" else "你是不是要找",
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(16.dp),
+                    )
+
+                }
+
+            }
+            if (state.searchWords.isEmpty()) {
+                items(state.searchHistory) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp)
+                            .padding(vertical = 4.dp)
+                            .throttleClick {
+                                dispatch(SearchAction.UpdateSearchWords(it.keyword))
+                                dispatch(SearchAction.ClearSearchResult)
+                                dispatch(SearchAction.SearchIllust(searchWords = it.keyword))
+                                dispatch(SearchAction.AddSearchHistory(it.keyword))
+                                focusRequester.freeFocus()
+                                navigateToResult()
+                            },
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = it.keyword,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        IconButton(onClick = { dispatch(SearchAction.DeleteSearchHistory(it.keyword)) }) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = "delete"
+                            )
+                        }
+                    }
+                }
+            }
+            items(state.autoCompleteSearchWords, key = { it.name }) { word ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp)
                         .padding(vertical = 4.dp)
-                        .clickable {
+                        .throttleClick {
                             dispatch(SearchAction.UpdateSearchWords(word.name))
                             dispatch(SearchAction.ClearSearchResult)
-                            dispatch(
-                                SearchAction.SearchIllust(
-                                    searchWords = word.name,
-                                )
-                            )
+                            dispatch(SearchAction.SearchIllust(searchWords = word.name))
+                            dispatch(SearchAction.AddSearchHistory(word.name))
+                            focusRequester.freeFocus()
                             navigateToResult()
-                        }
+                        },
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = word.name,
@@ -299,7 +354,7 @@ internal fun SearchResultScreen(
                     Text(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .click { popBack() },
+                            .throttleClick { popBack() },
                         text = state.searchWords
                     )
                 },
@@ -425,7 +480,7 @@ private fun FilterBottomSheet(
             Text(text = "筛选")
             Text(
                 text = "应用",
-                modifier = Modifier.clickable {
+                modifier = Modifier.throttleClick {
                     dispatch(SearchAction.ClearSearchResult)
                     dispatch(
                         SearchAction.SearchIllust(searchWords = state.searchWords)

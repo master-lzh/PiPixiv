@@ -14,14 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.graphics.Color
@@ -114,9 +107,9 @@ fun TextField(
     minWidth: Dp = TextFieldDefaults.MinWidth,
     minHeight: Dp = TextFieldDefaults.MinHeight,
     contentPadding: PaddingValues = if (label == null) {
-        TextFieldDefaults.textFieldWithoutLabelPadding()
+        TextFieldDefaults.contentPaddingWithoutLabel()
     } else {
-        TextFieldDefaults.textFieldWithLabelPadding()
+        TextFieldDefaults.contentPaddingWithLabel()
     }
 ) {
     // If color is not provided via the text style, use content color as a default

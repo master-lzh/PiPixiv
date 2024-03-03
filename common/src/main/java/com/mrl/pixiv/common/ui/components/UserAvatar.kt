@@ -12,7 +12,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import coil.transform.Transformation
-import com.mrl.pixiv.util.click
+import com.mrl.pixiv.util.throttleClick
 
 @Composable
 fun UserAvatar(
@@ -34,6 +34,6 @@ fun UserAvatar(
         contentScale = contentScale,
         modifier = modifier
             .size(size)
-            .click(onClick = onClick)
+            .throttleClick(onClick = onClick)
     )
 }

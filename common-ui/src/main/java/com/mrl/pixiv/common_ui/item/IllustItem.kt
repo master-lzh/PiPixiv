@@ -23,18 +23,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
+import androidx.compose.ui.unit.*
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.util.click
+import com.mrl.pixiv.util.throttleClick
 
 @Composable
 fun SquareIllustItem(
@@ -72,7 +68,7 @@ fun SquareIllustItem(
             )
             .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium)
             .clip(MaterialTheme.shapes.medium)
-            .click { onClick() }
+            .throttleClick { onClick() }
     ) {
         val (image, imageCountText, bookmark) = createRefs()
         val screenWidth = LocalConfiguration.current.screenWidthDp.dp
