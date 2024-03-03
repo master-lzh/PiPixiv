@@ -16,6 +16,7 @@
 
 package com.mrl.pixiv.buildsrc
 
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -59,7 +60,9 @@ fun Project.configureAndroidCompose(
             add("implementation", libs.findLibrary("koin.compose").get())
 
             add("implementation", project(":data"))
-            add("androidTestImplementation", compose.findLibrary("ui-test-junit4").get())
+            if (commonExtension !is ApplicationExtension) {
+                add("androidTestImplementation", compose.findLibrary("ui-test-junit4").get())
+            }
         }
     }
 

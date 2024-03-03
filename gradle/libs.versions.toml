@@ -25,6 +25,8 @@ firebase-bom = "32.7.2"
 firebase-crashlytics-gradle = "2.9.9"
 uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.2.3"
+protobuf-gradle = "0.9.4"
+protobuf = "3.25.3"
 
 [libraries]
 desugar = "com.android.tools:desugar_jdk_libs:2.0.4"
@@ -121,7 +123,7 @@ koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = 
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 
-guava = "com.google.guava:guava:31.1-jre"
+guava = "com.google.guava:guava:33.0.0-jre"
 
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-test-espresso-espresso-core" }
@@ -136,6 +138,8 @@ firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-cra
 metadata-extractor = "com.drewnoakes:metadata-extractor:2.18.0"
 uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark-macro-junit4" }
+
+protobuf-kotlin-lite = { module="com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
 
 [bundles]
 reactivex = ["rxandroid", "rxjava", "rxrelay"]
@@ -153,3 +157,4 @@ firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
 [plugins]
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-gradle" }
+protubuf = { id = "com.google.protobuf", version.ref = "protobuf-gradle" }

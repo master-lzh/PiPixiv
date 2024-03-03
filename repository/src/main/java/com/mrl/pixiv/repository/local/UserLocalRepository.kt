@@ -1,6 +1,6 @@
 package com.mrl.pixiv.repository.local
 
-import com.mrl.pixiv.data.auth.AuthUser
+import com.mrl.pixiv.data.user.UserInfo
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import kotlinx.coroutines.flow.first
@@ -32,8 +32,8 @@ class UserLocalRepository(
         !(it1 > System.currentTimeMillis() && it2.isNotEmpty())
     }
 
-    val userInfo = userInfoDataSource.userInfo.get<AuthUser>()
-    fun setUserInfo(userInfo: AuthUser) =
-        userInfoDataSource.userInfo.set<AuthUser>(userInfo)
-    suspend fun getUserId() = userInfo.first().id.toLong()
+    val userInfo = userInfoDataSource.data
+    fun setUserInfo(userInfo: (UserInfo) -> UserInfo) =
+        userInfoDataSource.updateData { userInfo(it) }
+    suspend fun getUserId() = userInfo.first().uid
 }

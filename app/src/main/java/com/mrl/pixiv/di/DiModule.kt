@@ -15,6 +15,7 @@ import com.mrl.pixiv.common.middleware.follow.FollowMiddleware
 import com.mrl.pixiv.common.middleware.follow.FollowReducer
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.user.userInfoDataStore
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
@@ -52,7 +53,6 @@ import com.mrl.pixiv.splash.viewmodel.SplashMiddleware
 import com.mrl.pixiv.splash.viewmodel.SplashReducer
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import com.mrl.pixiv.userAuthDataStore
-import com.mrl.pixiv.userInfoDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
