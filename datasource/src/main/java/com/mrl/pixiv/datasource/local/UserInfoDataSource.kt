@@ -1,15 +1,12 @@
 package com.mrl.pixiv.datasource.local
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringPreferencesKey
+import com.mrl.pixiv.data.user.UserInfo
 
 class UserInfoDataSource(
-    userInfoDataSource: DataStore<Preferences>,
-) : BaseDataSource(userInfoDataSource) {
-    companion object {
-        val KEY_USER_INFO = stringPreferencesKey("user_info")
+    userInfoDataSource: DataStore<UserInfo>,
+) : BaseProtoDataSource<UserInfo, UserInfo.Builder>(userInfoDataSource) {
+    override fun defaultValue(): UserInfo {
+        return UserInfo.getDefaultInstance()
     }
-
-    var userInfo: ObjectFiled = createObjectFiled(KEY_USER_INFO)
 }

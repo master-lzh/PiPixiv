@@ -14,13 +14,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.mrl.pixiv.di.appModule
-import com.mrl.pixiv.di.dataSourceModule
-import com.mrl.pixiv.di.middlewareModule
-import com.mrl.pixiv.di.reducerModule
-import com.mrl.pixiv.di.repositoryModule
-import com.mrl.pixiv.di.useCaseModule
-import com.mrl.pixiv.di.viewModelModule
+import com.mrl.pixiv.di.*
 import com.mrl.pixiv.network.HttpManager
 import com.mrl.pixiv.util.AppUtil
 import kotlinx.coroutines.Dispatchers
@@ -117,5 +111,3 @@ internal object CoilMemoryCache {
 }
 
 val Context.userAuthDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_auth")
-
-val Context.userInfoDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_info")

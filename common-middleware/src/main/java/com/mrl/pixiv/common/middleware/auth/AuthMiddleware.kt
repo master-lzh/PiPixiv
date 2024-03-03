@@ -5,6 +5,7 @@ import com.mrl.pixiv.data.Constants
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.AuthTokenResp
 import com.mrl.pixiv.data.auth.GrantType
+import com.mrl.pixiv.data.user.userInfo
 import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
@@ -60,7 +61,15 @@ class AuthMiddleware(
 
     private fun setUserInfo(authTokenResp: AuthTokenResp) = launchIO {
         authTokenResp.apply {
-            user?.let { setLocalUserInfoUseCase(it) }
+            user?.let { authUser ->
+                setLocalUserInfoUseCase {
+                    userInfo {
+                        uid = authUser.id.toLongOrNull() ?: 0
+                        username = authUser.name
+                        avatar = authUser.profileImageUrls.px50X50
+                    }
+                }
+            }
             setUserAccessTokenUseCase(accessToken)
             setUserRefreshTokenUseCase(refreshToken)
         }
