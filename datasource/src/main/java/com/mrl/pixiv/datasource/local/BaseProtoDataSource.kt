@@ -29,8 +29,7 @@ abstract class BaseProtoDataSource<T : GeneratedMessageLite<T, TBuilder>, TBuild
     fun updateData(update: (T) -> T) {
         launchIO {
             dataStore.updateData {
-                val newValue = update(it)
-                it.toBuilder().mergeFrom(newValue).build()
+                update(it)
             }
         }
     }

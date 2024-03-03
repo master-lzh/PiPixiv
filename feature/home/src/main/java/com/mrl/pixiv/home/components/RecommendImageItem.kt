@@ -1,17 +1,7 @@
 package com.mrl.pixiv.home.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
@@ -38,8 +28,8 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.ui.components.Surface
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.DisplayUtil
-import com.mrl.pixiv.util.click
 import com.mrl.pixiv.util.second
+import com.mrl.pixiv.util.throttleClick
 
 val SPACING_HORIZONTAL_DP = 5.dp
 val SPACING_VERTICAL_DP = 5.dp
@@ -63,7 +53,7 @@ fun RecommendImageItem(
         modifier = Modifier
             .padding(horizontal = 5.dp)
             .padding(bottom = 5.dp)
-            .click {
+            .throttleClick {
                 navToPictureScreen(illust)
             },
         shape = RoundedCornerShape(10.dp),

@@ -15,7 +15,9 @@ import com.mrl.pixiv.common.middleware.follow.FollowMiddleware
 import com.mrl.pixiv.common.middleware.follow.FollowReducer
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.search.searchDataStore
 import com.mrl.pixiv.data.user.userInfoDataStore
+import com.mrl.pixiv.datasource.local.SearchDataSource
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
@@ -41,6 +43,7 @@ import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
 import com.mrl.pixiv.profile.viewmodel.ProfileReducer
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
+import com.mrl.pixiv.repository.local.SearchLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
@@ -66,6 +69,7 @@ import org.koin.dsl.module
 enum class DataStoreEnum {
     USER_AUTH,
     USER_INFO,
+    SEARCH,
 }
 
 
@@ -79,6 +83,8 @@ val appModule = module {
     single(named(DataStoreEnum.USER_AUTH)) { androidContext().userAuthDataStore }
 
     single(named(DataStoreEnum.USER_INFO)) { androidContext().userInfoDataStore }
+
+    single(named(DataStoreEnum.SEARCH)) { androidContext().searchDataStore }
 
     single {
         JSON.asConverterFactory("application/json".toMediaType())
@@ -117,6 +123,7 @@ val viewModelModule = module {
 
 val repositoryModule = module {
     single { UserLocalRepository(get(), get()) }
+    single { SearchLocalRepository(get()) }
 
 
     single { AuthRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
@@ -128,6 +135,7 @@ val repositoryModule = module {
 val dataSourceModule = module {
     single { UserAuthDataSource(get(named(DataStoreEnum.USER_AUTH))) }
     single { UserInfoDataSource(get(named(DataStoreEnum.USER_INFO))) }
+    single { SearchDataSource(get(named(DataStoreEnum.SEARCH))) }
 
     single { IllustHttpService(provideCommonService(get(), IllustApi::class.java)) }
     single { UserAuthHttpService(provideAuthService(get())) }
@@ -160,7 +168,7 @@ val middlewareModule = module {
 
     factory { FollowMiddleware(get()) }
 
-    factory { SearchMiddleware(get()) }
+    factory { SearchMiddleware(get(), get()) }
 }
 
 val reducerModule = module {

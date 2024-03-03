@@ -4,6 +4,7 @@ import com.mrl.pixiv.common.data.State
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Tag
 import com.mrl.pixiv.data.search.SearchAiType
+import com.mrl.pixiv.data.search.SearchHistory
 import com.mrl.pixiv.data.search.SearchSort
 import com.mrl.pixiv.data.search.SearchTarget
 
@@ -11,7 +12,7 @@ data class SearchState(
     val searchWords: String,
     val autoCompleteSearchWords: List<Tag>,
     val searchFilter: SearchFilter,
-
+    val searchHistory: List<SearchHistory>,
     val searchResults: List<Illust>,
     val nextUrl: String,
 ) : State {
@@ -31,6 +32,7 @@ data class SearchState(
                 searchTarget = SearchTarget.PARTIAL_MATCH_FOR_TAGS,
                 searchAiType = SearchAiType.HIDE_AI,
             ),
+            searchHistory = emptyList(),
             searchResults = emptyList(),
             nextUrl = "",
         )

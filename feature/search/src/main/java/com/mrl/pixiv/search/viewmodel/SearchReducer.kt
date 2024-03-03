@@ -5,6 +5,10 @@ import com.mrl.pixiv.common.data.Reducer
 class SearchReducer : Reducer<SearchState, SearchAction> {
     override fun reduce(state: SearchState, action: SearchAction): SearchState {
         return when (action) {
+            is SearchAction.ClearAutoCompleteSearchWords -> {
+                state.copy(autoCompleteSearchWords = emptyList())
+            }
+
             is SearchAction.ClearSearchResult -> {
                 state.copy(
                     searchResults = emptyList(),
@@ -29,6 +33,10 @@ class SearchReducer : Reducer<SearchState, SearchAction> {
 
             is SearchAction.UpdateFilter -> {
                 state.copy(searchFilter = action.searchFilter)
+            }
+
+            is SearchAction.UpdateSearchHistory -> {
+                state.copy(searchHistory = action.searchHistory)
             }
 
             else -> state
