@@ -2,7 +2,13 @@ package com.mrl.pixiv.profile
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -73,12 +79,7 @@ internal fun ProfileScreen(
     navToPictureScreen: (Illust) -> Unit = {},
     dispatch: (ProfileAction) -> Unit,
 ) {
-//    LaunchedEffect(Unit) {
-//        profileViewModel.dispatch(ProfileAction.GetUserInfoIntent)
-//        profileViewModel.dispatch(ProfileAction.GetUserBookmarksIllustIntent)
-//    }
     val userInfo = state.userInfo
-//    val userInfo = UserInfo()
     val backgroundHeight = when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_PORTRAIT -> DisplayUtil.getScreenWidthDp() / 3
         Configuration.ORIENTATION_LANDSCAPE -> DisplayUtil.getScreenHeightDp() / 3
@@ -87,7 +88,7 @@ internal fun ProfileScreen(
     val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
 
     CollapsingToolbarScaffold(
-        modifier = Modifier,
+        modifier = modifier.padding(bottom = 80.dp),
         state = collapsingToolbarScaffoldState,
         toolbar = {
             val toolbarHeight = DisplayUtil.getStatusBarHeight() + 60.dp

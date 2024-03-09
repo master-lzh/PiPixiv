@@ -54,12 +54,12 @@ val LazyStaggeredGridState.isScrollToBottom: Boolean
     get() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
 
 @Composable
-fun LazyStaggeredGridState.OnScrollToBottom(block: () -> Unit) {
+fun LazyStaggeredGridState.OnScrollToBottom(loadingItemCount: Int, block: () -> Unit) {
     val shouldLoadMore by remember {
         derivedStateOf {
             val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
                 ?: return@derivedStateOf false
-            lastVisibleItem.index == layoutInfo.totalItemsCount - 1
+            lastVisibleItem.index >= layoutInfo.totalItemsCount - 1 - loadingItemCount
         }
     }
     LaunchedEffect(shouldLoadMore) {

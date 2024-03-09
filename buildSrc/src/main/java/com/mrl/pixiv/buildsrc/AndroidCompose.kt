@@ -30,7 +30,7 @@ import java.io.File
  * Configure Compose-specific options
  */
 fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension<*, *, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     val compose = extensions.getByType<VersionCatalogsExtension>().named("compose")
     val androidx = extensions.getByType<VersionCatalogsExtension>().named("androidx")
@@ -53,6 +53,7 @@ fun Project.configureAndroidCompose(
             add("implementation", androidx.findBundle("lifecycle").get())
             add("implementation", androidx.findLibrary("navigation.compose").get())
             add("implementation", androidx.findLibrary("constraintlayout.compose").get())
+            add("implementation", androidx.findLibrary("tracing").get())
 
             add("implementation", compose.findBundle("material").get())
             add("implementation", compose.findBundle("baselibs").get())
@@ -78,7 +79,7 @@ private fun Project.buildComposeMetricsParameters(): List<String> {
     val enableMetricsProvider = project.providers.gradleProperty("enableComposeCompilerMetrics")
     val enableMetrics = (enableMetricsProvider.orNull == "true")
     if (enableMetrics) {
-        val metricsFolder = File(project.buildDir, "compose-metrics")
+        val metricsFolder = project.layout.buildDirectory.file("compose-metrics").get().asFile
         metricParameters.add("-P")
         metricParameters.add(
             "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + metricsFolder.absolutePath
@@ -88,7 +89,7 @@ private fun Project.buildComposeMetricsParameters(): List<String> {
     val enableReportsProvider = project.providers.gradleProperty("enableComposeCompilerReports")
     val enableReports = (enableReportsProvider.orNull == "true")
     if (enableReports) {
-        val reportsFolder = File(project.buildDir, "compose-reports")
+        val reportsFolder = project.layout.buildDirectory.file("compose-reports").get().asFile
         metricParameters.add("-P")
         metricParameters.add(
             "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + reportsFolder.absolutePath

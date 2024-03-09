@@ -37,7 +37,6 @@ include(":network")
 include(":domain")
 include(":common-ui")
 include(":common-middleware")
-include(":benchmark")
 
 // include modules in feature folder
 file("./feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
@@ -46,3 +45,4 @@ file("./feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
     println("module name: $moduleName")
     include(moduleName)
 }
+include(":baselineprofile")

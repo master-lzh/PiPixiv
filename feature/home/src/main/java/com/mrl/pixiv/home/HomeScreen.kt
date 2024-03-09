@@ -3,7 +3,6 @@ package com.mrl.pixiv.home
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
@@ -19,6 +18,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pullrefresh.PullRefreshIndicator
 import androidx.compose.material3.pullrefresh.pullRefresh
 import androidx.compose.material3.pullrefresh.rememberPullRefreshState
@@ -29,13 +29,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
-import com.mrl.pixiv.common.ui.BaseScreen
+import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.common_ui.util.navigateToSearchScreen
@@ -85,7 +84,6 @@ fun HomeScreen(
     navHostController: NavHostController,
     homeViewModel: HomeViewModel = koinViewModel(),
     bookmarkViewModel: BookmarkViewModel,
-    offsetAnimation: IntOffset,
 ) {
 //    OnLifecycle(onLifecycle = homeViewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
     HomeScreen(
@@ -97,9 +95,8 @@ fun HomeScreen(
         navToSearchScreen = navHostController::navigateToSearchScreen,
         onRefresh = homeViewModel::onRefresh,
         onScrollToBottom = homeViewModel::onScrollToBottom,
-        dispatch = homeViewModel::dispatch,
         exception = homeViewModel.exception,
-        offsetAnimation = offsetAnimation
+        dispatch = homeViewModel::dispatch,
     )
 }
 
@@ -116,7 +113,6 @@ internal fun HomeScreen(
     onScrollToBottom: () -> Unit,
     exception: SharedFlow<Throwable?>,
     dispatch: (HomeAction) -> Unit = {},
-    offsetAnimation: IntOffset,
 ) {
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val scope = rememberCoroutineScope()
@@ -147,19 +143,25 @@ internal fun HomeScreen(
         }
     }
 
-    BaseScreen(
-        title = stringResource(R.string.app_name),
-        actions = {
-            HomeTopBar(
-                navigateToSearchScreen = navToSearchScreen,
-                onRefreshToken = { dispatch(HomeAction.RefreshTokenIntent) }
-            ) {
-                dispatch(
-                    HomeAction.RefreshIllustRecommendedIntent(
-                        initRecommendedQuery
+    Screen(
+        modifier = modifier.padding(bottom = 80.dp),
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(R.string.app_name)) },
+                actions = {
+                    HomeTopBar(
+                        navigateToSearchScreen = navToSearchScreen,
+                        onRefreshToken = { dispatch(HomeAction.RefreshTokenIntent) },
+                        onRefresh = {
+                            dispatch(
+                                HomeAction.RefreshIllustRecommendedIntent(
+                                    initRecommendedQuery
+                                )
+                            )
+                        }
                     )
-                )
-            }
+                }
+            )
         },
         snackBarHost = {
             SnackbarHost(snackBarHostState) {
@@ -195,9 +197,8 @@ internal fun HomeScreen(
         floatingActionButton = {
             if (state.recommendImageList.isNotEmpty()) {
                 FloatingActionButton(
-                    modifier = Modifier
-                        .padding(bottom = 56.dp)
-                        .offset { offsetAnimation },
+                    modifier = Modifier,
+//                        .offset { offsetAnimation },
                     onClick = {
                         scope.launch {
                             lazyStaggeredGridState.scrollToItem(0)

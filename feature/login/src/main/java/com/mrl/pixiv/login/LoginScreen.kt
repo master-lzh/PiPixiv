@@ -9,10 +9,12 @@ import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,7 +31,7 @@ import com.mrl.pixiv.common.compose.OnLifecycle
 import com.mrl.pixiv.common.middleware.auth.AuthAction
 import com.mrl.pixiv.common.middleware.auth.AuthState
 import com.mrl.pixiv.common.router.Graph
-import com.mrl.pixiv.common.ui.BaseScreen
+import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.security.MessageDigest
@@ -102,21 +104,28 @@ internal fun LoginScreen(
             navToMainGraph()
         }
     }
-    BaseScreen(
-        actions = {
-            Button(onClick = {
-                getCodeVer()
-                currUrl = generateWebViewUrl(false)
-            }) {
-                Text(text = "登录")
-            }
-            Button(onClick = {
-                getCodeVer()
-                currUrl = generateWebViewUrl(true)
-            }) {
-                Text(text = "注册")
-            }
-        }) {
+    Screen(
+        modifier = modifier.statusBarsPadding(),
+        topBar = {
+            TopAppBar(
+                title = {},
+                actions = {
+                    Button(onClick = {
+                        getCodeVer()
+                        currUrl = generateWebViewUrl(false)
+                    }) {
+                        Text(text = "登录")
+                    }
+                    Button(onClick = {
+                        getCodeVer()
+                        currUrl = generateWebViewUrl(true)
+                    }) {
+                        Text(text = "注册")
+                    }
+                }
+            )
+        }
+    ) {
         val webViewState = rememberWebViewState(url = currUrl)
         when (webViewState.loadingState) {
             LoadingState.Finished -> {}

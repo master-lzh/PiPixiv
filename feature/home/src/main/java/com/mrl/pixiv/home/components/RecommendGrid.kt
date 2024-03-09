@@ -2,19 +2,14 @@ package com.mrl.pixiv.home.components
 
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
@@ -22,6 +17,7 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.OnScrollToBottom
 
+private const val LOADING_ITEM_COUNT = 4
 
 @Composable
 fun RecommendGrid(
@@ -29,7 +25,6 @@ fun RecommendGrid(
     bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,
     recommendImageList: List<Illust>,
-    loadMore: Boolean,
     onBookmarkClick: (Long, Boolean) -> Unit,
     onScrollToBottom: () -> Unit,
 ) {
@@ -49,20 +44,16 @@ fun RecommendGrid(
         items(recommendImageList, key = { it.id }) {
             RecommendImageItem(navToPictureScreen, it, bookmarkState, onBookmarkClick, spanCount)
         }
-        if (loadMore) {
-            item(key = "loading", span = StaggeredGridItemSpan.FullLine) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+
+        if (recommendImageList.isNotEmpty()) {
+            itemsIndexed(
+                List(LOADING_ITEM_COUNT) { 0 },
+                key = { index, _ -> "loading-$index" }) { _, _ ->
+                RecommendSkeleton(spanCount = spanCount)
             }
         }
     }
-    lazyStaggeredGridState.OnScrollToBottom {
+    lazyStaggeredGridState.OnScrollToBottom(loadingItemCount = LOADING_ITEM_COUNT) {
         onScrollToBottom()
     }
 }
