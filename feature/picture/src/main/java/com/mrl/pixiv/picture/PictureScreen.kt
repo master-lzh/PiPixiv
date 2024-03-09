@@ -1,8 +1,11 @@
 package com.mrl.pixiv.picture
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Environment
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -15,7 +18,20 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -23,8 +39,24 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -61,6 +93,8 @@ import androidx.navigation.NavHostController
 import coil.Coil
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.mrl.pixiv.common.compose.OnLifecycle
 import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
@@ -80,7 +114,17 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
-import com.mrl.pixiv.util.*
+import com.mrl.pixiv.util.AppUtil
+import com.mrl.pixiv.util.DOWNLOAD_DIR
+import com.mrl.pixiv.util.PictureType
+import com.mrl.pixiv.util.calculateImageSize
+import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
+import com.mrl.pixiv.util.isEven
+import com.mrl.pixiv.util.isFileExists
+import com.mrl.pixiv.util.joinPaths
+import com.mrl.pixiv.util.queryParams
+import com.mrl.pixiv.util.saveToAlbum
+import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -115,7 +159,9 @@ fun PictureScreen(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalPermissionsApi::class
+)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
@@ -171,6 +217,11 @@ internal fun PictureScreen(
     var currLongClickPicSize by rememberSaveable { mutableFloatStateOf(0f) }
     val lastRelatedPic = remember { mutableStateListOf<Illust>() }
     var loading by rememberSaveable { mutableStateOf(false) }
+    val readMediaImagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        rememberMultiplePermissionsState(permissions = listOf(READ_MEDIA_IMAGES))
+    } else {
+        rememberMultiplePermissionsState(permissions= listOf(READ_EXTERNAL_STORAGE))
+    }
     LaunchedEffect(followState.followStatus[illust.user.id]) {
         isFollowed = followState.followStatus[illust.user.id] ?: false
     }
@@ -697,18 +748,21 @@ internal fun PictureScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .throttleClick {
-                                scope.launch(Dispatchers.IO) {
-                                    loading = true
-                                    if (createShareImage(
-                                            currLongClickPic,
-                                            illust,
-                                            shareLauncher
-                                        )
-                                    ) return@launch
-                                    loading = false
-                                    currLongClickPic = Pair(0, "")
+                                readMediaImagePermission.launchMultiplePermissionRequest()
+                                if (readMediaImagePermission.allPermissionsGranted) {
+                                    scope.launch(Dispatchers.IO) {
+                                        loading = true
+                                        if (createShareImage(
+                                                currLongClickPic,
+                                                illust,
+                                                shareLauncher
+                                            )
+                                        ) return@launch
+                                        loading = false
+                                        currLongClickPic = Pair(0, "")
+                                    }
+                                    openBottomSheet = false
                                 }
-                                openBottomSheet = false
                             }
                             .padding(vertical = 10.dp)
                     ) {
