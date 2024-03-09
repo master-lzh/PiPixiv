@@ -43,6 +43,8 @@ dependencies {
     implementation(kotlinx.bundles.serialization)
     implementation(androidx.datastore)
     api(libs.protobuf.kotlin.lite)
+    implementation(platform(compose.bom))
+    implementation(compose.runtime.android)
 
     implementation(androidx.core.ktx)
     implementation(androidx.appcompat)

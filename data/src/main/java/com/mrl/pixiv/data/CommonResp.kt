@@ -1,19 +1,23 @@
 package com.mrl.pixiv.data
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
 
 @Serializable
+@Immutable
 class EmptyResp
 
 @Serializable
+@Immutable
 data class ProfileImageUrls(
     val medium: String = ""
 )
 
 @Serializable
+@Immutable
 data class ImageUrls(
     @SerialName("square_medium")
     val squareMedium: String = "",
@@ -24,6 +28,7 @@ data class ImageUrls(
 )
 
 @Serializable
+@Immutable
 data class Illust(
     val id: Long,
     val title: String,
@@ -83,18 +88,21 @@ data class Illust(
 )
 
 @Serializable
+@Immutable
 data class MetaPage(
     @SerialName("image_urls")
     val imageUrls: ImageUrls? = null
 )
 
 @Serializable
+@Immutable
 data class MetaSinglePage(
     @SerialName("original_image_url")
     val originalImageURL: String = ""
 )
 
 @Serializable
+@Immutable
 data class Tag(
     val name: String = "",
 
@@ -106,6 +114,7 @@ data class Tag(
 )
 
 @Serializable
+@Immutable
 enum class Type(val value: String) {
     @SerialName("illust")
     Illust("illust"),
@@ -118,6 +127,7 @@ enum class Type(val value: String) {
 }
 
 @Serializable
+@Immutable
 data class User(
     val id: Long,
     val name: String,
@@ -136,7 +146,8 @@ data class User(
 )
 
 @Serializable
-data class Novel (
+@Immutable
+data class Novel(
     val id: Long,
     val title: String,
     val caption: String,
@@ -194,7 +205,8 @@ data class Novel (
 
 
 @Serializable
-data class Series (
+@Immutable
+data class Series(
     val id: Long? = null,
     val title: String? = null
 )

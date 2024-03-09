@@ -21,7 +21,7 @@ com-google-android-material-material = "1.11.0"
 lottie = "6.1.0"
 #noinspection GradleDependency
 google-services = "4.3.15"
-firebase-bom = "32.7.2"
+firebase-bom = "32.7.4"
 firebase-crashlytics-gradle = "2.9.9"
 uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.2.3"

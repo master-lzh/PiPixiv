@@ -26,7 +26,6 @@ fun HomeContent(
         bookmarkState = bookmarkState,
         lazyStaggeredGridState = lazyStaggeredGridState,
         recommendImageList = state.recommendImageList,
-        loadMore = state.loadMore,
         onBookmarkClick = onBookmarkClick,
         onScrollToBottom = onScrollToBottom,
     )
