@@ -30,7 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.compose.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
@@ -49,7 +51,6 @@ import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.second
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -85,7 +86,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = koinViewModel(),
     bookmarkViewModel: BookmarkViewModel,
 ) {
-//    OnLifecycle(onLifecycle = homeViewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
+    OnLifecycle(lifecycleEvent = Lifecycle.Event.ON_CREATE, onLifecycle = homeViewModel::onCreate)
     HomeScreen(
         modifier = modifier,
         state = homeViewModel.state,
@@ -95,7 +96,6 @@ fun HomeScreen(
         navToSearchScreen = navHostController::navigateToSearchScreen,
         onRefresh = homeViewModel::onRefresh,
         onScrollToBottom = homeViewModel::onScrollToBottom,
-        exception = homeViewModel.exception,
         dispatch = homeViewModel::dispatch,
     )
 }
@@ -111,7 +111,6 @@ internal fun HomeScreen(
     navToSearchScreen: () -> Unit,
     onRefresh: () -> Unit,
     onScrollToBottom: () -> Unit,
-    exception: SharedFlow<Throwable?>,
     dispatch: (HomeAction) -> Unit = {},
 ) {
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
@@ -135,10 +134,10 @@ internal fun HomeScreen(
             }
         }
     }
-    LaunchedEffect(Unit) {
-        scope.launch {
-            exception.collect {
-                snackBarHostState.showSnackbar(it?.message ?: "未知错误")
+    LaunchedEffect(state.exception) {
+        if (state.exception != null) {
+            scope.launch {
+                snackBarHostState.showSnackbar(state.exception?.message ?: "未知错误")
             }
         }
     }

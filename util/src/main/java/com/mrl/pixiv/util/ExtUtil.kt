@@ -6,6 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableMap
 import java.net.URL
 import java.net.URLDecoder
 
@@ -27,7 +30,7 @@ val Number.week: Long
 val Number.month: Long
     get() = this.day * 30
 
-val String.queryParams: Map<String, String>
+val String.queryParams: ImmutableMap<String, String>
     get() {
         val queryMap = mutableMapOf<String, String>()
         return try {
@@ -38,9 +41,9 @@ val String.queryParams: Map<String, String>
                     queryMap[keyValuePair[0]] = if (keyValuePair.size > 1) keyValuePair[1] else ""
                 }
             }
-            queryMap
+            queryMap.toImmutableMap()
         } catch (e: Exception) {
-            mapOf()
+           persistentMapOf()
         }
     }
 

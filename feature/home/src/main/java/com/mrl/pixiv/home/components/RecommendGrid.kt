@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.OnScrollToBottom
+import kotlinx.collections.immutable.ImmutableList
 
 private const val LOADING_ITEM_COUNT = 4
 
@@ -24,7 +25,7 @@ fun RecommendGrid(
     navToPictureScreen: (Illust) -> Unit,
     bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,
-    recommendImageList: List<Illust>,
+    recommendImageList: ImmutableList<Illust>,
     onBookmarkClick: (Long, Boolean) -> Unit,
     onScrollToBottom: () -> Unit,
 ) {

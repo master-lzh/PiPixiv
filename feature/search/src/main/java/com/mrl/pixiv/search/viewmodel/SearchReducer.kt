@@ -1,17 +1,19 @@
 package com.mrl.pixiv.search.viewmodel
 
 import com.mrl.pixiv.common.data.Reducer
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 class SearchReducer : Reducer<SearchState, SearchAction> {
     override fun reduce(state: SearchState, action: SearchAction): SearchState {
         return when (action) {
             is SearchAction.ClearAutoCompleteSearchWords -> {
-                state.copy(autoCompleteSearchWords = emptyList())
+                state.copy(autoCompleteSearchWords = persistentListOf())
             }
 
             is SearchAction.ClearSearchResult -> {
                 state.copy(
-                    searchResults = emptyList(),
+                    searchResults = persistentListOf(),
                     nextUrl = ""
                 )
             }
@@ -21,12 +23,12 @@ class SearchReducer : Reducer<SearchState, SearchAction> {
             }
 
             is SearchAction.UpdateAutoCompleteSearchWords -> {
-                state.copy(autoCompleteSearchWords = action.autoCompleteSearchWords)
+                state.copy(autoCompleteSearchWords = action.autoCompleteSearchWords.toImmutableList())
             }
 
             is SearchAction.UpdateSearchIllustsResult -> {
                 state.copy(
-                    searchResults = state.searchResults + action.illusts,
+                    searchResults = (state.searchResults + action.illusts).toImmutableList(),
                     nextUrl = action.nextUrl
                 )
             }
@@ -36,7 +38,7 @@ class SearchReducer : Reducer<SearchState, SearchAction> {
             }
 
             is SearchAction.UpdateSearchHistory -> {
-                state.copy(searchHistory = action.searchHistory)
+                state.copy(searchHistory = action.searchHistory.toImmutableList())
             }
 
             else -> state

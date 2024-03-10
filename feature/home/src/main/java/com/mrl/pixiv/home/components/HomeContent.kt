@@ -9,6 +9,7 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.home.TAG
 import com.mrl.pixiv.home.viewmodel.HomeState
+import kotlinx.collections.immutable.toImmutableList
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -25,7 +26,7 @@ fun HomeContent(
         navToPictureScreen = navToPictureScreen,
         bookmarkState = bookmarkState,
         lazyStaggeredGridState = lazyStaggeredGridState,
-        recommendImageList = state.recommendImageList,
+        recommendImageList = state.recommendImageList.toImmutableList(),
         onBookmarkClick = onBookmarkClick,
         onScrollToBottom = onScrollToBottom,
     )

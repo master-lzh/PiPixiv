@@ -7,6 +7,7 @@ import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.home.R
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 import com.mrl.pixiv.util.ToastUtil
+import kotlinx.collections.immutable.toImmutableList
 
 class HomeMiddleware(
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
@@ -21,8 +22,15 @@ class HomeMiddleware(
 
             is HomeAction.RefreshIllustRecommendedIntent -> refreshIllustRecommended(state, action)
             is HomeAction.RefreshTokenIntent -> refreshToken(state)
+            is HomeAction.CollectExceptionFlow-> collectExceptionFlow()
 
             else -> {}
+        }
+    }
+
+    private fun collectExceptionFlow() {
+        launchUI {
+
         }
     }
 
@@ -46,7 +54,7 @@ class HomeMiddleware(
                 dispatch(
                     HomeAction.UpdateState(
                         state.copy(
-                            recommendImageList = imageList,
+                            recommendImageList = imageList.toImmutableList(),
                             isRefresh = false,
                             nextUrl = it.nextURL
                         )
@@ -76,7 +84,7 @@ class HomeMiddleware(
                 dispatch(
                     HomeAction.UpdateState(
                         state.copy(
-                            recommendImageList = state.recommendImageList + imageList,
+                            recommendImageList = (state.recommendImageList + imageList).toImmutableList(),
                             isRefresh = false,
                             nextUrl = it.nextURL
                         )

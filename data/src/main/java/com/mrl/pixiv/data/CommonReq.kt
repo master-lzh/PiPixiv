@@ -1,6 +1,7 @@
 package com.mrl.pixiv.data
 
 import androidx.annotation.StringDef
+import androidx.compose.runtime.Stable
 import com.google.common.base.CaseFormat
 import kotlin.reflect.full.memberProperties
 
@@ -9,6 +10,7 @@ enum class Filter(override val value: String): IBaseEnum {
     IOS("for_ios"),
 }
 
+@Stable
 interface IBaseMap {
     fun toMap(): Map<String, String> {
         val map = mutableMapOf<String, String>()
