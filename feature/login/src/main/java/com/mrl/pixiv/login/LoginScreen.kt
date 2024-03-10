@@ -8,6 +8,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
@@ -105,7 +106,7 @@ internal fun LoginScreen(
         }
     }
     Screen(
-        modifier = modifier.statusBarsPadding(),
+        modifier = modifier.statusBarsPadding().imePadding(),
         topBar = {
             TopAppBar(
                 title = {},

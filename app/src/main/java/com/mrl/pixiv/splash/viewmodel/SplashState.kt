@@ -1,7 +1,9 @@
 package com.mrl.pixiv.splash.viewmodel
 
+import androidx.compose.runtime.Stable
 import com.mrl.pixiv.common.data.State
 
+@Stable
 data class SplashState(
     val isLoading: Boolean,
     val startDestination: String?,

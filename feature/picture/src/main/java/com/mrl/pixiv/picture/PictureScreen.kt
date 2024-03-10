@@ -125,6 +125,8 @@ import com.mrl.pixiv.util.joinPaths
 import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.saveToAlbum
 import com.mrl.pixiv.util.throttleClick
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -638,7 +640,7 @@ internal fun PictureScreen(
         lazyListState.OnScrollToRelatedBottom(
             isScrollToBottom = isScrollToRelatedBottom,
             id = illust.id,
-            lastTwoRelated = lastRelatedPic,
+            lastTwoRelated = lastRelatedPic.toImmutableList(),
         )
         ConstraintLayout(
             modifier = Modifier
@@ -874,7 +876,7 @@ private fun LazyListState.OnScrollToBottom(
 private fun LazyListState.OnScrollToRelatedBottom(
     isScrollToBottom: MutableState<Boolean>,
     id: Long,
-    lastTwoRelated: List<Illust>,
+    lastTwoRelated: ImmutableList<Illust>,
 ) {
     // 判断是否滚动到相关作品最底部
     val isToBottom by remember {

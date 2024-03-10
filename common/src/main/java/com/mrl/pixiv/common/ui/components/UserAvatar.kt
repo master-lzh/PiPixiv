@@ -13,6 +13,8 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import coil.transform.Transformation
 import com.mrl.pixiv.util.throttleClick
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun UserAvatar(
@@ -23,7 +25,7 @@ fun UserAvatar(
     contentDescription: String = "",
     contentScale: ContentScale = ContentScale.Fit,
     tint: Color = Color.Unspecified,
-    transformations: List<Transformation> = listOf(CircleCropTransformation()),
+    transformations: ImmutableList<Transformation> = persistentListOf(CircleCropTransformation()),
 ) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)

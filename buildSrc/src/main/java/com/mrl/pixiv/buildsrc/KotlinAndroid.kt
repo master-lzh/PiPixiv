@@ -55,9 +55,11 @@ internal fun Project.configureKotlinAndroid(
     configureKotlin()
 
     val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+    val kotlinx = extensions.getByType<VersionCatalogsExtension>().named("kotlinx")
 
     dependencies {
         add("coreLibraryDesugaring", libs.findLibrary("desugar").get())
+        add("implementation", kotlinx.findLibrary("collections-immutable").get())
     }
 }
 
