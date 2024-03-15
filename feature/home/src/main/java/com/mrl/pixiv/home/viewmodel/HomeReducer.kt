@@ -1,6 +1,6 @@
 package com.mrl.pixiv.home.viewmodel
 
-import com.mrl.pixiv.common.data.Reducer
+import com.mrl.pixiv.common.viewmodel.Reducer
 
 class HomeReducer : Reducer<HomeState, HomeAction> {
     override fun reduce(state: HomeState, action: HomeAction): HomeState {

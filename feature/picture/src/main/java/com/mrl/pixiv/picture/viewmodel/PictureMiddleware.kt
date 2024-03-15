@@ -3,7 +3,7 @@ package com.mrl.pixiv.picture.viewmodel
 import androidx.core.graphics.drawable.toBitmap
 import coil.Coil
 import coil.request.ImageRequest
-import com.mrl.pixiv.common.data.Middleware
+import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq

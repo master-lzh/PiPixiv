@@ -1,6 +1,6 @@
 package com.mrl.pixiv.picture.viewmodel
 
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.viewmodel.BaseViewModel
 import com.mrl.pixiv.data.Illust
 
 class PictureViewModel(

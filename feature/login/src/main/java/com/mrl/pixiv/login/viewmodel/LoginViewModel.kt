@@ -1,6 +1,6 @@
 package com.mrl.pixiv.login.viewmodel
 
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.viewmodel.BaseViewModel
 import com.mrl.pixiv.common.middleware.auth.AuthAction
 import com.mrl.pixiv.common.middleware.auth.AuthMiddleware
 import com.mrl.pixiv.common.middleware.auth.AuthReducer

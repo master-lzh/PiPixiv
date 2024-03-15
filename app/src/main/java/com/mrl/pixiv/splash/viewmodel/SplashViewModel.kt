@@ -1,6 +1,6 @@
 package com.mrl.pixiv.splash.viewmodel
 
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.viewmodel.BaseViewModel
 
 class SplashViewModel(
     reducer: SplashReducer,

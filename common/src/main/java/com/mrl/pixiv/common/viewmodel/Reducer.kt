@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.data
+package com.mrl.pixiv.common.viewmodel
 
 interface Reducer<S : State, A : Action> {
     /**

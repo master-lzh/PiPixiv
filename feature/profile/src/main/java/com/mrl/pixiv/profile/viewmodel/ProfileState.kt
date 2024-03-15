@@ -1,7 +1,7 @@
 package com.mrl.pixiv.profile.viewmodel
 
 import androidx.compose.runtime.Stable
-import com.mrl.pixiv.common.data.State
+import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Novel
 import com.mrl.pixiv.profile.state.UserInfo

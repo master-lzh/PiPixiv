@@ -1,6 +1,6 @@
 package com.mrl.pixiv.splash.viewmodel
 
-import com.mrl.pixiv.common.data.Middleware
+import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.GrantType
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase

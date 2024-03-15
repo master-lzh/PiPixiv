@@ -1,6 +1,6 @@
 package com.mrl.pixiv.common.middleware.follow
 
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.viewmodel.BaseViewModel
 
 
 class FollowViewModel(

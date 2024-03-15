@@ -1,6 +1,6 @@
 package com.mrl.pixiv.common.middleware.auth
 
-import com.mrl.pixiv.common.data.Reducer
+import com.mrl.pixiv.common.viewmodel.Reducer
 
 class AuthReducer : Reducer<AuthState, AuthAction> {
     override fun reduce(state: AuthState, action: AuthAction): AuthState {

@@ -1,6 +1,6 @@
 package com.mrl.pixiv.splash.viewmodel
 
-import com.mrl.pixiv.common.data.Action
+import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.data.auth.GrantType
 
 sealed class SplashAction : Action {

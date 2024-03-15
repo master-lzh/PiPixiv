@@ -1,6 +1,6 @@
 package com.mrl.pixiv.common.middleware.bookmark
 
-import com.mrl.pixiv.common.data.Action
+import com.mrl.pixiv.common.viewmodel.Action
 
 sealed class BookmarkAction : Action {
     data class IllustBookmarkAddIntent(val illustId: Long) : BookmarkAction()

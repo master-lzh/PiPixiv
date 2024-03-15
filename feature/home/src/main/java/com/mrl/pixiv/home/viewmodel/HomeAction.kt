@@ -1,6 +1,6 @@
 package com.mrl.pixiv.home.viewmodel
 
-import com.mrl.pixiv.common.data.Action
+import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import kotlinx.collections.immutable.ImmutableMap
 

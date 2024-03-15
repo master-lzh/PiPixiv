@@ -95,7 +95,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.mrl.pixiv.common.compose.OnLifecycle
+import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState

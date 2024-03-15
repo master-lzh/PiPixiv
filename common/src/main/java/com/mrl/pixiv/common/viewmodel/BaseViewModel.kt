@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.base
+package com.mrl.pixiv.common.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -6,11 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mrl.pixiv.common.data.Action
-import com.mrl.pixiv.common.data.Dispatcher
-import com.mrl.pixiv.common.data.Middleware
-import com.mrl.pixiv.common.data.Reducer
-import com.mrl.pixiv.common.data.State
 import com.mrl.pixiv.util.TAG
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -53,7 +48,7 @@ abstract class BaseViewModel<S : State, A : Action>(
         }
         viewModelScope.launch {
             actions.collect {
-                state = reducer.reduce(it.state, it.action)
+                state = reducer.reduce(state, it.action)
             }
         }
     }
