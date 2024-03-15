@@ -1,6 +1,6 @@
 package com.mrl.pixiv.profile.viewmodel
 
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.viewmodel.BaseViewModel
 
 class ProfileViewModel(
     reducer: ProfileReducer,

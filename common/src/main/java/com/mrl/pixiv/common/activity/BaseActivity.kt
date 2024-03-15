@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.base
+package com.mrl.pixiv.common.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

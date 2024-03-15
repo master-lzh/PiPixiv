@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.compose
+package com.mrl.pixiv.common.lifecycle
 
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -12,7 +12,7 @@ import com.mrl.pixiv.util.TAG
 
 @Composable
 fun OnLifecycle(
-    lifecycleEvent: Lifecycle.Event = Lifecycle.Event.ON_START,
+    lifecycleEvent: Lifecycle.Event = Lifecycle.Event.ON_CREATE,
     onLifecycle: () -> Unit,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current

@@ -1,7 +1,7 @@
 package com.mrl.pixiv.home.viewmodel
 
 import androidx.compose.runtime.Stable
-import com.mrl.pixiv.common.data.State
+import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.Illust
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

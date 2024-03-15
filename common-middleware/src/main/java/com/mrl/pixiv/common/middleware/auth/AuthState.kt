@@ -1,7 +1,7 @@
 package com.mrl.pixiv.common.middleware.auth
 
 import androidx.compose.runtime.Stable
-import com.mrl.pixiv.common.data.State
+import com.mrl.pixiv.common.viewmodel.State
 
 @Stable
 data class AuthState(

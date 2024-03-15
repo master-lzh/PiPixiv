@@ -1,7 +1,7 @@
 package com.mrl.pixiv.search.viewmodel
 
 import androidx.compose.runtime.Stable
-import com.mrl.pixiv.common.data.State
+import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Tag
 import com.mrl.pixiv.data.search.SearchAiType

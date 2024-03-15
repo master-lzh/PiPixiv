@@ -9,8 +9,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.mrl.pixiv.common.base.BaseActivity
-import com.mrl.pixiv.common.compose.OnLifecycle
+import com.mrl.pixiv.common.activity.BaseActivity
+import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.navigation.root.RootNavigationGraph
 import com.mrl.pixiv.splash.viewmodel.SplashAction
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel

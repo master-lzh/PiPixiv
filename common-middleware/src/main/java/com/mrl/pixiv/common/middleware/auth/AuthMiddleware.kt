@@ -1,6 +1,6 @@
 package com.mrl.pixiv.common.middleware.auth
 
-import com.mrl.pixiv.common.data.Middleware
+import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.Constants
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.AuthTokenResp

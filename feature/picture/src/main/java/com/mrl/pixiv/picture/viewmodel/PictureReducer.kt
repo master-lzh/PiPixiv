@@ -1,7 +1,7 @@
 package com.mrl.pixiv.picture.viewmodel
 
 import androidx.compose.runtime.toMutableStateList
-import com.mrl.pixiv.common.data.Reducer
+import com.mrl.pixiv.common.viewmodel.Reducer
 
 
 class PictureReducer : Reducer<PictureState, PictureAction> {

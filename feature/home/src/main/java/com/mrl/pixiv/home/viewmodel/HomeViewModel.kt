@@ -1,7 +1,7 @@
 package com.mrl.pixiv.home.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.mrl.pixiv.common.base.BaseViewModel
+import com.mrl.pixiv.common.viewmodel.BaseViewModel
 import com.mrl.pixiv.home.initRecommendedQuery
 import kotlinx.coroutines.launch
 

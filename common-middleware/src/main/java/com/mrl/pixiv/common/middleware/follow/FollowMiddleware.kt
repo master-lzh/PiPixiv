@@ -1,6 +1,6 @@
 package com.mrl.pixiv.common.middleware.follow
 
-import com.mrl.pixiv.common.data.Middleware
+import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.user.UserFollowAddReq
 import com.mrl.pixiv.data.user.UserFollowDeleteReq

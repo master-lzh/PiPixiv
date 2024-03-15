@@ -1,6 +1,8 @@
-package com.mrl.pixiv.common.data
+package com.mrl.pixiv.common.viewmodel
 
 import android.util.Log
+import com.mrl.pixiv.common.data.DispatcherEnum
+import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.util.NetworkExceptionUtil
 import com.mrl.pixiv.util.TAG
 import kotlinx.coroutines.CoroutineDispatcher

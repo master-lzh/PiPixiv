@@ -1,6 +1,6 @@
 package com.mrl.pixiv.splash.viewmodel
 
-import com.mrl.pixiv.common.data.Reducer
+import com.mrl.pixiv.common.viewmodel.Reducer
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.Graph
 

@@ -1,6 +1,6 @@
 package com.mrl.pixiv.home.viewmodel
 
-import com.mrl.pixiv.common.data.Middleware
+import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.illust.IllustRecommendedResp
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase

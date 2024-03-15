@@ -1,6 +1,6 @@
 package com.mrl.pixiv.common.middleware.bookmark
 
-import com.mrl.pixiv.common.data.Middleware
+import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository

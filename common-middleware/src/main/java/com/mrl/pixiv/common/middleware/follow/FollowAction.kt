@@ -1,6 +1,6 @@
 package com.mrl.pixiv.common.middleware.follow
 
-import com.mrl.pixiv.common.data.Action
+import com.mrl.pixiv.common.viewmodel.Action
 
 sealed class FollowAction : Action {
     data class UpdateFollowState(val userId: Long, val isFollowed: Boolean) : FollowAction()

@@ -1,6 +1,6 @@
 package com.mrl.pixiv.profile.viewmodel
 
-import com.mrl.pixiv.common.data.Middleware
+import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.ProfileImageUrls
 import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.User

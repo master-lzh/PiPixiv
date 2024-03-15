@@ -28,7 +28,7 @@ import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
-import com.mrl.pixiv.common.compose.OnLifecycle
+import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.auth.AuthAction
 import com.mrl.pixiv.common.middleware.auth.AuthState
 import com.mrl.pixiv.common.router.Graph

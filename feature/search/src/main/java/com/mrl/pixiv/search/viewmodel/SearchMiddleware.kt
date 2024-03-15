@@ -1,6 +1,6 @@
 package com.mrl.pixiv.search.viewmodel
 
-import com.mrl.pixiv.common.data.Middleware
+import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.search.SearchAutoCompleteQuery
 import com.mrl.pixiv.data.search.SearchIllustQuery
 import com.mrl.pixiv.repository.local.SearchLocalRepository

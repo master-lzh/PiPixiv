@@ -1,6 +1,6 @@
 package com.mrl.pixiv.picture.viewmodel
 
-import com.mrl.pixiv.common.data.Action
+import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.data.Illust
 
 sealed class PictureAction : Action {

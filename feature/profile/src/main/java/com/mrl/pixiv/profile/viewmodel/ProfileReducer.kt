@@ -1,6 +1,6 @@
 package com.mrl.pixiv.profile.viewmodel
 
-import com.mrl.pixiv.common.data.Reducer
+import com.mrl.pixiv.common.viewmodel.Reducer
 import kotlinx.collections.immutable.toImmutableList
 
 class ProfileReducer : Reducer<ProfileState, ProfileAction> {

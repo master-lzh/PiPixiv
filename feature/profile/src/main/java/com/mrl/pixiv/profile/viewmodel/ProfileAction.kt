@@ -1,6 +1,6 @@
 package com.mrl.pixiv.profile.viewmodel
 
-import com.mrl.pixiv.common.data.Action
+import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Novel
 import com.mrl.pixiv.profile.state.UserInfo

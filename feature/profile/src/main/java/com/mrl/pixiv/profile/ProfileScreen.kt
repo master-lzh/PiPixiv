@@ -32,7 +32,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.mrl.pixiv.common.coil.BlurTransformation
-import com.mrl.pixiv.common.compose.OnLifecycle
+import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel

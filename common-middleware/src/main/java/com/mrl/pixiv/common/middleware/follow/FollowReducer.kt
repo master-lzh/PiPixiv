@@ -1,6 +1,6 @@
 package com.mrl.pixiv.common.middleware.follow
 
-import com.mrl.pixiv.common.data.Reducer
+import com.mrl.pixiv.common.viewmodel.Reducer
 
 
 class FollowReducer : Reducer<FollowState, FollowAction> {
