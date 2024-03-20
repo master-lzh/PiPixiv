@@ -626,8 +626,7 @@ internal fun PictureScreen(
                 Surface(
                     Modifier
                         .size(size)
-                        .padding(horizontal = 5.dp)
-                        .padding(bottom = 5.dp),
+                        .padding(horizontal = 5.dp),
                     shape = MaterialTheme.shapes.medium,
                     shadowElevation = 4.dp,
                     propagateMinConstraints = false,
