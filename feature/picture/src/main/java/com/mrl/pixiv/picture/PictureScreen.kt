@@ -5,6 +5,7 @@ import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Environment
 import android.util.Log
@@ -32,10 +33,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -60,11 +63,10 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -83,20 +85,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import coil.Coil
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.coroutine.launchNetwork
+import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
@@ -104,6 +107,7 @@ import com.mrl.pixiv.common.middleware.follow.FollowAction
 import com.mrl.pixiv.common.middleware.follow.FollowState
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.components.Surface
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.deepBlue
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
@@ -116,6 +120,7 @@ import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import com.mrl.pixiv.util.AppUtil
 import com.mrl.pixiv.util.DOWNLOAD_DIR
+import com.mrl.pixiv.util.OnScrollToBottom
 import com.mrl.pixiv.util.PictureType
 import com.mrl.pixiv.util.calculateImageSize
 import com.mrl.pixiv.util.convertUtcStringToLocalDateTime
@@ -125,35 +130,32 @@ import com.mrl.pixiv.util.joinPaths
 import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.saveToAlbum
 import com.mrl.pixiv.util.throttleClick
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
 
-private const val USER_ILLUSTS_COUNT = 3
 
 @Composable
 fun PictureScreen(
     modifier: Modifier = Modifier,
     illust: Illust,
     navHostController: NavHostController,
-    viewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
+    pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
     bookmarkViewModel: BookmarkViewModel,
     followViewModel: FollowViewModel,
 ) {
-    OnLifecycle(onLifecycle = viewModel::onCreate, lifecycleEvent = Lifecycle.Event.ON_CREATE)
+    OnLifecycle(onLifecycle = pictureViewModel::onCreate)
     PictureScreen(
         modifier = modifier,
-        state = viewModel.state,
+        state = pictureViewModel.state,
         bookmarkState = bookmarkViewModel.state,
         followState = followViewModel.state,
         illust = illust,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         popBackStack = navHostController::popBackStack,
-        dispatch = viewModel::dispatch,
+        dispatch = pictureViewModel::dispatch,
         bookmarkDispatch = bookmarkViewModel::dispatch,
         followDispatch = followViewModel::dispatch,
         navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
@@ -161,7 +163,8 @@ fun PictureScreen(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class,
+@OptIn(
+    ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class,
     ExperimentalPermissionsApi::class
 )
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -180,6 +183,11 @@ internal fun PictureScreen(
     navToSearchResultScreen: (String) -> Unit = {},
     popBackToHomeScreen: () -> Unit = {},
 ) {
+    val (relatedSpanCount, userSpanCount) = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_PORTRAIT -> Pair(2, 3)
+        Configuration.ORIENTATION_LANDSCAPE -> Pair(4, 6)
+        else -> Pair(2, 3)
+    }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val shareLauncher =
@@ -193,47 +201,33 @@ internal fun PictureScreen(
                 // 分享失败或取消
             }
         }
-    val lazyListState = rememberLazyListState()
+    val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val currPage =
         remember {
             derivedStateOf {
                 minOf(
-                    lazyListState.firstVisibleItemIndex,
+                    lazyStaggeredGridState.firstVisibleItemIndex,
                     illust.pageCount - 1
                 )
             }
         }
-    val isBarVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex <= illust.pageCount } }
+    val isBarVisible by remember { derivedStateOf { lazyStaggeredGridState.firstVisibleItemIndex <= illust.pageCount } }
     val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
     val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
 
-    var isFollowed by rememberSaveable {
-        mutableStateOf(
-            followState.followStatus[illust.user.id] ?: false
-        )
-    }
+    val isFollowed = followState.followStatus[illust.user.id] ?: false
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
     var currLongClickPic by rememberSaveable { mutableStateOf(Pair(0, "")) }
     var currLongClickPicSize by rememberSaveable { mutableFloatStateOf(0f) }
-    val lastRelatedPic = remember { mutableStateListOf<Illust>() }
     var loading by rememberSaveable { mutableStateOf(false) }
     val readMediaImagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberMultiplePermissionsState(permissions = listOf(READ_MEDIA_IMAGES))
     } else {
-        rememberMultiplePermissionsState(permissions= listOf(READ_EXTERNAL_STORAGE))
+        rememberMultiplePermissionsState(permissions = listOf(READ_EXTERNAL_STORAGE))
     }
-    LaunchedEffect(followState.followStatus[illust.user.id]) {
-        isFollowed = followState.followStatus[illust.user.id] ?: false
-    }
-    LaunchedEffect(isScrollToRelatedBottom.value) {
-        if (isScrollToRelatedBottom.value) {
-            state.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
-                dispatch(PictureAction.LoadMoreIllustRelatedIntent(it))
-            }
-        }
-    }
+
     LaunchedEffect(currLongClickPic.second) {
         if (currLongClickPic.second.isNotEmpty()) {
             launchNetwork {
@@ -241,16 +235,16 @@ internal fun PictureScreen(
             }
         }
     }
-    SideEffect {
-        lastRelatedPic.clear()
-        lastRelatedPic.addAll(
-            if (isEven(state.illustRelated.size)) {
-                state.illustRelated.takeLast(2)
-            } else {
-                state.illustRelated.takeLast(1)
-            }
-        )
+
+    var currentLoadingItem by rememberSaveable { mutableIntStateOf(0) }
+    LaunchedEffect(state.illustRelated.size) {
+        currentLoadingItem = if (state.illustRelated.size.isEven()) {
+            4
+        } else {
+            5
+        }
     }
+
     Screen(
         topBar = {
             TopAppBar(
@@ -343,12 +337,16 @@ internal fun PictureScreen(
             }
         }
     ) {
-        LazyColumn(
-            state = lazyListState,
+        LazyVerticalStaggeredGrid(
+            state = lazyStaggeredGridState,
+            columns = StaggeredGridCells.Fixed(relatedSpanCount),
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
         ) {
-            items(illust.pageCount, key = { "${illust.id}_$it" }) { index ->
+            items(
+                illust.pageCount,
+                key = { "${illust.id}_$it" },
+                span = { StaggeredGridItemSpan.FullLine }) { index ->
                 if (illust.pageCount > 1) {
                     illust.metaPages?.get(index)?.let {
                         AsyncImage(
@@ -388,7 +386,7 @@ internal fun PictureScreen(
                     )
                 }
             }
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 if (isScrollToBottom.value) {
                     Row(
                         modifier = Modifier
@@ -431,7 +429,7 @@ internal fun PictureScreen(
                     )
                 }
             }
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 Row(
                     Modifier.padding(top = 10.dp)
                 ) {
@@ -453,7 +451,7 @@ internal fun PictureScreen(
                 }
             }
             // tag
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 FlowRow(
                     Modifier.padding(start = 20.dp, top = 10.dp)
                 ) {
@@ -478,14 +476,14 @@ internal fun PictureScreen(
                     }
                 }
             }
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 HorizontalDivider(
                     modifier = Modifier
                         .padding(horizontal = 15.dp)
                         .padding(top = 50.dp)
                 )
             }
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 //作者头像、名字、关注按钮
                 Row(
                     modifier = Modifier
@@ -561,19 +559,19 @@ internal fun PictureScreen(
                     }
                 }
             }
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 Row(
                     modifier = Modifier
                         .padding(horizontal = 15.dp)
                         .padding(top = 10.dp)
                 ) {
-                    state.userIllusts.subList(0, minOf(USER_ILLUSTS_COUNT, state.userIllusts.size))
+                    state.userIllusts.subList(0, minOf(userSpanCount, state.userIllusts.size))
                         .forEach {
                             SquareIllustItem(
                                 illust = it,
                                 bookmarkState = bookmarkState,
                                 dispatch = bookmarkDispatch,
-                                spanCount = minOf(USER_ILLUSTS_COUNT, state.userIllusts.size),
+                                spanCount = minOf(userSpanCount, state.userIllusts.size),
                                 horizontalPadding = 15.dp,
                                 paddingValues = PaddingValues(2.dp),
                                 elevation = 5.dp,
@@ -582,7 +580,7 @@ internal fun PictureScreen(
                         }
                 }
             }
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
                 //相关作品文字，显示在中间
                 Text(
                     text = "相关作品",
@@ -596,65 +594,64 @@ internal fun PictureScreen(
                     ),
                 )
             }
-            val illustRelated = state.illustRelated.chunked(2)
-            items(illustRelated, key = {
-                "${illust.id}_related_${
-                    it.joinToString(separator = "_") { it.id.toString() }
-                }"
-            }) {
+            items(
+                state.illustRelated,
+                key = { "${illust.id}_related_${it.id}" },
+                contentType = { "related_illusts" }
+            ) {
                 // 相关作品
                 // 由于不能在LazyColumn中嵌套LazyColumn，所以这里拆分成每个Row两张图片
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    it.forEach {
-                        SquareIllustItem(
-                            illust = it,
-                            bookmarkState = bookmarkState,
-                            dispatch = bookmarkDispatch,
-                            spanCount = 2,
-                            paddingValues = PaddingValues(5.dp),
-                            elevation = 5.dp,
-                            navToPictureScreen = navToPictureScreen
-                        )
-                    }
+                    SquareIllustItem(
+                        illust = it,
+                        bookmarkState = bookmarkState,
+                        dispatch = bookmarkDispatch,
+                        spanCount = relatedSpanCount,
+                        paddingValues = PaddingValues(5.dp),
+                        elevation = 5.dp,
+                        navToPictureScreen = navToPictureScreen
+                    )
                 }
             }
+
+            items(currentLoadingItem, key = { "loading_$it" }) {
+                val size =
+                    (LocalConfiguration.current.screenWidthDp.dp - 2 * relatedSpanCount * PaddingValues(
+                        5.dp
+                    ).calculateLeftPadding(
+                        LayoutDirection.Ltr
+                    ) - 1.dp) / relatedSpanCount
+                Surface(
+                    Modifier
+                        .size(size)
+                        .padding(horizontal = 5.dp)
+                        .padding(bottom = 5.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    shadowElevation = 4.dp,
+                    propagateMinConstraints = false,
+                ) {
+
+                }
+            }
+
             item(key = "spacer") {
                 Spacer(modifier = Modifier.height(if (isScrollToRelatedBottom.value) 0.dp else 100.dp))
             }
-            item(key = "loading") {
-                if (isScrollToRelatedBottom.value) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 100.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
+        }
+        lazyStaggeredGridState.OnScrollToBottom(isScrollToBottom, illust.pageCount, illust.id)
+        lazyStaggeredGridState.OnScrollToBottom(loadingItemCount = currentLoadingItem) {
+            isScrollToRelatedBottom.value = true
+            state.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
+                dispatch(PictureAction.LoadMoreIllustRelatedIntent(state.nextUrl.queryParams))
             }
         }
-        lazyListState.OnScrollToBottom(isScrollToBottom, illust.pageCount, illust.id)
-        lazyListState.OnScrollToRelatedBottom(
-            isScrollToBottom = isScrollToRelatedBottom,
-            id = illust.id,
-            lastTwoRelated = lastRelatedPic.toImmutableList(),
-        )
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
         ) {
             val picInfo = createRef()
-//            AnimatedVisibility(
-//                visible = isBarVisible,
-//                enter = fadeIn(),
-//                exit = fadeOut(),
-//            ) {
-//
-//            }
-
             AnimatedVisibility(
                 visible = !isScrollToBottom.value,
                 enter = fadeIn(),
@@ -838,7 +835,7 @@ private fun createShareIntent(text: String): Intent {
 }
 
 @Composable
-private fun LazyListState.OnScrollToBottom(
+private fun LazyStaggeredGridState.OnScrollToBottom(
     isScrollToBottom: MutableState<Boolean>,
     pageCount: Int,
     id: Long
@@ -859,46 +856,7 @@ private fun LazyListState.OnScrollToBottom(
 
             if (lastVisibleItem != null) {
                 return@derivedStateOf lastVisibleItem.index == pageCount - 1
-                        && lastVisibleItem.let { it.offset + it.size } <= layoutInfo.let { it.viewportEndOffset - it.viewportStartOffset }
-            } else {
-                return@derivedStateOf false
-            }
-        }
-    }
-    LaunchedEffect(isToBottom) {
-        Log.d("TAG", "OnScrollToBottom: $isToBottom")
-        isScrollToBottom.value = isToBottom
-        Log.d("TAG", "OnScrollToBottom: $isScrollToBottom")
-    }
-}
-
-@Composable
-private fun LazyListState.OnScrollToRelatedBottom(
-    isScrollToBottom: MutableState<Boolean>,
-    id: Long,
-    lastTwoRelated: ImmutableList<Illust>,
-) {
-    // 判断是否滚动到相关作品最底部
-    val isToBottom by remember {
-        derivedStateOf {
-            val lastVisibleItem =
-                layoutInfo.visibleItemsInfo.find {
-                    it.key == "${id}_related_${
-                        lastTwoRelated.joinToString(separator = "_") { it.id.toString() }
-                    }"
-                }
-//            layoutInfo.visibleItemsInfo.forEachIndexed { i, it ->
-//                Log.d(
-//                    "TAG",
-//                    "OnScrollToBottom: ${it.index} ${
-//                        it.let { "${it.offset} ${it.size} ${layoutInfo.viewportStartOffset} ${layoutInfo.viewportEndOffset}" }
-//                    }"
-//                )
-//            }
-
-            if (lastVisibleItem != null) {
-                return@derivedStateOf lastVisibleItem.index == layoutInfo.totalItemsCount - 3
-                        && lastVisibleItem.let { it.offset + it.size } <= layoutInfo.let { it.viewportEndOffset - it.viewportStartOffset }
+                        && lastVisibleItem.let { it.offset.y + it.size.height } <= layoutInfo.let { it.viewportEndOffset - it.viewportStartOffset }
             } else {
                 return@derivedStateOf false
             }
