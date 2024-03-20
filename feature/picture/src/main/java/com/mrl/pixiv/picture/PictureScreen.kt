@@ -625,8 +625,8 @@ internal fun PictureScreen(
                     ) - 1.dp) / relatedSpanCount
                 Surface(
                     Modifier
-                        .size(size)
-                        .padding(horizontal = 5.dp),
+                        .padding(5.dp)
+                        .size(size),
                     shape = MaterialTheme.shapes.medium,
                     shadowElevation = 4.dp,
                     propagateMinConstraints = false,
