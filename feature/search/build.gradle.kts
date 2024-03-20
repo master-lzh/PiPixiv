@@ -5,16 +5,6 @@ plugins {
 
 android {
     namespace = "com.mrl.pixiv.search"
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
 }
 
 dependencies {

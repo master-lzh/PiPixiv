@@ -8,16 +8,6 @@ plugins {
 android {
     namespace = "com.mrl.pixiv.data"
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-
     protobuf {
         protoc {
             artifact = "com.google.protobuf:protoc:3.25.3"
