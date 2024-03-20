@@ -6,16 +6,6 @@ plugins {
 
 android {
     namespace = "com.mrl.pixiv.datasource"
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
 }
 
 dependencies {

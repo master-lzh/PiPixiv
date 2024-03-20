@@ -31,3 +31,28 @@
    void traceEventEnd();
 
 }
+
+# 对于使用了 @Keep 注解的类和成员，不进行混淆处理
+-keep @androidx.annotation.Keep class * {
+
+}
+
+# 保持 Kotlin 标准库不被混淆
+-keep class kotlin.concurrent.** { *; }
+-keep class kotlin.coroutines.** { *; }
+-dontwarn kotlin.coroutines.**
+
+# 如果使用了 Kotlin 协程
+-keep class kotlinx.coroutines.** { *; }
+-dontwarn kotlinx.coroutines.**
+
+# 保持 protobuf 生成的消息类不被混淆
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite {
+    <fields>;
+    <methods>;
+}
+
+-keep class com.mrl.pixiv.common.data.Rlt { *; }
+
+-keep class com.mrl.pixiv.data.**Req { *; }
+-keep class com.mrl.pixiv.data.**Query { *; }
