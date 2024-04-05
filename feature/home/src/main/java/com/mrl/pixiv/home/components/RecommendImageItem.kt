@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -99,20 +98,18 @@ fun RecommendImageItem(
             Row(
                 modifier = Modifier
                     .padding(start = 5.dp)
-                    .widthIn(max = width)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
-                    modifier = Modifier
-                        .widthIn(max = width - 40.dp)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
                         text = illust.title,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier,
                         maxLines = 1,
-                        overflow = TextOverflow.Clip,
+                        overflow = TextOverflow.Ellipsis,
                     )
 
                     Text(
@@ -120,7 +117,7 @@ fun RecommendImageItem(
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier,
                         maxLines = 1,
-                        overflow = TextOverflow.Clip,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
