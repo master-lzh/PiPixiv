@@ -5,15 +5,15 @@ espresso-core = "3.5.1"
 junit = "4.13.2"
 material = "1.4.3"
 okhttp_version = "5.0.0-alpha.12"
-coil_version = "2.5.0"
+coil_version = "2.6.0"
 shizuku_version = "12.2.0"
 sqlite = "2.4.0"
 sqldelight = "1.5.5"
 leakcanary = "2.13"
-ui = "1.6.2"
+ui = "1.6.5"
 voyager = "1.0.0-rc08"
 richtext = "0.20.0"
-koin = "3.4.0"
+koin = "3.5.3"
 androidx-test-ext-junit = "1.1.5"
 androidx-test-espresso-espresso-core = "3.5.1"
 appcompat = "1.6.1"
@@ -21,12 +21,12 @@ com-google-android-material-material = "1.11.0"
 lottie = "6.1.0"
 #noinspection GradleDependency
 google-services = "4.3.15"
-firebase-bom = "32.7.4"
+firebase-bom = "32.8.0"
 firebase-crashlytics-gradle = "2.9.9"
 uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.2.3"
 protobuf-gradle = "0.9.4"
-protobuf = "3.25.3"
+protobuf = "4.26.0"
 
 [libraries]
 desugar = "com.android.tools:desugar_jdk_libs:2.0.4"
@@ -42,7 +42,7 @@ flowreactivenetwork = "ru.beryukhov:flowreactivenetwork:1.0.4"
 okhttp-core = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp_version" }
 okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp_version" }
 okhttp-dnsoverhttps = { module = "com.squareup.okhttp3:okhttp-dnsoverhttps", version.ref = "okhttp_version" }
-okio = "com.squareup.okio:okio:3.6.0"
+okio = "com.squareup.okio:okio:3.9.0"
 retrofit2 = "com.squareup.retrofit2:retrofit:2.9.0"
 
 conscrypt-android = "org.conscrypt:conscrypt-android:2.5.2"
@@ -59,7 +59,7 @@ junrar = "com.github.junrar:junrar:7.5.5"
 
 sqlite-framework = { module = "androidx.sqlite:sqlite-framework", version.ref = "sqlite" }
 sqlite-ktx = { module = "androidx.sqlite:sqlite-ktx", version.ref = "sqlite" }
-sqlite-android = "com.github.requery:sqlite-android:3.43.0"
+sqlite-android = "com.github.requery:sqlite-android:3.45.0"
 
 preferencektx = "androidx.preference:preference-ktx:1.2.1"
 
@@ -90,7 +90,7 @@ compose-simpleicons = "br.com.devsrsouza.compose.icons.android:simple-icons:1.0.
 logcat = "com.squareup.logcat:logcat:0.1"
 
 acra-http = "ch.acra:acra-http:5.11.3"
-firebase-analytics = "com.google.firebase:firebase-analytics-ktx:21.5.1"
+firebase-analytics = "com.google.firebase:firebase-analytics-ktx:21.6.1"
 
 aboutLibraries-gradle = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutlib_version" }
 aboutLibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutlib_version" }
