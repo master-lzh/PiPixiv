@@ -34,7 +34,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
-import com.mrl.pixiv.common.ui.components.Surface
+import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.second

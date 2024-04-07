@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.ui.components
+package com.mrl.pixiv.common.ui.components.m3
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
