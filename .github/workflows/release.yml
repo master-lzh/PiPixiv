@@ -83,7 +83,7 @@ jobs:
           tag_name: ${{ env.VERSION_TAG }}
           name: PiPixiv ${{ env.VERSION_TAG }}
           body: |
-            Release ${{ github.ref }}
+            Release ${{ env.VERSION_TAG }}
           draft: true
           prerelease: false
           files: |
