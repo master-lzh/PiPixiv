@@ -71,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: PiPixiv ${{ github.ref }}
+          name: PiPixiv ${{ github.ref }}
           body: |
             Release ${{ github.ref }}
           draft: true
