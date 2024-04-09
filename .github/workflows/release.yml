@@ -38,6 +38,13 @@ jobs:
           echo $ENCODED_STRING > keystore-b64.txt
           base64 -d keystore-b64.txt > pipixiv.jks
 
+      - name: Add Google Services
+        env:
+          GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+
+        run: |
+          echo $GOOGLE_SERVICE_JSON > app/google-services.json
+
       - name: Build Release apk
         env:
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
