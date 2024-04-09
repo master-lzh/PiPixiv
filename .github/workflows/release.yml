@@ -35,6 +35,7 @@ jobs:
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
 
         run: |
+          echo ${{ github.ref }}
           echo $ENCODED_STRING > keystore-b64.txt
           base64 -d keystore-b64.txt > pipixiv.jks
 
