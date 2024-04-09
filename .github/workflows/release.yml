@@ -64,6 +64,12 @@ jobs:
           name: release-apk
           path: ${{ steps.releaseApk.outputs.apkfile }}
 
+      - name: Get tag name
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          set -x
+          echo "VERSION_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
         id: create_release
@@ -71,8 +77,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          name: PiPixiv ${{ github.ref }}
+          tag_name: ${{ env.VERSION_TAG }}
+          name: PiPixiv ${{ env.VERSION_TAG }}
           body: |
             Release ${{ github.ref }}
           draft: true
