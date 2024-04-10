@@ -36,6 +36,12 @@ A third party Pixiv App which is entirely writen by [Jetpack Compose](https://de
 * Deep link support (open from https://www.pixiv.net/illust/xxxxxx)
 * More...
 
+### v1.1.0
+- [ ] Setting Page
+- [ ] Collection Page
+- [ ] Follow Page
+- [ ] History Page
+
 </div>
 
 ## App Preview
