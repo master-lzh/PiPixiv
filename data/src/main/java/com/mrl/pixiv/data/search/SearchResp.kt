@@ -23,3 +23,17 @@ data class SearchIllustResp (
 data class SearchAutoCompleteResp (
     val tags: List<Tag>
 )
+
+@Serializable
+data class TrendingTag (
+    val illust: Illust,
+    val tag: String,
+    @SerialName("translated_name")
+    val translatedName: String? = null
+)
+
+@Serializable
+data class TrendingTagsResp (
+    @SerialName("trend_tags")
+    val trendTags: List<TrendingTag>
+)

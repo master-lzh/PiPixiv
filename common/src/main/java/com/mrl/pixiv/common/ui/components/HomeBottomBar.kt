@@ -34,7 +34,7 @@ fun HomeBottomBar(
 ) {
     val screens = listOf(
         Destination.HomeScreen,
-        Destination.SearchScreen,
+        Destination.SearchPreviewScreen,
         Destination.ProfileScreen,
     )
     AnimatedVisibility(
