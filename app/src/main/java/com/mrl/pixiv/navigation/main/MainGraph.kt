@@ -19,8 +19,8 @@ import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
 import com.mrl.pixiv.search.OutsideSearchResultsScreen
-import com.mrl.pixiv.search.SearchResultScreen1
-import com.mrl.pixiv.search.SearchScreen1
+import com.mrl.pixiv.search.SearchResultScreen
+import com.mrl.pixiv.search.SearchScreen
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.io.encoding.Base64
@@ -104,7 +104,7 @@ fun MainGraph(
                 composable(
                     route = Destination.SearchScreen.route,
                 ) {
-                    SearchScreen1(
+                    SearchScreen(
                         searchNavHostController = searchNavHostController,
                         navHostController = navHostController,
                         searchViewModel = searchViewModel
@@ -113,7 +113,7 @@ fun MainGraph(
                 composable(
                     route = Destination.SearchResultsScreen.route,
                 ) {
-                    SearchResultScreen1(
+                    SearchResultScreen(
                         searchNavHostController = searchNavHostController,
                         bookmarkViewModel = bookmarkViewModel,
                         searchViewModel = searchViewModel,
