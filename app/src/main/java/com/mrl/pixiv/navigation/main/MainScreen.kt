@@ -38,6 +38,7 @@ fun bottomBarVisibility(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     when (navBackStackEntry?.destination?.route) {
         Destination.HomeScreen.route -> bottomBarState.value = true
+        Destination.SearchScreen.route -> bottomBarState.value = true
         Destination.ProfileScreen.route -> bottomBarState.value = true
         else -> bottomBarState.value = false
     }
