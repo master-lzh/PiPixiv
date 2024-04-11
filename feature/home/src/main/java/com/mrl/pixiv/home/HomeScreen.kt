@@ -29,7 +29,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
@@ -39,7 +38,6 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
-import com.mrl.pixiv.common_ui.util.navigateToSearchScreen
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
@@ -93,7 +91,6 @@ fun HomeScreen(
         bookmarkState = bookmarkViewModel.state,
         bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        navToSearchScreen = navHostController::navigateToSearchScreen,
         onRefresh = homeViewModel::onRefresh,
         onScrollToBottom = homeViewModel::onScrollToBottom,
         dispatch = homeViewModel::dispatch,
@@ -108,7 +105,6 @@ internal fun HomeScreen(
     bookmarkState: BookmarkState,
     bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust) -> Unit,
-    navToSearchScreen: () -> Unit,
     onRefresh: () -> Unit,
     onScrollToBottom: () -> Unit,
     dispatch: (HomeAction) -> Unit = {},
@@ -137,19 +133,18 @@ internal fun HomeScreen(
     LaunchedEffect(state.exception) {
         if (state.exception != null) {
             scope.launch {
-                snackBarHostState.showSnackbar(state.exception?.message ?: "未知错误")
+                snackBarHostState.showSnackbar(state.exception.message ?: "未知错误")
             }
         }
     }
 
     Screen(
-        modifier = modifier.padding(bottom = 80.dp),
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.app_name)) },
                 actions = {
                     HomeTopBar(
-                        navigateToSearchScreen = navToSearchScreen,
                         onRefreshToken = { dispatch(HomeAction.RefreshTokenIntent) },
                         onRefresh = {
                             dispatch(

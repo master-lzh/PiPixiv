@@ -24,7 +24,7 @@ fun NavHostController.navigateToPictureScreen(illust: Illust) {
 }
 
 fun NavHostController.navigateToSearchScreen() {
-    navigate(route = Graph.SEARCH) {
+    navigate(route = Destination.SearchScreen.route) {
         launchSingleTop = true
     }
 }

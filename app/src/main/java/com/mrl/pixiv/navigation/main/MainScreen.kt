@@ -1,10 +1,12 @@
 package com.mrl.pixiv.navigation.main
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -25,7 +27,10 @@ fun MainScreen(
             )
         },
     ) {
-        MainGraph(navHostController = navHostController)
+        MainGraph(
+            modifier = Modifier.padding(bottom = it.calculateBottomPadding()),
+            navHostController = navHostController
+        )
     }
 }
 
@@ -38,6 +43,7 @@ fun bottomBarVisibility(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     when (navBackStackEntry?.destination?.route) {
         Destination.HomeScreen.route -> bottomBarState.value = true
+        Destination.SearchPreviewScreen.route -> bottomBarState.value = true
         Destination.ProfileScreen.route -> bottomBarState.value = true
         else -> bottomBarState.value = false
     }

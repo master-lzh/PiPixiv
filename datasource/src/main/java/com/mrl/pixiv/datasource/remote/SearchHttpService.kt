@@ -15,4 +15,6 @@ class SearchHttpService(
 
     suspend fun searchAutoComplete(searchAutoCompleteQuery: SearchAutoCompleteQuery) =
         searchApi.searchAutoComplete(searchAutoCompleteQuery.toMap())
+
+
 }

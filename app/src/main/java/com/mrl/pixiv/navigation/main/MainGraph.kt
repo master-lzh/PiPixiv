@@ -1,6 +1,7 @@
 package com.mrl.pixiv.navigation.main
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,8 +20,9 @@ import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
 import com.mrl.pixiv.search.OutsideSearchResultsScreen
-import com.mrl.pixiv.search.SearchResultScreen1
-import com.mrl.pixiv.search.SearchScreen1
+import com.mrl.pixiv.search.SearchResultScreen
+import com.mrl.pixiv.search.SearchScreen
+import com.mrl.pixiv.search.preview.SearchPreviewScreen
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.io.encoding.Base64
@@ -29,6 +31,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun MainGraph(
+    modifier: Modifier = Modifier,
     navHostController: NavHostController,
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
@@ -39,6 +42,7 @@ fun MainGraph(
         route = Graph.MAIN,
         startDestination = Destination.HomeScreen.route,
     ) {
+        // 首页
         composable(
             route = Destination.HomeScreen.route,
             deepLinks = listOf(
@@ -46,14 +50,26 @@ fun MainGraph(
                     uriPattern = DestinationsDeepLink.HomePattern
                 }
             ),
-
-            ) {
+        ) {
             HomeScreen(
+                modifier = modifier,
                 navHostController = navHostController,
                 homeViewModel = homeViewModel,
                 bookmarkViewModel = bookmarkViewModel
             )
         }
+
+        // 搜索预览页
+        composable(
+            route = Destination.SearchPreviewScreen.route,
+        ) {
+            SearchPreviewScreen(
+                modifier = modifier,
+                navHostController = navHostController,
+            )
+        }
+
+        // 个人主页
         composable(
             route = Destination.ProfileScreen.route,
             deepLinks = listOf(
@@ -63,10 +79,13 @@ fun MainGraph(
             ),
         ) {
             ProfileScreen(
+                modifier = modifier,
                 navHostController = navHostController,
                 bookmarkViewModel = bookmarkViewModel
             )
         }
+
+        // 作品详情页
         composable(
             route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustParams}}",
             arguments = listOf(
@@ -91,8 +110,10 @@ fun MainGraph(
                 followViewModel = followViewModel,
             )
         }
+
+        // 搜索页
         composable(
-            route = Graph.SEARCH,
+            route = Destination.SearchScreen.route,
         ) {
             val searchViewModel: SearchViewModel = koinViewModel(viewModelStoreOwner = it)
             val searchNavHostController = rememberNavController()
@@ -104,7 +125,7 @@ fun MainGraph(
                 composable(
                     route = Destination.SearchScreen.route,
                 ) {
-                    SearchScreen1(
+                    SearchScreen(
                         searchNavHostController = searchNavHostController,
                         navHostController = navHostController,
                         searchViewModel = searchViewModel
@@ -113,7 +134,7 @@ fun MainGraph(
                 composable(
                     route = Destination.SearchResultsScreen.route,
                 ) {
-                    SearchResultScreen1(
+                    SearchResultScreen(
                         searchNavHostController = searchNavHostController,
                         bookmarkViewModel = bookmarkViewModel,
                         searchViewModel = searchViewModel,
@@ -122,6 +143,8 @@ fun MainGraph(
                 }
             }
         }
+
+        // 外部搜索结果页
         composable(
             route = "${Destination.SearchResultsScreen.route}/{${Destination.SearchResultsScreen.searchWord}}",
             arguments = listOf(
