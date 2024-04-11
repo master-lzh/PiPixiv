@@ -3,6 +3,7 @@ package com.mrl.pixiv.common.router
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 
@@ -39,7 +40,16 @@ sealed class Destination(
         const val illustParams = "illust"
     }
 
-    data object SearchScreen : Destination(route = "search_screen")
+    data object SearchScreen : Destination(
+        route = "search_screen",
+        title = "搜索",
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.Search,
+                contentDescription = null,
+            )
+        }
+    )
 
     data object SearchResultsScreen : Destination(route = "search_results_screen") {
         const val searchWord = "search_keyword"

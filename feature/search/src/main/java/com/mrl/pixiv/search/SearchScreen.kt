@@ -41,7 +41,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,7 +50,6 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.m3.TextField
-import com.mrl.pixiv.common_ui.util.navigateToMainScreen
 import com.mrl.pixiv.common_ui.util.navigateToSearchResultScreen
 import com.mrl.pixiv.search.viewmodel.SearchAction
 import com.mrl.pixiv.search.viewmodel.SearchState
@@ -75,7 +73,7 @@ fun SearchScreen(
         modifier = modifier,
         state = searchViewModel.state,
         navigateToResult = searchNavHostController::navigateToSearchResultScreen,
-        popBack = { navHostController.navigateToMainScreen() },
+        popBack = { navHostController.popBackStack() },
         dispatch = searchViewModel::dispatch,
     )
 }
@@ -92,13 +90,6 @@ internal fun SearchScreen_(
 ) {
     var textState by remember { mutableStateOf(TextFieldValue(state.searchWords)) }
     val focusRequester = remember { FocusRequester() }
-    OnLifecycle(Lifecycle.Event.ON_RESUME) {
-        try {
-            focusRequester.requestFocus()
-        } catch (_: Exception) {
-        }
-        textState = textState.copy(selection = TextRange(textState.text.length))
-    }
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     Screen(
@@ -132,7 +123,7 @@ internal fun SearchScreen_(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(vertical = 4.dp, horizontal = 8.dp),
-                            shape = MaterialTheme.shapes.small
+                            shape = MaterialTheme.shapes.extraLarge
                         ) {
                             TextField(
                                 value = textState,
@@ -164,7 +155,7 @@ internal fun SearchScreen_(
                                     focusedIndicatorColor = Color.Transparent,
                                 ),
                                 singleLine = true,
-                                shape = MaterialTheme.shapes.medium,
+                                shape = MaterialTheme.shapes.extraLarge,
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                                 keyboardActions = KeyboardActions(
                                     onSearch = {

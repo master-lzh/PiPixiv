@@ -92,7 +92,7 @@ fun MainGraph(
             )
         }
         composable(
-            route = Graph.SEARCH,
+            route = Destination.SearchScreen.route,
         ) {
             val searchViewModel: SearchViewModel = koinViewModel(viewModelStoreOwner = it)
             val searchNavHostController = rememberNavController()
