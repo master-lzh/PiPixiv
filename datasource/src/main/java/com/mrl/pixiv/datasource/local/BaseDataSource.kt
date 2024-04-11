@@ -4,22 +4,17 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.mrl.pixiv.common.coroutine.launchIO
-import com.mrl.pixiv.common.data.DispatcherEnum
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
 
 abstract class BaseDataSource(
     private val dataStore: DataStore<Preferences>
 ) : KoinComponent {
-    private val ioDispatcher: CoroutineDispatcher by inject(named(DispatcherEnum.IO))
     val json by inject<Json>()
 
     fun <T> set(key: Preferences.Key<T>, value: T) {
@@ -34,7 +29,7 @@ abstract class BaseDataSource(
     fun <T> get(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
         dataStore.data.map {
             it[key] ?: defaultValue
-        }.flowOn(ioDispatcher)
+        }
 
     protected fun <T> createFiled(key: Preferences.Key<T>) = Filed(key)
 

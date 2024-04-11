@@ -40,8 +40,8 @@ sealed class Destination(
         const val illustParams = "illust"
     }
 
-    data object SearchScreen : Destination(
-        route = "search_screen",
+    data object SearchPreviewScreen : Destination(
+        route = "search_preview_screen",
         title = "搜索",
         icon = {
             Icon(
@@ -50,6 +50,8 @@ sealed class Destination(
             )
         }
     )
+
+    data object SearchScreen : Destination(route = "search_screen")
 
     data object SearchResultsScreen : Destination(route = "search_results_screen") {
         const val searchWord = "search_keyword"

@@ -15,13 +15,14 @@ class HomeViewModel(
 ) {
     init {
         dispatch(HomeAction.RefreshIllustRecommendedIntent(initRecommendedQuery))
-    }
-
-    override fun onCreate() {
         viewModelScope.launch {
             exception.collect {
                 dispatch(HomeAction.CollectExceptionFlow(it))
             }
         }
+    }
+
+    override fun onCreate() {
+
     }
 }

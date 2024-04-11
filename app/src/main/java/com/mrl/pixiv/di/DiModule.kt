@@ -2,6 +2,7 @@ package com.mrl.pixiv.di
 
 import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.api.SearchApi
+import com.mrl.pixiv.api.TrendingApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
@@ -21,6 +22,7 @@ import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.SearchHttpService
+import com.mrl.pixiv.datasource.remote.TrendingHttpService
 import com.mrl.pixiv.datasource.remote.UserAuthHttpService
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import com.mrl.pixiv.domain.GetLocalUserInfoUseCase
@@ -47,7 +49,11 @@ import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 import com.mrl.pixiv.repository.remote.SearchRemoteRepository
+import com.mrl.pixiv.repository.remote.TrendingRemoteRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
+import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewMiddleware
+import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewReducer
+import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewViewModel
 import com.mrl.pixiv.search.viewmodel.SearchMiddleware
 import com.mrl.pixiv.search.viewmodel.SearchReducer
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
@@ -120,6 +126,8 @@ val viewModelModule = module {
     viewModelOf(::FollowViewModel)
 
     viewModelOf(::SearchViewModel)
+
+    viewModelOf(::SearchPreviewViewModel)
 }
 
 val repositoryModule = module {
@@ -131,6 +139,7 @@ val repositoryModule = module {
     singleOf(::IllustRemoteRepository)
     singleOf(::UserRemoteRepository)
     singleOf(::SearchRemoteRepository)
+    singleOf(::TrendingRemoteRepository)
 }
 
 val dataSourceModule = module {
@@ -142,6 +151,7 @@ val dataSourceModule = module {
     single { UserAuthHttpService(provideAuthService(get())) }
     single { UserHttpService(provideCommonService(get(), UserApi::class.java)) }
     single { SearchHttpService(provideCommonService(get(), SearchApi::class.java)) }
+    single { TrendingHttpService(provideCommonService(get(), TrendingApi::class.java)) }
 }
 
 val useCaseModule = module {
@@ -170,6 +180,8 @@ val middlewareModule = module {
     factoryOf(::FollowMiddleware)
 
     factoryOf(::SearchMiddleware)
+
+    factoryOf(::SearchPreviewMiddleware)
 }
 
 val reducerModule = module {
@@ -181,6 +193,7 @@ val reducerModule = module {
     singleOf(::PictureReducer)
     singleOf(::FollowReducer)
     singleOf(::SearchReducer)
+    singleOf(::SearchPreviewReducer)
 }
 
 fun provideAuthService(

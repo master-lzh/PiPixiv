@@ -29,7 +29,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
@@ -140,7 +139,7 @@ internal fun HomeScreen(
     }
 
     Screen(
-        modifier = modifier.padding(bottom = 80.dp),
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.app_name)) },

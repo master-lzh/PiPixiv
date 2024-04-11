@@ -41,6 +41,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -90,6 +91,13 @@ internal fun SearchScreen_(
 ) {
     var textState by remember { mutableStateOf(TextFieldValue(state.searchWords)) }
     val focusRequester = remember { FocusRequester() }
+    OnLifecycle(Lifecycle.Event.ON_RESUME) {
+        try {
+            focusRequester.requestFocus()
+        } catch (_: Exception) {
+        }
+        textState = textState.copy(selection = TextRange(textState.text.length))
+    }
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     Screen(
