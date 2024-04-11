@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,11 +41,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
@@ -278,10 +279,10 @@ private fun FilterBottomSheet(
                     launch { bottomSheetState.hide() }
                 })
         }
-        val textHeight = 30.dp
-        SelectedTabRow(selectedIndex = selectedTargetIndex, textHeight = textHeight) {
+        SelectedTabRow(selectedIndex = selectedTargetIndex) {
             searchTargetMap.forEach { (key, value) ->
                 Tab(
+                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
                     selected = filter.searchTarget == key,
                     onClick = {
                         selectedTargetIndex = searchTargetMap.keys.indexOf(key)
@@ -301,9 +302,10 @@ private fun FilterBottomSheet(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        SelectedTabRow(selectedIndex = selectedSortIndex, textHeight = textHeight) {
+        SelectedTabRow(selectedIndex = selectedSortIndex) {
             searchSortMap.forEach { (key, value) ->
                 Tab(
+                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
                     selected = filter.sort == key,
                     onClick = {
                         selectedSortIndex = searchSortMap.keys.indexOf(key)
@@ -329,7 +331,6 @@ private fun FilterBottomSheet(
 @Composable
 private fun SelectedTabRow(
     selectedIndex: Int,
-    textHeight: Dp = 25.dp,
     tabs: @Composable () -> Unit,
 ) {
     Surface(
@@ -346,7 +347,7 @@ private fun SelectedTabRow(
                 Surface(
                     modifier = Modifier
                         .tabIndicatorOffset(it[selectedIndex])
-                        .height(textHeight),
+                        .fillMaxHeight(),
                     shape = MaterialTheme.shapes.medium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                 ) {}
