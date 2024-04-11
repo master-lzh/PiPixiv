@@ -2,6 +2,7 @@ package com.mrl.pixiv.di
 
 import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.api.SearchApi
+import com.mrl.pixiv.api.TrendingApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
@@ -14,7 +15,6 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowMiddleware
 import com.mrl.pixiv.common.middleware.follow.FollowReducer
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
-import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.search.searchDataStore
 import com.mrl.pixiv.data.user.userInfoDataStore
 import com.mrl.pixiv.datasource.local.SearchDataSource
@@ -22,6 +22,7 @@ import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.SearchHttpService
+import com.mrl.pixiv.datasource.remote.TrendingHttpService
 import com.mrl.pixiv.datasource.remote.UserAuthHttpService
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import com.mrl.pixiv.domain.GetLocalUserInfoUseCase
@@ -48,7 +49,11 @@ import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 import com.mrl.pixiv.repository.remote.SearchRemoteRepository
+import com.mrl.pixiv.repository.remote.TrendingRemoteRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
+import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewMiddleware
+import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewReducer
+import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewViewModel
 import com.mrl.pixiv.search.viewmodel.SearchMiddleware
 import com.mrl.pixiv.search.viewmodel.SearchReducer
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
@@ -62,7 +67,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -90,13 +97,13 @@ val appModule = module {
         JSON.asConverterFactory("application/json".toMediaType())
     }
 
-    single { HttpManager(get(), get()) }
+    singleOf(::HttpManager)
 
     single(named(DispatcherEnum.IO)) { Dispatchers.IO }
 
     single(named(DispatcherEnum.MAIN)) { Dispatchers.Main.immediate }
 
-    single { JSON }
+    singleOf(::JSON)
 
     factory {
         CloseableCoroutineScope(SupervisorJob() + get<MainCoroutineDispatcher>(named(DispatcherEnum.MAIN)))
@@ -104,32 +111,35 @@ val appModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { SplashViewModel(get(), get()) }
+    viewModelOf(::SplashViewModel)
 
-    viewModel { LoginViewModel(get(), get()) }
+    viewModelOf(::LoginViewModel)
 
-    viewModel { HomeViewModel(get(), get()) }
+    viewModelOf(::HomeViewModel)
 
-    viewModel { ProfileViewModel(get(), get()) }
+    viewModelOf(::ProfileViewModel)
 
-    viewModel { (illust: Illust) -> PictureViewModel(illust, get(), get()) }
+    viewModelOf(::PictureViewModel)
 
-    viewModel { BookmarkViewModel(get(), get()) }
+    viewModelOf(::BookmarkViewModel)
 
-    viewModel { FollowViewModel(get(), get()) }
+    viewModelOf(::FollowViewModel)
 
-    viewModel { SearchViewModel(get(), get()) }
+    viewModelOf(::SearchViewModel)
+
+    viewModelOf(::SearchPreviewViewModel)
 }
 
 val repositoryModule = module {
-    single { UserLocalRepository(get(), get()) }
-    single { SearchLocalRepository(get()) }
+    singleOf(::UserLocalRepository)
+    singleOf(::SearchLocalRepository)
 
 
-    single { AuthRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
-    single { IllustRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
-    single { UserRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
-    single { SearchRemoteRepository(get(), get(named(DispatcherEnum.IO))) }
+    singleOf(::AuthRemoteRepository)
+    singleOf(::IllustRemoteRepository)
+    singleOf(::UserRemoteRepository)
+    singleOf(::SearchRemoteRepository)
+    singleOf(::TrendingRemoteRepository)
 }
 
 val dataSourceModule = module {
@@ -141,45 +151,49 @@ val dataSourceModule = module {
     single { UserAuthHttpService(provideAuthService(get())) }
     single { UserHttpService(provideCommonService(get(), UserApi::class.java)) }
     single { SearchHttpService(provideCommonService(get(), SearchApi::class.java)) }
+    single { TrendingHttpService(provideCommonService(get(), TrendingApi::class.java)) }
 }
 
 val useCaseModule = module {
-    single { SetUserRefreshTokenUseCase(get()) }
-    single { SetUserAccessTokenUseCase(get()) }
-    single { GetLocalUserInfoUseCase(get()) }
-    single { SetLocalUserInfoUseCase(get()) }
-    single { RefreshUserAccessTokenUseCase(get(), get(), get(), get(), get()) }
-    single { BookmarkUseCase(get()) }
-    single { UnBookmarkUseCase(get()) }
+    singleOf(::SetUserRefreshTokenUseCase)
+    singleOf(::SetUserAccessTokenUseCase)
+    singleOf(::GetLocalUserInfoUseCase)
+    singleOf(::SetLocalUserInfoUseCase)
+    singleOf(::RefreshUserAccessTokenUseCase)
+    singleOf(::BookmarkUseCase)
+    singleOf(::UnBookmarkUseCase)
 }
 
 val middlewareModule = module {
-    factory { SplashMiddleware(get(), get(), get(), get(), get()) }
+    factoryOf(::SplashMiddleware)
 
-    factory { HomeMiddleware(get(), get()) }
+    factoryOf(::HomeMiddleware)
 
-    factory { BookmarkMiddleware(get()) }
+    factoryOf(::BookmarkMiddleware)
 
-    factory { AuthMiddleware(get(), get(), get(), get(), get(), get()) }
+    factoryOf(::AuthMiddleware)
 
-    factory { ProfileMiddleware(get(), get()) }
+    factoryOf(::ProfileMiddleware)
 
-    factory { PictureMiddleware(get(), get()) }
+    factoryOf(::PictureMiddleware)
 
-    factory { FollowMiddleware(get()) }
+    factoryOf(::FollowMiddleware)
 
-    factory { SearchMiddleware(get(), get()) }
+    factoryOf(::SearchMiddleware)
+
+    factoryOf(::SearchPreviewMiddleware)
 }
 
 val reducerModule = module {
-    single { SplashReducer() }
-    single { HomeReducer() }
-    single { BookmarkReducer() }
-    single { AuthReducer() }
-    single { ProfileReducer() }
-    single { PictureReducer() }
-    single { FollowReducer() }
-    single { SearchReducer() }
+    singleOf(::SplashReducer)
+    singleOf(::HomeReducer)
+    singleOf(::BookmarkReducer)
+    singleOf(::AuthReducer)
+    singleOf(::ProfileReducer)
+    singleOf(::PictureReducer)
+    singleOf(::FollowReducer)
+    singleOf(::SearchReducer)
+    singleOf(::SearchPreviewReducer)
 }
 
 fun provideAuthService(
