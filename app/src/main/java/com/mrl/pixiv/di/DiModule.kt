@@ -44,6 +44,9 @@ import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailMiddleware
 import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailReducer
 import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailViewModel
+import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
+import com.mrl.pixiv.profile.viewmodel.ProfileReducer
+import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.repository.local.SearchLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
@@ -57,6 +60,9 @@ import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewViewModel
 import com.mrl.pixiv.search.viewmodel.SearchMiddleware
 import com.mrl.pixiv.search.viewmodel.SearchReducer
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
+import com.mrl.pixiv.setting.viewmodel.SettingMiddleware
+import com.mrl.pixiv.setting.viewmodel.SettingReducer
+import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import com.mrl.pixiv.splash.viewmodel.SplashMiddleware
 import com.mrl.pixiv.splash.viewmodel.SplashReducer
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
@@ -117,6 +123,8 @@ val viewModelModule = module {
 
     viewModelOf(::HomeViewModel)
 
+    viewModelOf(::ProfileViewModel)
+
     viewModelOf(::ProfileDetailViewModel)
 
     viewModelOf(::PictureViewModel)
@@ -128,6 +136,8 @@ val viewModelModule = module {
     viewModelOf(::SearchViewModel)
 
     viewModelOf(::SearchPreviewViewModel)
+
+    viewModelOf(::SettingViewModel)
 }
 
 val repositoryModule = module {
@@ -173,6 +183,8 @@ val middlewareModule = module {
 
     factoryOf(::AuthMiddleware)
 
+    factoryOf(::ProfileMiddleware)
+
     factoryOf(::ProfileDetailMiddleware)
 
     factoryOf(::PictureMiddleware)
@@ -182,6 +194,8 @@ val middlewareModule = module {
     factoryOf(::SearchMiddleware)
 
     factoryOf(::SearchPreviewMiddleware)
+
+    factoryOf(::SettingMiddleware)
 }
 
 val reducerModule = module {
@@ -189,11 +203,13 @@ val reducerModule = module {
     singleOf(::HomeReducer)
     singleOf(::BookmarkReducer)
     singleOf(::AuthReducer)
+    singleOf(::ProfileReducer)
     singleOf(::ProfileDetailReducer)
     singleOf(::PictureReducer)
     singleOf(::FollowReducer)
     singleOf(::SearchReducer)
     singleOf(::SearchPreviewReducer)
+    singleOf(::SettingReducer)
 }
 
 fun provideAuthService(

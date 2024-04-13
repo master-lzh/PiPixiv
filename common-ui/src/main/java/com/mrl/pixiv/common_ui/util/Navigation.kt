@@ -50,3 +50,7 @@ fun NavHostController.navigateToMainScreen() {
 fun NavHostController.popBackToMainScreen() {
     popBackStack(route = Destination.HomeScreen.route, inclusive = false)
 }
+
+fun NavHostController.navigateToProfileDetailScreen() {
+    navigate(route = Destination.ProfileDetailScreen.route)
+}

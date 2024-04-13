@@ -36,8 +36,8 @@ sealed class Destination(
         }
     )
 
-    data object ProfileDetailScreen : Destination(
-        route = "profile_detail_screen",
+    data object ProfileScreen : Destination(
+        route = "profile_screen",
         title = "我的",
         icon = {
             Icon(
@@ -46,6 +46,8 @@ sealed class Destination(
             )
         }
     )
+
+    data object ProfileDetailScreen : Destination(route = "profile_detail_screen")
 
     data object PictureScreen : Destination(route = "picture_screen") {
         const val illustParams = "illust"
