@@ -1,9 +1,9 @@
-package com.mrl.pixiv.profile.viewmodel
+package com.mrl.pixiv.profile.detail.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Novel
-import com.mrl.pixiv.profile.state.UserInfo
+import com.mrl.pixiv.profile.detail.state.UserInfo
 
 sealed class ProfileDetailAction : Action {
     data object GetUserInfoIntent : ProfileDetailAction()

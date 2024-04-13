@@ -1,10 +1,10 @@
-package com.mrl.pixiv.profile.viewmodel
+package com.mrl.pixiv.profile.detail.viewmodel
 
 import androidx.compose.runtime.Stable
 import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Novel
-import com.mrl.pixiv.profile.state.UserInfo
+import com.mrl.pixiv.profile.detail.state.UserInfo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

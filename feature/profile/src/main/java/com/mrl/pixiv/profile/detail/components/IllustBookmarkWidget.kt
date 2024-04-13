@@ -1,4 +1,4 @@
-package com.mrl.pixiv.profile.components
+package com.mrl.pixiv.profile.detail.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

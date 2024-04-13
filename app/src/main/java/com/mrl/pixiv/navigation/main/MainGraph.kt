@@ -18,7 +18,7 @@ import com.mrl.pixiv.di.JSON
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.PictureScreen
-import com.mrl.pixiv.profile.ProfileDetailScreen
+import com.mrl.pixiv.profile.detail.ProfileDetailScreen
 import com.mrl.pixiv.search.OutsideSearchResultsScreen
 import com.mrl.pixiv.search.SearchResultScreen
 import com.mrl.pixiv.search.SearchScreen
