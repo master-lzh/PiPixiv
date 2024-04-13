@@ -25,8 +25,19 @@ sealed class Destination(
         }
     )
 
-    data object ProfileScreen : Destination(
-        route = "profile_screen",
+    data object SearchPreviewScreen : Destination(
+        route = "search_preview_screen",
+        title = "搜索",
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.Search,
+                contentDescription = null,
+            )
+        }
+    )
+
+    data object ProfileDetailScreen : Destination(
+        route = "profile_detail_screen",
         title = "我的",
         icon = {
             Icon(
@@ -39,17 +50,6 @@ sealed class Destination(
     data object PictureScreen : Destination(route = "picture_screen") {
         const val illustParams = "illust"
     }
-
-    data object SearchPreviewScreen : Destination(
-        route = "search_preview_screen",
-        title = "搜索",
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.Search,
-                contentDescription = null,
-            )
-        }
-    )
 
     data object SearchScreen : Destination(route = "search_screen")
 

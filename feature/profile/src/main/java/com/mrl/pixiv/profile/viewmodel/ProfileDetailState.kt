@@ -9,13 +9,13 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Stable
-data class ProfileState(
+data class ProfileDetailState(
     var userBookmarksIllusts: ImmutableList<Illust>,
     var userBookmarksNovels: ImmutableList<Novel>,
     var userInfo: UserInfo,
 ) : State {
     companion object {
-        val INITIAL = ProfileState(
+        val INITIAL = ProfileDetailState(
             userBookmarksIllusts = persistentListOf(),
             userBookmarksNovels = persistentListOf(),
             userInfo = UserInfo(),

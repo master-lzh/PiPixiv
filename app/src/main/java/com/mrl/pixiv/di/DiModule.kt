@@ -41,9 +41,9 @@ import com.mrl.pixiv.network.converter.asConverterFactory
 import com.mrl.pixiv.picture.viewmodel.PictureMiddleware
 import com.mrl.pixiv.picture.viewmodel.PictureReducer
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
-import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
-import com.mrl.pixiv.profile.viewmodel.ProfileReducer
-import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
+import com.mrl.pixiv.profile.viewmodel.ProfileDetailMiddleware
+import com.mrl.pixiv.profile.viewmodel.ProfileDetailReducer
+import com.mrl.pixiv.profile.viewmodel.ProfileDetailViewModel
 import com.mrl.pixiv.repository.local.SearchLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
@@ -117,7 +117,7 @@ val viewModelModule = module {
 
     viewModelOf(::HomeViewModel)
 
-    viewModelOf(::ProfileViewModel)
+    viewModelOf(::ProfileDetailViewModel)
 
     viewModelOf(::PictureViewModel)
 
@@ -173,7 +173,7 @@ val middlewareModule = module {
 
     factoryOf(::AuthMiddleware)
 
-    factoryOf(::ProfileMiddleware)
+    factoryOf(::ProfileDetailMiddleware)
 
     factoryOf(::PictureMiddleware)
 
@@ -189,7 +189,7 @@ val reducerModule = module {
     singleOf(::HomeReducer)
     singleOf(::BookmarkReducer)
     singleOf(::AuthReducer)
-    singleOf(::ProfileReducer)
+    singleOf(::ProfileDetailReducer)
     singleOf(::PictureReducer)
     singleOf(::FollowReducer)
     singleOf(::SearchReducer)

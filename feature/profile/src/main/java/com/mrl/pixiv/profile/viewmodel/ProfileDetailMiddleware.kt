@@ -15,16 +15,16 @@ import com.mrl.pixiv.repository.remote.UserRemoteRepository
 import kotlinx.coroutines.flow.first
 
 
-class ProfileMiddleware(
+class ProfileDetailMiddleware(
     private val userLocalRepository: UserLocalRepository,
     private val userRemoteRepository: UserRemoteRepository,
-) : Middleware<ProfileState, ProfileAction>() {
-    override suspend fun process(state: ProfileState, action: ProfileAction) {
+) : Middleware<ProfileDetailState, ProfileDetailAction>() {
+    override suspend fun process(state: ProfileDetailState, action: ProfileDetailAction) {
         when (action) {
-            is ProfileAction.GetUserInfoIntent -> getUserInfo()
-            is ProfileAction.GetUserBookmarksIllustIntent -> getUserBookmarksIllust()
-            is ProfileAction.GetUserBookmarksNovelIntent -> getUserBookmarksNovel()
-            is ProfileAction.GetUserIllustsIntent -> TODO()
+            is ProfileDetailAction.GetUserInfoIntent -> getUserInfo()
+            is ProfileDetailAction.GetUserBookmarksIllustIntent -> getUserBookmarksIllust()
+            is ProfileDetailAction.GetUserBookmarksNovelIntent -> getUserBookmarksNovel()
+            is ProfileDetailAction.GetUserIllustsIntent -> TODO()
 
             else -> {}
         }
@@ -38,7 +38,7 @@ class ProfileMiddleware(
                     UserBookmarksNovelQuery(restrict = Restrict.PUBLIC, userId = userId)
                 )
             ) {
-                dispatch(ProfileAction.UpdateUserBookmarksNovels(it.novels))
+                dispatch(ProfileDetailAction.UpdateUserBookmarksNovels(it.novels))
             }
         }
 
@@ -50,7 +50,7 @@ class ProfileMiddleware(
                     UserBookmarksIllustQuery(restrict = Restrict.PUBLIC, userId = userId)
                 )
             ) {
-                dispatch(ProfileAction.UpdateUserBookmarksIllusts(it.illusts))
+                dispatch(ProfileDetailAction.UpdateUserBookmarksIllusts(it.illusts))
             }
         }
 
@@ -62,7 +62,7 @@ class ProfileMiddleware(
             failedCallback = {
                 val userInfo = userLocalRepository.userInfo.first()
                 dispatch(
-                    ProfileAction.UpdateUserInfo(
+                    ProfileDetailAction.UpdateUserInfo(
                         UserInfo(
                             user = User(
                                 id = userInfo.uid,
@@ -82,7 +82,7 @@ class ProfileMiddleware(
                     avatar = it.user.profileImageUrls.medium
                 }
             }
-            dispatch(ProfileAction.UpdateUserInfo(it.toUserInfo()))
+            dispatch(ProfileDetailAction.UpdateUserInfo(it.toUserInfo()))
         }
     }
 }

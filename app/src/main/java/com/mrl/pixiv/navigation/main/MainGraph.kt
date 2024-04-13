@@ -18,7 +18,7 @@ import com.mrl.pixiv.di.JSON
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.PictureScreen
-import com.mrl.pixiv.profile.ProfileScreen
+import com.mrl.pixiv.profile.ProfileDetailScreen
 import com.mrl.pixiv.search.OutsideSearchResultsScreen
 import com.mrl.pixiv.search.SearchResultScreen
 import com.mrl.pixiv.search.SearchScreen
@@ -71,14 +71,14 @@ fun MainGraph(
 
         // 个人主页
         composable(
-            route = Destination.ProfileScreen.route,
+            route = Destination.ProfileDetailScreen.route,
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = DestinationsDeepLink.ProfilePattern
                 }
             ),
         ) {
-            ProfileScreen(
+            ProfileDetailScreen(
                 modifier = modifier,
                 navHostController = navHostController,
                 bookmarkViewModel = bookmarkViewModel

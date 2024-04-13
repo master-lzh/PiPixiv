@@ -44,7 +44,7 @@ fun bottomBarVisibility(
     when (navBackStackEntry?.destination?.route) {
         Destination.HomeScreen.route -> bottomBarState.value = true
         Destination.SearchPreviewScreen.route -> bottomBarState.value = true
-        Destination.ProfileScreen.route -> bottomBarState.value = true
+        Destination.ProfileDetailScreen.route -> bottomBarState.value = true
         else -> bottomBarState.value = false
     }
 
