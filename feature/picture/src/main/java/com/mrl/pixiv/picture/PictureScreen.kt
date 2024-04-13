@@ -396,8 +396,8 @@ internal fun PictureScreen(
                     ) {
                         UserAvatar(
                             url = illust.user.profileImageUrls.medium,
-                            size = 20.dp,
                             modifier = Modifier
+                                .size(20.dp)
                                 .padding(start = 20.dp)
                                 .align(Alignment.CenterVertically),
                         )
@@ -492,8 +492,8 @@ internal fun PictureScreen(
                 ) {
                     UserAvatar(
                         url = illust.user.profileImageUrls.medium,
-                        size = 30.dp,
                         modifier = Modifier
+                            .size(30.dp)
                             .align(Alignment.CenterVertically),
                     )
                     Column(
@@ -668,8 +668,8 @@ internal fun PictureScreen(
                 ) {
                     UserAvatar(
                         url = illust.user.profileImageUrls.medium,
-                        size = 20.dp,
                         modifier = Modifier
+                            .size(20.dp)
                             .padding(start = 20.dp)
                             .align(Alignment.CenterVertically),
                     )

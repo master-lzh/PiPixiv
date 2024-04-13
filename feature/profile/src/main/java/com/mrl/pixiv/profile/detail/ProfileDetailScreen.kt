@@ -5,16 +5,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomStart
+import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -67,6 +75,7 @@ fun ProfileDetailScreen(
         bookmarkState = bookmarkViewModel.state,
         bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
+        popBack = { navHostController.popBackStack() },
         dispatch = profileDetailViewModel::dispatch,
     )
 }
@@ -79,6 +88,7 @@ internal fun ProfileDetailScreen(
     bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust) -> Unit = {},
     dispatch: (ProfileDetailAction) -> Unit,
+    popBack: () -> Unit = { },
 ) {
     val userInfo = state.userInfo
     val backgroundHeight = when (LocalConfiguration.current.orientation) {
@@ -89,15 +99,9 @@ internal fun ProfileDetailScreen(
     val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
 
     CollapsingToolbarScaffold(
-        modifier = modifier.padding(bottom = 80.dp),
+        modifier = modifier,
         state = collapsingToolbarScaffoldState,
         toolbar = {
-            val toolbarHeight = DisplayUtil.getStatusBarHeight() + 60.dp
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(toolbarHeight)
-            )
 
             Box(
                 modifier = Modifier
@@ -119,20 +123,28 @@ internal fun ProfileDetailScreen(
                     )
                 }
             }
+            IconButton(
+                onClick = popBack,
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(vertical = 10.dp)
+            ) {
+                Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
+            }
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(toolbarHeight)
+                    .windowInsetsPadding(WindowInsets.statusBars)
                     .graphicsLayer {
                         alpha = 1 - collapsingToolbarScaffoldState.toolbarState.progress
                     }
             ) {
                 Row(
                     modifier = Modifier
-                        .align(BottomStart)
-                        .padding(start = 20.dp, end = 10.dp)
-                        .padding(bottom = 10.dp)
+                        .align(CenterStart)
+                        .padding(start = 50.dp)
+                        .padding(vertical = 10.dp)
                         .graphicsLayer {
                             alpha = 1 - collapsingToolbarScaffoldState.toolbarState.progress
                         },
