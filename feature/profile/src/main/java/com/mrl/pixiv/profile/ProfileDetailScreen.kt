@@ -41,9 +41,9 @@ import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.profile.components.IllustBookmarkWidget
 import com.mrl.pixiv.profile.components.NovelBookmarkWidget
-import com.mrl.pixiv.profile.viewmodel.ProfileAction
-import com.mrl.pixiv.profile.viewmodel.ProfileState
-import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
+import com.mrl.pixiv.profile.viewmodel.ProfileDetailAction
+import com.mrl.pixiv.profile.viewmodel.ProfileDetailState
+import com.mrl.pixiv.profile.viewmodel.ProfileDetailViewModel
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.copyToClipboard
 import com.mrl.pixiv.util.throttleClick
@@ -53,31 +53,31 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ProfileScreen(
+fun ProfileDetailScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
     bookmarkViewModel: BookmarkViewModel,
-    profileViewModel: ProfileViewModel = koinViewModel(),
+    profileDetailViewModel: ProfileDetailViewModel = koinViewModel(),
 ) {
-    OnLifecycle(onLifecycle = profileViewModel::onStart)
-    ProfileScreen(
+    OnLifecycle(onLifecycle = profileDetailViewModel::onStart)
+    ProfileDetailScreen(
         modifier = modifier,
-        state = profileViewModel.state,
+        state = profileDetailViewModel.state,
         bookmarkState = bookmarkViewModel.state,
         bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        dispatch = profileViewModel::dispatch,
+        dispatch = profileDetailViewModel::dispatch,
     )
 }
 
 @Composable
-internal fun ProfileScreen(
+internal fun ProfileDetailScreen(
     modifier: Modifier = Modifier,
-    state: ProfileState,
+    state: ProfileDetailState,
     bookmarkState: BookmarkState,
     bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust) -> Unit = {},
-    dispatch: (ProfileAction) -> Unit,
+    dispatch: (ProfileDetailAction) -> Unit,
 ) {
     val userInfo = state.userInfo
     val backgroundHeight = when (LocalConfiguration.current.orientation) {
