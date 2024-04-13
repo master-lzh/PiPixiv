@@ -1,4 +1,4 @@
-package com.mrl.pixiv.profile.viewmodel
+package com.mrl.pixiv.profile.detail.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Reducer
 import kotlinx.collections.immutable.toImmutableList

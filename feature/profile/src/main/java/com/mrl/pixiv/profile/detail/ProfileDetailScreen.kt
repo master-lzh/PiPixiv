@@ -1,4 +1,4 @@
-package com.mrl.pixiv.profile
+package com.mrl.pixiv.profile.detail
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -39,11 +39,12 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.profile.components.IllustBookmarkWidget
-import com.mrl.pixiv.profile.components.NovelBookmarkWidget
-import com.mrl.pixiv.profile.viewmodel.ProfileDetailAction
-import com.mrl.pixiv.profile.viewmodel.ProfileDetailState
-import com.mrl.pixiv.profile.viewmodel.ProfileDetailViewModel
+import com.mrl.pixiv.profile.R
+import com.mrl.pixiv.profile.detail.components.IllustBookmarkWidget
+import com.mrl.pixiv.profile.detail.components.NovelBookmarkWidget
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailAction
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailState
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailViewModel
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.copyToClipboard
 import com.mrl.pixiv.util.throttleClick

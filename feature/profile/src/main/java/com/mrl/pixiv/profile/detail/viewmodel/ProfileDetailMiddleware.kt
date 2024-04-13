@@ -1,4 +1,4 @@
-package com.mrl.pixiv.profile.viewmodel
+package com.mrl.pixiv.profile.detail.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.ProfileImageUrls
@@ -8,8 +8,8 @@ import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
 import com.mrl.pixiv.data.user.UserBookmarksNovelQuery
 import com.mrl.pixiv.data.user.UserDetailQuery
 import com.mrl.pixiv.data.user.copy
-import com.mrl.pixiv.profile.state.UserInfo
-import com.mrl.pixiv.profile.state.toUserInfo
+import com.mrl.pixiv.profile.detail.state.UserInfo
+import com.mrl.pixiv.profile.detail.state.toUserInfo
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
 import kotlinx.coroutines.flow.first

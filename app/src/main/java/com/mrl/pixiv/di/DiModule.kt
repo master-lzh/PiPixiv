@@ -41,9 +41,9 @@ import com.mrl.pixiv.network.converter.asConverterFactory
 import com.mrl.pixiv.picture.viewmodel.PictureMiddleware
 import com.mrl.pixiv.picture.viewmodel.PictureReducer
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
-import com.mrl.pixiv.profile.viewmodel.ProfileDetailMiddleware
-import com.mrl.pixiv.profile.viewmodel.ProfileDetailReducer
-import com.mrl.pixiv.profile.viewmodel.ProfileDetailViewModel
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailMiddleware
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailReducer
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailViewModel
 import com.mrl.pixiv.repository.local.SearchLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
