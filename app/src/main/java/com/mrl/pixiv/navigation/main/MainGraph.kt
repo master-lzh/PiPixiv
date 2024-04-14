@@ -1,5 +1,9 @@
 package com.mrl.pixiv.navigation.main
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -107,6 +111,8 @@ fun MainGraph(
                     uriPattern = DestinationsDeepLink.PicturePattern
                 }
             ),
+            enterTransition = { scaleIn() + fadeIn() },
+            exitTransition = { scaleOut() + fadeOut() },
         ) {
             val illustParams =
                 (it.arguments?.getString(Destination.PictureScreen.illustParams)) ?: ""
