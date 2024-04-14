@@ -18,8 +18,10 @@ import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.data.search.searchDataStore
 import com.mrl.pixiv.data.user.userInfoDataStore
 import com.mrl.pixiv.datasource.local.SearchDataSource
+import com.mrl.pixiv.datasource.local.SettingDataSource
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
+import com.mrl.pixiv.datasource.local.settingDataStore
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.SearchHttpService
 import com.mrl.pixiv.datasource.remote.TrendingHttpService
@@ -48,6 +50,7 @@ import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
 import com.mrl.pixiv.profile.viewmodel.ProfileReducer
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.repository.local.SearchLocalRepository
+import com.mrl.pixiv.repository.local.SettingLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
@@ -83,6 +86,7 @@ enum class DataStoreEnum {
     USER_AUTH,
     USER_INFO,
     SEARCH,
+    SETTING,
 }
 
 
@@ -98,6 +102,8 @@ val appModule = module {
     single(named(DataStoreEnum.USER_INFO)) { androidContext().userInfoDataStore }
 
     single(named(DataStoreEnum.SEARCH)) { androidContext().searchDataStore }
+
+    single(named(DataStoreEnum.SETTING)) { androidContext().settingDataStore }
 
     single {
         JSON.asConverterFactory("application/json".toMediaType())
@@ -143,6 +149,7 @@ val viewModelModule = module {
 val repositoryModule = module {
     singleOf(::UserLocalRepository)
     singleOf(::SearchLocalRepository)
+    singleOf(::SettingLocalRepository)
 
 
     singleOf(::AuthRemoteRepository)
@@ -156,6 +163,7 @@ val dataSourceModule = module {
     single { UserAuthDataSource(get(named(DataStoreEnum.USER_AUTH))) }
     single { UserInfoDataSource(get(named(DataStoreEnum.USER_INFO))) }
     single { SearchDataSource(get(named(DataStoreEnum.SEARCH))) }
+    single { SettingDataSource(get(named(DataStoreEnum.SETTING))) }
 
     single { IllustHttpService(provideCommonService(get(), IllustApi::class.java)) }
     single { UserAuthHttpService(provideAuthService(get())) }

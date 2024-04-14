@@ -58,4 +58,6 @@ sealed class Destination(
     data object SearchResultsScreen : Destination(route = "search_results_screen") {
         const val searchWord = "search_keyword"
     }
+
+    data object SettingScreen : Destination(route = "setting_screen")
 }

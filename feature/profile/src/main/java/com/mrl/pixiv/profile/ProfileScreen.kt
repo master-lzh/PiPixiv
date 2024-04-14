@@ -1,18 +1,23 @@
 package com.mrl.pixiv.profile
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -24,8 +29,10 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common_ui.util.navigateToProfileDetailScreen
+import com.mrl.pixiv.common_ui.util.navigateToSettingScreen
 import com.mrl.pixiv.profile.viewmodel.ProfileState
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
+import com.mrl.pixiv.util.throttleClick
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -37,7 +44,8 @@ fun ProfileScreen(
     ProfileScreen_(
         modifier = modifier,
         state = viewModel.state,
-        navToProfileDetail = navHostController::navigateToProfileDetailScreen
+        navToProfileDetail = navHostController::navigateToProfileDetailScreen,
+        navToSetting = navHostController::navigateToSettingScreen
     )
 }
 
@@ -48,6 +56,7 @@ internal fun ProfileScreen_(
     modifier: Modifier = Modifier,
     state: ProfileState = ProfileState.INITIAL,
     navToProfileDetail: () -> Unit = {},
+    navToSetting: () -> Unit = {},
 ) {
     Screen(
         topBar = {
@@ -91,7 +100,32 @@ internal fun ProfileScreen_(
                 HorizontalDivider()
             }
             item {
-
+                Column {
+                    // 偏好设置
+                    repeat(3) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().throttleClick(
+                                indication = rememberRipple()
+                            ) {
+                                navToSetting()
+                            }
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .padding(vertical = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
+                                Text(
+                                    text = "偏好设置",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

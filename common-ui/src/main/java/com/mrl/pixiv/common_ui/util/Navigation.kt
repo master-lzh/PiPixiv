@@ -54,3 +54,7 @@ fun NavHostController.popBackToMainScreen() {
 fun NavHostController.navigateToProfileDetailScreen() {
     navigate(route = Destination.ProfileDetailScreen.route)
 }
+
+fun NavHostController.navigateToSettingScreen() {
+    navigate(route = Destination.SettingScreen.route)
+}
