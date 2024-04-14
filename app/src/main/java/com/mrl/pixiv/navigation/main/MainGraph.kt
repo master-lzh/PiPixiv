@@ -29,6 +29,7 @@ import com.mrl.pixiv.search.SearchResultScreen
 import com.mrl.pixiv.search.SearchScreen
 import com.mrl.pixiv.search.preview.SearchPreviewScreen
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
+import com.mrl.pixiv.setting.SettingScreen
 import org.koin.androidx.compose.koinViewModel
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -175,6 +176,15 @@ fun MainGraph(
                 searchWord = searchWord,
                 bookmarkViewModel = bookmarkViewModel,
                 navHostController = navHostController,
+            )
+        }
+
+        // 设置页
+        composable(
+            route = Destination.SettingScreen.route,
+        ) {
+            SettingScreen(
+                navHostController = navHostController
             )
         }
     }
