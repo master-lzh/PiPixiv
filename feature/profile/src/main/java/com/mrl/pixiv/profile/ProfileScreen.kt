@@ -23,6 +23,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -104,11 +105,13 @@ internal fun ProfileScreen_(
                     // 偏好设置
                     repeat(3) {
                         Box(
-                            modifier = Modifier.fillMaxWidth().throttleClick(
-                                indication = rememberRipple()
-                            ) {
-                                navToSetting()
-                            }
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .throttleClick(
+                                    indication = rememberRipple()
+                                ) {
+                                    navToSetting()
+                                }
                         ) {
                             Row(
                                 modifier = Modifier
@@ -119,7 +122,7 @@ internal fun ProfileScreen_(
                             ) {
                                 Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
                                 Text(
-                                    text = "偏好设置",
+                                    text = stringResource(R.string.preference),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }

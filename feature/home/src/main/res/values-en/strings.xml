@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="revoke">Revoke</string>
+    <string name="revoke_cancel_like">Revoke cancel like</string>
+    <string name="refresh_token_success">Refresh token successfully</string>
+</resources>

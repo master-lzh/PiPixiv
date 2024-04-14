@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tags_partially_match">Tags partially match</string>
+    <string name="tags_exact_match">Tags exact match</string>
+    <string name="title_and_description">Title and Description</string>
+    <string name="date_desc">Newer</string>
+    <string name="date_asc">Older</string>
+    <string name="popular_desc">Popular</string>
+    <string name="filter">Filter</string>
+    <string name="apply">Apply</string>
+    <string name="search_history">Search History</string>
+    <string name="find_for">Are you looking for</string>
+    <string name="enter_keywords">Enter Keywords</string>
+    <string name="popular_tags">Popular Tags</string>
+</resources>

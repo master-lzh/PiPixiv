@@ -41,6 +41,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -152,7 +153,7 @@ internal fun SearchScreen_(
                                         dispatch(SearchAction.ClearAutoCompleteSearchWords)
                                     }
                                 },
-                                placeholder = { Text("输入关键字") },
+                                placeholder = { Text(stringResource(R.string.enter_keywords)) },
                                 minHeight = 40.dp,
                                 contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
                                     top = 2.dp,
@@ -199,7 +200,10 @@ internal fun SearchScreen_(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = if (state.searchWords.isEmpty()) "搜索历史" else "你是不是要找",
+                        text = if (state.searchWords.isEmpty())
+                            stringResource(R.string.search_history)
+                        else
+                            stringResource(R.string.find_for),
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.padding(16.dp),
                     )
