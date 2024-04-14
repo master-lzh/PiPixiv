@@ -34,6 +34,7 @@ import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
 import com.mrl.pixiv.domain.bookmark.UnBookmarkUseCase
+import com.mrl.pixiv.domain.setting.GetAppThemeUseCase
 import com.mrl.pixiv.home.viewmodel.HomeMiddleware
 import com.mrl.pixiv.home.viewmodel.HomeReducer
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
@@ -180,6 +181,7 @@ val useCaseModule = module {
     singleOf(::RefreshUserAccessTokenUseCase)
     singleOf(::BookmarkUseCase)
     singleOf(::UnBookmarkUseCase)
+    singleOf(::GetAppThemeUseCase)
 }
 
 val middlewareModule = module {

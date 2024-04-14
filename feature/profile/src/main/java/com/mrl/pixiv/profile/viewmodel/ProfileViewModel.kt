@@ -3,6 +3,7 @@ package com.mrl.pixiv.profile.viewmodel
 import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.common.viewmodel.BaseViewModel
 import com.mrl.pixiv.common.viewmodel.State
+import com.mrl.pixiv.data.setting.SettingTheme
 import com.mrl.pixiv.data.user.UserInfo
 
 data class ProfileState(
@@ -17,6 +18,7 @@ data class ProfileState(
 
 sealed class ProfileAction : Action {
     data object GetUserInfo : ProfileAction()
+    data class ChangeAppTheme(val theme: SettingTheme) : ProfileAction()
 
     data class UpdateUserInfo(val userInfo: UserInfo) : ProfileAction()
 }

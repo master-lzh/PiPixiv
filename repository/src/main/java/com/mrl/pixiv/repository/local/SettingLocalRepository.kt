@@ -7,21 +7,9 @@ import kotlinx.coroutines.flow.map
 class SettingLocalRepository(
     private val settingDataSource: SettingDataSource
 ) {
-    val settingTheme = settingDataSource.settingTheme.get("system").map {
-        when (it) {
-            "light" -> SettingTheme.LIGHT
-            "dark" -> SettingTheme.DARK
-            else -> SettingTheme.SYSTEM
-        }
+    val settingTheme = settingDataSource.settingTheme.get(SettingTheme.SYSTEM.toString()).map {
+        enumValueOf<SettingTheme>(it)
     }
 
-    fun setSettingTheme(theme: SettingTheme) {
-        settingDataSource.settingTheme.set(
-            when (theme) {
-                SettingTheme.LIGHT -> "light"
-                SettingTheme.DARK -> "dark"
-                else -> "system"
-            }
-        )
-    }
+    fun setSettingTheme(theme: SettingTheme) = settingDataSource.settingTheme.set(theme.toString())
 }
