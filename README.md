@@ -46,9 +46,10 @@ A third party Pixiv App which is entirely writen by [Jetpack Compose](https://de
 
 ## App Preview
 
-| ![Home](https://github.com/master-lzh/PiPixiv/assets/60057825/0c9431bf-bff1-4752-9d62-f2721b3ade5e) | ![Preview](https://github.com/master-lzh/PiPixiv/assets/60057825/a4dfcd59-78cd-485a-8e36-5a37be2edd11) |
+| ![Home](https://github.com/master-lzh/PiPixiv/assets/60057825/0c9431bf-bff1-4752-9d62-f2721b3ade5e) | ![SearchPreview](https://github.com/master-lzh/PiPixiv/assets/60057825/240c5011-cbdb-4423-8d41-b787b5495d4d) |
 | ------------- | ------------- |
 | ![Search](https://github.com/master-lzh/PiPixiv/assets/60057825/8d44b554-7cdd-4eeb-a520-a93e6fc7507d) | ![Search Result](https://github.com/master-lzh/PiPixiv/assets/60057825/7b7f6ea4-5df7-46b9-ba65-4cb1b2f52373) |
+| ![13338cfbcacf68fd8aa38543d121f1bf_720](https://github.com/master-lzh/PiPixiv/assets/60057825/dfe36948-525c-486d-a339-6c2c78b5aebf) |  |
 
 
 

@@ -85,6 +85,7 @@ fun MainGraph(
             )
         }
 
+        // 个人详情页
         composable(
             route = Destination.ProfileDetailScreen.route,
             deepLinks = listOf(
@@ -92,6 +93,8 @@ fun MainGraph(
                     uriPattern = DestinationsDeepLink.ProfileDetailPattern
                 }
             ),
+            enterTransition = { scaleIn() + fadeIn() },
+            exitTransition = { scaleOut() + fadeOut() },
         ) {
             ProfileDetailScreen(
                 navHostController = navHostController,
