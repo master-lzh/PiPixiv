@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Translate
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -122,35 +121,36 @@ internal fun SettingScreen_(
                             modifier = Modifier.throttleClick {
                                 expanded = !expanded
                             },
-                            current = currentLanguage
-                        )
-                    }
-                }
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    langs.forEach {
-                        DropdownMenuItem(
-                            text = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = it.displayName,
-                                        modifier = Modifier.padding(16.dp),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                    )
-                                    if (currentLanguage == it.langTag) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Check,
-                                            contentDescription = null
-                                        )
-                                    }
-                                }
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            current = currentLanguage,
+                        ) {
+                            langs.forEach {
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = it.displayName,
+                                                modifier = Modifier.padding(16.dp),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                            )
+                                            if (currentLanguage == it.langTag) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.Check,
+                                                    contentDescription = null
+                                                )
+                                            }
+                                        }
 
-                            }, onClick = {
-                                currentLanguage = it.langTag
-                                expanded = false
+                                    }, onClick = {
+                                        currentLanguage = it.langTag
+                                        expanded = false
+                                    }
+                                )
                             }
-                        )
+                        }
                     }
                 }
             }

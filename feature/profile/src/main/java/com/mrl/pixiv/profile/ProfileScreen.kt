@@ -103,29 +103,27 @@ internal fun ProfileScreen_(
             item {
                 Column {
                     // 偏好设置
-                    repeat(3) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .throttleClick(
-                                    indication = rememberRipple()
-                                ) {
-                                    navToSetting()
-                                }
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                                    .padding(vertical = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .throttleClick(
+                                indication = rememberRipple()
                             ) {
-                                Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
-                                Text(
-                                    text = stringResource(R.string.preference),
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
+                                navToSetting()
                             }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .padding(vertical = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
+                            Text(
+                                text = stringResource(R.string.preference),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                         }
                     }
                 }
