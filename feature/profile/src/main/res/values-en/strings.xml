@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preference">Preference</string>
+    <string name="illust_and_manga_liked">Illust &amp; Manga Liked</string>
+    <string name="view_all">View all</string>
+    <string name="novel_collection">Novel Collection</string>
+    <string name="novel_description">%1$s words %2$s</string>
+</resources>

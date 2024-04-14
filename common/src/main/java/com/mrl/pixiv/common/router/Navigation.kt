@@ -6,17 +6,19 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.mrl.pixiv.common.R
 
 sealed class Destination(
     val route: String,
-    val title: String = "",
+    val title: @Composable () -> String = { "" },
     val icon: @Composable (() -> Unit)? = {},
 ) {
     data object LoginScreen : Destination(route = "login_screen")
 
     data object HomeScreen : Destination(
         route = "home_screen",
-        title = "首页",
+        title = { stringResource(R.string.home) },
         icon = {
             Icon(
                 imageVector = Icons.Rounded.Home,
@@ -27,7 +29,7 @@ sealed class Destination(
 
     data object SearchPreviewScreen : Destination(
         route = "search_preview_screen",
-        title = "搜索",
+        title = { stringResource(R.string.search) },
         icon = {
             Icon(
                 imageVector = Icons.Rounded.Search,
@@ -38,7 +40,7 @@ sealed class Destination(
 
     data object ProfileScreen : Destination(
         route = "profile_screen",
-        title = "我的",
+        title = { stringResource(R.string.my) },
         icon = {
             Icon(
                 imageVector = Icons.Rounded.AccountCircle,

@@ -43,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
@@ -236,6 +238,7 @@ private fun FilterBottomSheet(
     state: SearchState,
     dispatch: (SearchAction) -> Unit,
 ) {
+    val context = LocalContext.current
     ModalBottomSheet(
         onDismissRequest = {
             showBottomSheet.value = false
@@ -247,16 +250,16 @@ private fun FilterBottomSheet(
         val filter = state.searchFilter
         val searchTargetMap = remember {
             mapOf(
-                SearchTarget.PARTIAL_MATCH_FOR_TAGS to "标签部分一致",
-                SearchTarget.EXACT_MATCH_FOR_TAGS to "标签完全一致",
-                SearchTarget.TITLE_AND_CAPTION to "标题和简介",
+                SearchTarget.PARTIAL_MATCH_FOR_TAGS to context.getString(R.string.tags_partially_match),
+                SearchTarget.EXACT_MATCH_FOR_TAGS to context.getString(R.string.tags_exact_match),
+                SearchTarget.TITLE_AND_CAPTION to context.getString(R.string.title_and_description),
             )
         }
         val searchSortMap = remember {
             mapOf(
-                SearchSort.DATE_DESC to "日期降序",
-                SearchSort.DATE_ASC to "日期升序",
-                SearchSort.POPULAR_DESC to "人气降序",
+                SearchSort.DATE_DESC to context.getString(R.string.date_desc),
+                SearchSort.DATE_ASC to context.getString(R.string.date_asc),
+                SearchSort.POPULAR_DESC to context.getString(R.string.popular_desc),
             )
         }
         var selectedTargetIndex by remember { mutableIntStateOf(searchTargetMap.keys.indexOf(filter.searchTarget)) }
@@ -267,9 +270,9 @@ private fun FilterBottomSheet(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "筛选")
+            Text(text = stringResource(R.string.filter))
             Text(
-                text = "应用",
+                text = stringResource(R.string.apply),
                 modifier = Modifier.throttleClick {
                     dispatch(SearchAction.ClearSearchResult)
                     dispatch(

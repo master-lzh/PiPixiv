@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.LoadingState
@@ -106,7 +107,9 @@ internal fun LoginScreen(
         }
     }
     Screen(
-        modifier = modifier.statusBarsPadding().imePadding(),
+        modifier = modifier
+            .statusBarsPadding()
+            .imePadding(),
         topBar = {
             TopAppBar(
                 title = {},
@@ -115,13 +118,13 @@ internal fun LoginScreen(
                         getCodeVer()
                         currUrl = generateWebViewUrl(false)
                     }) {
-                        Text(text = "登录")
+                        Text(text = stringResource(R.string.sign_in))
                     }
                     Button(onClick = {
                         getCodeVer()
                         currUrl = generateWebViewUrl(true)
                     }) {
-                        Text(text = "注册")
+                        Text(text = stringResource(R.string.sign_up))
                     }
                 }
             )
