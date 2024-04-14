@@ -5,4 +5,7 @@
     <string name="view_all">查看全部</string>
     <string name="novel_collection">小说收集</string>
     <string name="novel_description">%1$s字 %2$s</string>
+    <string name="theme_system">跟随系统</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
 </resources>

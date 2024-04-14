@@ -5,4 +5,7 @@
     <string name="view_all">View all</string>
     <string name="novel_collection">Novel Collection</string>
     <string name="novel_description">%1$s words %2$s</string>
+    <string name="theme_system">Follow System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
 </resources>

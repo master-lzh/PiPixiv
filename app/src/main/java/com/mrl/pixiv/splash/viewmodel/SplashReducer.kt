@@ -1,8 +1,8 @@
 package com.mrl.pixiv.splash.viewmodel
 
-import com.mrl.pixiv.common.viewmodel.Reducer
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.Graph
+import com.mrl.pixiv.common.viewmodel.Reducer
 
 class SplashReducer : Reducer<SplashState, SplashAction> {
     override fun reduce(state: SplashState, action: SplashAction): SplashState {
