@@ -36,8 +36,10 @@ import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Illust
@@ -82,7 +84,7 @@ internal enum class HomeSnackbar(val actionLabel: String) {
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
     homeViewModel: HomeViewModel = koinViewModel(),
     bookmarkViewModel: BookmarkViewModel,
 ) {

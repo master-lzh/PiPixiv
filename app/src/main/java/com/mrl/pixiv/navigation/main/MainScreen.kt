@@ -2,6 +2,7 @@ package com.mrl.pixiv.navigation.main
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mrl.pixiv.common.router.Destination
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.HomeBottomBar
 
@@ -19,18 +21,20 @@ import com.mrl.pixiv.common.ui.components.HomeBottomBar
 fun MainScreen(
     navHostController: NavHostController = rememberNavController()
 ) {
-    Screen(
-        bottomBar = {
-            HomeBottomBar(
-                navController = navHostController,
-                bottomBarState = bottomBarVisibility(navHostController)
+    CompositionLocalProvider(LocalNavigator provides navHostController) {
+        Screen(
+            bottomBar = {
+                HomeBottomBar(
+                    navController = navHostController,
+                    bottomBarState = bottomBarVisibility(navHostController)
+                )
+            },
+        ) {
+            MainGraph(
+                modifier = Modifier.padding(bottom = it.calculateBottomPadding()),
+                navHostController = navHostController
             )
-        },
-    ) {
-        MainGraph(
-            modifier = Modifier.padding(bottom = it.calculateBottomPadding()),
-            navHostController = navHostController
-        )
+        }
     }
 }
 

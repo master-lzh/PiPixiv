@@ -33,7 +33,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.setting.components.DropDownSelector
 import com.mrl.pixiv.setting.components.SettingItem
 import com.mrl.pixiv.setting.viewmodel.SettingState
@@ -50,7 +52,7 @@ import org.xmlpull.v1.XmlPullParser
 fun SettingScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = koinViewModel(),
-    navHostController: NavHostController
+    navHostController: NavHostController = LocalNavigator.currentOrThrow
 ) {
     SettingScreen_(
         modifier = modifier,

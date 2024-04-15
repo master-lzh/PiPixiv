@@ -33,7 +33,9 @@ import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.auth.AuthAction
 import com.mrl.pixiv.common.middleware.auth.AuthState
 import com.mrl.pixiv.common.router.Graph
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.security.MessageDigest
@@ -77,7 +79,7 @@ private fun checkUri(dispatch: (AuthAction) -> Unit, uri: Uri): Boolean {
 fun LoginScreen(
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = koinViewModel(),
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
     OnLifecycle(onLifecycle = loginViewModel::onStart)
     LoginScreen(

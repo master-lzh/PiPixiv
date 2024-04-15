@@ -50,8 +50,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.m3.TextField
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToSearchResultScreen
 import com.mrl.pixiv.search.viewmodel.SearchAction
 import com.mrl.pixiv.search.viewmodel.SearchState
@@ -64,7 +66,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    searchNavHostController: NavHostController,
+    searchNavHostController: NavHostController = LocalNavigator.currentOrThrow,
     searchViewModel: SearchViewModel = koinViewModel(),
     navHostController: NavHostController,
 ) {
