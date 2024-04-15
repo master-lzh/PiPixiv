@@ -45,7 +45,9 @@ import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.UserAvatar
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.profile.R
@@ -65,7 +67,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ProfileDetailScreen(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
     bookmarkViewModel: BookmarkViewModel,
     profileDetailViewModel: ProfileDetailViewModel = koinViewModel(),
 ) {

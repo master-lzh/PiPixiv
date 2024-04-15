@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -17,6 +18,8 @@ import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
+import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.di.JSON
 import com.mrl.pixiv.home.HomeScreen
@@ -38,7 +41,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @Composable
 fun MainGraph(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
     val followViewModel: FollowViewModel = koinViewModel()
@@ -59,7 +62,6 @@ fun MainGraph(
         ) {
             HomeScreen(
                 modifier = modifier,
-                navHostController = navHostController,
                 homeViewModel = homeViewModel,
                 bookmarkViewModel = bookmarkViewModel
             )
@@ -71,7 +73,6 @@ fun MainGraph(
         ) {
             SearchPreviewScreen(
                 modifier = modifier,
-                navHostController = navHostController,
             )
         }
 
@@ -81,7 +82,6 @@ fun MainGraph(
         ) {
             ProfileScreen(
                 modifier = modifier,
-                navHostController = navHostController,
             )
         }
 
@@ -93,11 +93,8 @@ fun MainGraph(
                     uriPattern = DestinationsDeepLink.ProfileDetailPattern
                 }
             ),
-            enterTransition = { scaleIn() + fadeIn() },
-            exitTransition = { scaleOut() + fadeOut() },
         ) {
             ProfileDetailScreen(
-                navHostController = navHostController,
                 bookmarkViewModel = bookmarkViewModel
             )
         }
@@ -115,8 +112,10 @@ fun MainGraph(
                     uriPattern = DestinationsDeepLink.PicturePattern
                 }
             ),
-            enterTransition = { scaleIn() + fadeIn() },
-            exitTransition = { scaleOut() + fadeOut() },
+            enterTransition = { scaleIn(initialScale = 0.9f) + fadeIn() },
+            exitTransition = { scaleOut(targetScale = 1.1f) + fadeOut() },
+            popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
+            popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
         ) {
             val illustParams =
                 (it.arguments?.getString(Destination.PictureScreen.illustParams)) ?: ""
@@ -124,7 +123,6 @@ fun MainGraph(
             val illust = JSON.decodeFromString<Illust>(illustDecode)
             PictureScreen(
                 illust = illust,
-                navHostController = navHostController,
                 bookmarkViewModel = bookmarkViewModel,
                 followViewModel = followViewModel,
             )
@@ -136,29 +134,29 @@ fun MainGraph(
         ) {
             val searchViewModel: SearchViewModel = koinViewModel(viewModelStoreOwner = it)
             val searchNavHostController = rememberNavController()
-            NavHost(
-                navController = searchNavHostController,
-                route = Graph.SEARCH,
-                startDestination = Destination.SearchScreen.route
-            ) {
-                composable(
-                    route = Destination.SearchScreen.route,
+            CompositionLocalProvider(LocalNavigator provides searchNavHostController) {
+                NavHost(
+                    navController = searchNavHostController,
+                    route = Graph.SEARCH,
+                    startDestination = Destination.SearchScreen.route
                 ) {
-                    SearchScreen(
-                        searchNavHostController = searchNavHostController,
-                        navHostController = navHostController,
-                        searchViewModel = searchViewModel
-                    )
-                }
-                composable(
-                    route = Destination.SearchResultsScreen.route,
-                ) {
-                    SearchResultScreen(
-                        searchNavHostController = searchNavHostController,
-                        bookmarkViewModel = bookmarkViewModel,
-                        searchViewModel = searchViewModel,
-                        navHostController = navHostController
-                    )
+                    composable(
+                        route = Destination.SearchScreen.route,
+                    ) {
+                        SearchScreen(
+                            navHostController = navHostController,
+                            searchViewModel = searchViewModel
+                        )
+                    }
+                    composable(
+                        route = Destination.SearchResultsScreen.route,
+                    ) {
+                        SearchResultScreen(
+                            bookmarkViewModel = bookmarkViewModel,
+                            searchViewModel = searchViewModel,
+                            navHostController = navHostController
+                        )
+                    }
                 }
             }
         }
@@ -178,7 +176,6 @@ fun MainGraph(
             OutsideSearchResultsScreen(
                 searchWord = searchWord,
                 bookmarkViewModel = bookmarkViewModel,
-                navHostController = navHostController,
             )
         }
 
@@ -186,9 +183,7 @@ fun MainGraph(
         composable(
             route = Destination.SettingScreen.route,
         ) {
-            SettingScreen(
-                navHostController = navHostController
-            )
+            SettingScreen()
         }
     }
 }

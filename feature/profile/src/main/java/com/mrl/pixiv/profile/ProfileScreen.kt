@@ -35,8 +35,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToProfileDetailScreen
 import com.mrl.pixiv.common_ui.util.navigateToSettingScreen
 import com.mrl.pixiv.data.setting.SettingTheme
@@ -64,7 +66,7 @@ private val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel(),
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
     ProfileScreen_(
         modifier = modifier,

@@ -53,7 +53,9 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.OnScrollToBottom
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
@@ -72,7 +74,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SearchResultScreen(
     modifier: Modifier = Modifier,
-    searchNavHostController: NavHostController,
+    searchNavHostController: NavHostController = LocalNavigator.currentOrThrow,
     bookmarkViewModel: BookmarkViewModel,
     searchViewModel: SearchViewModel = koinViewModel(),
     navHostController: NavHostController,
@@ -94,7 +96,7 @@ fun OutsideSearchResultsScreen(
     searchWord: String,
     bookmarkViewModel: BookmarkViewModel,
     searchViewModel: SearchViewModel = koinViewModel(),
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
     val currentSearch by remember { mutableStateOf(searchWord) }
     LaunchedEffect(currentSearch) {
