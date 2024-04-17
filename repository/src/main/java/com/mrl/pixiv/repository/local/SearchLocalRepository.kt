@@ -20,6 +20,7 @@ class SearchLocalRepository(
             val index = it.searchHistoryList.indexOfFirst { it.keyword == searchWords }
             if (index == -1) {
                 it.toBuilder().addSearchHistory(
+                    0,
                     searchHistory {
                         keyword = searchWords
                         timestamp = System.currentTimeMillis()

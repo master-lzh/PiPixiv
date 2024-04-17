@@ -141,7 +141,10 @@ internal fun SearchPreviewScreen_(
             items(state.trendingTags) { tag ->
                 TrendingItem(
                     trendingTag = tag,
-                    onSearch = navToSearchResultsScreen
+                    onSearch = {
+                        navToSearchResultsScreen(it)
+                        dispatch(SearchPreviewAction.AddSearchHistory(it))
+                    }
                 )
             }
         }

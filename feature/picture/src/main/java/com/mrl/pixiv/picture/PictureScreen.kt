@@ -466,6 +466,7 @@ internal fun PictureScreen(
                                 .padding(end = 5.dp)
                                 .throttleClick {
                                     navToSearchResultScreen(it.name)
+                                    dispatch(PictureAction.AddSearchHistory(it.name))
                                 },
                             style = TextStyle(fontSize = 12.sp, color = deepBlue),
                         )
