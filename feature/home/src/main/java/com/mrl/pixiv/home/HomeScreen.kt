@@ -11,7 +11,6 @@ import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -52,6 +51,7 @@ import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.util.AppUtil
 import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.second
+import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -124,7 +124,7 @@ internal fun HomeScreen(
             val result = snackBarHostState.showSnackbar(
                 message = context.getString(R.string.revoke),
                 actionLabel = HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel,
-                duration = SnackbarDuration.Long,
+                duration = SnackbarDuration.Short,
             )
             when (result) {
                 SnackbarResult.Dismissed -> {}
@@ -169,24 +169,23 @@ internal fun HomeScreen(
                 when (it.visuals.actionLabel) {
                     HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel -> {
                         TextSnackbar(
-                            text = it.visuals.message,
-                            action = {
-                                Row {
-                                    IconButton(
-                                        onClick = { snackBarHostState.currentSnackbarData?.performAction() },
-                                        modifier = Modifier.align(Alignment.CenterVertically)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Rounded.Undo,
-                                            contentDescription = null
-                                        )
-                                    }
-                                    it.visuals.actionLabel?.let {
-                                        Text(text = it)
-                                    }
+                            text = it.visuals.message
+                        ) {
+                            Row(
+                                modifier = Modifier.throttleClick {
+                                    snackBarHostState.currentSnackbarData?.performAction()
+                                },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.Undo,
+                                    contentDescription = null
+                                )
+                                it.visuals.actionLabel?.let {
+                                    Text(text = it)
                                 }
                             }
-                        )
+                        }
                     }
 
                     else -> {
@@ -229,11 +228,9 @@ internal fun HomeScreen(
                 onBookmarkClick = { id, bookmark ->
                     if (bookmark) {
                         bookmarkDispatch(BookmarkAction.IllustBookmarkDeleteIntent(id))
+                        onUnBookmark(id)
                     } else {
                         bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
-                    }
-                    if (!bookmark) {
-                        onUnBookmark(id)
                     }
                 },
                 dismissRefresh = {
