@@ -2,15 +2,15 @@ package com.mrl.pixiv.setting
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.NetworkWifi
 import androidx.compose.material.icons.rounded.Translate
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
+import com.mrl.pixiv.common_ui.util.navigateToNetworkSettingScreen
 import com.mrl.pixiv.setting.components.DropDownSelector
 import com.mrl.pixiv.setting.components.SettingItem
 import com.mrl.pixiv.setting.viewmodel.SettingState
@@ -52,12 +53,14 @@ import org.xmlpull.v1.XmlPullParser
 fun SettingScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = koinViewModel(),
-    navHostController: NavHostController = LocalNavigator.currentOrThrow
+    mainNavHostController: NavHostController,
+    settingNavHostController: NavHostController = LocalNavigator.currentOrThrow
 ) {
     SettingScreen_(
         modifier = modifier,
         state = viewModel.state,
-        popBack = { navHostController.popBackStack() }
+        popBack = { mainNavHostController.popBackStack() },
+        navToNetworkScreen = settingNavHostController::navigateToNetworkSettingScreen
     )
 }
 
@@ -67,7 +70,8 @@ fun SettingScreen(
 internal fun SettingScreen_(
     modifier: Modifier = Modifier,
     state: SettingState = SettingState.INITIAL,
-    popBack: () -> Unit = {}
+    popBack: () -> Unit = {},
+    navToNetworkScreen: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val langs = remember { getLangs(context) }
@@ -100,7 +104,7 @@ internal fun SettingScreen_(
                 SettingItem(
                     icon = {
                         Icon(Icons.Rounded.Translate, contentDescription = null)
-                    },
+                    }
                 ) {
                     LaunchedEffect(currentLanguage) {
                         val locale = if (currentLanguage == "Default") {
@@ -110,50 +114,63 @@ internal fun SettingScreen_(
                         }
                         AppCompatDelegate.setApplicationLocales(locale)
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(R.string.app_language),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        DropDownSelector(
-                            modifier = Modifier.throttleClick {
-                                expanded = !expanded
-                            },
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            current = currentLanguage,
-                        ) {
-                            langs.forEach {
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(
-                                                text = it.displayName,
-                                                modifier = Modifier.padding(16.dp),
-                                                style = MaterialTheme.typography.bodyMedium,
-                                            )
-                                            if (currentLanguage == it.langTag) {
-                                                Icon(
-                                                    imageVector = Icons.Rounded.Check,
-                                                    contentDescription = null
-                                                )
-                                            }
-                                        }
 
-                                    }, onClick = {
-                                        currentLanguage = it.langTag
-                                        expanded = false
+                    Text(
+                        text = stringResource(R.string.app_language),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    DropDownSelector(
+                        modifier = Modifier.throttleClick {
+                            expanded = !expanded
+                        },
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        current = currentLanguage,
+                    ) {
+                        langs.forEach {
+                            DropdownMenuItem(
+                                text = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = it.displayName,
+                                            modifier = Modifier.padding(16.dp),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                        )
+                                        if (currentLanguage == it.langTag) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Check,
+                                                contentDescription = null
+                                            )
+                                        }
                                     }
-                                )
-                            }
+
+                                }, onClick = {
+                                    currentLanguage = it.langTag
+                                    expanded = false
+                                }
+                            )
                         }
                     }
+                }
+            }
+
+            item {
+                SettingItem(
+                    icon = {
+                        Icon(imageVector = Icons.Rounded.NetworkWifi, contentDescription = null)
+                    },
+                    onClick = navToNetworkScreen
+                ) {
+                    Text(
+                        text = stringResource(R.string.network_setting),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
+                        contentDescription = null
+                    )
                 }
             }
         }

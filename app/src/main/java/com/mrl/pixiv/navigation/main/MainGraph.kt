@@ -1,5 +1,6 @@
 package com.mrl.pixiv.navigation.main
 
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -7,6 +8,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,6 +35,8 @@ import com.mrl.pixiv.search.SearchScreen
 import com.mrl.pixiv.search.preview.SearchPreviewScreen
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
 import com.mrl.pixiv.setting.SettingScreen
+import com.mrl.pixiv.setting.network.NetworkSettingScreen
+import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -183,7 +187,31 @@ fun MainGraph(
         composable(
             route = Destination.SettingScreen.route,
         ) {
-            SettingScreen()
+            val settingViewModel: SettingViewModel =
+                koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
+            val settingNavHostController = rememberNavController()
+            CompositionLocalProvider(LocalNavigator provides settingNavHostController) {
+                NavHost(
+                    navController = settingNavHostController,
+                    startDestination = Destination.SettingScreen.route
+                ) {
+                    composable(
+                        route = Destination.SettingScreen.route,
+                    ) {
+                        SettingScreen(
+                            viewModel = settingViewModel,
+                            mainNavHostController = navHostController
+                        )
+                    }
+
+                    // 网络设置页
+                    composable(
+                        route = Destination.NetworkSettingScreen.route,
+                    ) {
+                        NetworkSettingScreen(viewModel = settingViewModel)
+                    }
+                }
+            }
         }
     }
 }

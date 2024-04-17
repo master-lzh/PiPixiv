@@ -3,6 +3,7 @@ package com.mrl.pixiv.network
 import android.os.Build
 import android.util.Log
 import com.mrl.pixiv.common.coroutine.launchIO
+import com.mrl.pixiv.repository.local.SettingLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -21,9 +22,12 @@ import javax.net.ssl.HostnameVerifier
 
 class HttpManager(
     private val userLocalRepository: UserLocalRepository,
+    settingLocalRepository: SettingLocalRepository,
     private val jsonConvertFactory: Converter.Factory,
 ) {
     private lateinit var token: String
+    private var enableBypassSniffing: Boolean =
+        settingLocalRepository.allSettingsSync.enableBypassSniffing
 
     private val logInterceptor by lazy {
         HttpLoggingInterceptor().apply {
@@ -170,7 +174,7 @@ class HttpManager(
                 switchHostResponse(chain, req)
             }.build()
         Retrofit.Builder()
-            .baseUrl("https://${hostMap[AUTH_HOST]}")
+            .baseUrl("https://${if (enableBypassSniffing) AUTH_HOST else hostMap[AUTH_HOST]}")
             .addConverterFactory(jsonConvertFactory)
             .client(authHttpClient)
             .build()
@@ -178,7 +182,7 @@ class HttpManager(
 
     private val commonRetrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://${hostMap[API_HOST]}")
+            .baseUrl("https://${if (enableBypassSniffing) API_HOST else hostMap[API_HOST]}")
             .addConverterFactory(jsonConvertFactory)
             .client(commonOkHttpClient)
             .build()

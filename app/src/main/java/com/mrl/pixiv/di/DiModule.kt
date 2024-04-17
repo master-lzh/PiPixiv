@@ -21,7 +21,7 @@ import com.mrl.pixiv.datasource.local.SearchDataSource
 import com.mrl.pixiv.datasource.local.SettingDataSource
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
-import com.mrl.pixiv.datasource.local.settingDataStore
+import com.mrl.pixiv.datasource.local.userPreferenceDataStore
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.SearchHttpService
 import com.mrl.pixiv.datasource.remote.TrendingHttpService
@@ -104,7 +104,7 @@ val appModule = module {
 
     single(named(DataStoreEnum.SEARCH)) { androidContext().searchDataStore }
 
-    single(named(DataStoreEnum.SETTING)) { androidContext().settingDataStore }
+    single(named(DataStoreEnum.SETTING)) { androidContext().userPreferenceDataStore }
 
     single {
         JSON.asConverterFactory("application/json".toMediaType())

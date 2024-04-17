@@ -1,12 +1,29 @@
 package com.mrl.pixiv.setting.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Middleware
+import com.mrl.pixiv.repository.local.SettingLocalRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 
-class SettingMiddleware : Middleware<SettingState, SettingAction>() {
+class SettingMiddleware(
+    private val settingLocalRepository: SettingLocalRepository
+) : Middleware<SettingState, SettingAction>() {
     override suspend fun process(state: SettingState, action: SettingAction) {
         when (action) {
-            is SettingAction.ChangeTheme -> {
+            is SettingAction.LoadSetting -> loadSetting()
+            is SettingAction.SwitchBypassSniffing -> switchBypassSniffing(state)
+            else -> Unit
+        }
+    }
 
+    private fun switchBypassSniffing(state: SettingState) {
+        settingLocalRepository.setEnableBypassSniffing(!state.enableBypassSniffing)
+    }
+
+    private fun loadSetting() {
+        launchIO {
+            settingLocalRepository.allSettings.flowOn(Dispatchers.Main).collect {
+                dispatch(SettingAction.UpdateSetting(it))
             }
         }
     }
