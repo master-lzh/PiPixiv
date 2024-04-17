@@ -58,3 +58,7 @@ fun NavHostController.navigateToProfileDetailScreen() {
 fun NavHostController.navigateToSettingScreen() {
     navigate(route = Destination.SettingScreen.route)
 }
+
+fun NavHostController.navigateToNetworkSettingScreen() {
+    navigate(route = Destination.NetworkSettingScreen.route)
+}

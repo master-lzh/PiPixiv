@@ -3,4 +3,7 @@
     <string name="label_default">默认</string>
     <string name="app_language">应用语言</string>
     <string name="setting">设置</string>
+    <string name="network_setting">网络设置</string>
+    <string name="enable_bypass_sniffing">是否开启绕过嗅探</string>
+    <string name="close_to_use_ip_directly">关闭则使用IP直连</string>
 </resources>

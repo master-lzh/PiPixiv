@@ -2,18 +2,17 @@ package com.mrl.pixiv.datasource.local
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.dataStore
+import com.mrl.pixiv.data.setting.UserPreference
+import com.mrl.pixiv.data.setting.UserPreferenceSerializer
 
 class SettingDataSource(
-    settingDataSource: DataStore<Preferences>
-) : BaseDataSource(settingDataSource) {
-    companion object {
-        val KEY_SETTING_THEME = stringPreferencesKey("setting_theme")
-    }
-
-    val settingTheme = createFiled(KEY_SETTING_THEME)
+    settingDataSource: DataStore<UserPreference>
+) : BaseProtoDataSource<UserPreference, UserPreference.Builder>(settingDataSource) {
+    override fun defaultValue(): UserPreference = UserPreference.getDefaultInstance()
 }
 
-val Context.settingDataStore: DataStore<Preferences> by preferencesDataStore(name = "setting")
+val Context.userPreferenceDataStore by dataStore(
+    fileName = "settings.pb",
+    serializer = UserPreferenceSerializer
+)

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +22,7 @@ fun SettingItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .throttleClick { onClick() }) {
+            .throttleClick(indication = rememberRipple()) { onClick() }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -31,7 +32,13 @@ fun SettingItem(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             icon?.invoke()
-            content()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                content()
+            }
         }
     }
 }

@@ -3,19 +3,22 @@ package com.mrl.pixiv.setting.viewmodel
 import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.common.viewmodel.BaseViewModel
 import com.mrl.pixiv.common.viewmodel.State
+import com.mrl.pixiv.data.setting.UserPreference
 
 data class SettingState(
-    val theme: String
+    val enableBypassSniffing: Boolean
 ) : State {
     companion object {
         val INITIAL = SettingState(
-            theme = "Light"
+            enableBypassSniffing = false
         )
     }
 }
 
 sealed class SettingAction : Action {
-    data object ChangeTheme : SettingAction()
+    data object LoadSetting : SettingAction()
+    data object SwitchBypassSniffing : SettingAction()
+    data class UpdateSetting(val setting: UserPreference) : SettingAction()
 }
 
 class SettingViewModel(
@@ -26,4 +29,7 @@ class SettingViewModel(
     reducer = reducer,
     middlewares = listOf(middleware),
 ) {
+    init {
+        dispatch(SettingAction.LoadSetting)
+    }
 }
