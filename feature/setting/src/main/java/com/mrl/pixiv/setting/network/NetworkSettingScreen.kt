@@ -22,6 +22,7 @@ import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.setting.R
 import com.mrl.pixiv.setting.components.SettingItem
+import com.mrl.pixiv.setting.network.components.PictureSourceWidget
 import com.mrl.pixiv.setting.viewmodel.SettingAction
 import com.mrl.pixiv.setting.viewmodel.SettingState
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
@@ -85,6 +86,10 @@ internal fun NetworkSettingScreen_(
                     onCheckedChange = { dispatch(SettingAction.SwitchBypassSniffing) }
                 )
             }
+            PictureSourceWidget(
+                currentSelected = state.pictureSourceHost,
+                savePictureSourceHost = { dispatch(SettingAction.SavePictureSourceHost(it)) }
+            )
         }
     }
 }
