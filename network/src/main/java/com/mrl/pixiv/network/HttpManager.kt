@@ -1,31 +1,68 @@
 package com.mrl.pixiv.network
 
+import android.os.Build
+import android.util.Log
+import com.mrl.pixiv.common.coroutine.launchIO
+import com.mrl.pixiv.repository.local.SettingLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
+import java.net.SocketTimeoutException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.HostnameVerifier
 
 class HttpManager(
     private val userLocalRepository: UserLocalRepository,
+    settingLocalRepository: SettingLocalRepository,
     private val jsonConvertFactory: Converter.Factory,
 ) {
+    private lateinit var token: String
+    private var enableBypassSniffing: Boolean =
+        settingLocalRepository.allSettingsSync.enableBypassSniffing
 
-    private val logInterceptor by lazy { HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY } }
+    private val logInterceptor by lazy {
+        HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+    }
+
+    init {
+        launchIO {
+            userLocalRepository.userAccessToken.collect {
+                token = it
+            }
+        }
+    }
+
 
     companion object {
         private const val TAG = "HttpManager"
-        private const val HashSalt = "28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c"
+        private const val HashSalt =
+            "28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c"
+        private const val API_HOST = "app-api.pixiv.net"
+        private const val IMAGE_HOST = "i.pximg.net"
+        private const val STATIC_IMAGE_HOST = "s.pximg.net"
+        private const val AUTH_HOST = "oauth.secure.pixiv.net"
+        private val hostMap: Map<String, String> = mapOf(
+            API_HOST to "210.140.131.199",
+            AUTH_HOST to "210.140.131.219",
+            IMAGE_HOST to "210.140.92.144",
+            STATIC_IMAGE_HOST to "210.140.92.143",
+            "doh" to "doh.dns.sb",
+        )
+        val hostnameVerifier = HostnameVerifier { hostname, session ->
+            // 检查主机名是否是你期望连接的IP地址或域名
+            hostname in hostMap.keys || hostname in hostMap.values || hostname == "doh.dns.sb"
+        }
     }
 
 
@@ -52,36 +89,47 @@ class HttpManager(
 
     private val commonHeaderInterceptor by lazy {
         Interceptor { chain ->
-            var accessToken = ""
-            runBlocking {
-                withTimeoutOrNull(100) {
-                    accessToken = userLocalRepository.userAccessToken.first()
-                }
-            }
-            val local = Locale.getDefault()
-            val ISO8601_DATETIME_FORMAT =
-                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ", local)
-            val isoDate = ISO8601_DATETIME_FORMAT.format(Date())
-            val original = chain.request()
-            val requestBuilder = original.newBuilder()
-                .removeHeader("User-Agent")
-                .addHeader(
-                    "User-Agent",
-                    "PixivAndroidApp/5.0.166 (Android ${android.os.Build.VERSION.RELEASE}; ${android.os.Build.MODEL})"
-                )
-                .addHeader("Authorization", "Bearer $accessToken")
-                .addHeader("Accept-Language", "${local.language}_${local.country}")
-                .addHeader("App-OS", "Android")
-                .addHeader("App-OS-Version", android.os.Build.VERSION.RELEASE)
-                .header("App-Version", "5.0.166")
-                .addHeader("X-Client-Time", isoDate)
-                .addHeader("X-Client-Hash", encode("$isoDate$HashSalt"))
-
-            val request = requestBuilder.build()
-            val response = chain.proceed(request)
-
+            val requestBuilder = addAuthHeader(chain)
+            val request = requestBuilder
+                .header("Host", API_HOST)
+                .build()
+            val response = switchHostResponse(chain, request)
             response
         }
+    }
+
+    private fun addAuthHeader(chain: Interceptor.Chain): Request.Builder {
+        val local = Locale.getDefault()
+        val ISO8601_DATETIME_FORMAT =
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ", local)
+        val isoDate = ISO8601_DATETIME_FORMAT.format(Date())
+        val original = chain.request()
+        return original.newBuilder()
+            .removeHeader("User-Agent")
+            .addHeader(
+                "User-Agent",
+                "PixivAndroidApp/5.0.166 (Android ${Build.VERSION.RELEASE}; ${Build.MODEL})"
+            )
+            .addHeader("Authorization", "Bearer $token")
+            .addHeader("Accept-Language", "${local.language}_${local.country}")
+            .addHeader("App-OS", "Android")
+            .addHeader("App-OS-Version", Build.VERSION.RELEASE)
+            .header("App-Version", "5.0.166")
+            .addHeader("X-Client-Time", isoDate)
+            .addHeader("X-Client-Hash", encode("$isoDate$HashSalt"))
+            .header("Host", API_HOST)
+    }
+
+    private fun switchHostResponse(chain: Interceptor.Chain, request: Request) = try {
+        chain.proceed(request)
+    } catch (e: SocketTimeoutException) {
+        val host = request.url.host
+        val newUrl = request.url.newBuilder()
+            .host(hostMap[host] ?: host)
+            .build()
+        val newRequest = request.newBuilder().url(newUrl).header("Host", host).build()
+        Log.d(TAG, "switchHostResponse: $newRequest")
+        chain.proceed(newRequest)
     }
 
     private val imageHeaderInterceptor by lazy {
@@ -91,7 +139,7 @@ class HttpManager(
                 .removeHeader("Referer")
                 .addHeader("Referer", "https://app-api.pixiv.net/")
             val request = requestBuilder.build()
-            chain.proceed(request)
+            switchHostResponse(chain, request)
         }
     }
 
@@ -100,6 +148,7 @@ class HttpManager(
             .writeTimeout(10, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
             .addInterceptor(logInterceptor)
+            .hostnameVerifier(hostnameVerifier)
             .build()
     }
 
@@ -118,11 +167,14 @@ class HttpManager(
     private val authRetrofit by lazy {
         val authHttpClient = commonOkHttpClient.newBuilder()
             .addInterceptor { chain ->
-                val req = chain.request().newBuilder().removeHeader("Authorization").build()
-                chain.proceed(req)
+                val req = chain.request().newBuilder()
+                    .header("Host", AUTH_HOST)
+                    .removeHeader("Authorization")
+                    .build()
+                switchHostResponse(chain, req)
             }.build()
         Retrofit.Builder()
-            .baseUrl("https://oauth.secure.pixiv.net")
+            .baseUrl("https://${if (enableBypassSniffing) AUTH_HOST else hostMap[AUTH_HOST]}")
             .addConverterFactory(jsonConvertFactory)
             .client(authHttpClient)
             .build()
@@ -130,7 +182,7 @@ class HttpManager(
 
     private val commonRetrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://app-api.pixiv.net")
+            .baseUrl("https://${if (enableBypassSniffing) API_HOST else hostMap[API_HOST]}")
             .addConverterFactory(jsonConvertFactory)
             .client(commonOkHttpClient)
             .build()

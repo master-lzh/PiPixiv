@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tags_partially_match">标签部分一致</string>
+    <string name="tags_exact_match">标签完全一致</string>
+    <string name="title_and_description">标题和简介</string>
+    <string name="date_desc">日期降序</string>
+    <string name="date_asc">日期升序</string>
+    <string name="popular_desc">人气降序</string>
+    <string name="filter">筛选</string>
+    <string name="apply">应用</string>
+    <string name="search_history">搜索历史</string>
+    <string name="find_for">你是不是要找</string>
+    <string name="enter_keywords">输入关键字</string>
+    <string name="popular_tags">热门标签</string>
+</resources>

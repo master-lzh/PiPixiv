@@ -1,4 +1,4 @@
-package com.mrl.pixiv.profile.components
+package com.mrl.pixiv.profile.detail.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +26,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mrl.pixiv.data.Novel
+import com.mrl.pixiv.profile.R
 
 private const val MAX_SHOW_NOVEL_COUNT = 3
 
@@ -40,14 +42,14 @@ fun NovelBookmarkWidget(
                 .padding(top = 20.dp)
         ) {
             Text(
-                text = "小说收集",
+                text = stringResource(R.string.novel_collection),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             Row(modifier = Modifier.align(Alignment.CenterEnd)) {
                 Text(
-                    text = "查看全部",
+                    text = stringResource(R.string.view_all),
                     fontSize = 12.sp,
                 )
                 Icon(
@@ -148,7 +150,10 @@ private fun NovelItem(
                 )
                 //tag
                 Text(
-                    text = "${novel.textLength}字 ${novel.tags.joinToString(" ") { "#${it.name}" }}",
+                    text = stringResource(
+                        R.string.novel_description,
+                        novel.textLength,
+                        novel.tags.joinToString(" ") { "#${it.name}" }),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(top = 5.dp)

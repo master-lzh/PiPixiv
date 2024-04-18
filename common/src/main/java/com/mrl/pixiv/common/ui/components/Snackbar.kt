@@ -11,16 +11,11 @@ import androidx.compose.ui.unit.dp
 fun TextSnackbar(
     text: String,
     singleLine: Boolean = true,
-    hasNavigationBar: Boolean = true,
     action: @Composable () -> Unit = {},
 ) {
     Snackbar(
         action = action,
-        modifier = Modifier.padding(
-            bottom = if (hasNavigationBar) 56.dp else 0.dp,
-            start = 16.dp,
-            end = 16.dp
-        )
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
         Text(
             text = text,

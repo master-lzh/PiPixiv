@@ -106,9 +106,11 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowAction
 import com.mrl.pixiv.common.middleware.follow.FollowState
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.components.m3.Surface
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.deepBlue
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
@@ -141,7 +143,7 @@ import java.io.File
 fun PictureScreen(
     modifier: Modifier = Modifier,
     illust: Illust,
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
     pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
     bookmarkViewModel: BookmarkViewModel,
     followViewModel: FollowViewModel,
@@ -183,6 +185,7 @@ internal fun PictureScreen(
     navToSearchResultScreen: (String) -> Unit = {},
     popBackToHomeScreen: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val (relatedSpanCount, userSpanCount) = when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_PORTRAIT -> Pair(2, 3)
         Configuration.ORIENTATION_LANDSCAPE -> Pair(4, 6)
@@ -195,7 +198,7 @@ internal fun PictureScreen(
             // 处理分享结果
             if (result.resultCode == Activity.RESULT_OK) {
                 scope.launch {
-                    snackbarHostState.showSnackbar("分享成功")
+                    snackbarHostState.showSnackbar(context.getString(R.string.sharing_success))
                 }
             } else {
                 // 分享失败或取消
@@ -396,8 +399,8 @@ internal fun PictureScreen(
                     ) {
                         UserAvatar(
                             url = illust.user.profileImageUrls.medium,
-                            size = 20.dp,
                             modifier = Modifier
+                                .size(20.dp)
                                 .padding(start = 20.dp)
                                 .align(Alignment.CenterVertically),
                         )
@@ -439,12 +442,12 @@ internal fun PictureScreen(
                         style = TextStyle(fontSize = 12.sp),
                     )
                     Text(
-                        text = illust.totalView.toString() + " 阅读",
+                        text = illust.totalView.toString() + " ${stringResource(R.string.viewed)}",
                         Modifier.padding(start = 10.dp),
                         style = TextStyle(fontSize = 12.sp),
                     )
                     Text(
-                        text = illust.totalBookmarks.toString() + " 收藏！",
+                        text = illust.totalBookmarks.toString() + " ${stringResource(R.string.liked)}",
                         Modifier.padding(start = 10.dp),
                         style = TextStyle(fontSize = 12.sp),
                     )
@@ -463,6 +466,7 @@ internal fun PictureScreen(
                                 .padding(end = 5.dp)
                                 .throttleClick {
                                     navToSearchResultScreen(it.name)
+                                    dispatch(PictureAction.AddSearchHistory(it.name))
                                 },
                             style = TextStyle(fontSize = 12.sp, color = deepBlue),
                         )
@@ -492,8 +496,8 @@ internal fun PictureScreen(
                 ) {
                     UserAvatar(
                         url = illust.user.profileImageUrls.medium,
-                        size = 30.dp,
                         modifier = Modifier
+                            .size(30.dp)
                             .align(Alignment.CenterVertically),
                     )
                     Column(
@@ -529,7 +533,7 @@ internal fun PictureScreen(
                                 .throttleClick {
                                     followDispatch(FollowAction.UnFollowUser(illust.user.id))
                                 },
-                            text = "已关注",
+                            text = stringResource(R.string.followed),
                             style = TextStyle(
                                 color = Color.White,
                                 fontSize = 12.sp,
@@ -549,7 +553,7 @@ internal fun PictureScreen(
                                 .throttleClick {
                                     followDispatch(FollowAction.FollowUser(illust.user.id))
                                 },
-                            text = "关注",
+                            text = stringResource(R.string.follow),
                             style = TextStyle(
                                 color = deepBlue,
                                 fontSize = 12.sp,
@@ -583,7 +587,7 @@ internal fun PictureScreen(
             item(span = StaggeredGridItemSpan.FullLine) {
                 //相关作品文字，显示在中间
                 Text(
-                    text = "相关作品",
+                    text = stringResource(R.string.related_artworks),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 50.dp),
@@ -668,8 +672,8 @@ internal fun PictureScreen(
                 ) {
                     UserAvatar(
                         url = illust.user.profileImageUrls.medium,
-                        size = 20.dp,
                         modifier = Modifier
+                            .size(20.dp)
                             .padding(start = 20.dp)
                             .align(Alignment.CenterVertically),
                     )
@@ -725,7 +729,8 @@ internal fun PictureScreen(
                                         loading = false
                                         scope.launch {
                                             snackbarHostState.showSnackbar(
-                                                if (it) "下载成功" else "下载失败"
+                                                if (it) context.getString(R.string.download_success)
+                                                else context.getString(R.string.download_failed)
                                             )
                                         }
                                     })
@@ -766,7 +771,7 @@ internal fun PictureScreen(
                     ) {
                         Icon(imageVector = Icons.Rounded.Share, contentDescription = null)
                         Text(
-                            text = "分享",
+                            text = stringResource(R.string.share),
                             modifier = Modifier.padding(start = 10.dp)
                         )
                     }

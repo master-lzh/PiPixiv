@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.mrl.pixiv.common.activity.BaseActivity
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.navigation.root.RootNavigationGraph
+import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import com.mrl.pixiv.splash.viewmodel.SplashAction
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import com.mrl.pixiv.theme.PiPixivTheme
@@ -21,6 +22,8 @@ import kotlin.time.Duration.Companion.minutes
 
 class MainActivity : BaseActivity() {
     private val splashViewModel: SplashViewModel by viewModel()
+    private val settingViewModel: SettingViewModel by viewModel()
+
 
     @Composable
     override fun BuildContent() {

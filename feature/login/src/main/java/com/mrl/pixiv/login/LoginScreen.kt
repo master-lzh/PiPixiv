@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.LoadingState
@@ -32,7 +33,9 @@ import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.auth.AuthAction
 import com.mrl.pixiv.common.middleware.auth.AuthState
 import com.mrl.pixiv.common.router.Graph
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.security.MessageDigest
@@ -76,7 +79,7 @@ private fun checkUri(dispatch: (AuthAction) -> Unit, uri: Uri): Boolean {
 fun LoginScreen(
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = koinViewModel(),
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
     OnLifecycle(onLifecycle = loginViewModel::onStart)
     LoginScreen(
@@ -106,7 +109,9 @@ internal fun LoginScreen(
         }
     }
     Screen(
-        modifier = modifier.statusBarsPadding().imePadding(),
+        modifier = modifier
+            .statusBarsPadding()
+            .imePadding(),
         topBar = {
             TopAppBar(
                 title = {},
@@ -115,13 +120,13 @@ internal fun LoginScreen(
                         getCodeVer()
                         currUrl = generateWebViewUrl(false)
                     }) {
-                        Text(text = "登录")
+                        Text(text = stringResource(R.string.sign_in))
                     }
                     Button(onClick = {
                         getCodeVer()
                         currUrl = generateWebViewUrl(true)
                     }) {
-                        Text(text = "注册")
+                        Text(text = stringResource(R.string.sign_up))
                     }
                 }
             )
