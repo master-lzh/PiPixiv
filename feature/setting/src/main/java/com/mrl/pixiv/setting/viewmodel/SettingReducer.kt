@@ -6,7 +6,12 @@ class SettingReducer : Reducer<SettingState, SettingAction> {
     override fun reduce(state: SettingState, action: SettingAction): SettingState {
         return when (action) {
             is SettingAction.SwitchBypassSniffing -> state.copy(enableBypassSniffing = !state.enableBypassSniffing)
-            is SettingAction.UpdateSetting -> state.copy(enableBypassSniffing = action.setting.enableBypassSniffing)
+            is SettingAction.UpdateSetting -> state.copy(
+                enableBypassSniffing = action.setting.enableBypassSniffing,
+                pictureSourceHost = action.setting.imageHost
+            )
+
+            is SettingAction.UpdatePictureSourceHost -> state.copy(pictureSourceHost = action.host)
             else -> state
         }
     }
