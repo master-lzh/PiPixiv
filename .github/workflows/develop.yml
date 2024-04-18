@@ -1,15 +1,13 @@
-name: Production Builds
+name: Dev Builds
 on:
   push:
     branches:
-      - master
-    tags:
-      - 'v*'
+      - develop
   workflow_dispatch:
     inputs:
       name:
-        description: "Release-Build"
-        default: "Generate release build"
+        description: "Dev-Build"
+        default: "Generate dev build"
 
 jobs:
   build:
