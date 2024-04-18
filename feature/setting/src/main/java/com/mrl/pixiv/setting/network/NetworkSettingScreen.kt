@@ -26,6 +26,7 @@ import com.mrl.pixiv.setting.network.components.PictureSourceWidget
 import com.mrl.pixiv.setting.viewmodel.SettingAction
 import com.mrl.pixiv.setting.viewmodel.SettingState
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
+import com.mrl.pixiv.util.ToastUtil
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -88,7 +89,10 @@ internal fun NetworkSettingScreen_(
             }
             PictureSourceWidget(
                 currentSelected = state.pictureSourceHost,
-                savePictureSourceHost = { dispatch(SettingAction.SavePictureSourceHost(it)) }
+                savePictureSourceHost = {
+                    dispatch(SettingAction.SavePictureSourceHost(it))
+                    ToastUtil.safeShortToast(R.string.restart_app_to_take_effect)
+                }
             )
         }
     }
