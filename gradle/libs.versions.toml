@@ -13,7 +13,7 @@ com-google-android-material-material = "1.11.0"
 lottie = "6.1.0"
 #noinspection GradleDependency
 google-services = "4.3.15"
-firebase-bom = "32.8.0"
+firebase-bom = "32.8.1"
 firebase-crashlytics-gradle = "2.9.9"
 uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.2.3"
@@ -49,15 +49,15 @@ richtext-m3 = { module = "com.halilibo.compose-richtext:richtext-ui-material3", 
 shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizuku_version" }
 shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizuku_version" }
 
-junit = "org.junit.jupiter:junit-jupiter:5.10.1"
-kotest-assertions = "io.kotest:kotest-assertions-core:5.6.2"
+junit = "org.junit.jupiter:junit-jupiter:5.10.2"
+kotest-assertions = "io.kotest:kotest-assertions-core:5.8.1"
 
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
 
-mockk = "io.mockk:mockk:1.13.9"
+mockk = "io.mockk:mockk:1.13.10"
 
 koin = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
