@@ -11,7 +11,6 @@ import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -28,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
@@ -35,8 +35,10 @@ import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Illust
@@ -46,8 +48,10 @@ import com.mrl.pixiv.home.components.HomeTopBar
 import com.mrl.pixiv.home.viewmodel.HomeAction
 import com.mrl.pixiv.home.viewmodel.HomeState
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
+import com.mrl.pixiv.util.AppUtil
 import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.second
+import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -74,13 +78,13 @@ fun HomeViewModel.onScrollToBottom() {
 
 
 internal enum class HomeSnackbar(val actionLabel: String) {
-    REVOKE_UNBOOKMARK("撤销取消收藏"),
+    REVOKE_UNBOOKMARK(AppUtil.getString(R.string.revoke_cancel_like)),
 }
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
     homeViewModel: HomeViewModel = koinViewModel(),
     bookmarkViewModel: BookmarkViewModel,
 ) {
@@ -109,6 +113,7 @@ internal fun HomeScreen(
     onScrollToBottom: () -> Unit,
     dispatch: (HomeAction) -> Unit = {},
 ) {
+    val context = LocalContext.current
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val scope = rememberCoroutineScope()
     val pullRefreshState =
@@ -117,9 +122,9 @@ internal fun HomeScreen(
     val onUnBookmark = { id: Long ->
         scope.launch {
             val result = snackBarHostState.showSnackbar(
-                message = "撤销",
+                message = context.getString(R.string.revoke),
                 actionLabel = HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel,
-                duration = SnackbarDuration.Long,
+                duration = SnackbarDuration.Short,
             )
             when (result) {
                 SnackbarResult.Dismissed -> {}
@@ -133,7 +138,9 @@ internal fun HomeScreen(
     LaunchedEffect(state.exception) {
         if (state.exception != null) {
             scope.launch {
-                snackBarHostState.showSnackbar(state.exception.message ?: "未知错误")
+                snackBarHostState.showSnackbar(
+                    state.exception.message ?: context.getString(R.string.unknown_error)
+                )
             }
         }
     }
@@ -162,24 +169,23 @@ internal fun HomeScreen(
                 when (it.visuals.actionLabel) {
                     HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel -> {
                         TextSnackbar(
-                            text = it.visuals.message,
-                            action = {
-                                Row {
-                                    IconButton(
-                                        onClick = { snackBarHostState.currentSnackbarData?.performAction() },
-                                        modifier = Modifier.align(Alignment.CenterVertically)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Rounded.Undo,
-                                            contentDescription = null
-                                        )
-                                    }
-                                    it.visuals.actionLabel?.let {
-                                        Text(text = it)
-                                    }
+                            text = it.visuals.message
+                        ) {
+                            Row(
+                                modifier = Modifier.throttleClick {
+                                    snackBarHostState.currentSnackbarData?.performAction()
+                                },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.Undo,
+                                    contentDescription = null
+                                )
+                                it.visuals.actionLabel?.let {
+                                    Text(text = it)
                                 }
                             }
-                        )
+                        }
                     }
 
                     else -> {
@@ -222,11 +228,9 @@ internal fun HomeScreen(
                 onBookmarkClick = { id, bookmark ->
                     if (bookmark) {
                         bookmarkDispatch(BookmarkAction.IllustBookmarkDeleteIntent(id))
+                        onUnBookmark(id)
                     } else {
                         bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
-                    }
-                    if (!bookmark) {
-                        onUnBookmark(id)
                     }
                 },
                 dismissRefresh = {

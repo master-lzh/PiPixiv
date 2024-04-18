@@ -14,11 +14,23 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.mrl.pixiv.di.*
+import com.mrl.pixiv.data.setting.setAppCompatDelegateThemeMode
+import com.mrl.pixiv.di.appModule
+import com.mrl.pixiv.di.dataSourceModule
+import com.mrl.pixiv.di.middlewareModule
+import com.mrl.pixiv.di.reducerModule
+import com.mrl.pixiv.di.repositoryModule
+import com.mrl.pixiv.di.useCaseModule
+import com.mrl.pixiv.di.viewModelModule
+import com.mrl.pixiv.domain.setting.GetAppThemeUseCase
 import com.mrl.pixiv.network.HttpManager
 import com.mrl.pixiv.util.AppUtil
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -30,12 +42,14 @@ class App : Application(), ImageLoaderFactory {
     }
 
     private val httpManager: HttpManager by inject()
+    private val getAppThemeUseCase: GetAppThemeUseCase by inject()
 
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -50,6 +64,9 @@ class App : Application(), ImageLoaderFactory {
             modules(useCaseModule)
             modules(middlewareModule)
             modules(reducerModule)
+        }
+        GlobalScope.launch {
+            setAppCompatDelegateThemeMode(getAppThemeUseCase().first())
         }
     }
 

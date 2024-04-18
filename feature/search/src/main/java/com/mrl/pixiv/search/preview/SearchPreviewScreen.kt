@@ -27,14 +27,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.m3.TextField
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
 import com.mrl.pixiv.common_ui.util.navigateToSearchScreen
+import com.mrl.pixiv.search.R
 import com.mrl.pixiv.search.preview.components.TrendingItem
 import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewAction
 import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewState
@@ -45,7 +49,7 @@ import org.koin.androidx.compose.koinViewModel
 fun SearchPreviewScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchPreviewViewModel = koinViewModel(),
-    navHostController: NavHostController,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
     SearchPreviewScreen_(
         modifier = modifier,
@@ -91,7 +95,7 @@ internal fun SearchPreviewScreen_(
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 onValueChange = {},
-                                placeholder = { Text("输入关键字") },
+                                placeholder = { Text(stringResource(R.string.enter_keywords)) },
                                 minHeight = 40.dp,
                                 contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
                                     top = 2.dp,
@@ -129,7 +133,7 @@ internal fun SearchPreviewScreen_(
                 span = { GridItemSpan(3) },
             ) {
                 Text(
-                    text = "热门标签",
+                    text = stringResource(R.string.popular_tags),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -137,7 +141,10 @@ internal fun SearchPreviewScreen_(
             items(state.trendingTags) { tag ->
                 TrendingItem(
                     trendingTag = tag,
-                    onSearch = navToSearchResultsScreen
+                    onSearch = {
+                        navToSearchResultsScreen(it)
+                        dispatch(SearchPreviewAction.AddSearchHistory(it))
+                    }
                 )
             }
         }

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PiPixiv</string>
+    <string name="app_name" translatable="false">PiPixiv</string>
     <string name="refresh_token_success">刷新token成功</string>
+    <string name="unknown_error">未知错误</string>
+    <string name="revoke">撤销</string>
+    <string name="revoke_cancel_like">撤销取消收藏</string>
 </resources>

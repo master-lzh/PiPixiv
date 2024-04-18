@@ -1,6 +1,27 @@
 package com.mrl.pixiv.profile.viewmodel
 
+import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.common.viewmodel.BaseViewModel
+import com.mrl.pixiv.common.viewmodel.State
+import com.mrl.pixiv.data.setting.SettingTheme
+import com.mrl.pixiv.data.user.UserInfo
+
+data class ProfileState(
+    val user: UserInfo
+) : State {
+    companion object {
+        val INITIAL = ProfileState(
+            user = UserInfo.getDefaultInstance()
+        )
+    }
+}
+
+sealed class ProfileAction : Action {
+    data object GetUserInfo : ProfileAction()
+    data class ChangeAppTheme(val theme: SettingTheme) : ProfileAction()
+
+    data class UpdateUserInfo(val userInfo: UserInfo) : ProfileAction()
+}
 
 class ProfileViewModel(
     reducer: ProfileReducer,
@@ -10,9 +31,9 @@ class ProfileViewModel(
     middlewares = listOf(middleware),
     initialState = ProfileState.INITIAL,
 ) {
-    override fun onStart() {
-        dispatch(ProfileAction.GetUserInfoIntent)
-        dispatch(ProfileAction.GetUserBookmarksIllustIntent)
-        dispatch(ProfileAction.GetUserBookmarksNovelIntent)
+    init {
+        dispatch(ProfileAction.GetUserInfo)
     }
 }
+
+

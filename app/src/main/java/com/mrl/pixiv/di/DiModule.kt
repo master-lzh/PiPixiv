@@ -18,8 +18,10 @@ import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.data.search.searchDataStore
 import com.mrl.pixiv.data.user.userInfoDataStore
 import com.mrl.pixiv.datasource.local.SearchDataSource
+import com.mrl.pixiv.datasource.local.SettingDataSource
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
+import com.mrl.pixiv.datasource.local.userPreferenceDataStore
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.SearchHttpService
 import com.mrl.pixiv.datasource.remote.TrendingHttpService
@@ -32,6 +34,7 @@ import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
 import com.mrl.pixiv.domain.bookmark.UnBookmarkUseCase
+import com.mrl.pixiv.domain.setting.GetAppThemeUseCase
 import com.mrl.pixiv.home.viewmodel.HomeMiddleware
 import com.mrl.pixiv.home.viewmodel.HomeReducer
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
@@ -41,10 +44,14 @@ import com.mrl.pixiv.network.converter.asConverterFactory
 import com.mrl.pixiv.picture.viewmodel.PictureMiddleware
 import com.mrl.pixiv.picture.viewmodel.PictureReducer
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailMiddleware
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailReducer
+import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailViewModel
 import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
 import com.mrl.pixiv.profile.viewmodel.ProfileReducer
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.repository.local.SearchLocalRepository
+import com.mrl.pixiv.repository.local.SettingLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
@@ -57,6 +64,9 @@ import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewViewModel
 import com.mrl.pixiv.search.viewmodel.SearchMiddleware
 import com.mrl.pixiv.search.viewmodel.SearchReducer
 import com.mrl.pixiv.search.viewmodel.SearchViewModel
+import com.mrl.pixiv.setting.viewmodel.SettingMiddleware
+import com.mrl.pixiv.setting.viewmodel.SettingReducer
+import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import com.mrl.pixiv.splash.viewmodel.SplashMiddleware
 import com.mrl.pixiv.splash.viewmodel.SplashReducer
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
@@ -77,6 +87,7 @@ enum class DataStoreEnum {
     USER_AUTH,
     USER_INFO,
     SEARCH,
+    SETTING,
 }
 
 
@@ -92,6 +103,8 @@ val appModule = module {
     single(named(DataStoreEnum.USER_INFO)) { androidContext().userInfoDataStore }
 
     single(named(DataStoreEnum.SEARCH)) { androidContext().searchDataStore }
+
+    single(named(DataStoreEnum.SETTING)) { androidContext().userPreferenceDataStore }
 
     single {
         JSON.asConverterFactory("application/json".toMediaType())
@@ -119,6 +132,8 @@ val viewModelModule = module {
 
     viewModelOf(::ProfileViewModel)
 
+    viewModelOf(::ProfileDetailViewModel)
+
     viewModelOf(::PictureViewModel)
 
     viewModelOf(::BookmarkViewModel)
@@ -128,11 +143,14 @@ val viewModelModule = module {
     viewModelOf(::SearchViewModel)
 
     viewModelOf(::SearchPreviewViewModel)
+
+    viewModelOf(::SettingViewModel)
 }
 
 val repositoryModule = module {
     singleOf(::UserLocalRepository)
     singleOf(::SearchLocalRepository)
+    singleOf(::SettingLocalRepository)
 
 
     singleOf(::AuthRemoteRepository)
@@ -146,6 +164,7 @@ val dataSourceModule = module {
     single { UserAuthDataSource(get(named(DataStoreEnum.USER_AUTH))) }
     single { UserInfoDataSource(get(named(DataStoreEnum.USER_INFO))) }
     single { SearchDataSource(get(named(DataStoreEnum.SEARCH))) }
+    single { SettingDataSource(get(named(DataStoreEnum.SETTING))) }
 
     single { IllustHttpService(provideCommonService(get(), IllustApi::class.java)) }
     single { UserAuthHttpService(provideAuthService(get())) }
@@ -162,6 +181,7 @@ val useCaseModule = module {
     singleOf(::RefreshUserAccessTokenUseCase)
     singleOf(::BookmarkUseCase)
     singleOf(::UnBookmarkUseCase)
+    singleOf(::GetAppThemeUseCase)
 }
 
 val middlewareModule = module {
@@ -175,6 +195,8 @@ val middlewareModule = module {
 
     factoryOf(::ProfileMiddleware)
 
+    factoryOf(::ProfileDetailMiddleware)
+
     factoryOf(::PictureMiddleware)
 
     factoryOf(::FollowMiddleware)
@@ -182,6 +204,8 @@ val middlewareModule = module {
     factoryOf(::SearchMiddleware)
 
     factoryOf(::SearchPreviewMiddleware)
+
+    factoryOf(::SettingMiddleware)
 }
 
 val reducerModule = module {
@@ -190,10 +214,12 @@ val reducerModule = module {
     singleOf(::BookmarkReducer)
     singleOf(::AuthReducer)
     singleOf(::ProfileReducer)
+    singleOf(::ProfileDetailReducer)
     singleOf(::PictureReducer)
     singleOf(::FollowReducer)
     singleOf(::SearchReducer)
     singleOf(::SearchPreviewReducer)
+    singleOf(::SettingReducer)
 }
 
 fun provideAuthService(

@@ -10,6 +10,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 sealed class SearchPreviewAction : Action {
     data object LoadTrendingTags : SearchPreviewAction()
+    data class AddSearchHistory(val keyword: String) : SearchPreviewAction()
 
     data class UpdateTrendingTags(val trendingTags: List<TrendingTag>) : SearchPreviewAction()
 }

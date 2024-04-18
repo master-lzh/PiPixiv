@@ -10,6 +10,7 @@ import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.data.user.UserIllustsQuery
+import com.mrl.pixiv.repository.local.SearchLocalRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 import com.mrl.pixiv.repository.remote.UserRemoteRepository
 import com.mrl.pixiv.util.AppUtil
@@ -22,9 +23,11 @@ import kotlin.time.Duration.Companion.seconds
 class PictureMiddleware(
     private val illustRemoteRepository: IllustRemoteRepository,
     private val userRemoteRepository: UserRemoteRepository,
+    private val searchLocalRepository: SearchLocalRepository,
 ) : Middleware<PictureState, PictureAction>() {
     override suspend fun process(state: PictureState, action: PictureAction) {
         when (action) {
+            is PictureAction.AddSearchHistory -> addSearchHistory(action.keyword)
             is PictureAction.GetUserIllustsIntent -> getUserIllusts(state, action.userId)
             is PictureAction.GetIllustRelatedIntent -> getIllustRelated(state, action.illustId)
             is PictureAction.LoadMoreIllustRelatedIntent -> loadMoreIllustRelated(
@@ -44,6 +47,10 @@ class PictureMiddleware(
 
             else -> {}
         }
+    }
+
+    private fun addSearchHistory(keyword: String) {
+        searchLocalRepository.addSearchHistory(keyword)
     }
 
     private fun downloadIllust(

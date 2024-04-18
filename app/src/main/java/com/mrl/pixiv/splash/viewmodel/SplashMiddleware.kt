@@ -35,7 +35,11 @@ class SplashMiddleware(
 
 
     private fun refreshAccessToken(grantType: GrantType) {
-        launchNetwork {
+        launchNetwork(
+            onError = {
+                dispatch(SplashAction.RouteToLoginScreenIntent)
+            }
+        ) {
             if (userLocalRepository.isNeedRefreshToken.first()) {
                 val userRefreshToken = userLocalRepository.userRefreshToken.first()
                 val req = AuthTokenFieldReq(

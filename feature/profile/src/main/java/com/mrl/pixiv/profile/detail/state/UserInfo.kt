@@ -1,4 +1,4 @@
-package com.mrl.pixiv.profile.state
+package com.mrl.pixiv.profile.detail.state
 
 import com.mrl.pixiv.data.User
 import com.mrl.pixiv.data.user.UserDetailResp

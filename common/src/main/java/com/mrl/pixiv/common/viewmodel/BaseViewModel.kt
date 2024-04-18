@@ -54,7 +54,12 @@ abstract class BaseViewModel<S : State, A : Action>(
     }
 
     override fun dispatch(action: A) {
-        val success = actions.tryEmit(ActionImpl(state, action))
+        val success = try {
+            actions.tryEmit(ActionImpl(state, action))
+        } catch (e: Exception) {
+            Log.e(TAG, "dispatch error", e)
+            false
+        }
         if (!success) error("MVI action buffer overflow")
     }
 

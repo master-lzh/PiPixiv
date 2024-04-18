@@ -53,7 +53,7 @@ fun HomeBottomBar(
                 NavigationBarItem(
                     icon = screen.icon!!,
                     label = {
-                        Text(text = screen.title)
+                        Text(text = screen.title())
                     },
                     selected = currentRoute == screen.route,
                     onClick = {
