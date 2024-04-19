@@ -6,7 +6,7 @@ import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 
-class IllustHttpService constructor(
+class IllustHttpService(
     private val illustApi: IllustApi,
 ) {
     suspend fun getIllustRecommended(illustRecommendedQuery: IllustRecommendedQuery) =
