@@ -3,7 +3,7 @@ package com.mrl.pixiv.datasource.remote
 import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 
-class UserAuthHttpService constructor(
+class UserAuthHttpService(
     private val userAuthApi: UserAuthApi
 ) {
     suspend fun login(

@@ -27,7 +27,7 @@ fun closeQuietly(output: OutputStream?) {
 fun closeQuietly(closeable: Closeable?) {
     try {
         closeable?.close()
-    } catch (e: IOException) {
+    } catch (_: IOException) {
     }
 }
 
@@ -35,7 +35,7 @@ fun closeQuietly(sock: Socket?) {
     if (sock != null) {
         try {
             sock.close()
-        } catch (e: IOException) {
+        } catch (_: IOException) {
         }
     }
 }

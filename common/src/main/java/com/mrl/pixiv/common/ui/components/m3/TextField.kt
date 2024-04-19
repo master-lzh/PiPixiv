@@ -79,7 +79,7 @@ internal fun TextFieldColors.cursorColor(isError: Boolean): State<Color> {
 
 @JvmInline
 @Immutable
-internal value class Strings constructor(val value: Int) {
+internal value class Strings(val value: Int) {
     companion object {
         inline val DefaultErrorMessage get() = Strings(R.string.default_error_message)
     }
