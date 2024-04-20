@@ -28,7 +28,8 @@ import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
-import com.mrl.pixiv.profile.detail.ProfileDetailScreen
+import com.mrl.pixiv.profile.detail.OtherProfileDetailScreen
+import com.mrl.pixiv.profile.detail.SelfProfileDetailScreen
 import com.mrl.pixiv.search.OutsideSearchResultsScreen
 import com.mrl.pixiv.search.SearchResultScreen
 import com.mrl.pixiv.search.SearchScreen
@@ -91,14 +92,35 @@ fun MainGraph(
 
         // 个人详情页
         composable(
-            route = Destination.ProfileDetailScreen.route,
+            route = Destination.SelfProfileDetailScreen.route,
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = DestinationsDeepLink.ProfileDetailPattern
                 }
             ),
         ) {
-            ProfileDetailScreen(
+            SelfProfileDetailScreen(
+                bookmarkViewModel = bookmarkViewModel
+            )
+        }
+
+        // 他人详情页
+        composable(
+            route = "${Destination.OtherProfileDetailScreen.route}/{${Destination.OtherProfileDetailScreen.userId}}",
+            arguments = listOf(
+                navArgument(Destination.OtherProfileDetailScreen.userId) {
+//                    type = NavType.LongType
+                    defaultValue = 0L
+                }
+            ),
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = DestinationsDeepLink.ProfileDetailPattern
+                }
+            ),
+        ) {
+            OtherProfileDetailScreen(
+                uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId) ?: 0L,
                 bookmarkViewModel = bookmarkViewModel
             )
         }

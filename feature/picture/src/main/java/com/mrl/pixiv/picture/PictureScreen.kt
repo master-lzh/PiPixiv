@@ -22,7 +22,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -49,7 +48,6 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -113,6 +111,7 @@ import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.deepBlue
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
+import com.mrl.pixiv.common_ui.util.navigateToOtherProfileDetailScreen
 import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.common_ui.util.popBackToMainScreen
@@ -162,13 +161,12 @@ fun PictureScreen(
         followDispatch = followViewModel::dispatch,
         navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
         popBackToHomeScreen = navHostController::popBackToMainScreen,
+        navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
     )
 }
 
-@OptIn(
-    ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalPermissionsApi::class
-)
+
+@OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
@@ -184,6 +182,7 @@ internal fun PictureScreen(
     followDispatch: (FollowAction) -> Unit = {},
     navToSearchResultScreen: (String) -> Unit = {},
     popBackToHomeScreen: () -> Unit = {},
+    navToUserDetailScreen: (Long) -> Unit = {},
 ) {
     val context = LocalContext.current
     val (relatedSpanCount, userSpanCount) = when (LocalConfiguration.current.orientation) {
@@ -349,7 +348,8 @@ internal fun PictureScreen(
             items(
                 illust.pageCount,
                 key = { "${illust.id}_$it" },
-                span = { StaggeredGridItemSpan.FullLine }) { index ->
+                span = { StaggeredGridItemSpan.FullLine }
+            ) { index ->
                 if (illust.pageCount > 1) {
                     illust.metaPages?.get(index)?.let {
                         AsyncImage(
@@ -389,7 +389,7 @@ internal fun PictureScreen(
                     )
                 }
             }
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = StaggeredGridItemSpan.FullLine, key = "illust_title") {
                 if (isScrollToBottom.value) {
                     Row(
                         modifier = Modifier
@@ -399,9 +399,12 @@ internal fun PictureScreen(
                     ) {
                         UserAvatar(
                             url = illust.user.profileImageUrls.medium,
+                            onClick = {
+                                navToUserDetailScreen(illust.user.id)
+                            },
                             modifier = Modifier
-                                .size(20.dp)
                                 .padding(start = 20.dp)
+                                .size(30.dp)
                                 .align(Alignment.CenterVertically),
                         )
                         Column(
@@ -432,7 +435,7 @@ internal fun PictureScreen(
                     )
                 }
             }
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = StaggeredGridItemSpan.FullLine, key = "illust_data") {
                 Row(
                     Modifier.padding(top = 10.dp)
                 ) {
@@ -454,7 +457,7 @@ internal fun PictureScreen(
                 }
             }
             // tag
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = StaggeredGridItemSpan.FullLine, key = "illust_tags") {
                 FlowRow(
                     Modifier.padding(start = 20.dp, top = 10.dp)
                 ) {
@@ -480,14 +483,14 @@ internal fun PictureScreen(
                     }
                 }
             }
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = StaggeredGridItemSpan.FullLine, key = "illust_divider_1") {
                 HorizontalDivider(
                     modifier = Modifier
                         .padding(horizontal = 15.dp)
                         .padding(top = 50.dp)
                 )
             }
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = StaggeredGridItemSpan.FullLine, key = "illust_author") {
                 //作者头像、名字、关注按钮
                 Row(
                     modifier = Modifier
@@ -496,6 +499,9 @@ internal fun PictureScreen(
                 ) {
                     UserAvatar(
                         url = illust.user.profileImageUrls.medium,
+                        onClick = {
+                            navToUserDetailScreen(illust.user.id)
+                        },
                         modifier = Modifier
                             .size(30.dp)
                             .align(Alignment.CenterVertically),
@@ -563,7 +569,7 @@ internal fun PictureScreen(
                     }
                 }
             }
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = StaggeredGridItemSpan.FullLine, key = "illust_author_other_works") {
                 Row(
                     modifier = Modifier
                         .padding(horizontal = 15.dp)
@@ -584,13 +590,13 @@ internal fun PictureScreen(
                         }
                 }
             }
-            item(span = StaggeredGridItemSpan.FullLine) {
+            item(span = StaggeredGridItemSpan.FullLine, key = "illust_related_title") {
                 //相关作品文字，显示在中间
                 Text(
                     text = stringResource(R.string.related_artworks),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 50.dp),
+                        .padding(top = 50.dp, bottom = 10.dp),
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -640,7 +646,7 @@ internal fun PictureScreen(
             }
 
             item(key = "spacer") {
-                Spacer(modifier = Modifier.height(if (isScrollToRelatedBottom.value) 0.dp else 100.dp))
+                Spacer(modifier = Modifier.height(70.dp))
             }
         }
         lazyStaggeredGridState.OnScrollToBottom(isScrollToBottom, illust.pageCount, illust.id)
@@ -672,9 +678,12 @@ internal fun PictureScreen(
                 ) {
                     UserAvatar(
                         url = illust.user.profileImageUrls.medium,
+                        onClick = {
+                            navToUserDetailScreen(illust.user.id)
+                        },
                         modifier = Modifier
-                            .size(20.dp)
                             .padding(start = 20.dp)
+                            .size(20.dp)
                             .align(Alignment.CenterVertically),
                     )
                     Column(

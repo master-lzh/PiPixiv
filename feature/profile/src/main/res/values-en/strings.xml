@@ -8,4 +8,6 @@
     <string name="theme_system">Follow System</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="illustration_works">Illustration Works</string>
+    <string name="illustration_count">%d illustration works</string>
 </resources>
