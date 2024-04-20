@@ -8,7 +8,7 @@ object DestinationsDeepLink {
     private val BaseUri = "pipixiv://com.mrl.pixiv".toUri()
 
     val HomePattern = "$BaseUri/${Destination.HomeScreen.route}"
-    val ProfileDetailPattern = "$BaseUri/${Destination.ProfileDetailScreen.route}"
+    val ProfileDetailPattern = "$BaseUri/${Destination.SelfProfileDetailScreen.route}"
     val PicturePattern = "$BaseUri/${Destination.PictureScreen.route}"
 
     fun getProfileUri(): Uri =

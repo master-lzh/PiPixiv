@@ -39,7 +39,7 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common_ui.util.navigateToProfileDetailScreen
+import com.mrl.pixiv.common_ui.util.navigateToSelfProfileDetailScreen
 import com.mrl.pixiv.common_ui.util.navigateToSettingScreen
 import com.mrl.pixiv.data.setting.SettingTheme
 import com.mrl.pixiv.data.setting.getAppCompatDelegateThemeMode
@@ -72,7 +72,7 @@ fun ProfileScreen(
         modifier = modifier,
         state = viewModel.state,
         dispatch = viewModel::dispatch,
-        navToProfileDetail = navHostController::navigateToProfileDetailScreen,
+        navToProfileDetail = navHostController::navigateToSelfProfileDetailScreen,
         navToSetting = navHostController::navigateToSettingScreen
     )
 }
