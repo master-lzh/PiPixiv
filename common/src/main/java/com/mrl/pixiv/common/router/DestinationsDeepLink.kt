@@ -3,6 +3,8 @@ package com.mrl.pixiv.common.router
 import androidx.core.net.toUri
 
 object DestinationsDeepLink {
+    val illustRegex = "http(s)?://(www\\.)?pixiv\\.(net|me)/artworks/(\\d+)".toRegex()
+    val userRegex = "http(s)?://(www\\.)?pixiv\\.(net|me)/users/(\\d+)".toRegex()
 
     private val BaseUri = listOf(
         "https://www.pixiv.net".toUri(),
