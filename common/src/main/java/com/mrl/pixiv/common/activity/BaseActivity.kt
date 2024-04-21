@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.core.view.WindowCompat
 
 abstract class BaseActivity : AppCompatActivity() {
-    protected val TAG = this::class.java.simpleName
+    protected val TAG = this::class.simpleName
 
     @Composable
     abstract fun BuildContent()

@@ -28,5 +28,8 @@ class SettingLocalRepository(
         it.toBuilder().setEnableBypassSniffing(enable).build()
     }
 
-
+    val pictureSourceHost = settingDataSource.data.map { it.imageHost }
+    fun setPictureSourceHost(host: String) = settingDataSource.updateData {
+        it.toBuilder().setImageHost(host).build()
+    }
 }

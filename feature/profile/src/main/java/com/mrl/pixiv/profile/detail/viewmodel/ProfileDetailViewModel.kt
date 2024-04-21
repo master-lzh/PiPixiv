@@ -3,6 +3,7 @@ package com.mrl.pixiv.profile.detail.viewmodel
 import com.mrl.pixiv.common.viewmodel.BaseViewModel
 
 class ProfileDetailViewModel(
+    uid: Long,
     reducer: ProfileDetailReducer,
     middleware: ProfileDetailMiddleware,
 ) : BaseViewModel<ProfileDetailState, ProfileDetailAction>(
@@ -10,9 +11,10 @@ class ProfileDetailViewModel(
     middlewares = listOf(middleware),
     initialState = ProfileDetailState.INITIAL,
 ) {
-    override fun onStart() {
-        dispatch(ProfileDetailAction.GetUserInfoIntent)
-        dispatch(ProfileDetailAction.GetUserBookmarksIllustIntent)
-        dispatch(ProfileDetailAction.GetUserBookmarksNovelIntent)
+    init {
+        dispatch(ProfileDetailAction.GetUserInfoIntent(uid))
+        dispatch(ProfileDetailAction.GetUserIllustsIntent(uid))
+        dispatch(ProfileDetailAction.GetUserBookmarksIllustIntent(uid))
+        dispatch(ProfileDetailAction.GetUserBookmarksNovelIntent(uid))
     }
 }

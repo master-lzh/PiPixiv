@@ -51,8 +51,12 @@ fun NavHostController.popBackToMainScreen() {
     popBackStack(route = Destination.HomeScreen.route, inclusive = false)
 }
 
-fun NavHostController.navigateToProfileDetailScreen() {
-    navigate(route = Destination.ProfileDetailScreen.route)
+fun NavHostController.navigateToSelfProfileDetailScreen() {
+    navigate(route = Destination.SelfProfileDetailScreen.route)
+}
+
+fun NavHostController.navigateToOtherProfileDetailScreen(userId: Long) {
+    navigate(route = "${Destination.OtherProfileDetailScreen.route}/$userId")
 }
 
 fun NavHostController.navigateToSettingScreen() {

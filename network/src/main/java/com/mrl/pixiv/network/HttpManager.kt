@@ -3,6 +3,7 @@ package com.mrl.pixiv.network
 import android.os.Build
 import android.util.Log
 import com.mrl.pixiv.common.coroutine.launchIO
+import com.mrl.pixiv.data.setting.UserPreference
 import com.mrl.pixiv.repository.local.SettingLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import okhttp3.Interceptor
@@ -25,21 +26,28 @@ class HttpManager(
     settingLocalRepository: SettingLocalRepository,
     private val jsonConvertFactory: Converter.Factory,
 ) {
-    private lateinit var token: String
-    private var enableBypassSniffing: Boolean =
-        settingLocalRepository.allSettingsSync.enableBypassSniffing
-
-    private val logInterceptor by lazy {
-        HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-    }
+    private var allSetting: UserPreference
 
     init {
+        allSetting = settingLocalRepository.allSettingsSync
         launchIO {
             userLocalRepository.userAccessToken.collect {
                 token = it
             }
+        }
+    }
+
+    private lateinit var token: String
+    private val enableBypassSniffing: Boolean = allSetting.enableBypassSniffing
+    private val imageHost: String = allSetting.imageHost.ifEmpty { IMAGE_HOST }
+    private val hostnameVerifier = HostnameVerifier { hostname, session ->
+        // 检查主机名是否是你期望连接的IP地址或域名
+        hostname in hostMap.keys || hostname in hostMap.values || hostname == imageHost || hostname == "doh.dns.sb"
+    }
+
+    private val logInterceptor by lazy {
+        HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
         }
     }
 
@@ -59,10 +67,7 @@ class HttpManager(
             STATIC_IMAGE_HOST to "210.140.92.143",
             "doh" to "doh.dns.sb",
         )
-        val hostnameVerifier = HostnameVerifier { hostname, session ->
-            // 检查主机名是否是你期望连接的IP地址或域名
-            hostname in hostMap.keys || hostname in hostMap.values || hostname == "doh.dns.sb"
-        }
+
     }
 
 
@@ -135,11 +140,15 @@ class HttpManager(
     private val imageHeaderInterceptor by lazy {
         Interceptor { chain ->
             val original = chain.request()
+            val url = original.url.newBuilder()
+                .host(imageHost)
+                .build()
             val requestBuilder = original.newBuilder()
+                .url(url)
                 .removeHeader("Referer")
                 .addHeader("Referer", "https://app-api.pixiv.net/")
             val request = requestBuilder.build()
-            switchHostResponse(chain, request)
+            chain.proceed(request)
         }
     }
 

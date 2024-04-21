@@ -8,6 +8,7 @@ import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
+import com.mrl.pixiv.data.illust.IllustDetailQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.repository.local.SearchLocalRepository
@@ -27,6 +28,7 @@ class PictureMiddleware(
 ) : Middleware<PictureState, PictureAction>() {
     override suspend fun process(state: PictureState, action: PictureAction) {
         when (action) {
+            is PictureAction.GetIllustDetail -> getIllustDetail(action.illustId)
             is PictureAction.AddSearchHistory -> addSearchHistory(action.keyword)
             is PictureAction.GetUserIllustsIntent -> getUserIllusts(state, action.userId)
             is PictureAction.GetIllustRelatedIntent -> getIllustRelated(state, action.illustId)
@@ -46,6 +48,23 @@ class PictureMiddleware(
             )
 
             else -> {}
+        }
+    }
+
+    private fun getIllustDetail(illustId: Long) {
+        launchNetwork {
+            requestHttpDataWithFlow(
+                request = illustRemoteRepository.getIllustDetail(
+                    IllustDetailQuery(
+                        illustId = illustId,
+                        filter = Filter.ANDROID.value
+                    )
+                )
+            ) {
+                dispatch(PictureAction.UpdateIllust(it.illust))
+                dispatch(PictureAction.GetUserIllustsIntent(it.illust.user.id))
+                dispatch(PictureAction.GetIllustRelatedIntent(it.illust.id))
+            }
         }
     }
 

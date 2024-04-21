@@ -6,11 +6,13 @@ import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.setting.UserPreference
 
 data class SettingState(
-    val enableBypassSniffing: Boolean
+    val enableBypassSniffing: Boolean,
+    val pictureSourceHost: String
 ) : State {
     companion object {
         val INITIAL = SettingState(
-            enableBypassSniffing = false
+            enableBypassSniffing = false,
+            pictureSourceHost = ""
         )
     }
 }
@@ -18,7 +20,11 @@ data class SettingState(
 sealed class SettingAction : Action {
     data object LoadSetting : SettingAction()
     data object SwitchBypassSniffing : SettingAction()
+    data class SavePictureSourceHost(val host: String) : SettingAction()
+
+
     data class UpdateSetting(val setting: UserPreference) : SettingAction()
+    data class UpdatePictureSourceHost(val host: String) : SettingAction()
 }
 
 class SettingViewModel(

@@ -3,10 +3,11 @@ package com.mrl.pixiv.datasource.remote
 import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
+import com.mrl.pixiv.data.illust.IllustDetailQuery
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 
-class IllustHttpService constructor(
+class IllustHttpService(
     private val illustApi: IllustApi,
 ) {
     suspend fun getIllustRecommended(illustRecommendedQuery: IllustRecommendedQuery) =
@@ -27,4 +28,6 @@ class IllustHttpService constructor(
     suspend fun loadMoreIllustRelated(queryMap: Map<String, String>) =
         illustApi.getIllustRelated(queryMap)
 
+    suspend fun getIllustDetail(illustDetailQuery: IllustDetailQuery) =
+        illustApi.getIllustDetail(illustDetailQuery.toMap())
 }

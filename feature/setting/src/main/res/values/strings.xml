@@ -6,4 +6,9 @@
     <string name="network_setting">网络设置</string>
     <string name="enable_bypass_sniffing">是否开启绕过嗅探</string>
     <string name="close_to_use_ip_directly">关闭则使用IP直连</string>
+    <string name="restart_app_to_take_effect">重启App生效</string>
+    <string name="image_source">图源</string>
+    <string name="self_defined_source">自定义图源</string>
+    <string name="default_open">默认打开链接</string>
+    <string name="allow_open_link">允许应用打开对应网络连接</string>
 </resources>

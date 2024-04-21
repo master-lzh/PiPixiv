@@ -7,4 +7,5 @@ message UserPreference {
     string theme = 1;
     bool enable_bypass_sniffing = 2;
     bool is_r18_enabled = 3;
+    string image_host = 4;
 }

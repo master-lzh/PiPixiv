@@ -26,11 +26,29 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.PiPixiv"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+
+                <data android:host="pixiv.me"/>
+                <data android:host="pixiv.net"/>
+                <data android:host="www.pixiv.me"/>
+                <data android:host="www.pixiv.net"/>
+
+                <data android:pathPrefix="/artworks/"/>
+                <data android:pathPrefix="/users/"/>
             </intent-filter>
         </activity>
 

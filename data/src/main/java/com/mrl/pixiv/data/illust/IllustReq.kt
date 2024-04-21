@@ -25,3 +25,8 @@ data class IllustRelatedQuery(
     val illustId: Long,
     val filter: String,
 ) : IBaseQueryMap
+
+data class IllustDetailQuery(
+    val filter: String,
+    val illustId: Long,
+) : IBaseQueryMap

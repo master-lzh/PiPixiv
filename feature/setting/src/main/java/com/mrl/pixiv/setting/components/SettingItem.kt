@@ -2,6 +2,7 @@ package com.mrl.pixiv.setting.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,19 +16,20 @@ import com.mrl.pixiv.util.throttleClick
 
 @Composable
 fun SettingItem(
+    modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
     onClick: () -> Unit = {},
+    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
     content: @Composable RowScope.() -> Unit = {},
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .throttleClick(indication = rememberRipple()) { onClick() }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp)
-                .padding(vertical = 16.dp),
+                .padding(contentPadding),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {

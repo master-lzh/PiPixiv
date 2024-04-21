@@ -12,8 +12,14 @@ class SettingMiddleware(
         when (action) {
             is SettingAction.LoadSetting -> loadSetting()
             is SettingAction.SwitchBypassSniffing -> switchBypassSniffing(state)
+            is SettingAction.SavePictureSourceHost -> savePictureSourceHost(action.host)
             else -> Unit
         }
+    }
+
+    private fun savePictureSourceHost(host: String) {
+        settingLocalRepository.setPictureSourceHost(host)
+        dispatch(SettingAction.UpdatePictureSourceHost(host))
     }
 
     private fun switchBypassSniffing(state: SettingState) {
