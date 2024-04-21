@@ -1,5 +1,6 @@
 package com.mrl.pixiv.navigation.main
 
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -7,8 +8,10 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,6 +42,7 @@ import com.mrl.pixiv.search.viewmodel.SearchViewModel
 import com.mrl.pixiv.setting.SettingScreen
 import com.mrl.pixiv.setting.network.NetworkSettingScreen
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
+import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -52,6 +56,10 @@ fun MainGraph(
     val homeViewModel: HomeViewModel = koinViewModel()
     val followViewModel: FollowViewModel = koinViewModel()
     val bookmarkViewModel: BookmarkViewModel = koinViewModel()
+    val splashViewModel: SplashViewModel =
+        koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
+    val intent = splashViewModel.intent.collectAsStateWithLifecycle().value
+    HandleDeeplink(intent, navHostController)
     NavHost(
         navController = navHostController,
         route = Graph.MAIN,
@@ -146,7 +154,7 @@ fun MainGraph(
         }
 
         composable(
-            route = Destination.PictureDeeplinkScreen.route,
+            route = "${Destination.PictureDeeplinkScreen.route}/{${Destination.PictureDeeplinkScreen.illustId}}",
             arguments = listOf(
                 navArgument(Destination.PictureDeeplinkScreen.illustId) {
                     defaultValue = 0L
@@ -244,6 +252,27 @@ fun MainGraph(
                     ) {
                         NetworkSettingScreen(viewModel = settingViewModel)
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HandleDeeplink(
+    intent: Intent?,
+    navHostController: NavHostController
+) {
+    LaunchedEffect(intent) {
+        if (intent != null) {
+            val data = intent.data ?: return@LaunchedEffect
+            when {
+                DestinationsDeepLink.illustRegex.matches(data.toString()) -> {
+                    navHostController.navigate("${Destination.PictureDeeplinkScreen.route}/${data.lastPathSegment}")
+                }
+
+                DestinationsDeepLink.userRegex.matches(data.toString()) -> {
+                    navHostController.navigate("${Destination.OtherProfileDetailScreen.route}/${data.lastPathSegment}")
                 }
             }
         }
