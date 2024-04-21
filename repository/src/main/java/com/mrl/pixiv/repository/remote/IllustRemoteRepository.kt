@@ -2,6 +2,7 @@ package com.mrl.pixiv.repository.remote
 
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
+import com.mrl.pixiv.data.illust.IllustDetailQuery
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.datasource.remote.IllustHttpService
@@ -26,4 +27,7 @@ class IllustRemoteRepository(
 
     suspend fun loadMoreIllustRelated(queryMap: Map<String, String>) =
         illustHttpService.loadMoreIllustRelated(queryMap)
+
+    suspend fun getIllustDetail(illustDetailQuery: IllustDetailQuery) =
+        illustHttpService.getIllustDetail(illustDetailQuery)
 }

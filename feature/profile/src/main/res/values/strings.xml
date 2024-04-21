@@ -8,4 +8,6 @@
     <string name="theme_system">跟随系统</string>
     <string name="theme_light">浅色</string>
     <string name="theme_dark">深色</string>
+    <string name="illustration_works">插画作品</string>
+    <string name="illustration_count">%d件作品</string>
 </resources>

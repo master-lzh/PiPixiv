@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,14 +24,15 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common_ui.item.SquareIllustItem
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.profile.R
 
 private const val SPAN_COUNT = 3
 private const val MAX_SHOW_ILLUST_COUNT = 6
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun IllustBookmarkWidget(
+fun IllustWidget(
+    title: String,
+    endText: String,
     bookmarkState: BookmarkState,
     bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust) -> Unit,
@@ -43,18 +44,19 @@ fun IllustBookmarkWidget(
             .fillMaxWidth()
             .padding(horizontal = horizontalPadding)
     ) {
+        HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = stringResource(R.string.illust_and_manga_liked),
+                text = title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             Row(modifier = Modifier.align(Alignment.CenterEnd)) {
                 Text(
-                    text = stringResource(R.string.view_all),
+                    text = endText,
                     fontSize = 12.sp,
                 )
                 Icon(

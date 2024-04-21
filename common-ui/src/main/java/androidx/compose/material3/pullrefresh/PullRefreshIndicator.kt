@@ -136,6 +136,7 @@ private fun CircularArrowIndicator(
         }
     }
 
+    @Suppress("AnimateAsStateLabel")
     val alphaState = animateFloatAsState(targetValue = targetAlpha, animationSpec = AlphaTween)
 
     // Empty semantics for tests

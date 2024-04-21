@@ -2,10 +2,15 @@ package com.mrl.pixiv.api
 
 import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.data.EmptyResp
+import com.mrl.pixiv.data.illust.IllustDetailResp
 import com.mrl.pixiv.data.illust.IllustRecommendedResp
 import com.mrl.pixiv.data.illust.IllustRelatedResp
 import kotlinx.coroutines.flow.Flow
-import retrofit2.http.*
+import retrofit2.http.FieldMap
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.QueryMap
 
 interface IllustApi {
     @GET("v1/illust/recommended")
@@ -30,4 +35,9 @@ interface IllustApi {
     suspend fun getIllustRelated(
         @QueryMap illustRelatedQuery: Map<String, String>
     ): Flow<Rlt<IllustRelatedResp>>
+
+    @GET("v1/illust/detail")
+    suspend fun getIllustDetail(
+        @QueryMap illustDetailQuery: Map<String, String>
+    ): Flow<Rlt<IllustDetailResp>>
 }

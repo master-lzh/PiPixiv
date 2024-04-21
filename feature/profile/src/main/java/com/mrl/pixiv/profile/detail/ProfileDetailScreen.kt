@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -51,7 +51,7 @@ import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.profile.R
-import com.mrl.pixiv.profile.detail.components.IllustBookmarkWidget
+import com.mrl.pixiv.profile.detail.components.IllustWidget
 import com.mrl.pixiv.profile.detail.components.NovelBookmarkWidget
 import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailAction
 import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailState
@@ -63,13 +63,34 @@ import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
-fun ProfileDetailScreen(
+fun SelfProfileDetailScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     bookmarkViewModel: BookmarkViewModel,
-    profileDetailViewModel: ProfileDetailViewModel = koinViewModel(),
+    profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(Long.MIN_VALUE) },
+) {
+    OnLifecycle(onLifecycle = profileDetailViewModel::onStart)
+    ProfileDetailScreen(
+        modifier = modifier,
+        state = profileDetailViewModel.state,
+        bookmarkState = bookmarkViewModel.state,
+        bookmarkDispatch = bookmarkViewModel::dispatch,
+        navToPictureScreen = navHostController::navigateToPictureScreen,
+        popBack = { navHostController.popBackStack() },
+        dispatch = profileDetailViewModel::dispatch,
+    )
+}
+
+@Composable
+fun OtherProfileDetailScreen(
+    uid: Long,
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    bookmarkViewModel: BookmarkViewModel,
+    profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(uid) },
 ) {
     OnLifecycle(onLifecycle = profileDetailViewModel::onStart)
     ProfileDetailScreen(
@@ -262,22 +283,45 @@ internal fun ProfileDetailScreen(
                             .fillMaxWidth()
                             .height(200.dp)
                     )
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 15.dp))
+                }
+            }
+            item(key = "user_illusts") {
+                if (state.userIllusts.isNotEmpty()) {
+                    // 插画、漫画网格组件
+                    IllustWidget(
+                        title = stringResource(R.string.illustration_works),
+                        endText = stringResource(
+                            R.string.illustration_count,
+                            state.userInfo.totalIllusts
+                        ),
+                        bookmarkState = bookmarkState,
+                        bookmarkDispatch = bookmarkDispatch,
+                        navToPictureScreen = navToPictureScreen,
+                        illusts = state.userIllusts
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
             }
             item(key = "user_bookmarks_illusts") {
-                // 插画、漫画收藏网格组件
-                IllustBookmarkWidget(
-                    bookmarkState = bookmarkState,
-                    bookmarkDispatch = bookmarkDispatch,
-                    navToPictureScreen = navToPictureScreen,
-                    illusts = state.userBookmarksIllusts
-                )
+                if (state.userBookmarksIllusts.isNotEmpty()) {
+                    // 插画、漫画收藏网格组件
+                    IllustWidget(
+                        title = stringResource(R.string.illust_and_manga_liked),
+                        endText = stringResource(R.string.view_all),
+                        bookmarkState = bookmarkState,
+                        bookmarkDispatch = bookmarkDispatch,
+                        navToPictureScreen = navToPictureScreen,
+                        illusts = state.userBookmarksIllusts
+                    )
+                }
             }
             item(key = "user_bookmarks_novels") {
-                NovelBookmarkWidget(
-                    novels = state.userBookmarksNovels
-                )
+                if (state.userBookmarksNovels.isNotEmpty()) {
+                    // 小说收藏网格组件
+                    NovelBookmarkWidget(
+                        novels = state.userBookmarksNovels
+                    )
+                }
             }
             item(key = "space") {
                 Spacer(

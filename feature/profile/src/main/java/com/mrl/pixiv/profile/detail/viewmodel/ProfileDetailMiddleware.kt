@@ -3,10 +3,12 @@ package com.mrl.pixiv.profile.detail.viewmodel
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.ProfileImageUrls
 import com.mrl.pixiv.data.Restrict
+import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.data.User
 import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
 import com.mrl.pixiv.data.user.UserBookmarksNovelQuery
 import com.mrl.pixiv.data.user.UserDetailQuery
+import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.data.user.copy
 import com.mrl.pixiv.profile.detail.state.UserInfo
 import com.mrl.pixiv.profile.detail.state.toUserInfo
@@ -21,18 +23,34 @@ class ProfileDetailMiddleware(
 ) : Middleware<ProfileDetailState, ProfileDetailAction>() {
     override suspend fun process(state: ProfileDetailState, action: ProfileDetailAction) {
         when (action) {
-            is ProfileDetailAction.GetUserInfoIntent -> getUserInfo()
-            is ProfileDetailAction.GetUserBookmarksIllustIntent -> getUserBookmarksIllust()
-            is ProfileDetailAction.GetUserBookmarksNovelIntent -> getUserBookmarksNovel()
-            is ProfileDetailAction.GetUserIllustsIntent -> TODO()
+            is ProfileDetailAction.GetUserInfoIntent -> getUserInfo(action.uid)
+            is ProfileDetailAction.GetUserBookmarksIllustIntent -> getUserBookmarksIllust(action.uid)
+            is ProfileDetailAction.GetUserBookmarksNovelIntent -> getUserBookmarksNovel(action.uid)
+            is ProfileDetailAction.GetUserIllustsIntent -> getUserIllusts(action.uid)
 
             else -> {}
         }
     }
 
-    private fun getUserBookmarksNovel() =
+    private fun getUserIllusts(uid: Long) {
         launchNetwork {
-            val userId = userLocalRepository.getUserId()
+            val userId = if (uid != Long.MIN_VALUE) uid else userLocalRepository.getUserId()
+            requestHttpDataWithFlow(
+                request = userRemoteRepository.getUserIllusts(
+                    UserIllustsQuery(
+                        userId = userId,
+                        type = Type.Illust.value,
+                    )
+                ),
+            ) {
+                dispatch(ProfileDetailAction.UpdateUserIllusts(it.illusts))
+            }
+        }
+    }
+
+    private fun getUserBookmarksNovel(uid: Long) =
+        launchNetwork {
+            val userId = if (uid != Long.MIN_VALUE) uid else userLocalRepository.getUserId()
             requestHttpDataWithFlow(
                 request = userRemoteRepository.getUserBookmarksNovels(
                     UserBookmarksNovelQuery(restrict = Restrict.PUBLIC, userId = userId)
@@ -42,9 +60,9 @@ class ProfileDetailMiddleware(
             }
         }
 
-    private fun getUserBookmarksIllust() =
+    private fun getUserBookmarksIllust(uid: Long) =
         launchNetwork {
-            val userId = userLocalRepository.getUserId()
+            val userId = if (uid != Long.MIN_VALUE) uid else userLocalRepository.getUserId()
             requestHttpDataWithFlow(
                 request = userRemoteRepository.getUserBookmarksIllust(
                     UserBookmarksIllustQuery(restrict = Restrict.PUBLIC, userId = userId)
@@ -55,8 +73,8 @@ class ProfileDetailMiddleware(
         }
 
 
-    private fun getUserInfo() = launchNetwork {
-        val userId = userLocalRepository.getUserId()
+    private fun getUserInfo(uid: Long) = launchNetwork {
+        val userId = if (uid != Long.MIN_VALUE) uid else userLocalRepository.getUserId()
         requestHttpDataWithFlow(
             request = userRemoteRepository.getUserDetail(UserDetailQuery(userId = userId)),
             failedCallback = {
@@ -75,11 +93,13 @@ class ProfileDetailMiddleware(
                 )
             }
         ) {
-            userLocalRepository.setUserInfo { userInfo ->
-                userInfo.copy {
-                    uid = it.user.id
-                    username = it.user.name
-                    avatar = it.user.profileImageUrls.medium
+            if (uid == Long.MIN_VALUE) {
+                userLocalRepository.setUserInfo { userInfo ->
+                    userInfo.copy {
+                        this.uid = it.user.id
+                        username = it.user.name
+                        avatar = it.user.profileImageUrls.medium
+                    }
                 }
             }
             dispatch(ProfileDetailAction.UpdateUserInfo(it.toUserInfo()))

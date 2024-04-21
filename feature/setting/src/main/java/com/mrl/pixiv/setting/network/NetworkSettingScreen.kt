@@ -22,9 +22,11 @@ import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.setting.R
 import com.mrl.pixiv.setting.components.SettingItem
+import com.mrl.pixiv.setting.network.components.PictureSourceWidget
 import com.mrl.pixiv.setting.viewmodel.SettingAction
 import com.mrl.pixiv.setting.viewmodel.SettingState
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
+import com.mrl.pixiv.util.ToastUtil
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -85,6 +87,13 @@ internal fun NetworkSettingScreen_(
                     onCheckedChange = { dispatch(SettingAction.SwitchBypassSniffing) }
                 )
             }
+            PictureSourceWidget(
+                currentSelected = state.pictureSourceHost,
+                savePictureSourceHost = {
+                    dispatch(SettingAction.SavePictureSourceHost(it))
+                    ToastUtil.safeShortToast(R.string.restart_app_to_take_effect)
+                }
+            )
         }
     }
 }

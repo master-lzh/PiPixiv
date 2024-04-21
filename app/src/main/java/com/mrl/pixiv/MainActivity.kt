@@ -1,5 +1,7 @@
 package com.mrl.pixiv
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +19,7 @@ import com.mrl.pixiv.splash.viewmodel.SplashAction
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import com.mrl.pixiv.theme.PiPixivTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.update
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.time.Duration.Companion.minutes
 
@@ -56,5 +59,14 @@ class MainActivity : BaseActivity() {
             }
         }
         super.onCreate(savedInstanceState)
+    }
+
+    @SuppressLint("MissingSuperCall")
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        splashViewModel.intent.update {
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
     }
 }

@@ -98,7 +98,7 @@ object DisplayUtil {
         // 获取状态栏的PaddingValues
         val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         // 计算状态栏高度
-        return with(density) { statusBarPadding.calculateTopPadding() }
+        return statusBarPadding.calculateTopPadding()
     }
 
     @JvmStatic

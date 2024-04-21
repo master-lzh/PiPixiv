@@ -36,3 +36,8 @@ data class PrivacyPolicy(
     val message: String = "",
     val url: String = ""
 )
+
+@Serializable
+data class IllustDetailResp(
+    val illust: Illust,
+)
