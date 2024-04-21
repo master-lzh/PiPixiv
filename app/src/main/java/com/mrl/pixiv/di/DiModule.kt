@@ -41,6 +41,7 @@ import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
 import com.mrl.pixiv.network.HttpManager
 import com.mrl.pixiv.network.converter.asConverterFactory
+import com.mrl.pixiv.picture.viewmodel.PictureDeeplinkViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureMiddleware
 import com.mrl.pixiv.picture.viewmodel.PictureReducer
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
@@ -135,6 +136,8 @@ val viewModelModule = module {
     viewModelOf(::ProfileDetailViewModel)
 
     viewModelOf(::PictureViewModel)
+
+    viewModelOf(::PictureDeeplinkViewModel)
 
     viewModelOf(::BookmarkViewModel)
 

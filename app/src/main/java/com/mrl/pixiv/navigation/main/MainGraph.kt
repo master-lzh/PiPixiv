@@ -26,6 +26,7 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.di.JSON
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
+import com.mrl.pixiv.picture.PictureDeeplinkScreen
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
 import com.mrl.pixiv.profile.detail.OtherProfileDetailScreen
@@ -59,11 +60,11 @@ fun MainGraph(
         // 首页
         composable(
             route = Destination.HomeScreen.route,
-            deepLinks = listOf(
+            deepLinks = DestinationsDeepLink.HomePattern.map {
                 navDeepLink {
-                    uriPattern = DestinationsDeepLink.HomePattern
+                    uriPattern = it
                 }
-            ),
+            },
         ) {
             HomeScreen(
                 modifier = modifier,
@@ -93,11 +94,6 @@ fun MainGraph(
         // 个人详情页
         composable(
             route = Destination.SelfProfileDetailScreen.route,
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = DestinationsDeepLink.ProfileDetailPattern
-                }
-            ),
         ) {
             SelfProfileDetailScreen(
                 bookmarkViewModel = bookmarkViewModel
@@ -113,11 +109,11 @@ fun MainGraph(
                     defaultValue = 0L
                 }
             ),
-            deepLinks = listOf(
+            deepLinks = DestinationsDeepLink.ProfileDetailPattern.map {
                 navDeepLink {
-                    uriPattern = DestinationsDeepLink.ProfileDetailPattern
+                    uriPattern = it
                 }
-            ),
+            },
         ) {
             OtherProfileDetailScreen(
                 uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId) ?: 0L,
@@ -133,11 +129,6 @@ fun MainGraph(
                     defaultValue = ""
                 }
             ),
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = DestinationsDeepLink.PicturePattern
-                }
-            ),
             enterTransition = { scaleIn(initialScale = 0.9f) + fadeIn() },
             exitTransition = { scaleOut(targetScale = 1.1f) + fadeOut() },
             popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
@@ -149,6 +140,27 @@ fun MainGraph(
             val illust = JSON.decodeFromString<Illust>(illustDecode)
             PictureScreen(
                 illust = illust,
+                bookmarkViewModel = bookmarkViewModel,
+                followViewModel = followViewModel,
+            )
+        }
+
+        composable(
+            route = Destination.PictureDeeplinkScreen.route,
+            arguments = listOf(
+                navArgument(Destination.PictureDeeplinkScreen.illustId) {
+                    defaultValue = 0L
+                }
+            ),
+            deepLinks = DestinationsDeepLink.PicturePattern.map {
+                navDeepLink {
+                    uriPattern = it
+                }
+            },
+        ) {
+            val illustId = it.arguments?.getLong(Destination.PictureDeeplinkScreen.illustId) ?: 0L
+            PictureDeeplinkScreen(
+                illustId = illustId,
                 bookmarkViewModel = bookmarkViewModel,
                 followViewModel = followViewModel,
             )

@@ -19,6 +19,8 @@ class PictureReducer : Reducer<PictureState, PictureAction> {
                 illustRelated = action.illustRelated.toMutableStateList()
             )
 
+            is PictureAction.UpdateIllust -> state.copy(illust = action.illust)
+
             else -> state
         }
     }

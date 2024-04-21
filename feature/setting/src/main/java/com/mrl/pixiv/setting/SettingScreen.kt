@@ -1,7 +1,10 @@
 package com.mrl.pixiv.setting
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -9,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
+import androidx.compose.material.icons.rounded.AddLink
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.NetworkWifi
 import androidx.compose.material.icons.rounded.Translate
@@ -171,6 +175,41 @@ internal fun SettingScreen_(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
                         contentDescription = null
                     )
+                }
+            }
+
+            item {
+                SettingItem(
+                    icon = {
+                        Icon(imageVector = Icons.Rounded.AddLink, contentDescription = null)
+                    },
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            try {
+                                val intent = Intent().apply {
+                                    action =
+                                        android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
+                                    addCategory(Intent.CATEGORY_DEFAULT)
+                                    data = android.net.Uri.parse("package:${context.packageName}")
+                                    addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                                    addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                                }
+                                context.startActivity(intent)
+                            } catch (ignored:Throwable) {
+                            }
+                        }
+                    }
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.default_open),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = stringResource(R.string.allow_open_link),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
         }

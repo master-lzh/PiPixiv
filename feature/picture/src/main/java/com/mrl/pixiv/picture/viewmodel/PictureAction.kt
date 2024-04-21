@@ -4,6 +4,7 @@ import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.data.Illust
 
 sealed class PictureAction : Action {
+    data class GetIllustDetail(val illustId: Long) : PictureAction()
     data class AddSearchHistory(val keyword: String) : PictureAction()
     data class GetUserIllustsIntent(
         val userId: Long,
@@ -33,6 +34,8 @@ sealed class PictureAction : Action {
         val userIllusts: List<Illust>,
         val illustRelated: List<Illust>
     ) : PictureAction()
+
+    data class UpdateIllust(val illust: Illust) : PictureAction()
 
     data class DownloadIllust(
         val illustId: Long,
