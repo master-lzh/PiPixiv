@@ -117,6 +117,7 @@ import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.common_ui.util.popBackToMainScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.picture.viewmodel.PictureAction
+import com.mrl.pixiv.picture.viewmodel.PictureDeeplinkViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import com.mrl.pixiv.util.AppUtil
@@ -163,6 +164,42 @@ fun PictureScreen(
         popBackToHomeScreen = navHostController::popBackToMainScreen,
         navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
     )
+}
+
+@Composable
+fun PictureDeeplinkScreen(
+    modifier: Modifier = Modifier,
+    illustId: Long,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    pictureViewModel: PictureDeeplinkViewModel = koinViewModel { parametersOf(illustId) },
+    bookmarkViewModel: BookmarkViewModel,
+    followViewModel: FollowViewModel,
+) {
+    val illust = pictureViewModel.state.illust
+    if (illust != null) {
+        PictureScreen(
+            modifier = modifier,
+            state = pictureViewModel.state,
+            bookmarkState = bookmarkViewModel.state,
+            followState = followViewModel.state,
+            illust = illust,
+            navToPictureScreen = navHostController::navigateToPictureScreen,
+            popBackStack = navHostController::popBackStack,
+            dispatch = pictureViewModel::dispatch,
+            bookmarkDispatch = bookmarkViewModel::dispatch,
+            followDispatch = followViewModel::dispatch,
+            navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
+            popBackToHomeScreen = navHostController::popBackToMainScreen,
+            navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
+        )
+    } else {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
 }
 
 

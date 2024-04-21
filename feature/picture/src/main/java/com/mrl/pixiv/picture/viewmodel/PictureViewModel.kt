@@ -12,12 +12,25 @@ class PictureViewModel(
     middlewares = listOf(middleware),
     initialState = PictureState.INITIAL,
 ) {
-
     init {
         dispatch(PictureAction.GetUserIllustsIntent(illust.user.id))
         dispatch(PictureAction.GetIllustRelatedIntent(illust.id))
     }
     override fun onStart() {
 
+    }
+}
+
+class PictureDeeplinkViewModel(
+    illustId: Long,
+    reducer: PictureReducer,
+    middleware: PictureMiddleware,
+) : BaseViewModel<PictureState, PictureAction>(
+    reducer = reducer,
+    middlewares = listOf(middleware),
+    initialState = PictureState.INITIAL,
+) {
+    init {
+        dispatch(PictureAction.GetIllustDetail(illustId))
     }
 }

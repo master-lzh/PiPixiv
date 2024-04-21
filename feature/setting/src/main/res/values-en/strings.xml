@@ -9,4 +9,6 @@
     <string name="restart_app_to_take_effect">Restart app to take effect</string>
     <string name="image_source">Image Source</string>
     <string name="self_defined_source">Self-defined Image Source</string>
+    <string name="default_open">Default Open Link</string>
+    <string name="allow_open_link">Allow the application to open the corresponding link</string>
 </resources>

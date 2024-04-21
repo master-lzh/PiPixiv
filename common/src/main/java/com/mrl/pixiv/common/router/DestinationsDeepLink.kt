@@ -1,20 +1,28 @@
 package com.mrl.pixiv.common.router
 
-import android.net.Uri
 import androidx.core.net.toUri
 
 object DestinationsDeepLink {
 
-    private val BaseUri = "pipixiv://com.mrl.pixiv".toUri()
+    private val BaseUri = listOf(
+        "https://www.pixiv.net".toUri(),
+        "http://www.pixiv.net".toUri(),
+        "https://pixiv.net".toUri(),
+        "http://pixiv.net".toUri(),
+        "https://www.pixiv.me".toUri(),
+        "http://www.pixiv.me".toUri(),
+        "https://pixiv.me".toUri(),
+        "http://pixiv.me".toUri(),
+    )
 
-    val HomePattern = "$BaseUri/${Destination.HomeScreen.route}"
-    val ProfileDetailPattern = "$BaseUri/${Destination.SelfProfileDetailScreen.route}"
-    val PicturePattern = "$BaseUri/${Destination.PictureScreen.route}"
 
-    fun getProfileUri(): Uri =
-        ProfileDetailPattern.toUri()
-
-
-    fun getHomeUri(): Uri =
-        HomePattern.toUri()
+    val HomePattern = BaseUri.map {
+        "$it/${Destination.HomeScreen.route}"
+    }
+    val ProfileDetailPattern = BaseUri.map {
+        "$it/users/{${Destination.OtherProfileDetailScreen.userId}}"
+    }
+    val PicturePattern = BaseUri.map {
+        "$it/artworks/{${Destination.PictureDeeplinkScreen.illustId}}"
+    }
 }

@@ -52,11 +52,15 @@ sealed class Destination(
     data object SelfProfileDetailScreen : Destination(route = "self_profile_detail_screen")
 
     data object OtherProfileDetailScreen : Destination(route = "other_profile_detail_screen") {
-        const val userId = "user_id"
+        const val userId = "userId"
     }
 
     data object PictureScreen : Destination(route = "picture_screen") {
         const val illustParams = "illust"
+    }
+
+    data object PictureDeeplinkScreen : Destination(route = "picture_deeplink_screen") {
+        const val illustId = "illustId"
     }
 
     data object SearchScreen : Destination(route = "search_screen")
