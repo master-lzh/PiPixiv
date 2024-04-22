@@ -43,4 +43,11 @@ data class UserNovelsResp (
     val nextUrl: JsonElement? = null
 )
 
+@Serializable
+data class UserHistoryIllustsResp(
+    val illusts: List<Illust>,
+
+    @SerialName("next_url")
+    val nextURL: String? = null
+)
 

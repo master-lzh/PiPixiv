@@ -66,3 +66,7 @@ fun NavHostController.navigateToSettingScreen() {
 fun NavHostController.navigateToNetworkSettingScreen() {
     navigate(route = Destination.NetworkSettingScreen.route)
 }
+
+fun NavHostController.navigateToHistoryScreen() {
+    navigate(route = Destination.HistoryScreen.route)
+}
