@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.ripple.rememberRipple
@@ -39,6 +40,7 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
+import com.mrl.pixiv.common_ui.item.SettingItem
 import com.mrl.pixiv.common_ui.util.navigateToSelfProfileDetailScreen
 import com.mrl.pixiv.common_ui.util.navigateToSettingScreen
 import com.mrl.pixiv.data.setting.SettingTheme
@@ -182,6 +184,24 @@ internal fun ProfileScreen_(
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
+                    }
+
+                    // 历史记录
+                    SettingItem(
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Rounded.History,
+                                contentDescription = null
+                            )
+                        },
+                        onClick = {
+
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.history),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 }
             }
