@@ -64,9 +64,10 @@
 <div align="left">
 
 本项目使用或参考了几个开源项目：
-- **[Coil](https://github.com/coil-kt/coil)**：一个由 Kotlin Coroutines 支持的 Android 图像加载库
-- **[Mihon](https://github.com/mihonapp/mihon)**：发现并阅读漫画、网络漫画、漫画等。参考应用程序语言切换功能
-- **[pixez-flutter](https://github.com/Notsfsssf/pixez-flutter)**：参考登录实现方案
+- **[Coil](https://github.com/coil-kt/coil)**: 一个由 Kotlin Coroutines 支持的 Android 图像加载库
+- **[Koin](https://github.com/InsertKoinIO/koin)**: 面向 Kotlin 开发者的实用轻量级依赖注入框架
+- **[Mihon](https://github.com/mihonapp/mihon)**: 发现并阅读漫画、网络漫画、漫画等。参考应用程序语言切换功能
+- **[pixez-flutter](https://github.com/Notsfsssf/pixez-flutter)**: 参考登录实现方案
 
 </div>
 
