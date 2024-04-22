@@ -40,9 +40,9 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
+import com.mrl.pixiv.common_ui.item.SettingItem
 import com.mrl.pixiv.common_ui.util.navigateToNetworkSettingScreen
 import com.mrl.pixiv.setting.components.DropDownSelector
-import com.mrl.pixiv.setting.components.SettingItem
 import com.mrl.pixiv.setting.viewmodel.SettingState
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import com.mrl.pixiv.util.LocaleHelper
