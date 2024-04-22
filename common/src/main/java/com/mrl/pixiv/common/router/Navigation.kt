@@ -72,4 +72,6 @@ sealed class Destination(
     data object SettingScreen : Destination(route = "setting_screen")
 
     data object NetworkSettingScreen : Destination(route = "network_setting_screen")
+
+    data object HistoryScreen : Destination(route = "history_screen")
 }

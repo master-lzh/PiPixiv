@@ -153,9 +153,7 @@ internal fun SearchResultScreen_(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        popBack()
-                    }) {
+                    IconButton(onClick = popBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = "Back"
