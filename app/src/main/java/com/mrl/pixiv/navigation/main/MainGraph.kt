@@ -27,6 +27,7 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.di.JSON
+import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.picture.PictureDeeplinkScreen
@@ -254,6 +255,15 @@ fun MainGraph(
                     }
                 }
             }
+        }
+
+        // 历史记录
+        composable(
+            route = Destination.HistoryScreen.route,
+        ) {
+            HistoryScreen(
+                modifier = modifier,
+            )
         }
     }
 }

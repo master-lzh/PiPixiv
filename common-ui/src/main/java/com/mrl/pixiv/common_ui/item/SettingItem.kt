@@ -1,4 +1,4 @@
-package com.mrl.pixiv.setting.components
+package com.mrl.pixiv.common_ui.item
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
