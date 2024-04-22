@@ -28,4 +28,9 @@ class UserHttpService(
 
     suspend fun unFollowUser(userFollowDeleteReq: UserFollowDeleteReq) =
         userApi.unFollowUser(userFollowDeleteReq.toMap())
+
+    suspend fun getUserBrowsingHistoryIllusts() = userApi.getUserBrowsingHistoryIllusts(mapOf())
+
+    suspend fun loadMoreUserBrowsingHistoryIllusts(map: Map<String, String>) =
+        userApi.getUserBrowsingHistoryIllusts(map)
 }

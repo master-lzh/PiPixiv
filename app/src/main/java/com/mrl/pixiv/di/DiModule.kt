@@ -35,6 +35,9 @@ import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
 import com.mrl.pixiv.domain.bookmark.UnBookmarkUseCase
 import com.mrl.pixiv.domain.setting.GetAppThemeUseCase
+import com.mrl.pixiv.history.viewmodel.HistoryMiddleware
+import com.mrl.pixiv.history.viewmodel.HistoryReducer
+import com.mrl.pixiv.history.viewmodel.HistoryViewModel
 import com.mrl.pixiv.home.viewmodel.HomeMiddleware
 import com.mrl.pixiv.home.viewmodel.HomeReducer
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
@@ -55,6 +58,7 @@ import com.mrl.pixiv.repository.local.SearchLocalRepository
 import com.mrl.pixiv.repository.local.SettingLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
 import com.mrl.pixiv.repository.remote.AuthRemoteRepository
+import com.mrl.pixiv.repository.remote.HistoryRepository
 import com.mrl.pixiv.repository.remote.IllustRemoteRepository
 import com.mrl.pixiv.repository.remote.SearchRemoteRepository
 import com.mrl.pixiv.repository.remote.TrendingRemoteRepository
@@ -148,6 +152,8 @@ val viewModelModule = module {
     viewModelOf(::SearchPreviewViewModel)
 
     viewModelOf(::SettingViewModel)
+
+    viewModelOf(::HistoryViewModel)
 }
 
 val repositoryModule = module {
@@ -161,6 +167,7 @@ val repositoryModule = module {
     singleOf(::UserRemoteRepository)
     singleOf(::SearchRemoteRepository)
     singleOf(::TrendingRemoteRepository)
+    singleOf(::HistoryRepository)
 }
 
 val dataSourceModule = module {
@@ -209,6 +216,8 @@ val middlewareModule = module {
     factoryOf(::SearchPreviewMiddleware)
 
     factoryOf(::SettingMiddleware)
+
+    factoryOf(::HistoryMiddleware)
 }
 
 val reducerModule = module {
@@ -223,6 +232,7 @@ val reducerModule = module {
     singleOf(::SearchReducer)
     singleOf(::SearchPreviewReducer)
     singleOf(::SettingReducer)
+    singleOf(::HistoryReducer)
 }
 
 fun provideAuthService(

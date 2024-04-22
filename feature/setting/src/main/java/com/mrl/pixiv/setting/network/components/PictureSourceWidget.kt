@@ -30,8 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.components.m3.TextField
+import com.mrl.pixiv.common_ui.item.SettingItem
 import com.mrl.pixiv.setting.R
-import com.mrl.pixiv.setting.components.SettingItem
 import com.mrl.pixiv.util.AppUtil
 
 @OptIn(ExperimentalLayoutApi::class)
