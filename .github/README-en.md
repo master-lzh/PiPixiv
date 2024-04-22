@@ -64,6 +64,7 @@ by [Jetpack Compose](https://developer.android.com/develop/ui/compose)
 
 This project makes use of several open-source project:
 - **[Coil](https://github.com/coil-kt/coil)**: An image loading library for Android backed by Kotlin Coroutines
+- **[Koin](https://github.com/InsertKoinIO/koin)**: A pragmatic lightweight dependency injection framework for Kotlin developers
 - **[Mihon](https://github.com/mihonapp/mihon)**: Discover and read manga, webtoons, comics, and more. Refer to the function of switching application language
 - **[pixez-flutter](https://github.com/Notsfsssf/pixez-flutter)**: Refer to the login implementation plan
 
