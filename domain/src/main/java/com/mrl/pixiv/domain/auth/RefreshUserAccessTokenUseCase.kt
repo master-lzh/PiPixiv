@@ -19,7 +19,7 @@ class RefreshUserAccessTokenUseCase(
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val setLocalUserInfoUseCase: SetLocalUserInfoUseCase,
 ) {
-    suspend operator fun invoke(onSuccess: () -> Unit = {}) {
+    suspend operator fun invoke(onSuccess: (accessToken: String) -> Unit = {}) {
         val userRefreshToken = userLocalRepository.userRefreshToken.first()
         val req = AuthTokenFieldReq(
             grantType = GrantType.REFRESH_TOKEN.value,
@@ -28,7 +28,7 @@ class RefreshUserAccessTokenUseCase(
         safeHttpCall(
             request = authRemoteRepository.login(req),
         ) {
-            onSuccess()
+            onSuccess(it.accessToken)
             launchIO {
                 it.user?.let { authUser ->
                     setLocalUserInfoUseCase {

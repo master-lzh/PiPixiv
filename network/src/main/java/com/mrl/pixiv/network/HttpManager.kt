@@ -4,12 +4,17 @@ import android.os.Build
 import android.util.Log
 import com.mrl.pixiv.common.coroutine.launchIO
 import com.mrl.pixiv.data.setting.UserPreference
+import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.repository.local.SettingLocalRepository
 import com.mrl.pixiv.repository.local.UserLocalRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.net.SocketTimeoutException
@@ -25,9 +30,10 @@ class HttpManager(
     private val userLocalRepository: UserLocalRepository,
     settingLocalRepository: SettingLocalRepository,
     private val jsonConvertFactory: Converter.Factory,
-) {
+): KoinComponent {
     private var allSetting: UserPreference
 
+    private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase by inject()
     init {
         allSetting = settingLocalRepository.allSettingsSync
         launchIO {
@@ -99,6 +105,19 @@ class HttpManager(
                 .header("Host", API_HOST)
                 .build()
             val response = switchHostResponse(chain, request)
+            if (response.code in 400..499) {
+                response.close()
+                Log.d(TAG, "commonHeaderInterceptor: ${response.code}")
+                Log.d(TAG, "current Thread: ${Thread.currentThread().name}")
+                runBlocking(Dispatchers.IO) {
+                    Log.d(TAG, "current Thread: ${Thread.currentThread().name}")
+                    refreshUserAccessTokenUseCase {
+                        token = it
+                    }
+                }
+                val newRequest = addAuthHeader(chain).header("Host", API_HOST).build()
+                return@Interceptor switchHostResponse(chain, newRequest)
+            }
             response
         }
     }
