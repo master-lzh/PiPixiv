@@ -227,7 +227,8 @@ internal fun SearchScreen_(
                                 dispatch(SearchAction.AddSearchHistory(it.keyword))
                                 focusRequester.freeFocus()
                                 navigateToResult()
-                            },
+                            }
+                            .animateItemPlacement(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
