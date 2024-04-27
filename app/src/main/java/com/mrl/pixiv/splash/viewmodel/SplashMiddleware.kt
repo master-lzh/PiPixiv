@@ -3,19 +3,15 @@ package com.mrl.pixiv.splash.viewmodel
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.GrantType
-import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
-import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
-import com.mrl.pixiv.repository.local.UserLocalRepository
-import com.mrl.pixiv.repository.remote.AuthRemoteRepository
+import com.mrl.pixiv.repository.AuthRepository
+import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
 
 class SplashMiddleware(
-    private val setUserAccessTokenUseCase: SetUserAccessTokenUseCase,
-    private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
-    private val userLocalRepository: UserLocalRepository,
-    private val authRemoteRepository: AuthRemoteRepository,
+    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository,
 ) : Middleware<SplashState, SplashAction>() {
     override suspend fun process(state: SplashState, action: SplashAction) {
         when (action) {
@@ -40,14 +36,14 @@ class SplashMiddleware(
                 dispatch(SplashAction.RouteToLoginScreenIntent)
             }
         ) {
-            if (userLocalRepository.isNeedRefreshToken.first()) {
-                val userRefreshToken = userLocalRepository.userRefreshToken.first()
+            if (userRepository.isNeedRefreshToken.first()) {
+                val userRefreshToken = userRepository.userRefreshToken.first()
                 val req = AuthTokenFieldReq(
                     grantType = grantType.value,
                     refreshToken = userRefreshToken
                 )
                 requestHttpDataWithFlow(
-                    request = authRemoteRepository.login(req),
+                    request = authRepository.login(req),
                     failedCallback = {
                         dispatch(SplashAction.RouteToLoginScreenIntent)
                     }
@@ -64,7 +60,7 @@ class SplashMiddleware(
 
     private fun isNeedRefreshToken() {
         launchIO {
-            if (userLocalRepository.isNeedRefreshToken.first()) {
+            if (userRepository.isNeedRefreshToken.first()) {
                 dispatch(SplashAction.RefreshAccessTokenAndRouteIntent(GrantType.REFRESH_TOKEN))
             } else {
                 dispatch(SplashAction.RouteToHomeScreenIntent)
@@ -74,7 +70,7 @@ class SplashMiddleware(
 
     private fun isLogin() {
         launchIO {
-            if (userLocalRepository.isLogin.first()) {
+            if (userRepository.isLogin.first()) {
                 dispatch(SplashAction.IsNeedRefreshTokenIntent)
             } else {
                 dispatch(SplashAction.RouteToLoginScreenIntent)
@@ -82,6 +78,6 @@ class SplashMiddleware(
         }
     }
 
-    private fun setUserRefreshToken(refreshToken: String) = setUserRefreshTokenUseCase(refreshToken)
-    private fun setUserAccessToken(accessToken: String) = setUserAccessTokenUseCase(accessToken)
+    private fun setUserRefreshToken(refreshToken: String) = userRepository.setUserRefreshToken(refreshToken)
+    private fun setUserAccessToken(accessToken: String) = userRepository.setUserAccessToken(accessToken)
 }

@@ -1,21 +1,21 @@
 package com.mrl.pixiv.domain
 
 import com.mrl.pixiv.data.user.UserInfo
-import com.mrl.pixiv.repository.local.UserLocalRepository
+import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
 
 class GetLocalUserInfoUseCase(
-    private val userLocalRepository: UserLocalRepository
+    private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(): UserInfo {
-        return userLocalRepository.userInfo.first()
+        return userRepository.userInfo.first()
     }
 }
 
 class SetLocalUserInfoUseCase(
-    private val userLocalRepository: UserLocalRepository
+    private val userRepository: UserRepository
 ) {
     operator fun invoke(userInfo: (UserInfo) -> UserInfo) {
-        userLocalRepository.setUserInfo(userInfo)
+        userRepository.setUserInfo(userInfo)
     }
 }

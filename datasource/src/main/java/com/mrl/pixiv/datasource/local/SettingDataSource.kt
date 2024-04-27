@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import com.mrl.pixiv.data.setting.UserPreference
 import com.mrl.pixiv.data.setting.UserPreferenceSerializer
+import com.mrl.pixiv.datasource.local.base.BaseProtoDataSource
 
 class SettingDataSource(
     settingDataSource: DataStore<UserPreference>

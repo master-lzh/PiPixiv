@@ -1,26 +1,26 @@
 package com.mrl.pixiv.domain
 
-import com.mrl.pixiv.repository.local.UserLocalRepository
+import com.mrl.pixiv.repository.UserRepository
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
 
 class SetUserAccessTokenUseCase(
-    private val userLocalRepository: UserLocalRepository
+    private val userRepository: UserRepository
 ) {
     operator fun invoke(accessToken: String) {
-        userLocalRepository.setAccessTokenExpiresTime(
+        userRepository.setAccessTokenExpiresTime(
             System.currentTimeMillis() + 1.hours.toLong(
                 DurationUnit.MILLISECONDS
             )
         )
-        userLocalRepository.setUserAccessToken(accessToken)
+        userRepository.setUserAccessToken(accessToken)
     }
 }
 
 class SetUserRefreshTokenUseCase(
-    private val userLocalRepository: UserLocalRepository
+    private val userRepository: UserRepository
 ) {
     operator fun invoke(refreshToken: String) {
-        userLocalRepository.setUserRefreshToken(refreshToken)
+        userRepository.setUserRefreshToken(refreshToken)
     }
 }
