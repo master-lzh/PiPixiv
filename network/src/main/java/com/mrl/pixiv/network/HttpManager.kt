@@ -5,8 +5,8 @@ import android.util.Log
 import com.mrl.pixiv.common.coroutine.launchIO
 import com.mrl.pixiv.data.setting.UserPreference
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
-import com.mrl.pixiv.repository.local.SettingLocalRepository
-import com.mrl.pixiv.repository.local.UserLocalRepository
+import com.mrl.pixiv.repository.SettingRepository
+import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -27,17 +27,17 @@ import java.util.concurrent.TimeUnit
 import javax.net.ssl.HostnameVerifier
 
 class HttpManager(
-    private val userLocalRepository: UserLocalRepository,
-    settingLocalRepository: SettingLocalRepository,
     private val jsonConvertFactory: Converter.Factory,
-): KoinComponent {
+    settingRepository: SettingRepository,
+) : KoinComponent {
     private var allSetting: UserPreference
-
+    private val userRepository: UserRepository by inject()
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase by inject()
+
     init {
-        allSetting = settingLocalRepository.allSettingsSync
+        allSetting = settingRepository.allSettingsSync
         launchIO {
-            userLocalRepository.userAccessToken.collect {
+            userRepository.userAccessToken.collect {
                 token = it
             }
         }

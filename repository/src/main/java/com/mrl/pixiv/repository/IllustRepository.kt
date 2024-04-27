@@ -1,4 +1,4 @@
-package com.mrl.pixiv.repository.remote
+package com.mrl.pixiv.repository
 
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
@@ -7,7 +7,7 @@ import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 
-class IllustRemoteRepository(
+class IllustRepository(
     private val illustHttpService: IllustHttpService,
 ) {
     suspend fun getIllustRecommended(illustRecommendedQuery: IllustRecommendedQuery) =

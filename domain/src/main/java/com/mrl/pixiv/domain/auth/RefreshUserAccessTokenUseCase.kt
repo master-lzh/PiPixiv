@@ -8,25 +8,25 @@ import com.mrl.pixiv.data.user.userInfo
 import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
-import com.mrl.pixiv.repository.local.UserLocalRepository
-import com.mrl.pixiv.repository.remote.AuthRemoteRepository
+import com.mrl.pixiv.repository.AuthRepository
+import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
 
 class RefreshUserAccessTokenUseCase(
-    private val authRemoteRepository: AuthRemoteRepository,
-    private val userLocalRepository: UserLocalRepository,
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
     private val setUserAccessTokenUseCase: SetUserAccessTokenUseCase,
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val setLocalUserInfoUseCase: SetLocalUserInfoUseCase,
 ) {
     suspend operator fun invoke(onSuccess: (accessToken: String) -> Unit = {}) {
-        val userRefreshToken = userLocalRepository.userRefreshToken.first()
+        val userRefreshToken = userRepository.userRefreshToken.first()
         val req = AuthTokenFieldReq(
             grantType = GrantType.REFRESH_TOKEN.value,
             refreshToken = userRefreshToken
         )
         safeHttpCall(
-            request = authRemoteRepository.login(req),
+            request = authRepository.login(req),
         ) {
             onSuccess(it.accessToken)
             launchIO {

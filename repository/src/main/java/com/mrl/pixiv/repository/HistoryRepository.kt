@@ -1,4 +1,4 @@
-package com.mrl.pixiv.repository.remote
+package com.mrl.pixiv.repository
 
 import com.mrl.pixiv.datasource.remote.UserHttpService
 

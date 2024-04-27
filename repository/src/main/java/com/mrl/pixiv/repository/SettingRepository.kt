@@ -1,11 +1,11 @@
-package com.mrl.pixiv.repository.local
+package com.mrl.pixiv.repository
 
 import android.os.Build
 import com.mrl.pixiv.data.setting.SettingTheme
 import com.mrl.pixiv.datasource.local.SettingDataSource
 import kotlinx.coroutines.flow.map
 
-class SettingLocalRepository(
+class SettingRepository(
     private val settingDataSource: SettingDataSource
 ) {
     val allSettings = settingDataSource.data

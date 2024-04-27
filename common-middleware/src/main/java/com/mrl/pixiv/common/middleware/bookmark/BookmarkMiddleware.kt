@@ -3,10 +3,10 @@ package com.mrl.pixiv.common.middleware.bookmark
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
-import com.mrl.pixiv.repository.remote.IllustRemoteRepository
+import com.mrl.pixiv.repository.IllustRepository
 
 class BookmarkMiddleware(
-    private val illustRemoteRepository: IllustRemoteRepository,
+    private val illustRepository: IllustRepository,
 ) : Middleware<BookmarkState, BookmarkAction>() {
     override suspend fun process(state: BookmarkState, action: BookmarkAction) {
         when (action) {
@@ -20,7 +20,7 @@ class BookmarkMiddleware(
     private fun deleteBookmarkIllust(illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.postIllustBookmarkDelete(
+                request = illustRepository.postIllustBookmarkDelete(
                     IllustBookmarkDeleteReq(
                         illustId
                     )
@@ -34,7 +34,7 @@ class BookmarkMiddleware(
     private fun bookmarkIllust(illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
+                request = illustRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
             ) {
                 dispatch(BookmarkAction.UpdateBookmarkState(illustId, true))
             }

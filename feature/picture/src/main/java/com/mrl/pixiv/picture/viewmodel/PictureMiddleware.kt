@@ -11,9 +11,9 @@ import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.data.illust.IllustDetailQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.data.user.UserIllustsQuery
-import com.mrl.pixiv.repository.local.SearchLocalRepository
-import com.mrl.pixiv.repository.remote.IllustRemoteRepository
-import com.mrl.pixiv.repository.remote.UserRemoteRepository
+import com.mrl.pixiv.repository.IllustRepository
+import com.mrl.pixiv.repository.SearchRepository
+import com.mrl.pixiv.repository.UserRepository
 import com.mrl.pixiv.util.AppUtil
 import com.mrl.pixiv.util.PictureType
 import com.mrl.pixiv.util.saveToAlbum
@@ -22,9 +22,9 @@ import kotlin.time.Duration.Companion.seconds
 
 
 class PictureMiddleware(
-    private val illustRemoteRepository: IllustRemoteRepository,
-    private val userRemoteRepository: UserRemoteRepository,
-    private val searchLocalRepository: SearchLocalRepository,
+    private val illustRepository: IllustRepository,
+    private val userRepository: UserRepository,
+    private val searchRepository: SearchRepository,
 ) : Middleware<PictureState, PictureAction>() {
     override suspend fun process(state: PictureState, action: PictureAction) {
         when (action) {
@@ -54,7 +54,7 @@ class PictureMiddleware(
     private fun getIllustDetail(illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.getIllustDetail(
+                request = illustRepository.getIllustDetail(
                     IllustDetailQuery(
                         illustId = illustId,
                         filter = Filter.ANDROID.value
@@ -69,7 +69,7 @@ class PictureMiddleware(
     }
 
     private fun addSearchHistory(keyword: String) {
-        searchLocalRepository.addSearchHistory(keyword)
+        searchRepository.addSearchHistory(keyword)
     }
 
     private fun downloadIllust(
@@ -102,7 +102,7 @@ class PictureMiddleware(
     private fun unBookmark(state: PictureState, illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.postIllustBookmarkDelete(
+                request = illustRepository.postIllustBookmarkDelete(
                     IllustBookmarkDeleteReq(
                         illustId
                     )
@@ -129,7 +129,7 @@ class PictureMiddleware(
     private fun bookmark(state: PictureState, illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
+                request = illustRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
             ) {
                 dispatch(
                     PictureAction.UpdateIsBookmarkState(
@@ -152,7 +152,7 @@ class PictureMiddleware(
     private fun loadMoreIllustRelated(state: PictureState, queryMap: Map<String, String>?) =
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.loadMoreIllustRelated(
+                request = illustRepository.loadMoreIllustRelated(
                     queryMap ?: return@launchNetwork
                 )
             ) {
@@ -168,7 +168,7 @@ class PictureMiddleware(
     private fun getIllustRelated(state: PictureState, illustId: Long) =
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.getIllustRelated(
+                request = illustRepository.getIllustRelated(
                     IllustRelatedQuery(
                         illustId = illustId,
                         filter = Filter.ANDROID.value
@@ -187,7 +187,7 @@ class PictureMiddleware(
     private fun getUserIllusts(state: PictureState, userId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = userRemoteRepository.getUserIllusts(
+                request = userRepository.getUserIllusts(
                     UserIllustsQuery(
                         userId = userId,
                         type = Type.Illust.value
