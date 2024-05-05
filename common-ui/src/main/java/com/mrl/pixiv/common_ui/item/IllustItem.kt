@@ -33,7 +33,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.util.throttleClick
 
 @Composable
@@ -74,7 +76,7 @@ fun SquareIllustItem(
             .clip(MaterialTheme.shapes.medium)
             .throttleClick { onClick() }
     ) {
-        val (image, imageCountText, bookmark) = createRefs()
+        val (image, imageCountText, bookmark, isGif) = createRefs()
         val screenWidth = LocalConfiguration.current.screenWidthDp.dp
         val size =
             (screenWidth - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
@@ -112,6 +114,21 @@ fun SquareIllustItem(
                     modifier = Modifier.size(10.dp)
                 )
                 Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
+            }
+        }
+        if (illust.type == Type.Ugoira) {
+            Row(
+                modifier = Modifier
+                    .constrainAs(isGif) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+                    .padding(top = 5.dp, end = 5.dp)
+                    .background(lightBlue, MaterialTheme.shapes.small)
+                    .padding(horizontal = 5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "GIF", color = Color.White, fontSize = 10.sp)
             }
         }
         IconButton(
