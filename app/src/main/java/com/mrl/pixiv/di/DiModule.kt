@@ -3,6 +3,7 @@ package com.mrl.pixiv.di
 import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.api.SearchApi
 import com.mrl.pixiv.api.TrendingApi
+import com.mrl.pixiv.api.UgoiraApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
@@ -25,6 +26,7 @@ import com.mrl.pixiv.datasource.local.userPreferenceDataStore
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.SearchHttpService
 import com.mrl.pixiv.datasource.remote.TrendingHttpService
+import com.mrl.pixiv.datasource.remote.UgoiraHttpService
 import com.mrl.pixiv.datasource.remote.UserAuthHttpService
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import com.mrl.pixiv.domain.GetLocalUserInfoUseCase
@@ -177,6 +179,7 @@ val dataSourceModule = module {
     single { UserHttpService(provideCommonService(get(), UserApi::class.java)) }
     single { SearchHttpService(provideCommonService(get(), SearchApi::class.java)) }
     single { TrendingHttpService(provideCommonService(get(), TrendingApi::class.java)) }
+    single { UgoiraHttpService(provideCommonService(get(), UgoiraApi::class.java))}
 }
 
 val useCaseModule = module {

@@ -6,9 +6,11 @@ import com.mrl.pixiv.data.illust.IllustDetailQuery
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.datasource.remote.IllustHttpService
+import com.mrl.pixiv.datasource.remote.UgoiraHttpService
 
 class IllustRepository(
     private val illustHttpService: IllustHttpService,
+    private val ugoiraHttpService: UgoiraHttpService,
 ) {
     suspend fun getIllustRecommended(illustRecommendedQuery: IllustRecommendedQuery) =
         illustHttpService.getIllustRecommended(illustRecommendedQuery)
@@ -30,4 +32,6 @@ class IllustRepository(
 
     suspend fun getIllustDetail(illustDetailQuery: IllustDetailQuery) =
         illustHttpService.getIllustDetail(illustDetailQuery)
+
+    suspend fun getUgoiraMetadata(illustId: Long) = ugoiraHttpService.getUgoiraMetadata(illustId)
 }
