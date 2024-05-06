@@ -1,6 +1,7 @@
 package com.mrl.pixiv.common_ui.item
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,7 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.IllustAiType
 import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.util.throttleClick
 
@@ -76,7 +79,7 @@ fun SquareIllustItem(
             .clip(MaterialTheme.shapes.medium)
             .throttleClick { onClick() }
     ) {
-        val (image, imageCountText, bookmark, isGif) = createRefs()
+        val (image, bookmark, labelRow) = createRefs()
         val screenWidth = LocalConfiguration.current.screenWidthDp.dp
         val size =
             (screenWidth - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
@@ -96,39 +99,54 @@ fun SquareIllustItem(
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
-        if (illust.pageCount > 1) {
-            Row(
-                modifier = Modifier
-                    .constrainAs(imageCountText) {
-                        top.linkTo(image.top)
-                        end.linkTo(image.end)
-                    }
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .padding(horizontal = 5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.FileCopy,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(10.dp)
+        Row(
+            modifier = Modifier
+                .constrainAs(labelRow) {
+                    top.linkTo(image.top)
+                    end.linkTo(image.end)
+                }
+                .padding(5.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (illust.illustAIType == IllustAiType.AiGeneratedWorks) {
+                Text(
+                    text = "AI",
+                    color = Color.White,
+                    fontSize = 10.sp,
+                    modifier = Modifier
+                        .background(lightBlue, MaterialTheme.shapes.small)
+                        .padding(horizontal = 5.dp)
                 )
-                Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
             }
-        }
-        if (illust.type == Type.Ugoira) {
-            Row(
-                modifier = Modifier
-                    .constrainAs(isGif) {
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(top = 5.dp, end = 5.dp)
-                    .background(lightBlue, MaterialTheme.shapes.small)
-                    .padding(horizontal = 5.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "GIF", color = Color.White, fontSize = 10.sp)
+            if (illust.type == Type.Ugoira) {
+                Row(
+                    modifier = Modifier
+                        .background(lightBlue, MaterialTheme.shapes.small)
+                        .padding(horizontal = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "GIF", color = Color.White, fontSize = 10.sp)
+                }
+            }
+            if (illust.pageCount > 1) {
+                Row(
+                    modifier = Modifier
+                        .background(
+                            Color.Black.copy(alpha = 0.5f),
+                            MaterialTheme.shapes.small
+                        )
+                        .padding(horizontal = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.FileCopy,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(10.dp)
+                    )
+                    Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
+                }
             }
         }
         IconButton(

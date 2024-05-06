@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
@@ -35,7 +34,10 @@ import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.ui.components.m3.Surface
+import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.IllustAiType
+import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.second
 import com.mrl.pixiv.util.throttleClick
@@ -135,22 +137,51 @@ fun RecommendImageItem(
                 }
             }
         }
-        if (illust.pageCount > 1) {
-            Row(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .padding(horizontal = 5.dp)
-                    .align(Alignment.TopEnd),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.FileCopy,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(10.dp)
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(5.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (illust.illustAIType == IllustAiType.AiGeneratedWorks) {
+                Text(
+                    text = "AI",
+                    color = Color.White,
+                    fontSize = 10.sp,
+                    modifier = Modifier
+                        .background(lightBlue, MaterialTheme.shapes.small)
+                        .padding(horizontal = 5.dp)
                 )
-                Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
+            }
+            if (illust.type == Type.Ugoira) {
+                Row(
+                    modifier = Modifier
+                        .background(lightBlue, MaterialTheme.shapes.small)
+                        .padding(horizontal = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "GIF", color = Color.White, fontSize = 10.sp)
+                }
+            }
+            if (illust.pageCount > 1) {
+                Row(
+                    modifier = Modifier
+                        .background(
+                            Color.Black.copy(alpha = 0.5f),
+                            MaterialTheme.shapes.small
+                        )
+                        .padding(horizontal = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.FileCopy,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(10.dp)
+                    )
+                    Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
+                }
             }
         }
     }
