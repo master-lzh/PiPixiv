@@ -1,9 +1,13 @@
-package com.mrl.pixiv.repository.local
+package com.mrl.pixiv.repository
 
+import com.mrl.pixiv.data.search.SearchAutoCompleteQuery
+import com.mrl.pixiv.data.search.SearchIllustQuery
 import com.mrl.pixiv.data.search.searchHistory
 import com.mrl.pixiv.datasource.local.SearchDataSource
+import com.mrl.pixiv.datasource.remote.SearchHttpService
 
-class SearchLocalRepository(
+class SearchRepository(
+    private val searchHttpService: SearchHttpService,
     private val searchDataSource: SearchDataSource,
 ) {
     val searchLocalSource = searchDataSource.data
@@ -33,4 +37,12 @@ class SearchLocalRepository(
             }
         }
     }
+    suspend fun searchIllust(searchIllustQuery: SearchIllustQuery) =
+        searchHttpService.searchIllust(searchIllustQuery)
+
+    suspend fun searchIllustNext(queryMap: Map<String, String>) =
+        searchHttpService.searchIllust(queryMap)
+
+    suspend fun searchAutoComplete(searchAutoCompleteQuery: SearchAutoCompleteQuery) =
+        searchHttpService.searchAutoComplete(searchAutoCompleteQuery)
 }

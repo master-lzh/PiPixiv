@@ -10,13 +10,13 @@ import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
-import com.mrl.pixiv.repository.local.UserLocalRepository
-import com.mrl.pixiv.repository.remote.AuthRemoteRepository
+import com.mrl.pixiv.repository.AuthRepository
+import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
 
 class AuthMiddleware(
-    private val authRemoteRepository: AuthRemoteRepository,
-    private val userLocalRepository: UserLocalRepository,
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
     private val setUserAccessTokenUseCase: SetUserAccessTokenUseCase,
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
@@ -34,12 +34,12 @@ class AuthMiddleware(
     private fun refreshAccessToken() {
         launchNetwork {
             refreshUserAccessTokenUseCase()
-            val refreshToken = userLocalRepository.userRefreshToken.first()
+            val refreshToken = userRepository.userRefreshToken.first()
             val req = AuthTokenFieldReq(
                 grantType = GrantType.REFRESH_TOKEN.value,
                 refreshToken = refreshToken,
             )
-            requestHttpDataWithFlow(request = authRemoteRepository.login(req)) {
+            requestHttpDataWithFlow(request = authRepository.login(req)) {
                 setUserInfo(it)
             }
         }
@@ -53,7 +53,7 @@ class AuthMiddleware(
                 codeVerifier = codeVerifier,
                 redirectUri = Constants.PIXIV_LOGIN_REDIRECT_URL,
             )
-            requestHttpDataWithFlow(request = authRemoteRepository.login(req)) {
+            requestHttpDataWithFlow(request = authRepository.login(req)) {
                 setUserInfo(it)
                 dispatch(AuthAction.LoginSuccess)
             }

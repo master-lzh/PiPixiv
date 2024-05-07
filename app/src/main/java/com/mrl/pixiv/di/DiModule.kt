@@ -3,6 +3,7 @@ package com.mrl.pixiv.di
 import com.mrl.pixiv.api.IllustApi
 import com.mrl.pixiv.api.SearchApi
 import com.mrl.pixiv.api.TrendingApi
+import com.mrl.pixiv.api.UgoiraApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
@@ -15,16 +16,17 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowMiddleware
 import com.mrl.pixiv.common.middleware.follow.FollowReducer
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
-import com.mrl.pixiv.data.search.searchDataStore
-import com.mrl.pixiv.data.user.userInfoDataStore
 import com.mrl.pixiv.datasource.local.SearchDataSource
 import com.mrl.pixiv.datasource.local.SettingDataSource
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
 import com.mrl.pixiv.datasource.local.UserInfoDataSource
+import com.mrl.pixiv.datasource.local.searchDataStore
+import com.mrl.pixiv.datasource.local.userInfoDataStore
 import com.mrl.pixiv.datasource.local.userPreferenceDataStore
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.SearchHttpService
 import com.mrl.pixiv.datasource.remote.TrendingHttpService
+import com.mrl.pixiv.datasource.remote.UgoiraHttpService
 import com.mrl.pixiv.datasource.remote.UserAuthHttpService
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import com.mrl.pixiv.domain.GetLocalUserInfoUseCase
@@ -54,15 +56,13 @@ import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailViewModel
 import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
 import com.mrl.pixiv.profile.viewmodel.ProfileReducer
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
-import com.mrl.pixiv.repository.local.SearchLocalRepository
-import com.mrl.pixiv.repository.local.SettingLocalRepository
-import com.mrl.pixiv.repository.local.UserLocalRepository
-import com.mrl.pixiv.repository.remote.AuthRemoteRepository
-import com.mrl.pixiv.repository.remote.HistoryRepository
-import com.mrl.pixiv.repository.remote.IllustRemoteRepository
-import com.mrl.pixiv.repository.remote.SearchRemoteRepository
-import com.mrl.pixiv.repository.remote.TrendingRemoteRepository
-import com.mrl.pixiv.repository.remote.UserRemoteRepository
+import com.mrl.pixiv.repository.AuthRepository
+import com.mrl.pixiv.repository.HistoryRepository
+import com.mrl.pixiv.repository.IllustRepository
+import com.mrl.pixiv.repository.SearchRepository
+import com.mrl.pixiv.repository.SettingRepository
+import com.mrl.pixiv.repository.TrendingRepository
+import com.mrl.pixiv.repository.UserRepository
 import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewMiddleware
 import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewReducer
 import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewViewModel
@@ -157,16 +157,14 @@ val viewModelModule = module {
 }
 
 val repositoryModule = module {
-    singleOf(::UserLocalRepository)
-    singleOf(::SearchLocalRepository)
-    singleOf(::SettingLocalRepository)
+    singleOf(::UserRepository)
+    singleOf(::SettingRepository)
 
 
-    singleOf(::AuthRemoteRepository)
-    singleOf(::IllustRemoteRepository)
-    singleOf(::UserRemoteRepository)
-    singleOf(::SearchRemoteRepository)
-    singleOf(::TrendingRemoteRepository)
+    singleOf(::AuthRepository)
+    singleOf(::IllustRepository)
+    singleOf(::SearchRepository)
+    singleOf(::TrendingRepository)
     singleOf(::HistoryRepository)
 }
 
@@ -181,6 +179,7 @@ val dataSourceModule = module {
     single { UserHttpService(provideCommonService(get(), UserApi::class.java)) }
     single { SearchHttpService(provideCommonService(get(), SearchApi::class.java)) }
     single { TrendingHttpService(provideCommonService(get(), TrendingApi::class.java)) }
+    single { UgoiraHttpService(provideCommonService(get(), UgoiraApi::class.java))}
 }
 
 val useCaseModule = module {

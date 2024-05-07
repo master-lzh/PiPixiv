@@ -1,12 +1,12 @@
 package com.mrl.pixiv.setting.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Middleware
-import com.mrl.pixiv.repository.local.SettingLocalRepository
+import com.mrl.pixiv.repository.SettingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 
 class SettingMiddleware(
-    private val settingLocalRepository: SettingLocalRepository
+    private val settingRepository: SettingRepository
 ) : Middleware<SettingState, SettingAction>() {
     override suspend fun process(state: SettingState, action: SettingAction) {
         when (action) {
@@ -18,17 +18,17 @@ class SettingMiddleware(
     }
 
     private fun savePictureSourceHost(host: String) {
-        settingLocalRepository.setPictureSourceHost(host)
+        settingRepository.setPictureSourceHost(host)
         dispatch(SettingAction.UpdatePictureSourceHost(host))
     }
 
     private fun switchBypassSniffing(state: SettingState) {
-        settingLocalRepository.setEnableBypassSniffing(!state.enableBypassSniffing)
+        settingRepository.setEnableBypassSniffing(!state.enableBypassSniffing)
     }
 
     private fun loadSetting() {
         launchIO {
-            settingLocalRepository.allSettings.flowOn(Dispatchers.Main).collect {
+            settingRepository.allSettings.flowOn(Dispatchers.Main).collect {
                 dispatch(SettingAction.UpdateSetting(it))
             }
         }
