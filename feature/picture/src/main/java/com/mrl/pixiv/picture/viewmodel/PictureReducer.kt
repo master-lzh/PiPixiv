@@ -2,6 +2,7 @@ package com.mrl.pixiv.picture.viewmodel
 
 import androidx.compose.runtime.toMutableStateList
 import com.mrl.pixiv.common.viewmodel.Reducer
+import kotlinx.collections.immutable.toImmutableList
 
 
 class PictureReducer : Reducer<PictureState, PictureAction> {
@@ -20,6 +21,7 @@ class PictureReducer : Reducer<PictureState, PictureAction> {
             )
 
             is PictureAction.UpdateIllust -> state.copy(illust = action.illust)
+            is PictureAction.UpdateUgoiraFrame -> state.copy(ugoiraImages = action.images.toImmutableList())
 
             else -> state
         }

@@ -81,7 +81,7 @@ data class Illust(
     val isMuted: Boolean? = null,
 
     @SerialName("illust_ai_type")
-    val illustAIType: Int = 0,
+    val illustAIType: IllustAiType = IllustAiType.Undefined,
 
     @SerialName("illust_book_style")
     val illustBookStyle: Int = 0,
@@ -210,3 +210,16 @@ data class Series(
     val id: Long? = null,
     val title: String? = null
 )
+
+@Serializable
+@Immutable
+enum class IllustAiType(val value: Int) {
+    @SerialName("0")
+    Undefined(0),
+
+    @SerialName("1")
+    NotAiGeneratedWork(1),
+
+    @SerialName("2")
+    AiGeneratedWorks(2)
+}

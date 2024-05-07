@@ -1,5 +1,6 @@
 package com.mrl.pixiv.picture.viewmodel
 
+import android.graphics.Bitmap
 import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.data.Illust
 
@@ -22,6 +23,8 @@ sealed class PictureAction : Action {
 
     data class UnBookmarkIllust(val illustId: Long) : PictureAction()
 
+    data class DownloadUgoira(val illustId: Long) : PictureAction()
+
     data class UpdateState(val state: PictureState) : PictureAction()
 
     data class UpdateUserIllustsState(val userIllusts: List<Illust>) :
@@ -36,6 +39,8 @@ sealed class PictureAction : Action {
     ) : PictureAction()
 
     data class UpdateIllust(val illust: Illust) : PictureAction()
+
+    data class UpdateUgoiraFrame(val images: List<Pair<Bitmap, Long>>) : PictureAction()
 
     data class DownloadIllust(
         val illustId: Long,

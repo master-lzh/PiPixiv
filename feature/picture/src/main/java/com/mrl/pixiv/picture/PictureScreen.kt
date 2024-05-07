@@ -116,6 +116,8 @@ import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.common_ui.util.popBackToMainScreen
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.Type
+import com.mrl.pixiv.picture.components.UgoiraPlayer
 import com.mrl.pixiv.picture.viewmodel.PictureAction
 import com.mrl.pixiv.picture.viewmodel.PictureDeeplinkViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureState
@@ -382,23 +384,51 @@ internal fun PictureScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            items(
-                illust.pageCount,
-                key = { "${illust.id}_$it" },
-                span = { StaggeredGridItemSpan.FullLine }
-            ) { index ->
-                if (illust.pageCount > 1) {
-                    illust.metaPages?.get(index)?.let {
+            if (illust.type == Type.Ugoira) {
+                item(span = StaggeredGridItemSpan.FullLine, key = "ugoira") {
+                    UgoiraPlayer(
+                        images = state.ugoiraImages,
+                        placeholder = placeholder
+                    )
+                }
+            } else {
+                items(
+                    illust.pageCount,
+                    key = { "${illust.id}_$it" },
+                    span = { StaggeredGridItemSpan.FullLine }
+                ) { index ->
+                    if (illust.pageCount > 1) {
+                        illust.metaPages?.get(index)?.let {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(it.imageUrls?.large)
+                                    .build(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .throttleClick(
+                                        onLongClick = {
+                                            currLongClickPic =
+                                                Pair(index, it.imageUrls?.original ?: "")
+                                            openBottomSheet = true
+                                        }
+                                    ),
+                                contentScale = ContentScale.FillWidth,
+                                placeholder = placeholder,
+                            )
+                        }
+                    } else {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(it.imageUrls?.large)
+                                .data(illust.imageUrls.large)
                                 .build(),
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .throttleClick(
                                     onLongClick = {
-                                        currLongClickPic = Pair(index, it.imageUrls?.original ?: "")
+                                        currLongClickPic =
+                                            Pair(0, illust.metaSinglePage.originalImageURL)
                                         openBottomSheet = true
                                     }
                                 ),
@@ -406,24 +436,6 @@ internal fun PictureScreen(
                             placeholder = placeholder,
                         )
                     }
-                } else {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(illust.imageUrls.large)
-                            .build(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .throttleClick(
-                                onLongClick = {
-                                    currLongClickPic =
-                                        Pair(0, illust.metaSinglePage.originalImageURL)
-                                    openBottomSheet = true
-                                }
-                            ),
-                        contentScale = ContentScale.FillWidth,
-                        placeholder = placeholder,
-                    )
                 }
             }
             item(span = StaggeredGridItemSpan.FullLine, key = "illust_title") {

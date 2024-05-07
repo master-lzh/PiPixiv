@@ -3,14 +3,14 @@ package com.mrl.pixiv.profile.viewmodel
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.setting.SettingTheme
 import com.mrl.pixiv.data.setting.setAppCompatDelegateThemeMode
-import com.mrl.pixiv.repository.local.SettingLocalRepository
-import com.mrl.pixiv.repository.local.UserLocalRepository
+import com.mrl.pixiv.repository.SettingRepository
+import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 
 class ProfileMiddleware(
-    private val userLocalRepository: UserLocalRepository,
-    private val settingLocalRepository: SettingLocalRepository,
+    private val userRepository: UserRepository,
+    private val settingRepository: SettingRepository,
 ) : Middleware<ProfileState, ProfileAction>() {
     override suspend fun process(state: ProfileState, action: ProfileAction) {
         when (action) {
@@ -21,13 +21,13 @@ class ProfileMiddleware(
     }
 
     private fun changeAppTheme(theme: SettingTheme) {
-        settingLocalRepository.setSettingTheme(theme)
+        settingRepository.setSettingTheme(theme)
         setAppCompatDelegateThemeMode(theme)
     }
 
     private fun getUserInfo() {
         launchIO {
-            userLocalRepository.userInfo.flowOn(Dispatchers.Main).collect { userInfo ->
+            userRepository.userInfo.flowOn(Dispatchers.Main).collect { userInfo ->
                 dispatch(ProfileAction.UpdateUserInfo(userInfo))
             }
         }

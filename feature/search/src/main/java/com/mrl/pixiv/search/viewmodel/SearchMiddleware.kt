@@ -3,13 +3,11 @@ package com.mrl.pixiv.search.viewmodel
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.search.SearchAutoCompleteQuery
 import com.mrl.pixiv.data.search.SearchIllustQuery
-import com.mrl.pixiv.repository.local.SearchLocalRepository
-import com.mrl.pixiv.repository.remote.SearchRemoteRepository
+import com.mrl.pixiv.repository.SearchRepository
 import com.mrl.pixiv.util.queryParams
 
 class SearchMiddleware(
-    private val searchRemoteRepository: SearchRemoteRepository,
-    private val searchLocalRepository: SearchLocalRepository,
+    private val searchRepository: SearchRepository,
 ) : Middleware<SearchState, SearchAction>() {
     override suspend fun process(state: SearchState, action: SearchAction) {
         when (action) {
@@ -26,24 +24,24 @@ class SearchMiddleware(
 
     private fun loadSearchHistory() {
         launchIO {
-            searchLocalRepository.searchLocalSource.collect {
+            searchRepository.searchLocalSource.collect {
                 dispatch(SearchAction.UpdateSearchHistory(it.searchHistoryList))
             }
         }
     }
 
     private fun addSearchHistory(action: SearchAction.AddSearchHistory) {
-        launchIO { searchLocalRepository.addSearchHistory(action.searchWords) }
+        launchIO { searchRepository.addSearchHistory(action.searchWords) }
     }
 
     private fun deleteSearchHistory(action: SearchAction.DeleteSearchHistory) {
-        launchIO { searchLocalRepository.deleteSearchHistory(action.searchWords) }
+        launchIO { searchRepository.deleteSearchHistory(action.searchWords) }
     }
 
     private fun searchAutoComplete(action: SearchAction.SearchAutoComplete) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = searchRemoteRepository.searchAutoComplete(
+                request = searchRepository.searchAutoComplete(
                     SearchAutoCompleteQuery(
                         word = action.searchWords,
                     )
@@ -61,7 +59,7 @@ class SearchMiddleware(
     private fun searchIllustNext(action: SearchAction.SearchIllustNext) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = searchRemoteRepository.searchIllustNext(action.nextUrl.queryParams)
+                request = searchRepository.searchIllustNext(action.nextUrl.queryParams)
             ) {
                 dispatch(
                     SearchAction.UpdateSearchIllustsResult(
@@ -77,7 +75,7 @@ class SearchMiddleware(
     private fun searchIllust(state: SearchState, action: SearchAction.SearchIllust) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = searchRemoteRepository.searchIllust(
+                request = searchRepository.searchIllust(
                     SearchIllustQuery(
                         word = action.searchWords,
                         sort = state.searchFilter.sort,

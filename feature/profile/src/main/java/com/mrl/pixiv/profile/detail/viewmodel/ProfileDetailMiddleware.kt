@@ -12,14 +12,11 @@ import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.data.user.copy
 import com.mrl.pixiv.profile.detail.state.UserInfo
 import com.mrl.pixiv.profile.detail.state.toUserInfo
-import com.mrl.pixiv.repository.local.UserLocalRepository
-import com.mrl.pixiv.repository.remote.UserRemoteRepository
 import kotlinx.coroutines.flow.first
 
 
 class ProfileDetailMiddleware(
-    private val userLocalRepository: UserLocalRepository,
-    private val userRemoteRepository: UserRemoteRepository,
+    private val userRepository: com.mrl.pixiv.repository.UserRepository,
 ) : Middleware<ProfileDetailState, ProfileDetailAction>() {
     override suspend fun process(state: ProfileDetailState, action: ProfileDetailAction) {
         when (action) {
@@ -34,9 +31,9 @@ class ProfileDetailMiddleware(
 
     private fun getUserIllusts(uid: Long) {
         launchNetwork {
-            val userId = if (uid != Long.MIN_VALUE) uid else userLocalRepository.getUserId()
+            val userId = if (uid != Long.MIN_VALUE) uid else userRepository.getUserId()
             requestHttpDataWithFlow(
-                request = userRemoteRepository.getUserIllusts(
+                request = userRepository.getUserIllusts(
                     UserIllustsQuery(
                         userId = userId,
                         type = Type.Illust.value,
@@ -50,9 +47,9 @@ class ProfileDetailMiddleware(
 
     private fun getUserBookmarksNovel(uid: Long) =
         launchNetwork {
-            val userId = if (uid != Long.MIN_VALUE) uid else userLocalRepository.getUserId()
+            val userId = if (uid != Long.MIN_VALUE) uid else userRepository.getUserId()
             requestHttpDataWithFlow(
-                request = userRemoteRepository.getUserBookmarksNovels(
+                request = userRepository.getUserBookmarksNovels(
                     UserBookmarksNovelQuery(restrict = Restrict.PUBLIC, userId = userId)
                 )
             ) {
@@ -62,9 +59,9 @@ class ProfileDetailMiddleware(
 
     private fun getUserBookmarksIllust(uid: Long) =
         launchNetwork {
-            val userId = if (uid != Long.MIN_VALUE) uid else userLocalRepository.getUserId()
+            val userId = if (uid != Long.MIN_VALUE) uid else userRepository.getUserId()
             requestHttpDataWithFlow(
-                request = userRemoteRepository.getUserBookmarksIllust(
+                request = userRepository.getUserBookmarksIllust(
                     UserBookmarksIllustQuery(restrict = Restrict.PUBLIC, userId = userId)
                 )
             ) {
@@ -74,11 +71,11 @@ class ProfileDetailMiddleware(
 
 
     private fun getUserInfo(uid: Long) = launchNetwork {
-        val userId = if (uid != Long.MIN_VALUE) uid else userLocalRepository.getUserId()
+        val userId = if (uid != Long.MIN_VALUE) uid else userRepository.getUserId()
         requestHttpDataWithFlow(
-            request = userRemoteRepository.getUserDetail(UserDetailQuery(userId = userId)),
+            request = userRepository.getUserDetail(UserDetailQuery(userId = userId)),
             failedCallback = {
-                val userInfo = userLocalRepository.userInfo.first()
+                val userInfo = userRepository.userInfo.first()
                 dispatch(
                     ProfileDetailAction.UpdateUserInfo(
                         UserInfo(
@@ -94,7 +91,7 @@ class ProfileDetailMiddleware(
             }
         ) {
             if (uid == Long.MIN_VALUE) {
-                userLocalRepository.setUserInfo { userInfo ->
+                userRepository.setUserInfo { userInfo ->
                     userInfo.copy {
                         this.uid = it.user.id
                         username = it.user.name

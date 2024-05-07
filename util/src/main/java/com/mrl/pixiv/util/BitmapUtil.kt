@@ -1,6 +1,7 @@
 package com.mrl.pixiv.util
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory.decodeFile
 import android.os.Environment
 import java.io.File
 import java.io.FileOutputStream
@@ -65,5 +66,14 @@ fun calculateImageSize(url: String): Float {
     } catch (e: Exception) {
         e.printStackTrace()
         0f
+    }
+}
+
+fun File.toBitmap(): Bitmap? {
+    return try {
+        decodeFile(absolutePath)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 }

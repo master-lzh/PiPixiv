@@ -2,12 +2,12 @@ package com.mrl.pixiv.search.preview.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.Filter
-import com.mrl.pixiv.repository.local.SearchLocalRepository
-import com.mrl.pixiv.repository.remote.TrendingRemoteRepository
+import com.mrl.pixiv.repository.SearchRepository
+import com.mrl.pixiv.repository.TrendingRepository
 
 class SearchPreviewMiddleware(
-    private val trendingRemoteRepository: TrendingRemoteRepository,
-    private val searchLocalRepository: SearchLocalRepository,
+    private val trendingRepository: TrendingRepository,
+    private val searchRepository: SearchRepository,
 ) : Middleware<SearchPreviewState, SearchPreviewAction>() {
     override suspend fun process(state: SearchPreviewState, action: SearchPreviewAction) {
         when (action) {
@@ -18,13 +18,13 @@ class SearchPreviewMiddleware(
     }
 
     private fun addSearchHistory(keyword: String) {
-        searchLocalRepository.addSearchHistory(keyword)
+        searchRepository.addSearchHistory(keyword)
     }
 
     private fun loadTrendingTags() {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = trendingRemoteRepository.trendingTags(Filter.ANDROID)
+                request = trendingRepository.trendingTags(Filter.ANDROID)
             ) {
                 dispatch(SearchPreviewAction.UpdateTrendingTags(it.trendTags))
             }

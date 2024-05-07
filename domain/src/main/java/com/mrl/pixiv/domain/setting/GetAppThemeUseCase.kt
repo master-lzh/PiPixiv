@@ -1,11 +1,11 @@
 package com.mrl.pixiv.domain.setting
 
 import com.mrl.pixiv.data.setting.SettingTheme
-import com.mrl.pixiv.repository.local.SettingLocalRepository
+import com.mrl.pixiv.repository.SettingRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetAppThemeUseCase(
-    private val settingLocalRepository: SettingLocalRepository
+    private val settingRepository: SettingRepository
 ) {
-    operator fun invoke(): Flow<SettingTheme> = settingLocalRepository.settingTheme
+    operator fun invoke(): Flow<SettingTheme> = settingRepository.settingTheme
 }

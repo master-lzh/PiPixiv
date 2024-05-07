@@ -5,13 +5,13 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.illust.IllustRecommendedResp
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.home.R
-import com.mrl.pixiv.repository.remote.IllustRemoteRepository
+import com.mrl.pixiv.repository.IllustRepository
 import com.mrl.pixiv.util.ToastUtil
 import kotlinx.collections.immutable.toImmutableList
 
 class HomeMiddleware(
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
-    private val illustRemoteRepository: IllustRemoteRepository,
+    private val illustRepository: IllustRepository,
 ) : Middleware<HomeState, HomeAction>() {
     override suspend fun process(state: HomeState, action: HomeAction) {
         when (action) {
@@ -48,7 +48,7 @@ class HomeMiddleware(
     ) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.getIllustRecommended(action.illustRecommendedQuery)
+                request = illustRepository.getIllustRecommended(action.illustRecommendedQuery)
             ) {
                 val imageList = handleRecommendResp(it)
                 dispatch(
@@ -78,7 +78,7 @@ class HomeMiddleware(
             }
             dispatch(HomeAction.UpdateState(state.copy(loadMore = true)))
             requestHttpDataWithFlow(
-                request = illustRemoteRepository.loadMoreIllustRecommended(action.queryMap)
+                request = illustRepository.loadMoreIllustRecommended(action.queryMap)
             ) {
                 val imageList = handleRecommendResp(it)
                 dispatch(
