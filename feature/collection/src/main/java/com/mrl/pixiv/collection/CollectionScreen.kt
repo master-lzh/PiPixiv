@@ -135,7 +135,7 @@ fun CollectionScreen_(
                         ),
                     ) {
                         Text(
-                            text = "公开",
+                            text = stringResource(R.string.word_public),
                         )
                     }
                     TextButton(
@@ -152,7 +152,7 @@ fun CollectionScreen_(
                         ),
                     ) {
                         Text(
-                            text = "非公开",
+                            text = stringResource(R.string.non_public),
                         )
                     }
 

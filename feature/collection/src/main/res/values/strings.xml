@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="collection">收藏</string>
+    <string name="non_public">非公开</string>
+    <string name="word_public">公开</string>
 </resources>

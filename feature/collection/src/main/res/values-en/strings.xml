@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="collection">Collection</string>
+    <string name="non_public">Private</string>
+    <string name="word_public">Public</string>
 </resources>
