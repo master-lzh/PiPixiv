@@ -1,6 +1,7 @@
 package com.mrl.pixiv.datasource.remote
 
 import com.mrl.pixiv.api.UserApi
+import com.mrl.pixiv.data.user.UserBookmarkTagsQuery
 import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
 import com.mrl.pixiv.data.user.UserBookmarksNovelQuery
 import com.mrl.pixiv.data.user.UserDetailQuery
@@ -20,6 +21,9 @@ class UserHttpService(
     suspend fun getUserBookmarksIllust(userBookmarksIllustQuery: UserBookmarksIllustQuery) =
         userApi.getUserBookmarksIllust(userBookmarksIllustQuery.toMap())
 
+    suspend fun loadMoreUserBookmarksIllust(map: Map<String, String>) =
+        userApi.getUserBookmarksIllust(map)
+
     suspend fun getUserBookmarksNovels(userBookmarksNovelQuery: UserBookmarksNovelQuery) =
         userApi.getUserBookmarksNovel(userBookmarksNovelQuery.toMap())
 
@@ -33,4 +37,10 @@ class UserHttpService(
 
     suspend fun loadMoreUserBrowsingHistoryIllusts(map: Map<String, String>) =
         userApi.getUserBrowsingHistoryIllusts(map)
+
+    suspend fun getUserBookmarkTagsIllust(userBookmarkTagsQuery: UserBookmarkTagsQuery) =
+        userApi.getUserBookmarkTagsIllust(userBookmarkTagsQuery.toMap())
+
+    suspend fun getUserBookmarkTagsNovel(userBookmarkTagsQuery: UserBookmarkTagsQuery) =
+        userApi.getUserBookmarkTagsNovel(userBookmarkTagsQuery.toMap())
 }

@@ -11,4 +11,5 @@
     <string name="illustration_works">Illustration Works</string>
     <string name="illustration_count">%d illustration works</string>
     <string name="history">History</string>
+    <string name="collection">Collection</string>
 </resources>

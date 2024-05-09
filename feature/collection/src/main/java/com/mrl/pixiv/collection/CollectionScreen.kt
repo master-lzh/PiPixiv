@@ -1,0 +1,166 @@
+package com.mrl.pixiv.collection
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.mrl.pixiv.collection.viewmodel.CollectionAction
+import com.mrl.pixiv.collection.viewmodel.CollectionState
+import com.mrl.pixiv.collection.viewmodel.CollectionViewModel
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.currentOrThrow
+import com.mrl.pixiv.common.ui.lightBlue
+import com.mrl.pixiv.common_ui.illust.IllustGrid
+import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
+import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.Restrict
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+@Composable
+fun SelfCollectionScreen(
+    modifier: Modifier = Modifier,
+    collectionViewModel: CollectionViewModel = koinViewModel() { parametersOf(Long.MIN_VALUE) },
+    bookmarkViewModel: BookmarkViewModel,
+    navHostController: NavHostController = LocalNavigator.currentOrThrow
+) {
+    CollectionScreen_(
+        modifier = modifier,
+        state = collectionViewModel.state,
+        bookmarkState = bookmarkViewModel.state,
+        dispatch = collectionViewModel::dispatch,
+        popBack = { navHostController.popBackStack() },
+        navToPictureScreen = navHostController::navigateToPictureScreen
+    )
+}
+
+@Composable
+fun CollectionScreen_(
+    modifier: Modifier = Modifier,
+    state: CollectionState = CollectionState.INITIAL,
+    bookmarkState: BookmarkState = BookmarkState.INITIAL,
+    dispatch: (CollectionAction) -> Unit = {},
+    bookmarkDispatch: (BookmarkAction) -> Unit = {},
+    popBack: () -> Unit = {},
+    navToPictureScreen: (Illust) -> Unit = {}
+) {
+    Screen(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                modifier = Modifier.shadow(4.dp),
+                title = {
+                    Text(text = stringResource(R.string.collection))
+                },
+                navigationIcon = {
+                    IconButton(onClick = popBack) {
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
+                    }
+                }
+            )
+        }
+    ) {
+        val lazyGridState = rememberLazyGridState()
+        Box(
+            modifier = Modifier.padding(it),
+        ) {
+            IllustGrid(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp),
+                lazyGridState = lazyGridState,
+                illusts = state.userBookmarksIllusts,
+                bookmarkState = bookmarkState,
+                dispatch = bookmarkDispatch,
+                spanCount = 2,
+                navToPictureScreen = navToPictureScreen,
+                canLoadMore = state.illustNextUrl != null,
+                onLoadMore = {
+                    if (state.illustNextUrl != null) {
+                        dispatch(CollectionAction.LoadMoreUserBookmarksIllusts(state.illustNextUrl))
+                    }
+                },
+                loading = state.loading,
+                leadingContent = {
+                    item(key = "leading", span = { GridItemSpan(2) }) {
+                        Spacer(modifier = Modifier.height(50.dp))
+                    }
+                }
+            )
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(
+                        onClick = {
+                            if (state.restrict != Restrict.PUBLIC) {
+                                dispatch(CollectionAction.UpdateRestrict(Restrict.PUBLIC))
+                            }
+                        },
+                        colors = ButtonDefaults.filledTonalButtonColors().copy(
+                            containerColor = if (state.restrict == Restrict.PUBLIC)
+                                lightBlue
+                            else
+                                lightBlue.copy(alpha = 0.5f)
+                        ),
+                    ) {
+                        Text(
+                            text = "公开",
+                        )
+                    }
+                    TextButton(
+                        onClick = {
+                            if (state.restrict != Restrict.PRIVATE) {
+                                dispatch(CollectionAction.UpdateRestrict(Restrict.PRIVATE))
+                            }
+                        },
+                        colors = ButtonDefaults.filledTonalButtonColors().copy(
+                            containerColor = if (state.restrict == Restrict.PRIVATE)
+                                lightBlue
+                            else
+                                lightBlue.copy(alpha = 0.5f)
+                        ),
+                    ) {
+                        Text(
+                            text = "非公开",
+                        )
+                    }
+
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(Icons.Rounded.FilterList, contentDescription = null)
+                    }
+                }
+            }
+        }
+    }
+}

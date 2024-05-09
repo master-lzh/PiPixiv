@@ -102,3 +102,9 @@ data class Workspace(
     @SerialName("workspace_image_url")
     val workspaceImageURL: String = ""
 )
+
+@Serializable
+data class BookmarkTag (
+    val count: Long,
+    val name: String,
+)

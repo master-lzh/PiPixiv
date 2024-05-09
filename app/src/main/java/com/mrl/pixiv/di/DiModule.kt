@@ -6,6 +6,9 @@ import com.mrl.pixiv.api.TrendingApi
 import com.mrl.pixiv.api.UgoiraApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
+import com.mrl.pixiv.collection.viewmodel.CollectionMiddleware
+import com.mrl.pixiv.collection.viewmodel.CollectionReducer
+import com.mrl.pixiv.collection.viewmodel.CollectionViewModel
 import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
 import com.mrl.pixiv.common.data.DispatcherEnum
 import com.mrl.pixiv.common.middleware.auth.AuthMiddleware
@@ -57,6 +60,7 @@ import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
 import com.mrl.pixiv.profile.viewmodel.ProfileReducer
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.repository.AuthRepository
+import com.mrl.pixiv.repository.CollectionRepository
 import com.mrl.pixiv.repository.HistoryRepository
 import com.mrl.pixiv.repository.IllustRepository
 import com.mrl.pixiv.repository.SearchRepository
@@ -154,6 +158,8 @@ val viewModelModule = module {
     viewModelOf(::SettingViewModel)
 
     viewModelOf(::HistoryViewModel)
+
+    viewModelOf(::CollectionViewModel)
 }
 
 val repositoryModule = module {
@@ -166,6 +172,7 @@ val repositoryModule = module {
     singleOf(::SearchRepository)
     singleOf(::TrendingRepository)
     singleOf(::HistoryRepository)
+    singleOf(::CollectionRepository)
 }
 
 val dataSourceModule = module {
@@ -217,6 +224,8 @@ val middlewareModule = module {
     factoryOf(::SettingMiddleware)
 
     factoryOf(::HistoryMiddleware)
+
+    factoryOf(::CollectionMiddleware)
 }
 
 val reducerModule = module {
@@ -232,6 +241,7 @@ val reducerModule = module {
     singleOf(::SearchPreviewReducer)
     singleOf(::SettingReducer)
     singleOf(::HistoryReducer)
+    singleOf(::CollectionReducer)
 }
 
 fun provideAuthService(
