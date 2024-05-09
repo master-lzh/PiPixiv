@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.mrl.pixiv.collection.SelfCollectionScreen
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.router.Destination
@@ -263,6 +264,16 @@ fun MainGraph(
         ) {
             HistoryScreen(
                 modifier = modifier,
+            )
+        }
+
+        // 本人收藏页
+        composable(
+            route = Destination.SelfCollectionScreen.route,
+        ) {
+            SelfCollectionScreen(
+                modifier = modifier,
+                bookmarkViewModel = bookmarkViewModel
             )
         }
     }

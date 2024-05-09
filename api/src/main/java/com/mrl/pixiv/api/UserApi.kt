@@ -2,6 +2,8 @@ package com.mrl.pixiv.api
 
 import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.data.EmptyResp
+import com.mrl.pixiv.data.user.UserBookmarkTagsResp
+import com.mrl.pixiv.data.user.UserBookmarksIllustResp
 import com.mrl.pixiv.data.user.UserDetailResp
 import com.mrl.pixiv.data.user.UserHistoryIllustsResp
 import com.mrl.pixiv.data.user.UserIllustsResp
@@ -27,7 +29,7 @@ interface UserApi {
     @GET("/v1/user/bookmarks/illust")
     suspend fun getUserBookmarksIllust(
         @QueryMap userBookmarksIllustQuery: Map<String, String>,
-    ): Flow<Rlt<UserIllustsResp>>
+    ): Flow<Rlt<UserBookmarksIllustResp>>
 
     @GET("/v1/user/bookmarks/novel")
     suspend fun getUserBookmarksNovel(
@@ -50,4 +52,14 @@ interface UserApi {
     suspend fun getUserBrowsingHistoryIllusts(
         @QueryMap userBrowsingHistoryIllustsQuery: Map<String, String>,
     ): Flow<Rlt<UserHistoryIllustsResp>>
+
+    @GET("/v1/user/bookmark-tags/illust")
+    suspend fun getUserBookmarkTagsIllust(
+        @QueryMap userBookmarkTagsIllustQuery: Map<String, String>,
+    ): Flow<Rlt<UserBookmarkTagsResp>>
+
+    @GET("/v1/user/bookmark-tags/novel")
+    suspend fun getUserBookmarkTagsNovel(
+        @QueryMap userBookmarkTagsNovelQuery: Map<String, String>,
+    ): Flow<Rlt<UserBookmarkTagsResp>>
 }

@@ -32,7 +32,7 @@ data class UserBookmarksIllustResp(
     val illusts: List<Illust>,
 
     @SerialName("next_url")
-    val nextURL: String
+    val nextURL: String?
 )
 
 @Serializable
@@ -49,5 +49,14 @@ data class UserHistoryIllustsResp(
 
     @SerialName("next_url")
     val nextURL: String? = null
+)
+
+@Serializable
+data class UserBookmarkTagsResp (
+    @SerialName("bookmark_tags")
+    val bookmarkTags: List<BookmarkTag>,
+
+    @SerialName("next_url")
+    val nextUrl: String? = null
 )
 
