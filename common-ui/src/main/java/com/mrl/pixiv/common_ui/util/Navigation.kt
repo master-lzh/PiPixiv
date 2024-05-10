@@ -70,3 +70,7 @@ fun NavHostController.navigateToNetworkSettingScreen() {
 fun NavHostController.navigateToHistoryScreen() {
     navigate(route = Destination.HistoryScreen.route)
 }
+
+fun NavHostController.navigateToSelfCollectionScreen() {
+    navigate(route = Destination.SelfCollectionScreen.route)
+}

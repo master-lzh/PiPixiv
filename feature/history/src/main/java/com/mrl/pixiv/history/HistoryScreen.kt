@@ -42,6 +42,7 @@ import com.mrl.pixiv.history.viewmodel.HistoryAction
 import com.mrl.pixiv.history.viewmodel.HistoryState
 import com.mrl.pixiv.history.viewmodel.HistoryViewModel
 import com.mrl.pixiv.util.queryParams
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -122,24 +123,25 @@ internal fun HistoryScreen_(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .padding(horizontal = 8.dp, vertical = 16.dp),
+                .padding(horizontal = 8.dp),
             lazyGridState = lazyGridState,
             illusts = state.illusts.filter {
                 it.title.contains(searchValue.text, ignoreCase = true) || it.user.name.contains(
                     searchValue.text,
                     ignoreCase = true
                 )
-            },
+            }.toImmutableList(),
             bookmarkState = bookmarkState,
             dispatch = bookmarkDispatch,
             spanCount = 2,
-            navToPictureScreen = { navToPictureScreen(it) },
+            navToPictureScreen = navToPictureScreen,
             canLoadMore = state.illustNextUrl != null,
             onLoadMore = {
                 if (state.illustNextUrl != null) {
                     dispatch(HistoryAction.LoadHistory(state.illustNextUrl.queryParams))
                 }
-            }
+            },
+            loading = state.loading,
         )
     }
 }

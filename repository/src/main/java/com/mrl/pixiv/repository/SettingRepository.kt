@@ -32,4 +32,9 @@ class SettingRepository(
     fun setPictureSourceHost(host: String) = settingDataSource.updateData {
         it.toBuilder().setImageHost(host).build()
     }
+
+    val hasShowBookmarkTip = settingDataSource.data.map { it.hasShowBookmarkTip }
+    fun setHasShowBookmarkTip(hasShow: Boolean) = settingDataSource.updateData {
+        it.toBuilder().setHasShowBookmarkTip(hasShow).build()
+    }
 }

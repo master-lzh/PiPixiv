@@ -29,7 +29,6 @@ sealed class SearchAction : Action {
 
     data class SearchIllustNext(
         val nextUrl: String,
-        val callback: () -> Unit = {},
     ) : SearchAction()
 
     data class UpdateSearchHistory(
@@ -46,7 +45,7 @@ sealed class SearchAction : Action {
 
     data class UpdateSearchIllustsResult(
         val illusts: List<Illust>,
-        val nextUrl: String,
+        val nextUrl: String?,
     ) : SearchAction()
 
     data class UpdateFilter(
