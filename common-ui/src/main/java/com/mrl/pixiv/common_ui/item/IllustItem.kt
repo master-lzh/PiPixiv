@@ -2,19 +2,39 @@ package com.mrl.pixiv.common_ui.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.FileCopy
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +44,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -35,11 +56,19 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.ui.components.m3.IconButton
+import com.mrl.pixiv.common.ui.components.m3.TextField
+import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
 import com.mrl.pixiv.common.ui.lightBlue
+import com.mrl.pixiv.common_ui.R
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.IllustAiType
+import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.Type
+import com.mrl.pixiv.data.illust.BookmarkDetailTag
+import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.util.throttleClick
+import org.koin.compose.koinInject
 
 @Composable
 fun SquareIllustItem(
@@ -52,13 +81,16 @@ fun SquareIllustItem(
     elevation: Dp = 5.dp,
     navToPictureScreen: (Illust) -> Unit,
 ) {
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(true)
+    val getIllustBookmarkDetailUseCase = koinInject<GetIllustBookmarkDetailUseCase>()
     val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
-    val onBookmarkClick: () -> Unit = {
+    val onBookmarkClick = { restrict: String, tags: List<String>? ->
         dispatch(
             if (isBookmarked) {
                 BookmarkAction.IllustBookmarkDeleteIntent(illust.id)
             } else {
-                BookmarkAction.IllustBookmarkAddIntent(illust.id)
+                BookmarkAction.IllustBookmarkAddIntent(illust.id, restrict, tags)
             }
         )
     }
@@ -155,7 +187,8 @@ fun SquareIllustItem(
                     bottom.linkTo(image.bottom)
                     end.linkTo(image.end)
                 },
-            onClick = { onBookmarkClick() }
+            onClick = { onBookmarkClick(Restrict.PUBLIC, null) },
+            onLongClick = { showBottomSheet = true },
         ) {
             Icon(
                 imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
@@ -163,6 +196,186 @@ fun SquareIllustItem(
                 modifier = Modifier.size(24.dp),
                 tint = if (isBookmarked) Color.Red else Color.Gray
             )
+        }
+    }
+    if (showBottomSheet) {
+        val illustBookmarkDetailTags = remember { mutableStateListOf<BookmarkDetailTag>() }
+        LaunchedEffect(Unit) {
+            getIllustBookmarkDetailUseCase(illust.id) {
+                illustBookmarkDetailTags.clear()
+                illustBookmarkDetailTags.addAll(it.bookmarkDetail.tags)
+            }
+        }
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            modifier = Modifier
+                .imePadding()
+                .height(LocalConfiguration.current.screenHeightDp.dp * (2f / 3f)),
+            sheetState = bottomSheetState,
+            containerColor = MaterialTheme.colorScheme.background,
+        ) {
+            val allTags = remember(illustBookmarkDetailTags.size) {
+                illustBookmarkDetailTags.map { it.name to it.isRegistered }.toMutableStateList()
+            }
+            val selectedTagsIndex = allTags.indices.filter { allTags[it].second }
+            var inputTag by remember { mutableStateOf(TextFieldValue()) }
+            var publicSwitch by remember { mutableStateOf(true) }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = {
+                            onBookmarkClick(
+                                if (publicSwitch) Restrict.PUBLIC else Restrict.PRIVATE,
+                                selectedTagsIndex.map { allTags[it].first }
+                            )
+                            showBottomSheet = false
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                            contentDescription = null,
+                            tint = if (isBookmarked) Color.Red else Color.Gray
+                        )
+                    }
+                    if (isBookmarked) {
+                        TextButton(
+                            onClick = {
+                                dispatch(
+                                    BookmarkAction.IllustBookmarkAddIntent(
+                                        illust.id,
+                                        if (publicSwitch) Restrict.PUBLIC else Restrict.PRIVATE,
+                                        selectedTagsIndex.map { allTags[it].first }
+                                    )
+                                )
+                                showBottomSheet = false
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.filledTonalButtonColors().copy(
+                                containerColor = lightBlue
+                            )
+                        ) {
+                            Text(text = stringResource(R.string.save))
+                        }
+                    }
+                }
+            }
+            Text(
+                text = if (isBookmarked) stringResource(R.string.edit_favorite) else stringResource(
+                    R.string.add_to_favorite
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (publicSwitch) stringResource(R.string.word_public)
+                    else stringResource(R.string.word_private)
+                )
+                Switch(checked = publicSwitch, onCheckedChange = { publicSwitch = it })
+            }
+            Row(
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .fillMaxWidth()
+//                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(R.string.bookmark_tags),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+                Text(
+                    text = "${selectedTagsIndex.size} / 10",
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = inputTag,
+                    onValueChange = { inputTag = it },
+                    modifier = Modifier.weight(1f),
+                    enabled = selectedTagsIndex.size < 10,
+                    placeholder = { Text(text = stringResource(R.string.add_tags)) },
+                    shape = MaterialTheme.shapes.small,
+                    colors = transparentIndicatorColors
+                )
+                IconButton(
+                    onClick = {
+                        handleInputTag(inputTag, allTags)
+                        inputTag = inputTag.copy(text = "")
+                    },
+                    modifier = Modifier
+                ) {
+                    Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
+                }
+            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                itemsIndexed(allTags) { index, item ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = item.first,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Checkbox(
+                            checked = item.second,
+                            onCheckedChange = {
+                                allTags[index] = item.first to it
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun handleInputTag(
+    inputTag: TextFieldValue,
+    allTags: SnapshotStateList<Pair<String, Boolean>>,
+) {
+    val tagText = inputTag.text.trim()
+    if (tagText.isNotEmpty()) {
+        // 检查是否已存在于illustBookmarkDetailTags中
+        val existingTagIndex = allTags.indexOfFirst { it.first == tagText }
+        if (existingTagIndex != -1) {
+            // 如果存在，移动到首位
+            val existingTag = allTags[existingTagIndex]
+            allTags.remove(existingTag)
+            allTags.add(0, existingTag)
+        } else {
+            // 如果不存在，添加到首位
+            allTags.add(0, tagText to true)
         }
     }
 }

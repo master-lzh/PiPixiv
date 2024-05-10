@@ -30,3 +30,7 @@ data class IllustDetailQuery(
     val filter: String,
     val illustId: Long,
 ) : IBaseQueryMap
+
+data class IllustBookmarkDetailQuery(
+    val illustId: Long,
+) : IBaseQueryMap

@@ -2,14 +2,17 @@ package com.mrl.pixiv.api
 
 import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.data.EmptyResp
+import com.mrl.pixiv.data.illust.IllustBookmarkDetailResp
 import com.mrl.pixiv.data.illust.IllustDetailResp
 import com.mrl.pixiv.data.illust.IllustRecommendedResp
 import com.mrl.pixiv.data.illust.IllustRelatedResp
 import kotlinx.coroutines.flow.Flow
+import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 import retrofit2.http.QueryMap
 
 interface IllustApi {
@@ -21,7 +24,9 @@ interface IllustApi {
     @POST("v2/illust/bookmark/add")
     @FormUrlEncoded
     suspend fun postIllustBookmarkAdd(
-        @FieldMap illustBookmarkAddReq: Map<String, String>
+        @Field("illust_id") illustId: Long,
+        @Field("restrict") restrict: String,
+        @Field("tags[]") tags: List<String>?
     ): Flow<Rlt<EmptyResp>>
 
     @POST("v1/illust/bookmark/delete")
@@ -40,4 +45,9 @@ interface IllustApi {
     suspend fun getIllustDetail(
         @QueryMap illustDetailQuery: Map<String, String>
     ): Flow<Rlt<IllustDetailResp>>
+
+    @GET("/v2/illust/bookmark/detail")
+    suspend fun getIllustBookmarkDetail(
+        @Query("illust_id") illustId: Long
+    ): Flow<Rlt<IllustBookmarkDetailResp>>
 }
