@@ -39,12 +39,22 @@ data class CollectionState(
 }
 
 sealed class CollectionAction : Action {
-    data class LoadUserBookmarksIllusts(@Restrict val restrict: String) : CollectionAction()
+    data class LoadUserBookmarksIllusts(
+        @Restrict val restrict: String,
+        val filterTag: String
+    ) : CollectionAction()
+
     data class LoadMoreUserBookmarksIllusts(val nextUrl: String) : CollectionAction()
+    data class LoadUserBookmarksTagsIllust(@Restrict val restrict: String) : CollectionAction()
 
 
     data class UpdateUserId(val userId: Long) : CollectionAction()
     data class UpdateRestrict(@Restrict val restrict: String) : CollectionAction()
+    data class UpdateFilterTag(
+        @Restrict val restrict: String,
+        val filterTag: String
+    ) : CollectionAction()
+
     data class UpdateUserBookmarksIllusts(
         val userBookmarksIllusts: ImmutableList<Illust>,
         val illustNextUrl: String?
@@ -75,6 +85,6 @@ class CollectionViewModel(
 ) {
     init {
         dispatch(CollectionAction.UpdateUserId(uid))
-        dispatch(CollectionAction.LoadUserBookmarksIllusts(Restrict.PUBLIC))
+        dispatch(CollectionAction.LoadUserBookmarksIllusts(Restrict.PUBLIC, ""))
     }
 }
