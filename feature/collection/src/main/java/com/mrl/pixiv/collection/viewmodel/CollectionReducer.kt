@@ -8,7 +8,16 @@ class CollectionReducer : Reducer<CollectionState, CollectionAction> {
         return when (action) {
             is CollectionAction.LoadUserBookmarksIllusts -> state.copy(loading = true)
             is CollectionAction.UpdateUserId -> state.copy(userId = action.userId)
-            is CollectionAction.UpdateRestrict -> state.copy(restrict = action.restrict)
+            is CollectionAction.UpdateRestrict -> state.copy(
+                restrict = action.restrict,
+                filterTag = ""
+            )
+
+            is CollectionAction.UpdateFilterTag -> state.copy(
+                restrict = action.restrict,
+                filterTag = action.filterTag
+            )
+
             is CollectionAction.UpdateUserBookmarksIllusts -> state.copy(
                 userBookmarksIllusts = action.userBookmarksIllusts,
                 loading = false,
