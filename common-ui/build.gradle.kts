@@ -19,7 +19,8 @@ dependencies {
     implementation(project(":util"))
     implementation(project(":common"))
     implementation(project(":common-middleware"))
-    
+    implementation(project(":domain"))
+
 
     testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

@@ -17,7 +17,11 @@ class IllustHttpService(
         illustApi.getIllustRecommended(queryMap)
 
     suspend fun postIllustBookmarkAdd(illustBookmarkAddReq: IllustBookmarkAddReq) =
-        illustApi.postIllustBookmarkAdd(illustBookmarkAddReq.toMap())
+        illustApi.postIllustBookmarkAdd(
+            illustBookmarkAddReq.illustId,
+            illustBookmarkAddReq.restrict,
+            illustBookmarkAddReq.tags
+        )
 
     suspend fun postIllustBookmarkDelete(illustBookmarkDeleteReq: IllustBookmarkDeleteReq) =
         illustApi.postIllustBookmarkDelete(illustBookmarkDeleteReq.toMap())
@@ -30,4 +34,7 @@ class IllustHttpService(
 
     suspend fun getIllustDetail(illustDetailQuery: IllustDetailQuery) =
         illustApi.getIllustDetail(illustDetailQuery.toMap())
+
+    suspend fun getIllustBookmarkDetail(illustId: Long) =
+        illustApi.getIllustBookmarkDetail(illustId)
 }

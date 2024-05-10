@@ -37,8 +37,7 @@ import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
-import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
-import com.mrl.pixiv.domain.bookmark.UnBookmarkUseCase
+import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.domain.setting.GetAppThemeUseCase
 import com.mrl.pixiv.history.viewmodel.HistoryMiddleware
 import com.mrl.pixiv.history.viewmodel.HistoryReducer
@@ -195,9 +194,8 @@ val useCaseModule = module {
     singleOf(::GetLocalUserInfoUseCase)
     singleOf(::SetLocalUserInfoUseCase)
     singleOf(::RefreshUserAccessTokenUseCase)
-    singleOf(::BookmarkUseCase)
-    singleOf(::UnBookmarkUseCase)
     singleOf(::GetAppThemeUseCase)
+    singleOf(::GetIllustBookmarkDetailUseCase)
 }
 
 val middlewareModule = module {
