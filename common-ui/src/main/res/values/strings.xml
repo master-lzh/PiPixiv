@@ -7,4 +7,5 @@
     <string name="add_to_favorite">加为喜欢！</string>
     <string name="edit_favorite">编辑喜欢！</string>
     <string name="save">保存</string>
+    <string name="long_click_to_edit_favorite">长按编辑收藏</string>
 </resources>

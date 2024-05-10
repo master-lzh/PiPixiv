@@ -2,21 +2,16 @@ package com.mrl.pixiv.search
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterAlt
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,7 +34,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
@@ -56,8 +50,7 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common_ui.item.SquareIllustItem
-import com.mrl.pixiv.common_ui.util.OnScrollToBottom
+import com.mrl.pixiv.common_ui.illust.IllustGrid
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.search.SearchSort
@@ -175,53 +168,24 @@ internal fun SearchResultScreen_(
             )
         }
     ) {
-        val lazyListState = rememberLazyListState()
-        var loadMore by remember { mutableStateOf(false) }
-        LazyColumn(
-            modifier = modifier,
-            state = lazyListState,
-            contentPadding = it,
-        ) {
-            items(
-                state.searchResults.chunked(spanCount),
-                key = {
-                    it.joinToString("_") { illust ->
-                        illust.id.toString()
-                    }
-                }
-            ) { illusts ->
-                Row {
-                    illusts.forEach { illust ->
-                        SquareIllustItem(
-                            illust = illust,
-                            bookmarkState = bookmarkState,
-                            dispatch = bookmarkDispatch,
-                            spanCount = spanCount,
-                            paddingValues = PaddingValues(2.dp),
-                            navToPictureScreen = naviToPic,
-                        )
-                    }
+        IllustGrid(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(horizontal = 8.dp),
+            illusts = state.searchResults,
+            bookmarkState = bookmarkState,
+            dispatch = bookmarkDispatch,
+            spanCount = spanCount,
+            navToPictureScreen = naviToPic,
+            loading = state.loading,
+            canLoadMore = state.nextUrl != null,
+            onLoadMore = {
+                if (state.nextUrl != null) {
+                    dispatch(SearchAction.SearchIllustNext(state.nextUrl))
                 }
             }
-            if (loadMore) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
-            }
-        }
-        lazyListState.OnScrollToBottom {
-            loadMore = true
-            dispatch(SearchAction.SearchIllustNext(state.nextUrl) {
-                loadMore = false
-            })
-        }
+        )
 
         if (showBottomSheet.value) {
             FilterBottomSheet(showBottomSheet, launchDefault, bottomSheetState, state, dispatch)

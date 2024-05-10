@@ -33,7 +33,9 @@ import com.mrl.pixiv.datasource.remote.UgoiraHttpService
 import com.mrl.pixiv.datasource.remote.UserAuthHttpService
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import com.mrl.pixiv.domain.GetLocalUserInfoUseCase
+import com.mrl.pixiv.domain.HasShowBookmarkTipUseCase
 import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
+import com.mrl.pixiv.domain.SetShowBookmarkTipUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
@@ -196,6 +198,8 @@ val useCaseModule = module {
     singleOf(::RefreshUserAccessTokenUseCase)
     singleOf(::GetAppThemeUseCase)
     singleOf(::GetIllustBookmarkDetailUseCase)
+    singleOf(::HasShowBookmarkTipUseCase)
+    singleOf(::SetShowBookmarkTipUseCase)
 }
 
 val middlewareModule = module {
