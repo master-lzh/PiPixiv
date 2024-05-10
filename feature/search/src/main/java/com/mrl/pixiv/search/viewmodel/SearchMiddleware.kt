@@ -67,7 +67,6 @@ class SearchMiddleware(
                         nextUrl = it.nextUrl,
                     )
                 )
-                action.callback()
             }
         }
     }

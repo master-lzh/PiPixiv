@@ -47,10 +47,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -66,8 +68,11 @@ import com.mrl.pixiv.data.IllustAiType
 import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.data.illust.BookmarkDetailTag
+import com.mrl.pixiv.domain.HasShowBookmarkTipUseCase
+import com.mrl.pixiv.domain.SetShowBookmarkTipUseCase
 import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.util.throttleClick
+import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 
 @Composable
@@ -79,12 +84,16 @@ fun SquareIllustItem(
     horizontalPadding: Dp = 0.dp,
     paddingValues: PaddingValues = PaddingValues(1.dp),
     elevation: Dp = 5.dp,
+    shouldShowTip: Boolean = false,
     navToPictureScreen: (Illust) -> Unit,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(true)
     val getIllustBookmarkDetailUseCase = koinInject<GetIllustBookmarkDetailUseCase>()
+    val hasShowBookmarkTipUseCase = koinInject<HasShowBookmarkTipUseCase>()
+    val setShowBookmarkTipUseCase = koinInject<SetShowBookmarkTipUseCase>()
     val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
+    var showPopupTip by remember { mutableStateOf(false) }
     val onBookmarkClick = { restrict: String, tags: List<String>? ->
         dispatch(
             if (isBookmarked) {
@@ -96,6 +105,9 @@ fun SquareIllustItem(
     }
     val onClick = {
         navToPictureScreen(illust.copy(isBookmarked = isBookmarked))
+    }
+    LaunchedEffect(Unit) {
+        showPopupTip = shouldShowTip && !hasShowBookmarkTipUseCase()
     }
     ConstraintLayout(
         modifier = Modifier
@@ -181,21 +193,42 @@ fun SquareIllustItem(
                 }
             }
         }
-        IconButton(
+        Box(
             modifier = Modifier
                 .constrainAs(bookmark) {
                     bottom.linkTo(image.bottom)
                     end.linkTo(image.end)
-                },
-            onClick = { onBookmarkClick(Restrict.PUBLIC, null) },
-            onLongClick = { showBottomSheet = true },
+                }
         ) {
-            Icon(
-                imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                contentDescription = "",
-                modifier = Modifier.size(24.dp),
-                tint = if (isBookmarked) Color.Red else Color.Gray
-            )
+            IconButton(
+                onClick = { onBookmarkClick(Restrict.PUBLIC, null) },
+                onLongClick = { showBottomSheet = true },
+            ) {
+                Icon(
+                    imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                    contentDescription = "",
+                    modifier = Modifier.size(24.dp),
+                    tint = if (isBookmarked) Color.Red else Color.Gray
+                )
+            }
+            if (showPopupTip) {
+                LaunchedEffect(Unit) {
+                    setShowBookmarkTipUseCase(true)
+                    delay(3000)
+                    showPopupTip = false
+                }
+                Popup(
+                    alignment = Alignment.TopCenter,
+                    offset = IntOffset(x = 0, y = -100)
+                ) {
+                    Text(
+                        text = stringResource(R.string.long_click_to_edit_favorite),
+                        modifier = Modifier
+                            .background(lightBlue, MaterialTheme.shapes.small)
+                            .padding(8.dp)
+                    )
+                }
+            }
         }
     }
     if (showBottomSheet) {

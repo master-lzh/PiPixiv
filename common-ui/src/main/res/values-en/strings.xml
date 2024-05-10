@@ -7,4 +7,5 @@
     <string name="add_to_favorite">Add to favorite!</string>
     <string name="edit_favorite">Edit favorite</string>
     <string name="save">Save</string>
+    <string name="long_click_to_edit_favorite">Long click to edit favorite</string>
 </resources>

@@ -36,7 +36,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -653,26 +653,21 @@ internal fun PictureScreen(
                     ),
                 )
             }
-            items(
+            itemsIndexed(
                 state.illustRelated,
-                key = { "${illust.id}_related_${it.id}" },
-                contentType = { "related_illusts" }
-            ) {
+                key = { _, it -> "${illust.id}_related_${it.id}" },
+                contentType = { _, _ -> "related_illusts" }
+            ) { index, it ->
                 // 相关作品
-                // 由于不能在LazyColumn中嵌套LazyColumn，所以这里拆分成每个Row两张图片
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    SquareIllustItem(
-                        illust = it,
-                        bookmarkState = bookmarkState,
-                        dispatch = bookmarkDispatch,
-                        spanCount = relatedSpanCount,
-                        paddingValues = PaddingValues(5.dp),
-                        elevation = 5.dp,
-                        navToPictureScreen = navToPictureScreen
-                    )
-                }
+                SquareIllustItem(
+                    illust = it,
+                    bookmarkState = bookmarkState,
+                    dispatch = bookmarkDispatch,
+                    spanCount = relatedSpanCount,
+                    paddingValues = PaddingValues(5.dp),
+                    shouldShowTip = index == 0,
+                    navToPictureScreen = navToPictureScreen
+                )
             }
 
             items(currentLoadingItem, key = { "loading_$it" }) {
