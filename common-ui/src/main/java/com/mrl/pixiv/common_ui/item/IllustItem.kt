@@ -232,9 +232,11 @@ fun SquareIllustItem(
         }
     }
     if (showBottomSheet) {
+        var publicSwitch by remember { mutableStateOf(true) }
         val illustBookmarkDetailTags = remember { mutableStateListOf<BookmarkDetailTag>() }
         LaunchedEffect(Unit) {
             getIllustBookmarkDetailUseCase(illust.id) {
+                publicSwitch = it.bookmarkDetail.restrict == Restrict.PUBLIC
                 illustBookmarkDetailTags.clear()
                 illustBookmarkDetailTags.addAll(it.bookmarkDetail.tags)
             }
@@ -252,7 +254,6 @@ fun SquareIllustItem(
             }
             val selectedTagsIndex = allTags.indices.filter { allTags[it].second }
             var inputTag by remember { mutableStateOf(TextFieldValue()) }
-            var publicSwitch by remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
