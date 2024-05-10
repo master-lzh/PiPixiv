@@ -37,3 +37,9 @@ data class UserFollowAddReq(
 data class UserFollowDeleteReq(
     val userId: Long,
 ) : IBaseQueryMap
+
+data class UserBookmarkTagsQuery(
+    val userId: Long,
+    @Restrict
+    val restrict: String,
+) : IBaseQueryMap

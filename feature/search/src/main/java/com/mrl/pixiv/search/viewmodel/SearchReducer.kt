@@ -14,7 +14,7 @@ class SearchReducer : Reducer<SearchState, SearchAction> {
             is SearchAction.ClearSearchResult -> {
                 state.copy(
                     searchResults = persistentListOf(),
-                    nextUrl = ""
+                    nextUrl = null
                 )
             }
 
@@ -29,7 +29,8 @@ class SearchReducer : Reducer<SearchState, SearchAction> {
             is SearchAction.UpdateSearchIllustsResult -> {
                 state.copy(
                     searchResults = (state.searchResults + action.illusts).toImmutableList(),
-                    nextUrl = action.nextUrl
+                    nextUrl = action.nextUrl,
+                    loading = false
                 )
             }
 

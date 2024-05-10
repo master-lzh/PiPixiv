@@ -34,4 +34,7 @@ class IllustRepository(
         illustHttpService.getIllustDetail(illustDetailQuery)
 
     suspend fun getUgoiraMetadata(illustId: Long) = ugoiraHttpService.getUgoiraMetadata(illustId)
+
+    suspend fun getIllustBookmarkDetail(illustId: Long) =
+        illustHttpService.getIllustBookmarkDetail(illustId)
 }

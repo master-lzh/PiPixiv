@@ -8,7 +8,8 @@ class HistoryReducer : Reducer<HistoryState, HistoryAction> {
         return when (action) {
             is HistoryAction.UpdateHistory -> state.copy(
                 illusts = (state.illusts + action.illusts).toImmutableList(),
-                illustNextUrl = action.nextUrl
+                illustNextUrl = action.nextUrl,
+                loading = false
             )
 
             is HistoryAction.UpdateSearch -> state.copy(currentSearch = action.search)

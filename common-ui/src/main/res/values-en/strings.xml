@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bookmark_tags">Bookmark tags</string>
+    <string name="word_public">Public</string>
+    <string name="word_private">Private</string>
+    <string name="add_tags">Add tags</string>
+    <string name="add_to_favorite">Add to favorite!</string>
+    <string name="edit_favorite">Edit favorite</string>
+    <string name="save">Save</string>
+    <string name="long_click_to_edit_favorite">Long click to edit favorite</string>
+</resources>

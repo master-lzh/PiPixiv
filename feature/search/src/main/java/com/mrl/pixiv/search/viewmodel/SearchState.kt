@@ -18,7 +18,8 @@ data class SearchState(
     val searchFilter: SearchFilter,
     val searchHistory: ImmutableList<SearchHistory>,
     val searchResults: ImmutableList<Illust>,
-    val nextUrl: String,
+    val nextUrl: String?,
+    val loading: Boolean,
 ) : State {
 
     data class SearchFilter(
@@ -38,7 +39,8 @@ data class SearchState(
             ),
             searchHistory = persistentListOf(),
             searchResults = persistentListOf(),
-            nextUrl = "",
+            nextUrl = null,
+            loading = true,
         )
     }
 }

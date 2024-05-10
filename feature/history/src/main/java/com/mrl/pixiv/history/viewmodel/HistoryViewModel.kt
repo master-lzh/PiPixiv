@@ -8,12 +8,14 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 data class HistoryState(
+    val loading: Boolean,
     val currentSearch: String,
     val illusts: ImmutableList<Illust>,
     val illustNextUrl: String?,
 ) : State {
     companion object {
         val INITIAL = HistoryState(
+            loading = true,
             currentSearch = "",
             illusts = persistentListOf(),
             illustNextUrl = null

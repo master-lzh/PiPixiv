@@ -10,7 +10,7 @@ data class SearchIllustResp (
     val illusts: List<Illust>,
 
     @SerialName("next_url")
-    val nextUrl: String,
+    val nextUrl: String? = null,
 
     @SerialName("search_span_limit")
     val searchSpanLimit: Long,

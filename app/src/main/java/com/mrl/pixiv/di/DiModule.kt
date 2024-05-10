@@ -6,6 +6,9 @@ import com.mrl.pixiv.api.TrendingApi
 import com.mrl.pixiv.api.UgoiraApi
 import com.mrl.pixiv.api.UserApi
 import com.mrl.pixiv.api.UserAuthApi
+import com.mrl.pixiv.collection.viewmodel.CollectionMiddleware
+import com.mrl.pixiv.collection.viewmodel.CollectionReducer
+import com.mrl.pixiv.collection.viewmodel.CollectionViewModel
 import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
 import com.mrl.pixiv.common.data.DispatcherEnum
 import com.mrl.pixiv.common.middleware.auth.AuthMiddleware
@@ -30,12 +33,13 @@ import com.mrl.pixiv.datasource.remote.UgoiraHttpService
 import com.mrl.pixiv.datasource.remote.UserAuthHttpService
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import com.mrl.pixiv.domain.GetLocalUserInfoUseCase
+import com.mrl.pixiv.domain.HasShowBookmarkTipUseCase
 import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
+import com.mrl.pixiv.domain.SetShowBookmarkTipUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
-import com.mrl.pixiv.domain.bookmark.BookmarkUseCase
-import com.mrl.pixiv.domain.bookmark.UnBookmarkUseCase
+import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.domain.setting.GetAppThemeUseCase
 import com.mrl.pixiv.history.viewmodel.HistoryMiddleware
 import com.mrl.pixiv.history.viewmodel.HistoryReducer
@@ -57,6 +61,7 @@ import com.mrl.pixiv.profile.viewmodel.ProfileMiddleware
 import com.mrl.pixiv.profile.viewmodel.ProfileReducer
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.repository.AuthRepository
+import com.mrl.pixiv.repository.CollectionRepository
 import com.mrl.pixiv.repository.HistoryRepository
 import com.mrl.pixiv.repository.IllustRepository
 import com.mrl.pixiv.repository.SearchRepository
@@ -154,6 +159,8 @@ val viewModelModule = module {
     viewModelOf(::SettingViewModel)
 
     viewModelOf(::HistoryViewModel)
+
+    viewModelOf(::CollectionViewModel)
 }
 
 val repositoryModule = module {
@@ -166,6 +173,7 @@ val repositoryModule = module {
     singleOf(::SearchRepository)
     singleOf(::TrendingRepository)
     singleOf(::HistoryRepository)
+    singleOf(::CollectionRepository)
 }
 
 val dataSourceModule = module {
@@ -188,9 +196,10 @@ val useCaseModule = module {
     singleOf(::GetLocalUserInfoUseCase)
     singleOf(::SetLocalUserInfoUseCase)
     singleOf(::RefreshUserAccessTokenUseCase)
-    singleOf(::BookmarkUseCase)
-    singleOf(::UnBookmarkUseCase)
     singleOf(::GetAppThemeUseCase)
+    singleOf(::GetIllustBookmarkDetailUseCase)
+    singleOf(::HasShowBookmarkTipUseCase)
+    singleOf(::SetShowBookmarkTipUseCase)
 }
 
 val middlewareModule = module {
@@ -217,6 +226,8 @@ val middlewareModule = module {
     factoryOf(::SettingMiddleware)
 
     factoryOf(::HistoryMiddleware)
+
+    factoryOf(::CollectionMiddleware)
 }
 
 val reducerModule = module {
@@ -232,6 +243,7 @@ val reducerModule = module {
     singleOf(::SearchPreviewReducer)
     singleOf(::SettingReducer)
     singleOf(::HistoryReducer)
+    singleOf(::CollectionReducer)
 }
 
 fun provideAuthService(

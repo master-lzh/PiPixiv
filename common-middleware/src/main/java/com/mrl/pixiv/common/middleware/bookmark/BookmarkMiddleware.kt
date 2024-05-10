@@ -10,7 +10,12 @@ class BookmarkMiddleware(
 ) : Middleware<BookmarkState, BookmarkAction>() {
     override suspend fun process(state: BookmarkState, action: BookmarkAction) {
         when (action) {
-            is BookmarkAction.IllustBookmarkAddIntent -> bookmarkIllust(action.illustId)
+            is BookmarkAction.IllustBookmarkAddIntent -> bookmarkIllust(
+                action.illustId,
+                action.restrict,
+                action.tags
+            )
+
             is BookmarkAction.IllustBookmarkDeleteIntent -> deleteBookmarkIllust(action.illustId)
 
             else -> {}
@@ -31,10 +36,12 @@ class BookmarkMiddleware(
         }
     }
 
-    private fun bookmarkIllust(illustId: Long) {
+    private fun bookmarkIllust(illustId: Long, restrict: String, tags: List<String>?) {
         launchNetwork {
             requestHttpDataWithFlow(
-                request = illustRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
+                request = illustRepository.postIllustBookmarkAdd(
+                    IllustBookmarkAddReq(illustId, restrict, tags)
+                )
             ) {
                 dispatch(BookmarkAction.UpdateBookmarkState(illustId, true))
             }
