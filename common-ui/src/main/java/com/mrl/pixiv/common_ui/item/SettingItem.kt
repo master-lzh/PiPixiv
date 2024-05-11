@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +25,7 @@ fun SettingItem(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .throttleClick(indication = rememberRipple()) { onClick() }) {
+            .throttleClick(indication = ripple()) { onClick() }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

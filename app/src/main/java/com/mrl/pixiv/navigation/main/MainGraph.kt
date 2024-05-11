@@ -2,6 +2,7 @@ package com.mrl.pixiv.navigation.main
 
 import android.content.Intent
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -24,7 +25,10 @@ import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
+import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
+import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.di.JSON
@@ -62,219 +66,246 @@ fun MainGraph(
         koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
     val intent = splashViewModel.intent.collectAsStateWithLifecycle().value
     HandleDeeplink(intent, navHostController)
-    NavHost(
-        navController = navHostController,
-        route = Graph.MAIN,
-        startDestination = Destination.HomeScreen.route,
-    ) {
-        // 首页
-        composable(
-            route = Destination.HomeScreen.route,
-            deepLinks = DestinationsDeepLink.HomePattern.map {
-                navDeepLink {
-                    uriPattern = it
-                }
-            },
-        ) {
-            HomeScreen(
-                modifier = modifier,
-                homeViewModel = homeViewModel,
-                bookmarkViewModel = bookmarkViewModel
-            )
-        }
-
-        // 搜索预览页
-        composable(
-            route = Destination.SearchPreviewScreen.route,
-        ) {
-            SearchPreviewScreen(
-                modifier = modifier,
-            )
-        }
-
-        // 个人主页
-        composable(
-            route = Destination.ProfileScreen.route,
-        ) {
-            ProfileScreen(
-                modifier = modifier,
-            )
-        }
-
-        // 个人详情页
-        composable(
-            route = Destination.SelfProfileDetailScreen.route,
-        ) {
-            SelfProfileDetailScreen(
-                bookmarkViewModel = bookmarkViewModel
-            )
-        }
-
-        // 他人详情页
-        composable(
-            route = "${Destination.OtherProfileDetailScreen.route}/{${Destination.OtherProfileDetailScreen.userId}}",
-            arguments = listOf(
-                navArgument(Destination.OtherProfileDetailScreen.userId) {
-//                    type = NavType.LongType
-                    defaultValue = 0L
-                }
-            ),
-            deepLinks = DestinationsDeepLink.ProfileDetailPattern.map {
-                navDeepLink {
-                    uriPattern = it
-                }
-            },
-        ) {
-            OtherProfileDetailScreen(
-                uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId) ?: 0L,
-                bookmarkViewModel = bookmarkViewModel
-            )
-        }
-
-        // 作品详情页
-        composable(
-            route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustParams}}",
-            arguments = listOf(
-                navArgument(Destination.PictureScreen.illustParams) {
-                    defaultValue = ""
-                }
-            ),
-            enterTransition = { scaleIn(initialScale = 0.9f) + fadeIn() },
-            exitTransition = { scaleOut(targetScale = 1.1f) + fadeOut() },
-            popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
-            popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
-        ) {
-            val illustParams =
-                (it.arguments?.getString(Destination.PictureScreen.illustParams)) ?: ""
-            val illustDecode = Base64.UrlSafe.decode(illustParams).decodeToString()
-            val illust = JSON.decodeFromString<Illust>(illustDecode)
-            PictureScreen(
-                illust = illust,
-                bookmarkViewModel = bookmarkViewModel,
-                followViewModel = followViewModel,
-            )
-        }
-
-        composable(
-            route = "${Destination.PictureDeeplinkScreen.route}/{${Destination.PictureDeeplinkScreen.illustId}}",
-            arguments = listOf(
-                navArgument(Destination.PictureDeeplinkScreen.illustId) {
-                    defaultValue = 0L
-                }
-            ),
-            deepLinks = DestinationsDeepLink.PicturePattern.map {
-                navDeepLink {
-                    uriPattern = it
-                }
-            },
-        ) {
-            val illustId = it.arguments?.getLong(Destination.PictureDeeplinkScreen.illustId) ?: 0L
-            PictureDeeplinkScreen(
-                illustId = illustId,
-                bookmarkViewModel = bookmarkViewModel,
-                followViewModel = followViewModel,
-            )
-        }
-
-        // 搜索页
-        composable(
-            route = Destination.SearchScreen.route,
-        ) {
-            val searchViewModel: SearchViewModel = koinViewModel(viewModelStoreOwner = it)
-            val searchNavHostController = rememberNavController()
-            CompositionLocalProvider(LocalNavigator provides searchNavHostController) {
-                NavHost(
-                    navController = searchNavHostController,
-                    route = Graph.SEARCH,
-                    startDestination = Destination.SearchScreen.route
+    SharedTransitionLayout {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            NavHost(
+                navController = navHostController,
+                route = Graph.MAIN,
+                startDestination = Destination.HomeScreen.route,
+            ) {
+                // 首页
+                composable(
+                    route = Destination.HomeScreen.route,
+                    deepLinks = DestinationsDeepLink.HomePattern.map {
+                        navDeepLink {
+                            uriPattern = it
+                        }
+                    },
                 ) {
-                    composable(
-                        route = Destination.SearchScreen.route,
-                    ) {
-                        SearchScreen(
-                            navHostController = navHostController,
-                            searchViewModel = searchViewModel
-                        )
-                    }
-                    composable(
-                        route = Destination.SearchResultsScreen.route,
-                    ) {
-                        SearchResultScreen(
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
+                        HomeScreen(
+                            modifier = modifier,
+                            homeViewModel = homeViewModel,
                             bookmarkViewModel = bookmarkViewModel,
-                            searchViewModel = searchViewModel,
-                            navHostController = navHostController
                         )
                     }
                 }
-            }
-        }
 
-        // 外部搜索结果页
-        composable(
-            route = "${Destination.SearchResultsScreen.route}/{${Destination.SearchResultsScreen.searchWord}}",
-            arguments = listOf(
-                navArgument(Destination.SearchResultsScreen.searchWord) {
-                    defaultValue = ""
-                }
-            ),
-        ) {
-            val searchWord =
-                (it.arguments?.getString(Destination.SearchResultsScreen.searchWord))
-                    ?: ""
-            OutsideSearchResultsScreen(
-                searchWord = searchWord,
-                bookmarkViewModel = bookmarkViewModel,
-            )
-        }
-
-        // 设置页
-        composable(
-            route = Destination.SettingScreen.route,
-        ) {
-            val settingViewModel: SettingViewModel =
-                koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
-            val settingNavHostController = rememberNavController()
-            CompositionLocalProvider(LocalNavigator provides settingNavHostController) {
-                NavHost(
-                    navController = settingNavHostController,
-                    startDestination = Destination.SettingScreen.route
+                // 搜索预览页
+                composable(
+                    route = Destination.SearchPreviewScreen.route,
                 ) {
-                    composable(
-                        route = Destination.SettingScreen.route,
+                    SearchPreviewScreen(
+                        modifier = modifier,
+                    )
+                }
+
+                // 个人主页
+                composable(
+                    route = Destination.ProfileScreen.route,
+                ) {
+                    ProfileScreen(
+                        modifier = modifier,
+                    )
+                }
+
+                // 个人详情页
+                composable(
+                    route = Destination.SelfProfileDetailScreen.route,
+                ) {
+                    SelfProfileDetailScreen(
+                        bookmarkViewModel = bookmarkViewModel
+                    )
+                }
+
+                // 他人详情页
+                composable(
+                    route = "${Destination.OtherProfileDetailScreen.route}/{${Destination.OtherProfileDetailScreen.userId}}",
+                    arguments = listOf(
+                        navArgument(Destination.OtherProfileDetailScreen.userId) {
+//                    type = NavType.LongType
+                            defaultValue = 0L
+                        }
+                    ),
+                    deepLinks = DestinationsDeepLink.ProfileDetailPattern.map {
+                        navDeepLink {
+                            uriPattern = it
+                        }
+                    },
+                ) {
+                    OtherProfileDetailScreen(
+                        uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId)
+                            ?: 0L,
+                        bookmarkViewModel = bookmarkViewModel
+                    )
+                }
+
+                // 作品详情页
+                composable(
+                    route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustParams}}?prefix={${Destination.PictureScreen.prefix}}",
+                    arguments = listOf(
+                        navArgument(Destination.PictureScreen.illustParams) {
+                            defaultValue = ""
+                        },
+                        navArgument(Destination.PictureScreen.prefix) {
+                            defaultValue = ""
+                        }
+                    ),
+                    enterTransition = { scaleIn(initialScale = 0.9f) + fadeIn() },
+                    exitTransition = { scaleOut(targetScale = 1.1f) + fadeOut() },
+                    popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
+                    popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
+                ) {
+                    val illustParams =
+                        (it.arguments?.getString(Destination.PictureScreen.illustParams)) ?: ""
+                    val illustDecode = Base64.UrlSafe.decode(illustParams).decodeToString()
+                    val illust = JSON.decodeFromString<Illust>(illustDecode)
+                    val prefix = it.arguments?.getString(Destination.PictureScreen.prefix) ?: ""
+                    CompositionLocalProvider(
+                        LocalAnimatedContentScope provides this,
+                        LocalSharedKeyPrefix provides prefix
                     ) {
-                        SettingScreen(
-                            viewModel = settingViewModel,
-                            mainNavHostController = navHostController
+                        PictureScreen(
+                            illust = illust,
+                            bookmarkViewModel = bookmarkViewModel,
+                            followViewModel = followViewModel,
+                        )
+                    }
+                }
+
+                composable(
+                    route = "${Destination.PictureDeeplinkScreen.route}/{${Destination.PictureDeeplinkScreen.illustId}}",
+                    arguments = listOf(
+                        navArgument(Destination.PictureDeeplinkScreen.illustId) {
+                            defaultValue = 0L
+                        }
+                    ),
+                    deepLinks = DestinationsDeepLink.PicturePattern.map {
+                        navDeepLink {
+                            uriPattern = it
+                        }
+                    },
+                ) {
+                    val illustId =
+                        it.arguments?.getLong(Destination.PictureDeeplinkScreen.illustId) ?: 0L
+                    PictureDeeplinkScreen(
+                        illustId = illustId,
+                        bookmarkViewModel = bookmarkViewModel,
+                        followViewModel = followViewModel,
+                    )
+                }
+
+                // 搜索页
+                composable(
+                    route = Destination.SearchScreen.route,
+                ) {
+                    val searchViewModel: SearchViewModel = koinViewModel(viewModelStoreOwner = it)
+                    val searchNavHostController = rememberNavController()
+                    CompositionLocalProvider(
+                        LocalNavigator provides searchNavHostController,
+                        LocalAnimatedContentScope provides this
+                    ) {
+                        NavHost(
+                            navController = searchNavHostController,
+                            route = Graph.SEARCH,
+                            startDestination = Destination.SearchScreen.route
+                        ) {
+                            composable(
+                                route = Destination.SearchScreen.route,
+                            ) {
+                                SearchScreen(
+                                    navHostController = navHostController,
+                                    searchViewModel = searchViewModel
+                                )
+                            }
+                            composable(
+                                route = Destination.SearchResultsScreen.route,
+                            ) {
+                                SearchResultScreen(
+                                    bookmarkViewModel = bookmarkViewModel,
+                                    searchViewModel = searchViewModel,
+                                    navHostController = navHostController
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // 外部搜索结果页
+                composable(
+                    route = "${Destination.SearchResultsScreen.route}/{${Destination.SearchResultsScreen.searchWord}}",
+                    arguments = listOf(
+                        navArgument(Destination.SearchResultsScreen.searchWord) {
+                            defaultValue = ""
+                        }
+                    ),
+                ) {
+                    val searchWord =
+                        (it.arguments?.getString(Destination.SearchResultsScreen.searchWord))
+                            ?: ""
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        OutsideSearchResultsScreen(
+                            searchWord = searchWord,
+                            bookmarkViewModel = bookmarkViewModel,
                         )
                     }
 
-                    // 网络设置页
-                    composable(
-                        route = Destination.NetworkSettingScreen.route,
-                    ) {
-                        NetworkSettingScreen(viewModel = settingViewModel)
+                }
+
+                // 设置页
+                composable(
+                    route = Destination.SettingScreen.route,
+                ) {
+                    val settingViewModel: SettingViewModel =
+                        koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
+                    val settingNavHostController = rememberNavController()
+                    CompositionLocalProvider(LocalNavigator provides settingNavHostController) {
+                        NavHost(
+                            navController = settingNavHostController,
+                            startDestination = Destination.SettingScreen.route
+                        ) {
+                            composable(
+                                route = Destination.SettingScreen.route,
+                            ) {
+                                SettingScreen(
+                                    viewModel = settingViewModel,
+                                    mainNavHostController = navHostController
+                                )
+                            }
+
+                            // 网络设置页
+                            composable(
+                                route = Destination.NetworkSettingScreen.route,
+                            ) {
+                                NetworkSettingScreen(viewModel = settingViewModel)
+                            }
+                        }
+                    }
+                }
+
+                // 历史记录
+                composable(
+                    route = Destination.HistoryScreen.route,
+                ) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        HistoryScreen(
+                            modifier = modifier,
+                        )
+                    }
+                }
+
+                // 本人收藏页
+                composable(
+                    route = Destination.SelfCollectionScreen.route,
+                ) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        SelfCollectionScreen(
+                            modifier = modifier,
+                            bookmarkViewModel = bookmarkViewModel
+                        )
                     }
                 }
             }
-        }
-
-        // 历史记录
-        composable(
-            route = Destination.HistoryScreen.route,
-        ) {
-            HistoryScreen(
-                modifier = modifier,
-            )
-        }
-
-        // 本人收藏页
-        composable(
-            route = Destination.SelfCollectionScreen.route,
-        ) {
-            SelfCollectionScreen(
-                modifier = modifier,
-                bookmarkViewModel = bookmarkViewModel
-            )
         }
     }
 }

@@ -103,6 +103,7 @@ private fun Project.configureKotlin() {
                 "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
                 "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
                 "-opt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
+                "-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi",
                 "-opt-in=coil3.annotation.ExperimentalCoilApi",
             )
         }

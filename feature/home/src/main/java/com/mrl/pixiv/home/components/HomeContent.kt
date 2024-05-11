@@ -14,7 +14,7 @@ import kotlinx.collections.immutable.toImmutableList
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun HomeContent(
-    navToPictureScreen: (Illust) -> Unit,
+    navToPictureScreen: (Illust, String) -> Unit,
     state: HomeState,
     bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,

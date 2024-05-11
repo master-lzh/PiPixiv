@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
@@ -53,14 +53,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.window.Popup
-import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
+import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.m3.IconButton
 import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
+import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.common_ui.R
 import com.mrl.pixiv.data.Illust
@@ -74,6 +76,7 @@ import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
+import java.util.UUID
 
 @Composable
 fun SquareIllustItem(
@@ -85,10 +88,10 @@ fun SquareIllustItem(
     paddingValues: PaddingValues = PaddingValues(1.dp),
     elevation: Dp = 5.dp,
     shouldShowTip: Boolean = false,
-    navToPictureScreen: (Illust) -> Unit,
+    navToPictureScreen: (Illust, String) -> Unit,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState(true)
+    val bottomSheetState = rememberModalBottomSheetState()
     val getIllustBookmarkDetailUseCase = koinInject<GetIllustBookmarkDetailUseCase>()
     val hasShowBookmarkTipUseCase = koinInject<HasShowBookmarkTipUseCase>()
     val setShowBookmarkTipUseCase = koinInject<SetShowBookmarkTipUseCase>()
@@ -103,13 +106,14 @@ fun SquareIllustItem(
             }
         )
     }
+    val prefix = rememberSaveable { UUID.randomUUID().toString() }
     val onClick = {
-        navToPictureScreen(illust.copy(isBookmarked = isBookmarked))
+        navToPictureScreen(illust.copy(isBookmarked = isBookmarked), prefix)
     }
     LaunchedEffect(Unit) {
         showPopupTip = shouldShowTip && !hasShowBookmarkTipUseCase()
     }
-    ConstraintLayout(
+    Box(
         modifier = Modifier
             .padding(paddingValues)
             .graphicsLayer(
@@ -123,32 +127,28 @@ fun SquareIllustItem(
             .clip(MaterialTheme.shapes.medium)
             .throttleClick { onClick() }
     ) {
-        val (image, bookmark, labelRow) = createRefs()
         val screenWidth = LocalConfiguration.current.screenWidthDp.dp
         val size =
             (screenWidth - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
                 LayoutDirection.Ltr
             ) - 1.dp) / spanCount
-        AsyncImage(
-            modifier = Modifier
-                .size(size)
-                .constrainAs(image) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                },
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(illust.imageUrls.squareMedium).allowRgb565(true).build(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop
-        )
+        with(LocalSharedTransitionScope.currentOrThrow) {
+            AsyncImage(
+                modifier = Modifier
+                    .sharedElement(
+                        rememberSharedContentState(key = "${prefix}-image-${illust.id}-0"),
+                        animatedVisibilityScope = LocalAnimatedContentScope.currentOrThrow
+                    )
+                    .size(size),
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(illust.imageUrls.squareMedium).allowRgb565(true).build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+        }
         Row(
             modifier = Modifier
-                .constrainAs(labelRow) {
-                    top.linkTo(image.top)
-                    end.linkTo(image.end)
-                }
+                .align(Alignment.TopEnd)
                 .padding(5.dp),
             horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -194,11 +194,7 @@ fun SquareIllustItem(
             }
         }
         Box(
-            modifier = Modifier
-                .constrainAs(bookmark) {
-                    bottom.linkTo(image.bottom)
-                    end.linkTo(image.end)
-                }
+            modifier = Modifier.align(Alignment.BottomEnd)
         ) {
             IconButton(
                 onClick = { onBookmarkClick(Restrict.PUBLIC, null) },
@@ -244,8 +240,7 @@ fun SquareIllustItem(
         ModalBottomSheet(
             onDismissRequest = { showBottomSheet = false },
             modifier = Modifier
-                .imePadding()
-                .height(LocalConfiguration.current.screenHeightDp.dp * (2f / 3f)),
+                .imePadding(),
             sheetState = bottomSheetState,
             containerColor = MaterialTheme.colorScheme.background,
         ) {

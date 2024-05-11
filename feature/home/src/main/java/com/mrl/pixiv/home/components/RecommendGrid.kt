@@ -22,7 +22,7 @@ private const val LOADING_ITEM_COUNT = 4
 
 @Composable
 fun RecommendGrid(
-    navToPictureScreen: (Illust) -> Unit,
+    navToPictureScreen: (Illust, String) -> Unit,
     bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,
     recommendImageList: ImmutableList<Illust>,

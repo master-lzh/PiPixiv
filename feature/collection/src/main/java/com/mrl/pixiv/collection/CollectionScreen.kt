@@ -81,7 +81,7 @@ fun CollectionScreen_(
     dispatch: (CollectionAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
     popBack: () -> Unit = {},
-    navToPictureScreen: (Illust) -> Unit = {}
+    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> }
 ) {
     Screen(
         modifier = modifier,

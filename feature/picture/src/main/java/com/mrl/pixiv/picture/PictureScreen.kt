@@ -59,6 +59,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
@@ -104,7 +105,10 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowAction
 import com.mrl.pixiv.common.middleware.follow.FollowState
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
+import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
+import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.components.m3.Surface
@@ -139,6 +143,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
+import java.util.UUID
 
 
 @Composable
@@ -209,12 +214,12 @@ fun PictureDeeplinkScreen(
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
-    modifier: Modifier = Modifier,
     state: PictureState,
     bookmarkState: BookmarkState,
     followState: FollowState,
     illust: Illust,
-    navToPictureScreen: (Illust) -> Unit = {},
+    modifier: Modifier = Modifier,
+    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
@@ -378,38 +383,79 @@ internal fun PictureScreen(
             }
         }
     ) {
+        val prefix = LocalSharedKeyPrefix.current
+        val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
+        val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
         LazyVerticalStaggeredGrid(
             state = lazyStaggeredGridState,
             columns = StaggeredGridCells.Fixed(relatedSpanCount),
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            if (illust.type == Type.Ugoira) {
-                item(span = StaggeredGridItemSpan.FullLine, key = "ugoira") {
-                    UgoiraPlayer(
-                        images = state.ugoiraImages,
-                        placeholder = placeholder
-                    )
-                }
-            } else {
-                items(
-                    illust.pageCount,
-                    key = { "${illust.id}_$it" },
-                    span = { StaggeredGridItemSpan.FullLine }
-                ) { index ->
-                    if (illust.pageCount > 1) {
-                        illust.metaPages?.get(index)?.let {
+            with(sharedTransitionScope) {
+                if (illust.type == Type.Ugoira) {
+                    item(span = StaggeredGridItemSpan.FullLine, key = "ugoira") {
+                        UgoiraPlayer(
+                            images = state.ugoiraImages,
+                            placeholder = placeholder
+                        )
+                    }
+                } else {
+                    items(
+                        illust.pageCount,
+                        key = { "${illust.id}_$it" },
+                        span = { StaggeredGridItemSpan.FullLine }
+                    ) { index ->
+                        if (illust.pageCount > 1) {
+                            illust.metaPages?.get(index)?.let {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(it.imageUrls?.large)
+                                        .placeholderMemoryCacheKey("image-${illust.id}-$index")
+                                        .memoryCacheKey("image-${illust.id}-$index")
+                                        .build(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .then(
+                                            if (index == 0) Modifier.sharedElement(
+                                                sharedTransitionScope.rememberSharedContentState(key = "${prefix}-image-${illust.id}-0"),
+                                                animatedVisibilityScope = animatedContentScope
+                                            )
+                                            else Modifier
+                                        )
+                                        .fillMaxWidth()
+                                        .throttleClick(
+                                            onLongClick = {
+                                                currLongClickPic =
+                                                    Pair(index, it.imageUrls?.original ?: "")
+                                                openBottomSheet = true
+                                            }
+                                        ),
+                                    contentScale = ContentScale.FillWidth,
+                                    placeholder = placeholder,
+                                )
+                            }
+                        } else {
                             AsyncImage(
                                 model = ImageRequest.Builder(LocalContext.current)
-                                    .data(it.imageUrls?.large)
+                                    .data(illust.imageUrls.large)
+                                    .placeholderMemoryCacheKey("image-${illust.id}-$index")
+                                    .memoryCacheKey("image-${illust.id}-$index")
                                     .build(),
                                 contentDescription = null,
                                 modifier = Modifier
+                                    .then(
+                                        if (index == 0) Modifier.sharedElement(
+                                            sharedTransitionScope.rememberSharedContentState(key = "${prefix}-image-${illust.id}-0"),
+                                            animatedVisibilityScope = animatedContentScope
+                                        )
+                                        else Modifier
+                                    )
                                     .fillMaxWidth()
                                     .throttleClick(
                                         onLongClick = {
                                             currLongClickPic =
-                                                Pair(index, it.imageUrls?.original ?: "")
+                                                Pair(0, illust.metaSinglePage.originalImageURL)
                                             openBottomSheet = true
                                         }
                                     ),
@@ -417,24 +463,6 @@ internal fun PictureScreen(
                                 placeholder = placeholder,
                             )
                         }
-                    } else {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(illust.imageUrls.large)
-                                .build(),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .throttleClick(
-                                    onLongClick = {
-                                        currLongClickPic =
-                                            Pair(0, illust.metaSinglePage.originalImageURL)
-                                        openBottomSheet = true
-                                    }
-                                ),
-                            contentScale = ContentScale.FillWidth,
-                            placeholder = placeholder,
-                        )
                     }
                 }
             }
@@ -624,19 +652,24 @@ internal fun PictureScreen(
                         .padding(horizontal = 15.dp)
                         .padding(top = 10.dp)
                 ) {
-                    state.userIllusts.subList(0, minOf(userSpanCount, state.userIllusts.size))
-                        .forEach {
-                            SquareIllustItem(
-                                illust = it,
-                                bookmarkState = bookmarkState,
-                                dispatch = bookmarkDispatch,
-                                spanCount = minOf(userSpanCount, state.userIllusts.size),
-                                horizontalPadding = 15.dp,
-                                paddingValues = PaddingValues(2.dp),
-                                elevation = 5.dp,
-                                navToPictureScreen = navToPictureScreen
-                            )
-                        }
+                    val otherPrefix = remember { UUID.randomUUID().toString() }
+                    CompositionLocalProvider(
+                        LocalSharedKeyPrefix provides otherPrefix
+                    ) {
+                        state.userIllusts.subList(0, minOf(userSpanCount, state.userIllusts.size))
+                            .forEach {
+                                SquareIllustItem(
+                                    illust = it,
+                                    bookmarkState = bookmarkState,
+                                    dispatch = bookmarkDispatch,
+                                    spanCount = minOf(userSpanCount, state.userIllusts.size),
+                                    horizontalPadding = 15.dp,
+                                    paddingValues = PaddingValues(2.dp),
+                                    elevation = 5.dp,
+                                    navToPictureScreen = navToPictureScreen
+                                )
+                            }
+                    }
                 }
             }
             item(span = StaggeredGridItemSpan.FullLine, key = "illust_related_title") {

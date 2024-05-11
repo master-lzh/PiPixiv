@@ -118,7 +118,7 @@ internal fun SearchResultScreen_(
     modifier: Modifier = Modifier,
     state: SearchState = SearchState.INITIAL,
     popBack: () -> Unit = {},
-    naviToPic: (Illust) -> Unit = {},
+    naviToPic: (Illust, String) -> Unit = { _, _ -> },
     dispatch: (SearchAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
     bookmarkState: BookmarkState = BookmarkState.INITIAL,

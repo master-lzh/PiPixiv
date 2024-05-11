@@ -108,7 +108,7 @@ internal fun HomeScreen(
     state: HomeState,
     bookmarkState: BookmarkState,
     bookmarkDispatch: (BookmarkAction) -> Unit,
-    navToPictureScreen: (Illust) -> Unit,
+    navToPictureScreen: (Illust, String) -> Unit,
     onRefresh: () -> Unit,
     onScrollToBottom: () -> Unit,
     dispatch: (HomeAction) -> Unit = {},
