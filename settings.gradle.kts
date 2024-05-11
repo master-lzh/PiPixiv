@@ -25,6 +25,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven(url = "https://www.jitpack.io")
+        maven (url ="https://androidx.dev/storage/compose-compiler/repository/")
     }
 }
 rootProject.name = "PiPixiv"
