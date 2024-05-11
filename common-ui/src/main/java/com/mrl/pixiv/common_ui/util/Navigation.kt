@@ -10,14 +10,14 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalEncodingApi::class)
-fun NavHostController.navigateToPictureScreen(illust: Illust) {
+fun NavHostController.navigateToPictureScreen(illust: Illust, prefix: String) {
     navigate(
         route = "${Destination.PictureScreen.route}/${
             Base64.UrlSafe.encode(
                 Json.encodeToString(illust)
                     .encodeToByteArray()
             )
-        }"
+        }?prefix=${prefix}"
     ) {
         restoreState = true
     }

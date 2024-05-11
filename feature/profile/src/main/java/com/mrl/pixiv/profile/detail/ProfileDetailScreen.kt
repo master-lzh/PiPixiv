@@ -110,7 +110,7 @@ internal fun ProfileDetailScreen(
     state: ProfileDetailState,
     bookmarkState: BookmarkState,
     bookmarkDispatch: (BookmarkAction) -> Unit,
-    navToPictureScreen: (Illust) -> Unit = {},
+    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
     dispatch: (ProfileDetailAction) -> Unit,
     popBack: () -> Unit = { },
 ) {

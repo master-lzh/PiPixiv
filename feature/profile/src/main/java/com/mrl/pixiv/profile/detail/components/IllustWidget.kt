@@ -35,7 +35,7 @@ fun IllustWidget(
     endText: String,
     bookmarkState: BookmarkState,
     bookmarkDispatch: (BookmarkAction) -> Unit,
-    navToPictureScreen: (Illust) -> Unit,
+    navToPictureScreen: (Illust, String) -> Unit,
     illusts: List<Illust>,
 ) {
     val horizontalPadding = 16.dp
