@@ -1,6 +1,6 @@
 [versions]
-kotlin_version = "1.9.23"
-ksp = "1.9.23-1.0.19"
+kotlin_version = "1.9.24"
+ksp = "1.9.24-1.0.20"
 serialization_version = "1.6.3"
 xml_serialization_version = "0.86.2"
 coroutines_version = "1.8.0"

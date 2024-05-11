@@ -141,7 +141,11 @@ fun SquareIllustItem(
                     )
                     .size(size),
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(illust.imageUrls.squareMedium).allowRgb565(true).build(),
+                    .data(illust.imageUrls.squareMedium)
+                    .allowRgb565(true)
+                    .placeholderMemoryCacheKey("image-${illust.id}-0")
+                    .memoryCacheKey("image-${illust.id}-0")
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
