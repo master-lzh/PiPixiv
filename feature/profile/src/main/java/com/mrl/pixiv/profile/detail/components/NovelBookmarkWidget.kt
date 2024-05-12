@@ -22,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mrl.pixiv.data.Novel
@@ -83,29 +82,19 @@ private fun NovelItem(
                 .padding(horizontal = 16.dp)
                 .padding(top = 10.dp)
         ) {
-            ConstraintLayout {
-                val (image, likeIcon) = createRefs()
+            Column(
+                modifier = Modifier.padding(start = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 AsyncImage(
-                    modifier = Modifier
-                        .height(90.dp)
-                        .padding(start = 16.dp)
-                        .constrainAs(image) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                        },
+                    modifier = Modifier.height(90.dp),
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(novel.imageUrls.medium)
                         .build(),
                     contentDescription = null
                 )
                 Row(
-                    modifier = Modifier
-                        .padding(top = 5.dp)
-                        .constrainAs(likeIcon) {
-                            top.linkTo(image.bottom)
-                            start.linkTo(image.start)
-                            end.linkTo(image.end)
-                        },
+                    modifier = Modifier.padding(top = 5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(

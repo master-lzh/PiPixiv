@@ -90,7 +90,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.navigation.NavHostController
@@ -763,19 +762,16 @@ internal fun PictureScreen(
                     dispatch(PictureAction.LoadMoreIllustRelatedIntent(state.nextUrl.queryParams))
                 }
             }
-            ConstraintLayout(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                val picInfo = createRef()
                 AnimatedVisibility(
                     visible = !isScrollToBottom.value,
                     enter = fadeIn(),
                     exit = fadeOut(),
                     modifier = Modifier
-                        .constrainAs(picInfo) {
-                            bottom.linkTo(parent.bottom)
-                        }
+                        .align(Alignment.BottomCenter)
                 ) {
                     Row(
                         modifier = Modifier
