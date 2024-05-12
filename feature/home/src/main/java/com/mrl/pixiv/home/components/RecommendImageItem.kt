@@ -1,5 +1,6 @@
 package com.mrl.pixiv.home.components
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
@@ -71,6 +73,11 @@ fun RecommendImageItem(
     with(sharedTransitionScope) {
         Surface(
             modifier = Modifier
+                .sharedBounds(
+                    rememberSharedContentState(key = "${prefix}-card-${illust.id}"),
+                    animatedContentScope,
+                    clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(10.dp))
+                )
                 .padding(horizontal = 5.dp)
                 .padding(bottom = 5.dp)
                 .throttleClick {
@@ -81,35 +88,35 @@ fun RecommendImageItem(
             propagateMinConstraints = false,
         ) {
             Column {
-                val radius = with(LocalDensity.current) { 10.dp.toPx() }
-                Box(
-                    modifier = Modifier
-                        .width(width)
-                        .height(height)
-                ) {
+                Box {
+                    val imageKey = "image-${illust.id}-0"
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(illust.imageUrls.medium).allowRgb565(true)
                             .transformations(
-                                RoundedCornersTransformation(
-                                    topLeft = radius,
-                                    topRight = radius
-                                )
+                                with(LocalDensity.current) {
+                                    RoundedCornersTransformation(
+                                        topLeft = 10.dp.toPx(),
+                                        topRight = 10.dp.toPx()
+                                    )
+                                }
                             )
 //                        .scale(Scale.FIT)
                             .crossfade(1.seconds.inWholeMilliseconds.toInt())
-                            .placeholderMemoryCacheKey("image-${illust.id}-0")
-                            .memoryCacheKey("image-${illust.id}-0")
+                            .placeholderMemoryCacheKey(imageKey)
+                            .memoryCacheKey(imageKey)
                             .build(),
                         contentDescription = null,
                         modifier = Modifier
-                            .sharedElement(
-                                sharedTransitionScope.rememberSharedContentState(key = "${prefix}-image-${illust.id}-0"),
-                                animatedVisibilityScope = animatedContentScope
-                            )
                             .width(width)
-                            .height(height),
-                        filterQuality = FilterQuality.None
+                            .height(height)
+                            .sharedElement(
+                                sharedTransitionScope.rememberSharedContentState(key = "${prefix}-$imageKey"),
+                                animatedVisibilityScope = animatedContentScope,
+                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                            )
+                            .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)),
+                        filterQuality = FilterQuality.None,
                     )
                 }
                 Row(
@@ -124,7 +131,11 @@ fun RecommendImageItem(
                         Text(
                             text = illust.title,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier,
+                            modifier = Modifier.sharedElement(
+                                rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
+                                animatedContentScope,
+                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -132,7 +143,11 @@ fun RecommendImageItem(
                         Text(
                             text = illust.user.name,
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier,
+                            modifier = Modifier.sharedElement(
+                                rememberSharedContentState(key = "${prefix}-user-name-${illust.id}"),
+                                animatedContentScope,
+                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -142,6 +157,11 @@ fun RecommendImageItem(
                         onClick = {
                             onBookmarkClick(illust.id, isBookmarked)
                         },
+                        modifier = Modifier.sharedElement(
+                            rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
+                            animatedContentScope,
+                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                        )
                     ) {
                         Icon(
                             imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,

@@ -1,5 +1,6 @@
 package com.mrl.pixiv.common_ui.item
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Favorite
@@ -38,12 +40,11 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
@@ -113,120 +114,136 @@ fun SquareIllustItem(
     LaunchedEffect(Unit) {
         showPopupTip = shouldShowTip && !hasShowBookmarkTipUseCase()
     }
-    Box(
-        modifier = Modifier
-            .padding(paddingValues)
-            .graphicsLayer(
-                shadowElevation = with(LocalDensity.current) {
-                    elevation.toPx()
-                },
-                shape = MaterialTheme.shapes.medium,
-                clip = false
-            )
-            .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium)
-            .clip(MaterialTheme.shapes.medium)
-            .throttleClick { onClick() }
-    ) {
-        val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-        val size =
-            (screenWidth - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
-                LayoutDirection.Ltr
-            ) - 1.dp) / spanCount
-        with(LocalSharedTransitionScope.currentOrThrow) {
+    val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
+    with(LocalSharedTransitionScope.currentOrThrow) {
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .sharedBounds(
+                    rememberSharedContentState(key = "${prefix}-card-${illust.id}"),
+                    animatedContentScope,
+                    clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(10.dp))
+                )
+//                .graphicsLayer(
+//                    shadowElevation = with(LocalDensity.current) {
+//                        elevation.toPx()
+//                    },
+//                    shape = MaterialTheme.shapes.medium,
+//                    clip = false
+//                )
+                .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium)
+                .shadow(elevation, MaterialTheme.shapes.medium)
+                .throttleClick { onClick() }
+        ) {
+            val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+            val size =
+                (screenWidth - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
+                    LayoutDirection.Ltr
+                ) - 1.dp) / spanCount
+
+            val imageKey = "image-${illust.id}-0"
             AsyncImage(
                 modifier = Modifier
+                    .size(size)
                     .sharedElement(
-                        rememberSharedContentState(key = "${prefix}-image-${illust.id}-0"),
-                        animatedVisibilityScope = LocalAnimatedContentScope.currentOrThrow
+                        rememberSharedContentState(key = "${prefix}-$imageKey"),
+                        animatedVisibilityScope = LocalAnimatedContentScope.currentOrThrow,
+                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
                     )
-                    .size(size),
+                    .clip(MaterialTheme.shapes.medium),
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(illust.imageUrls.squareMedium)
                     .allowRgb565(true)
-                    .placeholderMemoryCacheKey("image-${illust.id}-0")
-                    .memoryCacheKey("image-${illust.id}-0")
+                    .placeholderMemoryCacheKey(imageKey)
+                    .memoryCacheKey(imageKey)
                     .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
-        }
-        Row(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(5.dp),
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (illust.illustAIType == IllustAiType.AiGeneratedWorks) {
-                Text(
-                    text = "AI",
-                    color = Color.White,
-                    fontSize = 10.sp,
-                    modifier = Modifier
-                        .background(lightBlue, MaterialTheme.shapes.small)
-                        .padding(horizontal = 5.dp)
-                )
-            }
-            if (illust.type == Type.Ugoira) {
-                Row(
-                    modifier = Modifier
-                        .background(lightBlue, MaterialTheme.shapes.small)
-                        .padding(horizontal = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "GIF", color = Color.White, fontSize = 10.sp)
-                }
-            }
-            if (illust.pageCount > 1) {
-                Row(
-                    modifier = Modifier
-                        .background(
-                            Color.Black.copy(alpha = 0.5f),
-                            MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.FileCopy,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(10.dp)
-                    )
-                    Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
-                }
-            }
-        }
-        Box(
-            modifier = Modifier.align(Alignment.BottomEnd)
-        ) {
-            IconButton(
-                onClick = { onBookmarkClick(Restrict.PUBLIC, null) },
-                onLongClick = { showBottomSheet = true },
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(5.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                    contentDescription = "",
-                    modifier = Modifier.size(24.dp),
-                    tint = if (isBookmarked) Color.Red else Color.Gray
-                )
-            }
-            if (showPopupTip) {
-                LaunchedEffect(Unit) {
-                    setShowBookmarkTipUseCase(true)
-                    delay(3000)
-                    showPopupTip = false
-                }
-                Popup(
-                    alignment = Alignment.TopCenter,
-                    offset = IntOffset(x = 0, y = -100)
-                ) {
+                if (illust.illustAIType == IllustAiType.AiGeneratedWorks) {
                     Text(
-                        text = stringResource(R.string.long_click_to_edit_favorite),
+                        text = "AI",
+                        color = Color.White,
+                        fontSize = 10.sp,
                         modifier = Modifier
                             .background(lightBlue, MaterialTheme.shapes.small)
-                            .padding(8.dp)
+                            .padding(horizontal = 5.dp)
                     )
+                }
+                if (illust.type == Type.Ugoira) {
+                    Row(
+                        modifier = Modifier
+                            .background(lightBlue, MaterialTheme.shapes.small)
+                            .padding(horizontal = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "GIF", color = Color.White, fontSize = 10.sp)
+                    }
+                }
+                if (illust.pageCount > 1) {
+                    Row(
+                        modifier = Modifier
+                            .background(
+                                Color.Black.copy(alpha = 0.5f),
+                                MaterialTheme.shapes.small
+                            )
+                            .padding(horizontal = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.FileCopy,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(10.dp)
+                        )
+                        Text(text = "${illust.pageCount}", color = Color.White, fontSize = 10.sp)
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier.align(Alignment.BottomEnd)
+            ) {
+                IconButton(
+                    onClick = { onBookmarkClick(Restrict.PUBLIC, null) },
+                    modifier = Modifier.sharedElement(
+                        rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
+                        animatedContentScope,
+                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                    ),
+                    onLongClick = { showBottomSheet = true },
+                ) {
+                    Icon(
+                        imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                        contentDescription = "",
+                        modifier = Modifier.size(24.dp),
+                        tint = if (isBookmarked) Color.Red else Color.Gray
+                    )
+                }
+                if (showPopupTip) {
+                    LaunchedEffect(Unit) {
+                        setShowBookmarkTipUseCase(true)
+                        delay(3000)
+                        showPopupTip = false
+                    }
+                    Popup(
+                        alignment = Alignment.TopCenter,
+                        offset = IntOffset(x = 0, y = -100)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.long_click_to_edit_favorite),
+                            modifier = Modifier
+                                .background(lightBlue, MaterialTheme.shapes.small)
+                                .padding(8.dp)
+                        )
+                    }
                 }
             }
         }
