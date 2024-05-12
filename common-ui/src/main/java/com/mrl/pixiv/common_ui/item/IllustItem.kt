@@ -118,7 +118,6 @@ fun SquareIllustItem(
     with(LocalSharedTransitionScope.currentOrThrow) {
         Box(
             modifier = Modifier
-                .padding(paddingValues)
                 .sharedBounds(
                     rememberSharedContentState(key = "${prefix}-card-${illust.id}"),
                     animatedContentScope,
@@ -131,8 +130,9 @@ fun SquareIllustItem(
 //                    shape = MaterialTheme.shapes.medium,
 //                    clip = false
 //                )
-                .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium)
                 .shadow(elevation, MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.background, MaterialTheme.shapes.medium)
+                .padding(paddingValues)
                 .throttleClick { onClick() }
         ) {
             val screenWidth = LocalConfiguration.current.screenWidthDp.dp
