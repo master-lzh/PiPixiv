@@ -131,11 +131,13 @@ fun RecommendImageItem(
                         Text(
                             text = illust.title,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.sharedElement(
-                                rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
-                                animatedContentScope,
-                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                            ),
+                            modifier = Modifier
+                                .sharedElement(
+                                    rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
+                                    animatedContentScope,
+                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                )
+                                .skipToLookaheadSize(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -143,11 +145,13 @@ fun RecommendImageItem(
                         Text(
                             text = illust.user.name,
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.sharedElement(
-                                rememberSharedContentState(key = "${prefix}-user-name-${illust.id}"),
-                                animatedContentScope,
-                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                            ),
+                            modifier = Modifier
+                                .sharedElement(
+                                    rememberSharedContentState(key = "${prefix}-user-name-${illust.user.id}"),
+                                    animatedContentScope,
+                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                )
+                                .skipToLookaheadSize(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )

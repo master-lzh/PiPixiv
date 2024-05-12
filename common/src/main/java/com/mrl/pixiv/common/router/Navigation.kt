@@ -14,6 +14,9 @@ sealed class Destination(
     val title: @Composable () -> String = { "" },
     val icon: @Composable (() -> Unit)? = {},
 ) {
+    companion object {
+        const val prefix = "prefix"
+    }
     data object LoginScreen : Destination(route = "login_screen")
 
     data object HomeScreen : Destination(
