@@ -380,9 +380,7 @@ internal fun PictureScreen(
                         .shadow(5.dp, CircleShape)
                         .background(
                             if (!isSystemInDarkTheme()) Color.White else Color.DarkGray,
-                            shape = CircleShape
                         )
-                        .clip(CircleShape)
                         .padding(10.dp)
 
                 ) {
