@@ -113,9 +113,11 @@ fun MainGraph(
                 composable(
                     route = Destination.SelfProfileDetailScreen.route,
                 ) {
-                    SelfProfileDetailScreen(
-                        bookmarkViewModel = bookmarkViewModel
-                    )
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
+                        SelfProfileDetailScreen(
+                            bookmarkViewModel = bookmarkViewModel
+                        )
+                    }
                 }
 
                 // 他人详情页
@@ -133,11 +135,13 @@ fun MainGraph(
                         }
                     },
                 ) {
-                    OtherProfileDetailScreen(
-                        uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId)
-                            ?: 0L,
-                        bookmarkViewModel = bookmarkViewModel
-                    )
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
+                        OtherProfileDetailScreen(
+                            uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId)
+                                ?: 0L,
+                            bookmarkViewModel = bookmarkViewModel
+                        )
+                    }
                 }
 
                 // 作品详情页
