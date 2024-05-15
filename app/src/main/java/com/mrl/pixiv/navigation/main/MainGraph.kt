@@ -104,9 +104,11 @@ fun MainGraph(
                 composable(
                     route = Destination.ProfileScreen.route,
                 ) {
-                    ProfileScreen(
-                        modifier = modifier,
-                    )
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                        ProfileScreen(
+                            modifier = modifier,
+                        )
+                    }
                 }
 
                 // 个人详情页
