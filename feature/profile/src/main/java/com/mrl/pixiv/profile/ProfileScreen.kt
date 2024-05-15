@@ -1,7 +1,6 @@
 package com.mrl.pixiv.profile
 
 import android.os.Build
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,9 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
@@ -57,7 +53,6 @@ import com.mrl.pixiv.profile.viewmodel.ProfileState
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
 import com.mrl.pixiv.util.throttleClick
 import org.koin.androidx.compose.koinViewModel
-import java.util.UUID
 
 private val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
     mapOf(
@@ -96,12 +91,11 @@ internal fun ProfileScreen_(
     modifier: Modifier = Modifier,
     state: ProfileState = ProfileState.INITIAL,
     dispatch: (ProfileAction) -> Unit = {},
-    navToProfileDetail: (String) -> Unit = {},
+    navToProfileDetail: () -> Unit = {},
     navToSetting: () -> Unit = {},
     navToHistory: () -> Unit = {},
     navToCollection: () -> Unit = {},
 ) {
-    val prefix = rememberSaveable { UUID.randomUUID().toString() }
     Screen(
         topBar = {
             var expanded by remember { mutableStateOf(false) }
@@ -159,32 +153,13 @@ internal fun ProfileScreen_(
                     UserAvatar(
                         url = state.user.avatar,
                         modifier = Modifier.size(80.dp),
-                        onClick = { navToProfileDetail(prefix) },
-                        enableSharedElement = true
+                        onClick = navToProfileDetail
                     )
-                    with(LocalSharedTransitionScope.currentOrThrow) {
-                        Column {
-                            // 昵称
-                            Text(
-                                text = state.user.username, modifier = Modifier
-                                    .sharedElement(
-                                        rememberSharedContentState(key = "${prefix}-user-name-${state.user.uid}"),
-                                        LocalAnimatedContentScope.currentOrThrow,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    )
-                                    .skipToLookaheadSize()
-                            )
-                            // ID
-                            Text(
-                                text = "ID: ${state.user.uid}", modifier = Modifier
-                                    .sharedElement(
-                                        rememberSharedContentState(key = "user-id-${state.user.uid}"),
-                                        LocalAnimatedContentScope.currentOrThrow,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    )
-                                    .skipToLookaheadSize()
-                            )
-                        }
+                    Column {
+                        // 昵称
+                        Text(text = state.user.username)
+                        // ID
+                        Text(text = "ID: ${state.user.uid}")
                     }
                 }
             }

@@ -82,7 +82,7 @@ fun MainGraph(
                         }
                     },
                 ) {
-                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
                         HomeScreen(
                             modifier = modifier,
                             homeViewModel = homeViewModel,
@@ -104,27 +104,16 @@ fun MainGraph(
                 composable(
                     route = Destination.ProfileScreen.route,
                 ) {
-                    CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                        ProfileScreen(
-                            modifier = modifier,
-                        )
-                    }
+                    ProfileScreen(
+                        modifier = modifier,
+                    )
                 }
 
                 // 个人详情页
                 composable(
-                    route = "${Destination.SelfProfileDetailScreen.route}?prefix={${Destination.prefix}}",
-                    arguments = listOf(
-                        navArgument(Destination.prefix) {
-                            defaultValue = ""
-                        }
-                    ),
+                    route = Destination.SelfProfileDetailScreen.route,
                 ) {
-                    val prefix = it.arguments?.getString(Destination.prefix) ?: ""
-                    CompositionLocalProvider(
-                        LocalAnimatedContentScope provides this,
-                        LocalSharedKeyPrefix provides prefix
-                    ) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
                         SelfProfileDetailScreen(
                             bookmarkViewModel = bookmarkViewModel
                         )
@@ -133,14 +122,11 @@ fun MainGraph(
 
                 // 他人详情页
                 composable(
-                    route = "${Destination.OtherProfileDetailScreen.route}/{${Destination.OtherProfileDetailScreen.userId}}?prefix={${Destination.prefix}}",
+                    route = "${Destination.OtherProfileDetailScreen.route}/{${Destination.OtherProfileDetailScreen.userId}}",
                     arguments = listOf(
                         navArgument(Destination.OtherProfileDetailScreen.userId) {
 //                    type = NavType.LongType
                             defaultValue = 0L
-                        },
-                        navArgument(Destination.prefix) {
-                            defaultValue = ""
                         }
                     ),
                     deepLinks = DestinationsDeepLink.ProfileDetailPattern.map {
@@ -149,11 +135,7 @@ fun MainGraph(
                         }
                     },
                 ) {
-                    val prefix = it.arguments?.getString(Destination.prefix) ?: ""
-                    CompositionLocalProvider(
-                        LocalAnimatedContentScope provides this,
-                        LocalSharedKeyPrefix provides prefix
-                    ) {
+                    CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
                         OtherProfileDetailScreen(
                             uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId)
                                 ?: 0L,
