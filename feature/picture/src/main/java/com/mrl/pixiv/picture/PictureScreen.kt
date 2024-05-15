@@ -505,11 +505,13 @@ internal fun PictureScreen(
                             ) {
                                 Text(
                                     text = illust.title,
-                                    modifier = Modifier.sharedElement(
-                                        rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
-                                        animatedContentScope,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    ),
+                                    modifier = Modifier
+                                        .sharedElement(
+                                            rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
+                                            animatedContentScope,
+                                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                        )
+                                        .skipToLookaheadSize(),
                                     style = TextStyle(
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
@@ -518,11 +520,7 @@ internal fun PictureScreen(
                                 )
                                 Text(
                                     text = illust.user.name,
-                                    modifier = Modifier.sharedElement(
-                                        rememberSharedContentState(key = "${prefix}-user-name-${illust.id}"),
-                                        animatedContentScope,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    ),
+                                    modifier = Modifier,
                                     style = TextStyle(
                                         fontSize = 12.sp,
                                     ),
@@ -616,6 +614,13 @@ internal fun PictureScreen(
                         ) {
                             Text(
                                 text = illust.user.name,
+                                modifier = Modifier
+                                    .sharedElement(
+                                        rememberSharedContentState(key = "${prefix}-user-name-${illust.user.id}"),
+                                        animatedContentScope,
+                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                    )
+                                    .skipToLookaheadSize(),
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
@@ -678,7 +683,7 @@ internal fun PictureScreen(
                             .padding(horizontal = 15.dp)
                             .padding(top = 10.dp)
                     ) {
-                        val otherPrefix = remember { UUID.randomUUID().toString() }
+                        val otherPrefix = rememberSaveable { UUID.randomUUID().toString() }
                         CompositionLocalProvider(
                             LocalSharedKeyPrefix provides otherPrefix
                         ) {
