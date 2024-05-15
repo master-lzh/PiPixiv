@@ -227,7 +227,7 @@ internal fun PictureScreen(
     followDispatch: (FollowAction) -> Unit = {},
     navToSearchResultScreen: (String) -> Unit = {},
     popBackToHomeScreen: () -> Unit = {},
-    navToUserDetailScreen: (Long, String) -> Unit = { _, _ -> },
+    navToUserDetailScreen: (Long) -> Unit = {},
 ) {
     val context = LocalContext.current
     val (relatedSpanCount, userSpanCount) = when (LocalConfiguration.current.orientation) {
@@ -493,7 +493,7 @@ internal fun PictureScreen(
                             UserAvatar(
                                 url = illust.user.profileImageUrls.medium,
                                 onClick = {
-                                    navToUserDetailScreen(illust.user.id, prefix)
+                                    navToUserDetailScreen(illust.user.id)
                                 },
                                 modifier = Modifier
                                     .padding(start = 20.dp)
@@ -505,13 +505,11 @@ internal fun PictureScreen(
                             ) {
                                 Text(
                                     text = illust.title,
-                                    modifier = Modifier
-                                        .sharedElement(
-                                            rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
-                                            animatedContentScope,
-                                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                        )
-                                        .skipToLookaheadSize(),
+                                    modifier = Modifier.sharedElement(
+                                        rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
+                                        animatedContentScope,
+                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                    ),
                                     style = TextStyle(
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
@@ -520,7 +518,11 @@ internal fun PictureScreen(
                                 )
                                 Text(
                                     text = illust.user.name,
-                                    modifier = Modifier,
+                                    modifier = Modifier.sharedElement(
+                                        rememberSharedContentState(key = "${prefix}-user-name-${illust.id}"),
+                                        animatedContentScope,
+                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                    ),
                                     style = TextStyle(
                                         fontSize = 12.sp,
                                     ),
@@ -601,12 +603,11 @@ internal fun PictureScreen(
                         UserAvatar(
                             url = illust.user.profileImageUrls.medium,
                             onClick = {
-                                navToUserDetailScreen(illust.user.id, prefix)
+                                navToUserDetailScreen(illust.user.id)
                             },
                             modifier = Modifier
                                 .size(30.dp)
                                 .align(Alignment.CenterVertically),
-                            enableSharedElement = true
                         )
                         Column(
                             modifier = Modifier
@@ -615,13 +616,6 @@ internal fun PictureScreen(
                         ) {
                             Text(
                                 text = illust.user.name,
-                                modifier = Modifier
-                                    .sharedElement(
-                                        rememberSharedContentState(key = "${prefix}-user-name-${illust.user.id}"),
-                                        animatedContentScope,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    )
-                                    .skipToLookaheadSize(),
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
@@ -629,13 +623,6 @@ internal fun PictureScreen(
                             )
                             Text(
                                 text = "ID: ${illust.user.id}",
-                                modifier = Modifier
-                                    .sharedElement(
-                                        rememberSharedContentState(key = "user-id-${illust.user.id}"),
-                                        LocalAnimatedContentScope.currentOrThrow,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    )
-                                    .skipToLookaheadSize(),
                                 style = TextStyle(
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium,
@@ -691,7 +678,7 @@ internal fun PictureScreen(
                             .padding(horizontal = 15.dp)
                             .padding(top = 10.dp)
                     ) {
-                        val otherPrefix = rememberSaveable { UUID.randomUUID().toString() }
+                        val otherPrefix = remember { UUID.randomUUID().toString() }
                         CompositionLocalProvider(
                             LocalSharedKeyPrefix provides otherPrefix
                         ) {
@@ -795,7 +782,7 @@ internal fun PictureScreen(
                         UserAvatar(
                             url = illust.user.profileImageUrls.medium,
                             onClick = {
-                                navToUserDetailScreen(illust.user.id, prefix)
+                                navToUserDetailScreen(illust.user.id)
                             },
                             modifier = Modifier
                                 .padding(start = 20.dp)

@@ -1,7 +1,6 @@
 package com.mrl.pixiv.profile.detail
 
 import android.content.res.Configuration
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -40,15 +39,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import com.mrl.pixiv.common.coil.BlurTransformation
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
-import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
@@ -124,12 +121,12 @@ internal fun ProfileDetailScreen(
         else -> DisplayUtil.getScreenWidthDp() / 3
     }
     val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
-    val prefix = LocalSharedKeyPrefix.current
 
     CollapsingToolbarScaffold(
         modifier = modifier.fillMaxSize(),
         state = collapsingToolbarScaffoldState,
         toolbar = {
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -208,10 +205,13 @@ internal fun ProfileDetailScreen(
                     }
             ) {
                 userInfo.user?.profileImageUrls?.medium?.let {
-                    UserAvatar(
-                        url = it,
-                        modifier = Modifier.fillMaxWidth(),
-                        enableSharedElement = true
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(it).allowRgb565(true)
+                            .transformations(CircleCropTransformation())
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
@@ -224,81 +224,65 @@ internal fun ProfileDetailScreen(
                 .fillMaxWidth(),
         ) {
             item(key = "user_info") {
-                with(LocalSharedTransitionScope.currentOrThrow) {
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                    ) {
-                        userInfo.user?.name?.let { it1 ->
-                            Text(
-                                text = it1,
-                                style = TextStyle(
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Medium,
-                                ),
-                                modifier = Modifier
-                                    .sharedElement(
-                                        rememberSharedContentState(key = "${prefix}-user-name-${userInfo.user.id}"),
-                                        LocalAnimatedContentScope.currentOrThrow,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    )
-                                    .skipToLookaheadSize()
-                            )
-                        }
-                        if (userInfo.isPremium) {
-                            Image(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
-                                modifier = Modifier
-                                    .padding(start = 5.dp)
-                                    .size(20.dp)
-                                    .align(CenterVertically),
-                                contentDescription = null
-                            )
-                        }
+                Row(
+                    modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp)
+                ) {
+                    userInfo.user?.name?.let { it1 ->
+                        Text(
+                            text = it1,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
                     }
-                    //id点击可复制
+                    if (userInfo.isPremium) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
+                            modifier = Modifier
+                                .padding(start = 5.dp)
+                                .size(20.dp)
+                                .align(CenterVertically),
+                            contentDescription = null
+                        )
+                    }
+                }
+                //id点击可复制
+                Row(
+                    modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp)
+                        .throttleClick {
+                            userInfo.user?.id?.let { it1 -> copyToClipboard(it1.toString()) }
+                        }
+                ) {
+                    Text(
+                        text = "ID: ${userInfo.user?.id}",
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    )
+                }
+                // 个人简介
+                userInfo.user?.comment?.let {
                     Row(
                         modifier = Modifier
                             .padding(start = 15.dp, top = 10.dp)
-                            .throttleClick {
-                                userInfo.user?.id?.let { it1 -> copyToClipboard(it1.toString()) }
-                            }
                     ) {
                         Text(
-                            text = "ID: ${userInfo.user?.id}",
-                            modifier = Modifier
-                                .sharedElement(
-                                    rememberSharedContentState(key = "user-id-${userInfo.user?.id}"),
-                                    LocalAnimatedContentScope.currentOrThrow,
-                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                )
-                                .skipToLookaheadSize(),
+                            text = it,
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
                             ),
                         )
                     }
-                    // 个人简介
-                    userInfo.user?.comment?.let {
-                        Row(
-                            modifier = Modifier
-                                .padding(start = 15.dp, top = 10.dp)
-                        ) {
-                            Text(
-                                text = it,
-                                style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                ),
-                            )
-                        }
-                        Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                        )
-                    }
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
                 }
             }
             item(key = "user_illusts") {

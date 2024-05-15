@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
@@ -58,7 +59,6 @@ import coil.request.ImageRequest
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
-import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.m3.IconButton
 import com.mrl.pixiv.common.ui.components.m3.TextField
@@ -77,6 +77,7 @@ import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
+import java.util.UUID
 
 @Composable
 fun SquareIllustItem(
@@ -106,7 +107,7 @@ fun SquareIllustItem(
             }
         )
     }
-    val prefix = LocalSharedKeyPrefix.current
+    val prefix = rememberSaveable { UUID.randomUUID().toString() }
     val onClick = {
         navToPictureScreen(illust.copy(isBookmarked = isBookmarked), prefix)
     }
