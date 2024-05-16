@@ -57,8 +57,8 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun SelfCollectionScreen(
     modifier: Modifier = Modifier,
-    collectionViewModel: CollectionViewModel = koinViewModel { parametersOf(Long.MIN_VALUE) },
     bookmarkViewModel: BookmarkViewModel,
+    collectionViewModel: CollectionViewModel = koinViewModel { parametersOf(Long.MIN_VALUE) },
     navHostController: NavHostController = LocalNavigator.currentOrThrow
 ) {
     CollectionScreen_(

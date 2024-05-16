@@ -22,6 +22,7 @@ import androidx.navigation.navDeepLink
 import com.mrl.pixiv.collection.SelfCollectionScreen
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
+import com.mrl.pixiv.common.middleware.illust.IllustViewModel
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
@@ -30,8 +31,6 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.di.JSON
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
@@ -50,7 +49,6 @@ import com.mrl.pixiv.setting.network.NetworkSettingScreen
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import org.koin.androidx.compose.koinViewModel
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -62,6 +60,7 @@ fun MainGraph(
     val homeViewModel: HomeViewModel = koinViewModel()
     val followViewModel: FollowViewModel = koinViewModel()
     val bookmarkViewModel: BookmarkViewModel = koinViewModel()
+    val illustViewModel: IllustViewModel = koinViewModel()
     val splashViewModel: SplashViewModel =
         koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
     val intent = splashViewModel.intent.collectAsStateWithLifecycle().value
@@ -148,10 +147,10 @@ fun MainGraph(
 
                 // 作品详情页
                 composable(
-                    route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustParams}}?prefix={${Destination.PictureScreen.prefix}}",
+                    route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustId}}?prefix={${Destination.PictureScreen.prefix}}",
                     arguments = listOf(
-                        navArgument(Destination.PictureScreen.illustParams) {
-                            defaultValue = ""
+                        navArgument(Destination.PictureScreen.illustId) {
+                            defaultValue = 0L
                         },
                         navArgument(Destination.PictureScreen.prefix) {
                             defaultValue = ""
@@ -162,20 +161,26 @@ fun MainGraph(
                     popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
                     popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
                 ) {
-                    val illustParams =
-                        (it.arguments?.getString(Destination.PictureScreen.illustParams)) ?: ""
-                    val illustDecode = Base64.UrlSafe.decode(illustParams).decodeToString()
-                    val illust = JSON.decodeFromString<Illust>(illustDecode)
+                    val illustId = (it.arguments?.getLong(Destination.PictureScreen.illustId)) ?: 0L
+                    val illust = illustViewModel.state.illusts[illustId]
                     val prefix = it.arguments?.getString(Destination.PictureScreen.prefix) ?: ""
                     CompositionLocalProvider(
                         LocalAnimatedContentScope provides this,
                         LocalSharedKeyPrefix provides prefix
                     ) {
-                        PictureScreen(
-                            illust = illust,
-                            bookmarkViewModel = bookmarkViewModel,
-                            followViewModel = followViewModel,
-                        )
+                        if (illust != null) {
+                            PictureScreen(
+                                illust = illust,
+                                bookmarkViewModel = bookmarkViewModel,
+                                followViewModel = followViewModel,
+                            )
+                        } else {
+                            PictureDeeplinkScreen(
+                                illustId = illustId,
+                                bookmarkViewModel = bookmarkViewModel,
+                                followViewModel = followViewModel,
+                            )
+                        }
                     }
                 }
 
