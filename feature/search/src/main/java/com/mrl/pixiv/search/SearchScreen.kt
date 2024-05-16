@@ -228,7 +228,7 @@ internal fun SearchScreen_(
                                 focusRequester.freeFocus()
                                 navigateToResult()
                             }
-                            .animateItemPlacement(),
+                            .animateItem(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
