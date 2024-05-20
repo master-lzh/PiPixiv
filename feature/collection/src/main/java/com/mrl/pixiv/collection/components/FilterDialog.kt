@@ -173,7 +173,7 @@ fun FilterDialog(
                                 },
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Text(text = it.name,)
+                                Text(text = it.name)
                                 Text(text = "${it.count}")
                             }
                         }
