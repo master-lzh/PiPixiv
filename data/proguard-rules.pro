@@ -23,3 +23,7 @@
 -keep class * extends com.google.protobuf.GeneratedMessageLite {
     *;
 }
+
+-keep class com.mrl.pixiv.** { *; }
+
+-dontwarn java.lang.invoke.StringConcatFactory
