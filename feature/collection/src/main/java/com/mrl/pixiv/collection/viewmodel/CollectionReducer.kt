@@ -6,7 +6,11 @@ import kotlinx.collections.immutable.toImmutableList
 class CollectionReducer : Reducer<CollectionState, CollectionAction> {
     override fun reduce(state: CollectionState, action: CollectionAction): CollectionState {
         return when (action) {
-            is CollectionAction.LoadUserBookmarksIllusts -> state.copy(loading = true)
+            is CollectionAction.LoadUserBookmarksIllusts -> state.copy(
+                refreshing = true,
+                loading = true
+            )
+
             is CollectionAction.UpdateUserId -> state.copy(userId = action.userId)
             is CollectionAction.UpdateRestrict -> state.copy(
                 restrict = action.restrict,
@@ -20,6 +24,7 @@ class CollectionReducer : Reducer<CollectionState, CollectionAction> {
 
             is CollectionAction.UpdateUserBookmarksIllusts -> state.copy(
                 userBookmarksIllusts = action.userBookmarksIllusts,
+                refreshing = false,
                 loading = false,
                 illustNextUrl = action.illustNextUrl
             )

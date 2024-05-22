@@ -14,6 +14,7 @@ import kotlinx.collections.immutable.persistentListOf
 @Stable
 data class CollectionState(
     val userId: Long,
+    val refreshing: Boolean,
     @Restrict val restrict: String,
     val filterTag: String,
     val userBookmarksIllusts: ImmutableList<Illust>,
@@ -27,6 +28,7 @@ data class CollectionState(
     companion object {
         val INITIAL = CollectionState(
             userId = Long.MIN_VALUE,
+            refreshing = true,
             restrict = Restrict.PUBLIC,
             filterTag = "",
             userBookmarksIllusts = persistentListOf(),

@@ -20,6 +20,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -104,8 +106,20 @@ fun CollectionScreen_(
         val lazyGridState = rememberLazyGridState()
         var selectedTab by remember(state.restrict) { mutableIntStateOf(if (state.restrict == Restrict.PUBLIC) 0 else 1) }
         val pagerState = rememberPagerState(initialPage = selectedTab, pageCount = { 2 })
-        Box(
+        val pullRefreshState = rememberPullToRefreshState()
+
+        PullToRefreshBox(
+            isRefreshing = state.refreshing,
+            onRefresh = {
+                dispatch(
+                    CollectionAction.LoadUserBookmarksIllusts(
+                        state.restrict,
+                        state.filterTag
+                    )
+                )
+            },
             modifier = Modifier.padding(it),
+            state = pullRefreshState
         ) {
             IllustGrid(
                 modifier = Modifier
