@@ -16,10 +16,12 @@ sealed class SearchPreviewAction : Action {
 }
 
 data class SearchPreviewState(
+    val refreshing: Boolean,
     val trendingTags: ImmutableList<TrendingTag>,
 ) : State {
     companion object {
         val INITIAL = SearchPreviewState(
+            refreshing = false,
             trendingTags = persistentListOf()
         )
     }
