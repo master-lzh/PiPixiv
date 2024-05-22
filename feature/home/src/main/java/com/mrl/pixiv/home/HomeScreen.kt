@@ -8,9 +8,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.ArrowUpward
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -21,6 +18,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -116,8 +115,7 @@ internal fun HomeScreen(
     val context = LocalContext.current
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val scope = rememberCoroutineScope()
-    val pullRefreshState =
-        rememberPullRefreshState(refreshing = state.isRefresh, onRefresh = onRefresh)
+    val pullRefreshState = rememberPullToRefreshState()
     val snackBarHostState = remember { SnackbarHostState() }
     val onUnBookmark = { id: Long ->
         scope.launch {
@@ -133,6 +131,11 @@ internal fun HomeScreen(
                     bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
                 }
             }
+        }
+    }
+    LaunchedEffect(state.isRefresh) {
+        if (state.isRefresh) {
+            pullRefreshState.animateToThreshold()
         }
     }
     LaunchedEffect(state.exception) {
@@ -214,45 +217,38 @@ internal fun HomeScreen(
             }
         }
     ) {
-        Box(
-            modifier = Modifier
-                .pullRefresh(pullRefreshState)
-                .fillMaxSize()
-                .padding(it)
+        PullToRefreshBox(
+            isRefreshing = state.isRefresh,
+            onRefresh = onRefresh,
+            modifier = Modifier.padding(it),
+            state = pullRefreshState
         ) {
-            HomeContent(
-                navToPictureScreen = navToPictureScreen,
-                state = state,
-                bookmarkState = bookmarkState,
-                lazyStaggeredGridState = lazyStaggeredGridState,
-                onBookmarkClick = { id, bookmark ->
-                    if (bookmark) {
-                        bookmarkDispatch(BookmarkAction.IllustBookmarkDeleteIntent(id))
-                        onUnBookmark(id)
-                    } else {
-                        bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
-                    }
-                },
-                dismissRefresh = {
-                    scope.launch {
-                        lazyStaggeredGridState.scrollToItem(0)
-                        delay(1.second)
-                        dispatch(HomeAction.DismissLoading)
-                    }
-                },
-                onScrollToBottom = onScrollToBottom,
-            )
-            PullRefreshIndicator(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .apply {
-                        if (state.recommendImageList.isEmpty()) {
-                            fillMaxSize()
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                HomeContent(
+                    navToPictureScreen = navToPictureScreen,
+                    state = state,
+                    bookmarkState = bookmarkState,
+                    lazyStaggeredGridState = lazyStaggeredGridState,
+                    onBookmarkClick = { id, bookmark ->
+                        if (bookmark) {
+                            bookmarkDispatch(BookmarkAction.IllustBookmarkDeleteIntent(id))
+                            onUnBookmark(id)
+                        } else {
+                            bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
                         }
                     },
-                refreshing = state.isRefresh,
-                state = pullRefreshState,
-            )
+                    dismissRefresh = {
+                        scope.launch {
+                            lazyStaggeredGridState.scrollToItem(0)
+                            delay(1.second)
+                            dispatch(HomeAction.DismissLoading)
+                        }
+                    },
+                    onScrollToBottom = onScrollToBottom,
+                )
+            }
         }
     }
 }
