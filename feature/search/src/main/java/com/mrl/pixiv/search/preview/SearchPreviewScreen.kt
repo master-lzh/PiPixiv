@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -120,32 +121,36 @@ internal fun SearchPreviewScreen_(
             )
         }
     ) {
-        LazyVerticalGrid(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        PullToRefreshBox(
+            isRefreshing = state.refreshing,
+            onRefresh = { dispatch(SearchPreviewAction.LoadTrendingTags) },
+            modifier = Modifier.padding(it),
         ) {
-            item(
-                span = { GridItemSpan(3) },
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxSize(),
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(
-                    text = stringResource(R.string.popular_tags),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            items(state.trendingTags) { tag ->
-                TrendingItem(
-                    trendingTag = tag,
-                    onSearch = {
-                        navToSearchResultsScreen(it)
-                        dispatch(SearchPreviewAction.AddSearchHistory(it))
-                    }
-                )
+                item(
+                    span = { GridItemSpan(3) },
+                ) {
+                    Text(
+                        text = stringResource(R.string.popular_tags),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                items(state.trendingTags) { tag ->
+                    TrendingItem(
+                        trendingTag = tag,
+                        onSearch = {
+                            navToSearchResultsScreen(it)
+                            dispatch(SearchPreviewAction.AddSearchHistory(it))
+                        }
+                    )
+                }
             }
         }
     }
