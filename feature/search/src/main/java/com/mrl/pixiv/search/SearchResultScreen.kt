@@ -24,6 +24,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -168,24 +169,29 @@ internal fun SearchResultScreen_(
             )
         }
     ) {
-        IllustGrid(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(horizontal = 8.dp),
-            illusts = state.searchResults,
-            bookmarkState = bookmarkState,
-            dispatch = bookmarkDispatch,
-            spanCount = spanCount,
-            navToPictureScreen = naviToPic,
-            loading = state.loading,
-            canLoadMore = state.nextUrl != null,
-            onLoadMore = {
-                if (state.nextUrl != null) {
-                    dispatch(SearchAction.SearchIllustNext(state.nextUrl))
+        PullToRefreshBox(
+            isRefreshing = state.refreshing,
+            onRefresh = { dispatch(SearchAction.SearchIllust(state.searchWords)) },
+            modifier = modifier.padding(it),
+        ) {
+            IllustGrid(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp),
+                illusts = state.searchResults,
+                bookmarkState = bookmarkState,
+                dispatch = bookmarkDispatch,
+                spanCount = spanCount,
+                navToPictureScreen = naviToPic,
+                loading = state.loading,
+                canLoadMore = state.nextUrl != null,
+                onLoadMore = {
+                    if (state.nextUrl != null) {
+                        dispatch(SearchAction.SearchIllustNext(state.nextUrl))
+                    }
                 }
-            }
-        )
+            )
+        }
 
         if (showBottomSheet.value) {
             FilterBottomSheet(showBottomSheet, launchDefault, bottomSheetState, state, dispatch)
