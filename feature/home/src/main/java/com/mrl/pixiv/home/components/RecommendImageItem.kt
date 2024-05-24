@@ -59,9 +59,6 @@ import org.koin.compose.koinInject
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
-val SPACING_HORIZONTAL_DP = 5.dp
-val SPACING_VERTICAL_DP = 5.dp
-
 
 @Composable
 fun RecommendImageItem(
@@ -70,7 +67,6 @@ fun RecommendImageItem(
     illust: Illust,
     bookmarkState: BookmarkState,
     onBookmarkClick: OnBookmarkClick,
-    spanCount: Int,
     dispatch: (BookmarkAction) -> Unit,
 ) {
     val scale = illust.height * 1.0f / illust.width
