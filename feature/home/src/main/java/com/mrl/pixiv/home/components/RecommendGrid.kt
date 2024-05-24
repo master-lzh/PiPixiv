@@ -16,10 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.OnScrollToBottom
 import kotlinx.collections.immutable.ImmutableList
 
 private const val LOADING_ITEM_COUNT = 4
+private const val INCLUDE_EDGE = true
 
 @Composable
 fun RecommendGrid(
@@ -36,16 +38,20 @@ fun RecommendGrid(
         ORIENTATION_LANDSCAPE -> 4
         else -> 2
     }
+    val paddingValues = 5.dp
+    val width =
+        (DisplayUtil.getScreenWidthDp() - paddingValues * (spanCount + if (INCLUDE_EDGE) 1 else -1)) / spanCount
 
     LazyVerticalStaggeredGrid(
         state = lazyStaggeredGridState,
-        contentPadding = PaddingValues(5.dp),
+        contentPadding = PaddingValues(paddingValues),
         columns = StaggeredGridCells.Fixed(spanCount),
         verticalItemSpacing = 3.dp,
         modifier = Modifier.fillMaxSize()
     ) {
         items(recommendImageList, key = { it.id }) {
             RecommendImageItem(
+                width,
                 navToPictureScreen,
                 it,
                 bookmarkState,
@@ -59,7 +65,7 @@ fun RecommendGrid(
             itemsIndexed(
                 List(LOADING_ITEM_COUNT) { 0 },
                 key = { index, _ -> "loading-$index" }) { _, _ ->
-                RecommendSkeleton(spanCount = spanCount)
+                RecommendSkeleton(size = width,spanCount = spanCount)
             }
         }
     }
