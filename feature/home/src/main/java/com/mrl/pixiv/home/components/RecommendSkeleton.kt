@@ -8,19 +8,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.ui.components.m3.Surface
-import com.mrl.pixiv.util.DisplayUtil
 
 @Preview
 @PreviewLightDark
 @PreviewScreenSizes
 @Composable
 fun RecommendSkeleton(
+    size: Dp = 100.dp,
     spanCount: Int = 2
 ) {
-    val size =
-        (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (spanCount + if (INCLUDE_EDGE) 1 else -1)) / spanCount
     Surface(
         Modifier
             .size(size)

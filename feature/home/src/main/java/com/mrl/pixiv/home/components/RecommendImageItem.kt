@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -53,7 +54,6 @@ import com.mrl.pixiv.data.IllustAiType
 import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
-import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.throttleClick
 import org.koin.compose.koinInject
 import java.util.UUID
@@ -61,11 +61,11 @@ import kotlin.time.Duration.Companion.seconds
 
 val SPACING_HORIZONTAL_DP = 5.dp
 val SPACING_VERTICAL_DP = 5.dp
-const val INCLUDE_EDGE = true
 
 
 @Composable
 fun RecommendImageItem(
+    width: Dp,
     navToPictureScreen: (Illust, String) -> Unit,
     illust: Illust,
     bookmarkState: BookmarkState,
@@ -73,8 +73,6 @@ fun RecommendImageItem(
     spanCount: Int,
     dispatch: (BookmarkAction) -> Unit,
 ) {
-    val width =
-        (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (spanCount + if (INCLUDE_EDGE) 1 else -1)) / spanCount
     val scale = illust.height * 1.0f / illust.width
     val height = width * scale
     val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
