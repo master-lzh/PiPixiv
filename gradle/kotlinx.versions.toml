@@ -1,9 +1,9 @@
 [versions]
-kotlin_version = "1.9.24"
-ksp = "1.9.24-1.0.20"
+kotlin_version = "2.0.0"
+ksp = "2.0.0-1.0.21"
 serialization_version = "1.6.3"
 xml_serialization_version = "0.86.2"
-coroutines_version = "1.8.0"
+coroutines_version = "1.8.1"
 
 [libraries]
 reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin_version" }
@@ -33,4 +33,6 @@ serialization = ["serialization-json", "serialization-json-okio", "serialization
 android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin_version" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_version" }
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin_version" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin_version" }
+
 
