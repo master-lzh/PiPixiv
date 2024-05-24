@@ -56,7 +56,6 @@ fun RecommendGrid(
                 it,
                 bookmarkState,
                 onBookmarkClick,
-                spanCount,
                 dispatch
             )
         }
@@ -65,7 +64,7 @@ fun RecommendGrid(
             itemsIndexed(
                 List(LOADING_ITEM_COUNT) { 0 },
                 key = { index, _ -> "loading-$index" }) { _, _ ->
-                RecommendSkeleton(size = width,spanCount = spanCount)
+                RecommendSkeleton(size = width)
             }
         }
     }

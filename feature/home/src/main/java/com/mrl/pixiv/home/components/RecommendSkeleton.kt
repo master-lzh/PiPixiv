@@ -18,7 +18,6 @@ import com.mrl.pixiv.common.ui.components.m3.Surface
 @Composable
 fun RecommendSkeleton(
     size: Dp = 100.dp,
-    spanCount: Int = 2
 ) {
     Surface(
         Modifier
