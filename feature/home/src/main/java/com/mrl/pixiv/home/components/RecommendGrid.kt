@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.OnScrollToBottom
@@ -26,8 +27,9 @@ fun RecommendGrid(
     bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,
     recommendImageList: ImmutableList<Illust>,
-    onBookmarkClick: (Long, Boolean) -> Unit,
+    onBookmarkClick: OnBookmarkClick,
     onScrollToBottom: () -> Unit,
+    dispatch: (BookmarkAction) -> Unit
 ) {
     val spanCount = when (LocalConfiguration.current.orientation) {
         ORIENTATION_PORTRAIT -> 2
@@ -43,7 +45,14 @@ fun RecommendGrid(
         modifier = Modifier.fillMaxSize()
     ) {
         items(recommendImageList, key = { it.id }) {
-            RecommendImageItem(navToPictureScreen, it, bookmarkState, onBookmarkClick, spanCount)
+            RecommendImageItem(
+                navToPictureScreen,
+                it,
+                bookmarkState,
+                onBookmarkClick,
+                spanCount,
+                dispatch
+            )
         }
 
         if (recommendImageList.isNotEmpty()) {

@@ -23,6 +23,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -248,6 +249,29 @@ fun SquareIllustItem(
             }
         }
     }
+    BottomBookmarkSheet(
+        showBottomSheet = showBottomSheet,
+        hideBottomSheet = { showBottomSheet = false },
+        getIllustBookmarkDetailUseCase = getIllustBookmarkDetailUseCase,
+        illust = illust,
+        bottomSheetState = bottomSheetState,
+        onBookmarkClick = onBookmarkClick,
+        isBookmarked = isBookmarked,
+        dispatch = dispatch
+    )
+}
+
+@Composable
+fun BottomBookmarkSheet(
+    showBottomSheet: Boolean,
+    hideBottomSheet: () -> Unit,
+    getIllustBookmarkDetailUseCase: GetIllustBookmarkDetailUseCase,
+    illust: Illust,
+    bottomSheetState: SheetState,
+    onBookmarkClick: (String, List<String>?) -> Unit,
+    isBookmarked: Boolean,
+    dispatch: (BookmarkAction) -> Unit
+) {
     if (showBottomSheet) {
         var publicSwitch by remember { mutableStateOf(true) }
         val illustBookmarkDetailTags = remember { mutableStateListOf<BookmarkDetailTag>() }
@@ -259,7 +283,7 @@ fun SquareIllustItem(
             }
         }
         ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
+            onDismissRequest = hideBottomSheet,
             modifier = Modifier
                 .imePadding(),
             sheetState = bottomSheetState,
@@ -286,7 +310,7 @@ fun SquareIllustItem(
                                 if (publicSwitch) Restrict.PUBLIC else Restrict.PRIVATE,
                                 selectedTagsIndex.map { allTags[it].first }
                             )
-                            showBottomSheet = false
+                            hideBottomSheet()
                         },
                         modifier = Modifier.weight(1f)
                     ) {
@@ -306,7 +330,7 @@ fun SquareIllustItem(
                                         selectedTagsIndex.map { allTags[it].first }
                                     )
                                 )
-                                showBottomSheet = false
+                                hideBottomSheet()
                             },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.filledTonalButtonColors().copy(

@@ -17,11 +17,15 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.FileCopy
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,17 +39,23 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
+import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
+import com.mrl.pixiv.common.ui.components.m3.IconButton
 import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.lightBlue
+import com.mrl.pixiv.common_ui.item.BottomBookmarkSheet
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.IllustAiType
+import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.Type
+import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.throttleClick
+import org.koin.compose.koinInject
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
@@ -59,8 +69,9 @@ fun RecommendImageItem(
     navToPictureScreen: (Illust, String) -> Unit,
     illust: Illust,
     bookmarkState: BookmarkState,
-    onBookmarkClick: (id: Long, bookmark: Boolean) -> Unit,
+    onBookmarkClick: OnBookmarkClick,
     spanCount: Int,
+    dispatch: (BookmarkAction) -> Unit,
 ) {
     val width =
         (DisplayUtil.getScreenWidthDp() - SPACING_HORIZONTAL_DP * (spanCount + if (INCLUDE_EDGE) 1 else -1)) / spanCount
@@ -70,6 +81,12 @@ fun RecommendImageItem(
     val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
     val prefix = rememberSaveable { UUID.randomUUID().toString() }
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState()
+    val getIllustBookmarkDetailUseCase = koinInject<GetIllustBookmarkDetailUseCase>()
+    val onBookmarkLongClick = {
+        showBottomSheet = true
+    }
     with(sharedTransitionScope) {
         Surface(
             modifier = Modifier
@@ -159,13 +176,14 @@ fun RecommendImageItem(
 
                     IconButton(
                         onClick = {
-                            onBookmarkClick(illust.id, isBookmarked)
+                            onBookmarkClick(illust.id, isBookmarked, Restrict.PUBLIC, null)
                         },
                         modifier = Modifier.sharedElement(
                             rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
                             animatedContentScope,
                             placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                        )
+                        ),
+                        onLongClick = onBookmarkLongClick
                     ) {
                         Icon(
                             imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
@@ -225,4 +243,16 @@ fun RecommendImageItem(
             }
         }
     }
+    BottomBookmarkSheet(
+        showBottomSheet = showBottomSheet,
+        hideBottomSheet = { showBottomSheet = false },
+        getIllustBookmarkDetailUseCase = getIllustBookmarkDetailUseCase,
+        illust = illust,
+        bottomSheetState = bottomSheetState,
+        onBookmarkClick = { restrict, tags ->
+            onBookmarkClick(illust.id, isBookmarked, restrict, tags)
+        },
+        isBookmarked = isBookmarked,
+        dispatch = dispatch
+    )
 }

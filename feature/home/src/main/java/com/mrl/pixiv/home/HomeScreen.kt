@@ -231,12 +231,14 @@ internal fun HomeScreen(
                     state = state,
                     bookmarkState = bookmarkState,
                     lazyStaggeredGridState = lazyStaggeredGridState,
-                    onBookmarkClick = { id, bookmark ->
+                    onBookmarkClick = { id, bookmark, restrict, tags ->
                         if (bookmark) {
                             bookmarkDispatch(BookmarkAction.IllustBookmarkDeleteIntent(id))
                             onUnBookmark(id)
                         } else {
-                            bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
+                            bookmarkDispatch(
+                                BookmarkAction.IllustBookmarkAddIntent(id, restrict, tags)
+                            )
                         }
                     },
                     dismissRefresh = {
@@ -247,6 +249,7 @@ internal fun HomeScreen(
                         }
                     },
                     onScrollToBottom = onScrollToBottom,
+                    dispatch = bookmarkDispatch
                 )
             }
         }
