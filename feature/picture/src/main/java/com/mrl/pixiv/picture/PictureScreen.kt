@@ -424,7 +424,6 @@ internal fun PictureScreen(
                                         model = ImageRequest.Builder(LocalContext.current)
                                             .data(it.imageUrls?.large)
                                             .placeholderMemoryCacheKey("image-${illust.id}-$index")
-                                            .memoryCacheKey("image-${illust.id}-$index")
                                             .build(),
                                         contentDescription = null,
                                         modifier = Modifier
@@ -455,7 +454,6 @@ internal fun PictureScreen(
                                     model = ImageRequest.Builder(LocalContext.current)
                                         .data(illust.imageUrls.large)
                                         .placeholderMemoryCacheKey("image-${illust.id}-$index")
-                                        .memoryCacheKey("image-${illust.id}-$index")
                                         .build(),
                                     contentDescription = null,
                                     modifier = Modifier
