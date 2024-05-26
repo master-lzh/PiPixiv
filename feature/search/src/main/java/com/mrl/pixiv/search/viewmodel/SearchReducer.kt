@@ -7,6 +7,7 @@ import kotlinx.collections.immutable.toImmutableList
 class SearchReducer : Reducer<SearchState, SearchAction> {
     override fun reduce(state: SearchState, action: SearchAction): SearchState {
         return when (action) {
+            is SearchAction.SearchIllust -> state.copy(refreshing = true)
             is SearchAction.ClearAutoCompleteSearchWords -> {
                 state.copy(autoCompleteSearchWords = persistentListOf())
             }
@@ -30,7 +31,8 @@ class SearchReducer : Reducer<SearchState, SearchAction> {
                 state.copy(
                     searchResults = (state.searchResults + action.illusts).toImmutableList(),
                     nextUrl = action.nextUrl,
-                    loading = false
+                    loading = false,
+                    refreshing = false
                 )
             }
 

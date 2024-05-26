@@ -9,7 +9,12 @@ class SearchPreviewReducer : Reducer<SearchPreviewState, SearchPreviewAction> {
         action: SearchPreviewAction
     ): SearchPreviewState {
         return when (action) {
-            is SearchPreviewAction.UpdateTrendingTags -> state.copy(trendingTags = action.trendingTags.toImmutableList())
+            is SearchPreviewAction.LoadTrendingTags -> state.copy(refreshing = true)
+            is SearchPreviewAction.UpdateTrendingTags -> state.copy(
+                trendingTags = action.trendingTags.toImmutableList(),
+                refreshing = false
+            )
+
             else -> state
         }
     }

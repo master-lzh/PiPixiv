@@ -30,12 +30,11 @@ class HttpManager(
     private val jsonConvertFactory: Converter.Factory,
     settingRepository: SettingRepository,
 ) : KoinComponent {
-    private var allSetting: UserPreference
+    private var allSetting: UserPreference = settingRepository.allSettingsSync
     private val userRepository: UserRepository by inject()
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase by inject()
 
     init {
-        allSetting = settingRepository.allSettingsSync
         launchIO {
             userRepository.userAccessToken.collect {
                 token = it

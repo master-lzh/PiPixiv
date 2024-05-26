@@ -14,6 +14,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -39,6 +40,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Download
@@ -59,6 +61,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
@@ -87,7 +90,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.navigation.NavHostController
@@ -104,7 +106,10 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowAction
 import com.mrl.pixiv.common.middleware.follow.FollowState
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
+import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
+import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.components.m3.Surface
@@ -139,6 +144,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
+import java.util.UUID
 
 
 @Composable
@@ -209,12 +215,12 @@ fun PictureDeeplinkScreen(
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
-    modifier: Modifier = Modifier,
     state: PictureState,
     bookmarkState: BookmarkState,
     followState: FollowState,
     illust: Illust,
-    navToPictureScreen: (Illust) -> Unit = {},
+    modifier: Modifier = Modifier,
+    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
@@ -285,161 +291,491 @@ internal fun PictureScreen(
             5
         }
     }
-
-    Screen(
-        topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 15.dp)
-                    ) {
-                        Row(
+    val prefix = LocalSharedKeyPrefix.current
+    val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
+    val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
+    with(sharedTransitionScope) {
+        Screen(
+            modifier = modifier.sharedBounds(
+                rememberSharedContentState(key = "${prefix}-card-${illust.id}"),
+                animatedContentScope,
+                clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(10.dp))
+            ),
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    actions = {
+                        Box(
                             modifier = Modifier
-                                .align(Alignment.CenterStart),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp)
                         ) {
+                            Row(
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                    contentDescription = null,
+                                    modifier = Modifier.throttleClick { popBackStack() },
+                                )
+                                Icon(
+                                    imageVector = Icons.Rounded.Home,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .throttleClick { popBackToHomeScreen() }
+                                )
+                            }
+                            // 分享按钮
                             Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                                contentDescription = null,
-                                modifier = Modifier.throttleClick { popBackStack() },
-                            )
-                            Icon(
-                                imageVector = Icons.Rounded.Home,
+                                imageVector = Icons.Rounded.Share,
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .padding(start = 15.dp)
-                                    .throttleClick { popBackToHomeScreen() }
+                                    .align(Alignment.CenterEnd)
+                                    .throttleClick {
+                                        val shareIntent = createShareIntent(
+                                            "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
+                                        )
+                                        shareLauncher.launch(shareIntent)
+                                    },
                             )
-                        }
-                        // 分享按钮
-                        Icon(
-                            imageVector = Icons.Rounded.Share,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .throttleClick {
-                                    val shareIntent = createShareIntent(
-                                        "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
-                                    )
-                                    shareLauncher.launch(shareIntent)
-                                },
-                        )
-                        this@TopAppBar.AnimatedVisibility(
-                            modifier = Modifier.align(Alignment.Center),
-                            visible = isBarVisible,
-                            enter = fadeIn(),
-                            exit = fadeOut(),
-                        ) {
-                            Text(
-                                text = "${currPage.value + 1}/${illust.pageCount}",
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors()
-                    .copy(containerColor = Color.Transparent)
-            )
-        },
-        floatingActionButton = {
-            Box(
-                Modifier
-                    .throttleClick {
-                        if (bookmarkState.bookmarkStatus[illust.id] == true) {
-                            bookmarkDispatch(
-                                BookmarkAction.IllustBookmarkDeleteIntent(
-                                    illust.id
+                            this@TopAppBar.AnimatedVisibility(
+                                modifier = Modifier.align(Alignment.Center),
+                                visible = isBarVisible,
+                                enter = fadeIn(),
+                                exit = fadeOut(),
+                            ) {
+                                Text(
+                                    text = "${currPage.value + 1}/${illust.pageCount}",
                                 )
-                            )
-                        } else {
-                            bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(illust.id))
+                            }
                         }
-                    }
-                    .shadow(5.dp, CircleShape)
-                    .background(
-                        if (!isSystemInDarkTheme()) Color.White else Color.DarkGray,
-                        shape = CircleShape
-                    )
-                    .clip(CircleShape)
-                    .padding(10.dp)
-
-            ) {
-                val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
-                Icon(
-                    imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                    contentDescription = null,
-                    tint = if (isBookmarked) Color.Red else LocalContentColor.current,
-                    modifier = Modifier
-                        .size(35.dp)
-                        .clip(CircleShape)
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors()
+                        .copy(containerColor = Color.Transparent)
                 )
-            }
-        }
-    ) {
-        LazyVerticalStaggeredGrid(
-            state = lazyStaggeredGridState,
-            columns = StaggeredGridCells.Fixed(relatedSpanCount),
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            if (illust.type == Type.Ugoira) {
-                item(span = StaggeredGridItemSpan.FullLine, key = "ugoira") {
-                    UgoiraPlayer(
-                        images = state.ugoiraImages,
-                        placeholder = placeholder
+            },
+            floatingActionButton = {
+                Box(
+                    Modifier
+                        .sharedElement(
+                            rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
+                            animatedContentScope,
+                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                        )
+                        .throttleClick {
+                            if (bookmarkState.bookmarkStatus[illust.id] == true) {
+                                bookmarkDispatch(
+                                    BookmarkAction.IllustBookmarkDeleteIntent(
+                                        illust.id
+                                    )
+                                )
+                            } else {
+                                bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(illust.id))
+                            }
+                        }
+                        .shadow(5.dp, CircleShape)
+                        .background(
+                            if (!isSystemInDarkTheme()) Color.White else Color.DarkGray,
+                        )
+                        .padding(10.dp)
+
+                ) {
+                    val isBookmarked =
+                        bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
+                    Icon(
+                        imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                        contentDescription = null,
+                        tint = if (isBookmarked) Color.Red else LocalContentColor.current,
+                        modifier = Modifier
+                            .size(35.dp)
+                            .clip(CircleShape)
                     )
                 }
-            } else {
-                items(
-                    illust.pageCount,
-                    key = { "${illust.id}_$it" },
-                    span = { StaggeredGridItemSpan.FullLine }
-                ) { index ->
-                    if (illust.pageCount > 1) {
-                        illust.metaPages?.get(index)?.let {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(it.imageUrls?.large)
-                                    .build(),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .throttleClick(
-                                        onLongClick = {
-                                            currLongClickPic =
-                                                Pair(index, it.imageUrls?.original ?: "")
-                                            openBottomSheet = true
-                                        }
-                                    ),
-                                contentScale = ContentScale.FillWidth,
-                                placeholder = placeholder,
+            }
+        ) {
+
+            LazyVerticalStaggeredGrid(
+                state = lazyStaggeredGridState,
+                columns = StaggeredGridCells.Fixed(relatedSpanCount),
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                with(sharedTransitionScope) {
+                    if (illust.type == Type.Ugoira) {
+                        item(span = StaggeredGridItemSpan.FullLine, key = "ugoira") {
+                            UgoiraPlayer(
+                                images = state.ugoiraImages,
+                                placeholder = placeholder
                             )
                         }
                     } else {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(illust.imageUrls.large)
-                                .build(),
-                            contentDescription = null,
+                        items(
+                            illust.pageCount,
+                            key = { "${illust.id}_$it" },
+                            span = { StaggeredGridItemSpan.FullLine }
+                        ) { index ->
+                            val firstImageKey = "image-${illust.id}-0"
+                            if (illust.pageCount > 1) {
+                                illust.metaPages?.get(index)?.let {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(it.imageUrls?.large)
+                                            .placeholderMemoryCacheKey("image-${illust.id}-$index")
+                                            .build(),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .then(
+                                                if (index == 0) Modifier.sharedElement(
+                                                    sharedTransitionScope.rememberSharedContentState(
+                                                        key = "${prefix}-$firstImageKey"
+                                                    ),
+                                                    animatedVisibilityScope = animatedContentScope,
+                                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                                )
+                                                else Modifier
+                                            )
+                                            .throttleClick(
+                                                onLongClick = {
+                                                    currLongClickPic =
+                                                        Pair(index, it.imageUrls?.original ?: "")
+                                                    openBottomSheet = true
+                                                }
+                                            ),
+                                        contentScale = ContentScale.FillWidth,
+                                        placeholder = placeholder,
+                                    )
+                                }
+                            } else {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(illust.imageUrls.large)
+                                        .placeholderMemoryCacheKey("image-${illust.id}-$index")
+                                        .build(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .then(
+                                            if (index == 0) Modifier.sharedElement(
+                                                sharedTransitionScope.rememberSharedContentState(key = "${prefix}-$firstImageKey"),
+                                                animatedVisibilityScope = animatedContentScope,
+                                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                            )
+                                            else Modifier
+                                        )
+                                        .throttleClick(
+                                            onLongClick = {
+                                                currLongClickPic =
+                                                    Pair(0, illust.metaSinglePage.originalImageURL)
+                                                openBottomSheet = true
+                                            }
+                                        ),
+                                    contentScale = ContentScale.FillWidth,
+                                    placeholder = placeholder,
+                                )
+                            }
+                        }
+                    }
+                }
+                item(span = StaggeredGridItemSpan.FullLine, key = "illust_title") {
+                    if (isScrollToBottom.value) {
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .throttleClick(
-                                    onLongClick = {
-                                        currLongClickPic =
-                                            Pair(0, illust.metaSinglePage.originalImageURL)
-                                        openBottomSheet = true
-                                    }
-                                ),
-                            contentScale = ContentScale.FillWidth,
-                            placeholder = placeholder,
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(vertical = 10.dp)
+                        ) {
+                            UserAvatar(
+                                url = illust.user.profileImageUrls.medium,
+                                onClick = {
+                                    navToUserDetailScreen(illust.user.id)
+                                },
+                                modifier = Modifier
+                                    .padding(start = 20.dp)
+                                    .size(30.dp)
+                                    .align(Alignment.CenterVertically),
+                            )
+                            Column(
+                                modifier = Modifier.padding(start = 10.dp)
+                            ) {
+                                Text(
+                                    text = illust.title,
+                                    modifier = Modifier
+                                        .sharedElement(
+                                            rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
+                                            animatedContentScope,
+                                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                        )
+                                        .skipToLookaheadSize(),
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    maxLines = 1,
+                                )
+                                Text(
+                                    text = illust.user.name,
+                                    modifier = Modifier,
+                                    style = TextStyle(
+                                        fontSize = 12.sp,
+                                    ),
+                                    maxLines = 1,
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
                         )
                     }
                 }
+                item(span = StaggeredGridItemSpan.FullLine, key = "illust_data") {
+                    Row(
+                        Modifier.padding(top = 10.dp)
+                    ) {
+                        Text(
+                            text = convertUtcStringToLocalDateTime(illust.createDate),
+                            modifier = Modifier.padding(start = 20.dp),
+                            style = TextStyle(fontSize = 12.sp),
+                        )
+                        Text(
+                            text = illust.totalView.toString() + " ${stringResource(R.string.viewed)}",
+                            Modifier.padding(start = 10.dp),
+                            style = TextStyle(fontSize = 12.sp),
+                        )
+                        Text(
+                            text = illust.totalBookmarks.toString() + " ${stringResource(R.string.liked)}",
+                            Modifier.padding(start = 10.dp),
+                            style = TextStyle(fontSize = 12.sp),
+                        )
+                    }
+                }
+                // tag
+                item(span = StaggeredGridItemSpan.FullLine, key = "illust_tags") {
+                    FlowRow(
+                        Modifier.padding(start = 20.dp, top = 10.dp)
+                    ) {
+                        illust.tags?.forEach {
+                            Text(
+                                text = "#" + it.name,
+                                modifier = Modifier
+                                    .padding(vertical = 2.5.dp)
+                                    .padding(end = 5.dp)
+                                    .throttleClick {
+                                        navToSearchResultScreen(it.name)
+                                        dispatch(PictureAction.AddSearchHistory(it.name))
+                                    },
+                                style = TextStyle(fontSize = 12.sp, color = deepBlue),
+                            )
+                            Text(
+                                text = it.translatedName,
+                                modifier = Modifier
+                                    .padding(vertical = 2.5.dp)
+                                    .padding(end = 10.dp),
+                                style = TextStyle(fontSize = 12.sp)
+                            )
+                        }
+                    }
+                }
+                item(span = StaggeredGridItemSpan.FullLine, key = "illust_divider_1") {
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp)
+                            .padding(top = 50.dp)
+                    )
+                }
+                item(span = StaggeredGridItemSpan.FullLine, key = "illust_author") {
+                    //作者头像、名字、关注按钮
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp)
+                            .padding(top = 10.dp)
+                    ) {
+                        UserAvatar(
+                            url = illust.user.profileImageUrls.medium,
+                            onClick = {
+                                navToUserDetailScreen(illust.user.id)
+                            },
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.CenterVertically),
+                        )
+                        Column(
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .align(Alignment.CenterVertically)
+                        ) {
+                            Text(
+                                text = illust.user.name,
+                                modifier = Modifier
+                                    .sharedElement(
+                                        rememberSharedContentState(key = "${prefix}-user-name-${illust.user.id}"),
+                                        animatedContentScope,
+                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                    )
+                                    .skipToLookaheadSize(),
+                                style = TextStyle(
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                            )
+                            Text(
+                                text = "ID: ${illust.user.id}",
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (isFollowed) {
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                                    .throttleClick {
+                                        followDispatch(FollowAction.UnFollowUser(illust.user.id))
+                                    },
+                                text = stringResource(R.string.followed),
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                            )
+                        } else {
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .border(
+                                        width = 1.dp,
+                                        color = deepBlue,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                                    .throttleClick {
+                                        followDispatch(FollowAction.FollowUser(illust.user.id))
+                                    },
+                                text = stringResource(R.string.follow),
+                                style = TextStyle(
+                                    color = deepBlue,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                            )
+                        }
+                    }
+                }
+                item(span = StaggeredGridItemSpan.FullLine, key = "illust_author_other_works") {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp)
+                            .padding(top = 10.dp)
+                    ) {
+                        val otherPrefix = rememberSaveable { UUID.randomUUID().toString() }
+                        CompositionLocalProvider(
+                            LocalSharedKeyPrefix provides otherPrefix
+                        ) {
+                            state.userIllusts.subList(
+                                0,
+                                minOf(userSpanCount, state.userIllusts.size)
+                            )
+                                .forEach {
+                                    SquareIllustItem(
+                                        illust = it,
+                                        bookmarkState = bookmarkState,
+                                        dispatch = bookmarkDispatch,
+                                        spanCount = minOf(userSpanCount, state.userIllusts.size),
+                                        horizontalPadding = 15.dp,
+                                        paddingValues = PaddingValues(2.dp),
+                                        elevation = 5.dp,
+                                        navToPictureScreen = navToPictureScreen
+                                    )
+                                }
+                        }
+                    }
+                }
+                item(span = StaggeredGridItemSpan.FullLine, key = "illust_related_title") {
+                    //相关作品文字，显示在中间
+                    Text(
+                        text = stringResource(R.string.related_artworks),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 50.dp, bottom = 10.dp),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        ),
+                    )
+                }
+                itemsIndexed(
+                    state.illustRelated,
+                    key = { _, it -> "${illust.id}_related_${it.id}" },
+                    contentType = { _, _ -> "related_illusts" }
+                ) { index, it ->
+                    // 相关作品
+                    SquareIllustItem(
+                        illust = it,
+                        bookmarkState = bookmarkState,
+                        dispatch = bookmarkDispatch,
+                        spanCount = relatedSpanCount,
+                        paddingValues = PaddingValues(5.dp),
+                        shouldShowTip = index == 0,
+                        navToPictureScreen = navToPictureScreen
+                    )
+                }
+
+                items(currentLoadingItem, key = { "loading_$it" }) {
+                    val size =
+                        (LocalConfiguration.current.screenWidthDp.dp - 2 * relatedSpanCount * PaddingValues(
+                            5.dp
+                        ).calculateLeftPadding(
+                            LayoutDirection.Ltr
+                        ) - 1.dp) / relatedSpanCount
+                    Surface(
+                        Modifier
+                            .padding(5.dp)
+                            .size(size),
+                        shape = MaterialTheme.shapes.medium,
+                        shadowElevation = 4.dp,
+                        propagateMinConstraints = false,
+                    ) {
+
+                    }
+                }
+
+                item(key = "spacer") {
+                    Spacer(modifier = Modifier.height(70.dp))
+                }
             }
-            item(span = StaggeredGridItemSpan.FullLine, key = "illust_title") {
-                if (isScrollToBottom.value) {
+            lazyStaggeredGridState.OnScrollToBottom(isScrollToBottom, illust.pageCount, illust.id)
+            lazyStaggeredGridState.OnScrollToBottom(loadingItemCount = currentLoadingItem) {
+                isScrollToRelatedBottom.value = true
+                state.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
+                    dispatch(PictureAction.LoadMoreIllustRelatedIntent(state.nextUrl.queryParams))
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                AnimatedVisibility(
+                    visible = !isScrollToBottom.value,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -453,7 +789,7 @@ internal fun PictureScreen(
                             },
                             modifier = Modifier
                                 .padding(start = 20.dp)
-                                .size(30.dp)
+                                .size(20.dp)
                                 .align(Alignment.CenterVertically),
                         )
                         Column(
@@ -476,368 +812,95 @@ internal fun PictureScreen(
                             )
                         }
                     }
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    )
                 }
             }
-            item(span = StaggeredGridItemSpan.FullLine, key = "illust_data") {
-                Row(
-                    Modifier.padding(top = 10.dp)
-                ) {
-                    Text(
-                        text = convertUtcStringToLocalDateTime(illust.createDate),
-                        modifier = Modifier.padding(start = 20.dp),
-                        style = TextStyle(fontSize = 12.sp),
-                    )
-                    Text(
-                        text = illust.totalView.toString() + " ${stringResource(R.string.viewed)}",
-                        Modifier.padding(start = 10.dp),
-                        style = TextStyle(fontSize = 12.sp),
-                    )
-                    Text(
-                        text = illust.totalBookmarks.toString() + " ${stringResource(R.string.liked)}",
-                        Modifier.padding(start = 10.dp),
-                        style = TextStyle(fontSize = 12.sp),
-                    )
-                }
-            }
-            // tag
-            item(span = StaggeredGridItemSpan.FullLine, key = "illust_tags") {
-                FlowRow(
-                    Modifier.padding(start = 20.dp, top = 10.dp)
-                ) {
-                    illust.tags?.forEach {
-                        Text(
-                            text = "#" + it.name,
-                            modifier = Modifier
-                                .padding(vertical = 2.5.dp)
-                                .padding(end = 5.dp)
-                                .throttleClick {
-                                    navToSearchResultScreen(it.name)
-                                    dispatch(PictureAction.AddSearchHistory(it.name))
-                                },
-                            style = TextStyle(fontSize = 12.sp, color = deepBlue),
-                        )
-                        Text(
-                            text = it.translatedName,
-                            modifier = Modifier
-                                .padding(vertical = 2.5.dp)
-                                .padding(end = 10.dp),
-                            style = TextStyle(fontSize = 12.sp)
-                        )
-                    }
-                }
-            }
-            item(span = StaggeredGridItemSpan.FullLine, key = "illust_divider_1") {
-                HorizontalDivider(
+            if (openBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        openBottomSheet = false
+                    },
                     modifier = Modifier
-                        .padding(horizontal = 15.dp)
-                        .padding(top = 50.dp)
-                )
-            }
-            item(span = StaggeredGridItemSpan.FullLine, key = "illust_author") {
-                //作者头像、名字、关注按钮
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 15.dp)
-                        .padding(top = 10.dp)
+                        .heightIn(LocalConfiguration.current.screenHeightDp.dp / 2),
+                    sheetState = bottomSheetState,
+                    containerColor = MaterialTheme.colorScheme.background,
                 ) {
-                    UserAvatar(
-                        url = illust.user.profileImageUrls.medium,
-                        onClick = {
-                            navToUserDetailScreen(illust.user.id)
-                        },
-                        modifier = Modifier
-                            .size(30.dp)
-                            .align(Alignment.CenterVertically),
-                    )
                     Column(
                         modifier = Modifier
-                            .padding(start = 10.dp)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Text(
-                            text = illust.user.name,
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                        )
-                        Text(
-                            text = "ID: ${illust.user.id}",
-                            style = TextStyle(
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    if (isFollowed) {
-                        Text(
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .padding(horizontal = 10.dp, vertical = 8.dp)
-                                .throttleClick {
-                                    followDispatch(FollowAction.UnFollowUser(illust.user.id))
-                                },
-                            text = stringResource(R.string.followed),
-                            style = TextStyle(
-                                color = Color.White,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                        )
-                    } else {
-                        Text(
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .border(
-                                    width = 1.dp,
-                                    color = deepBlue,
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .padding(horizontal = 10.dp, vertical = 8.dp)
-                                .throttleClick {
-                                    followDispatch(FollowAction.FollowUser(illust.user.id))
-                                },
-                            text = stringResource(R.string.follow),
-                            style = TextStyle(
-                                color = deepBlue,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                        )
-                    }
-                }
-            }
-            item(span = StaggeredGridItemSpan.FullLine, key = "illust_author_other_works") {
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 15.dp)
-                        .padding(top = 10.dp)
-                ) {
-                    state.userIllusts.subList(0, minOf(userSpanCount, state.userIllusts.size))
-                        .forEach {
-                            SquareIllustItem(
-                                illust = it,
-                                bookmarkState = bookmarkState,
-                                dispatch = bookmarkDispatch,
-                                spanCount = minOf(userSpanCount, state.userIllusts.size),
-                                horizontalPadding = 15.dp,
-                                paddingValues = PaddingValues(2.dp),
-                                elevation = 5.dp,
-                                navToPictureScreen = navToPictureScreen
-                            )
-                        }
-                }
-            }
-            item(span = StaggeredGridItemSpan.FullLine, key = "illust_related_title") {
-                //相关作品文字，显示在中间
-                Text(
-                    text = stringResource(R.string.related_artworks),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 50.dp, bottom = 10.dp),
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                    ),
-                )
-            }
-            itemsIndexed(
-                state.illustRelated,
-                key = { _, it -> "${illust.id}_related_${it.id}" },
-                contentType = { _, _ -> "related_illusts" }
-            ) { index, it ->
-                // 相关作品
-                SquareIllustItem(
-                    illust = it,
-                    bookmarkState = bookmarkState,
-                    dispatch = bookmarkDispatch,
-                    spanCount = relatedSpanCount,
-                    paddingValues = PaddingValues(5.dp),
-                    shouldShowTip = index == 0,
-                    navToPictureScreen = navToPictureScreen
-                )
-            }
-
-            items(currentLoadingItem, key = { "loading_$it" }) {
-                val size =
-                    (LocalConfiguration.current.screenWidthDp.dp - 2 * relatedSpanCount * PaddingValues(
-                        5.dp
-                    ).calculateLeftPadding(
-                        LayoutDirection.Ltr
-                    ) - 1.dp) / relatedSpanCount
-                Surface(
-                    Modifier
-                        .padding(5.dp)
-                        .size(size),
-                    shape = MaterialTheme.shapes.medium,
-                    shadowElevation = 4.dp,
-                    propagateMinConstraints = false,
-                ) {
-
-                }
-            }
-
-            item(key = "spacer") {
-                Spacer(modifier = Modifier.height(70.dp))
-            }
-        }
-        lazyStaggeredGridState.OnScrollToBottom(isScrollToBottom, illust.pageCount, illust.id)
-        lazyStaggeredGridState.OnScrollToBottom(loadingItemCount = currentLoadingItem) {
-            isScrollToRelatedBottom.value = true
-            state.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
-                dispatch(PictureAction.LoadMoreIllustRelatedIntent(state.nextUrl.queryParams))
-            }
-        }
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            val picInfo = createRef()
-            AnimatedVisibility(
-                visible = !isScrollToBottom.value,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier
-                    .constrainAs(picInfo) {
-                        bottom.linkTo(parent.bottom)
-                    }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(vertical = 10.dp)
-                ) {
-                    UserAvatar(
-                        url = illust.user.profileImageUrls.medium,
-                        onClick = {
-                            navToUserDetailScreen(illust.user.id)
-                        },
-                        modifier = Modifier
-                            .padding(start = 20.dp)
-                            .size(20.dp)
-                            .align(Alignment.CenterVertically),
-                    )
-                    Column(
-                        modifier = Modifier.padding(start = 10.dp)
-                    ) {
-                        Text(
-                            text = illust.title,
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            ),
-                            maxLines = 1,
-                        )
-                        Text(
-                            text = illust.user.name,
-                            style = TextStyle(
-                                fontSize = 12.sp,
-                            ),
-                            maxLines = 1,
-                        )
-                    }
-                }
-            }
-        }
-        if (openBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    openBottomSheet = false
-                },
-                modifier = Modifier
-                    .heightIn(LocalConfiguration.current.screenHeightDp.dp / 2),
-                sheetState = bottomSheetState,
-                containerColor = MaterialTheme.colorScheme.background,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
                             .fillMaxWidth()
-                            .throttleClick {
-                                loading = true
-                                // 下载原始图片
-                                dispatch(
-                                    PictureAction.DownloadIllust(
-                                        illust.id,
-                                        currLongClickPic.first,
-                                        currLongClickPic.second
-                                    ) {
-                                        loading = false
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(
-                                                if (it) context.getString(R.string.download_success)
-                                                else context.getString(R.string.download_failed)
-                                            )
-                                        }
-                                    })
-                                openBottomSheet = false
-                            }
-                            .padding(vertical = 10.dp)
+                            .padding(horizontal = 20.dp)
                     ) {
-                        Icon(imageVector = Icons.Rounded.Download, contentDescription = null)
-                        Text(
-                            text = stringResource(
-                                R.string.download_with_size,
-                                currLongClickPicSize
-                            ),
-                            modifier = Modifier.padding(start = 10.dp)
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .throttleClick {
-                                readMediaImagePermission.launchMultiplePermissionRequest()
-                                if (readMediaImagePermission.allPermissionsGranted) {
-                                    scope.launch(Dispatchers.IO) {
-                                        loading = true
-                                        if (createShareImage(
-                                                currLongClickPic,
-                                                illust,
-                                                shareLauncher
-                                            )
-                                        ) return@launch
-                                        loading = false
-                                        currLongClickPic = Pair(0, "")
-                                    }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .throttleClick {
+                                    loading = true
+                                    // 下载原始图片
+                                    dispatch(
+                                        PictureAction.DownloadIllust(
+                                            illust.id,
+                                            currLongClickPic.first,
+                                            currLongClickPic.second
+                                        ) {
+                                            loading = false
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    if (it) context.getString(R.string.download_success)
+                                                    else context.getString(R.string.download_failed)
+                                                )
+                                            }
+                                        })
                                     openBottomSheet = false
                                 }
-                            }
-                            .padding(vertical = 10.dp)
-                    ) {
-                        Icon(imageVector = Icons.Rounded.Share, contentDescription = null)
-                        Text(
-                            text = stringResource(R.string.share),
-                            modifier = Modifier.padding(start = 10.dp)
-                        )
+                                .padding(vertical = 10.dp)
+                        ) {
+                            Icon(imageVector = Icons.Rounded.Download, contentDescription = null)
+                            Text(
+                                text = stringResource(
+                                    R.string.download_with_size,
+                                    currLongClickPicSize
+                                ),
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .throttleClick {
+                                    readMediaImagePermission.launchMultiplePermissionRequest()
+                                    if (readMediaImagePermission.allPermissionsGranted) {
+                                        scope.launch(Dispatchers.IO) {
+                                            loading = true
+                                            if (createShareImage(
+                                                    currLongClickPic,
+                                                    illust,
+                                                    shareLauncher
+                                                )
+                                            ) return@launch
+                                            loading = false
+                                            currLongClickPic = Pair(0, "")
+                                        }
+                                        openBottomSheet = false
+                                    }
+                                }
+                                .padding(vertical = 10.dp)
+                        ) {
+                            Icon(imageVector = Icons.Rounded.Share, contentDescription = null)
+                            Text(
+                                text = stringResource(R.string.share),
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                        }
                     }
                 }
             }
-        }
-        if (loading) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+            if (loading) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
         }
     }

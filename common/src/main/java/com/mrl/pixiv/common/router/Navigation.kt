@@ -56,7 +56,8 @@ sealed class Destination(
     }
 
     data object PictureScreen : Destination(route = "picture_screen") {
-        const val illustParams = "illust"
+        const val illustId = "illustId"
+        const val prefix = "prefix"
     }
 
     data object PictureDeeplinkScreen : Destination(route = "picture_deeplink_screen") {

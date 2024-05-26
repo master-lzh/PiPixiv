@@ -40,9 +40,9 @@ fun Project.configureAndroidCompose(
             this.compose = true
         }
 
-        composeOptions {
-            kotlinCompilerExtensionVersion = compose.findVersion("compiler").get().toString()
-        }
+//        composeOptions {
+//            kotlinCompilerExtensionVersion = compose.findVersion("compiler").get().toString()
+//        }
 
         dependencies {
             val bom = compose.findLibrary("bom").get()
@@ -67,8 +67,9 @@ fun Project.configureAndroidCompose(
     }
 
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            freeCompilerArgs = freeCompilerArgs + buildComposeMetricsParameters()
+        compilerOptions {
+            freeCompilerArgs.addAll(buildComposeMetricsParameters())
+            apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
         }
     }
 }

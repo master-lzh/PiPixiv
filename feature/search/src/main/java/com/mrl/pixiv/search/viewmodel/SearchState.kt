@@ -13,6 +13,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Stable
 data class SearchState(
+    val refreshing: Boolean,
     val searchWords: String,
     val autoCompleteSearchWords: ImmutableList<Tag>,
     val searchFilter: SearchFilter,
@@ -30,6 +31,7 @@ data class SearchState(
 
     companion object {
         val INITIAL = SearchState(
+            refreshing = false,
             searchWords = "",
             autoCompleteSearchWords = persistentListOf(),
             searchFilter = SearchFilter(
