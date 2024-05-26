@@ -2,22 +2,15 @@
 
 package com.mrl.pixiv.util
 
-import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Point
-import android.graphics.Rect
 import android.util.DisplayMetrics
 import android.util.TypedValue
-import android.view.Window
 import android.view.WindowManager
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import java.util.Locale
@@ -83,60 +76,6 @@ object DisplayUtil {
     @Composable
     fun getScreenWidthDp(): Dp {
         return LocalConfiguration.current.screenWidthDp.dp
-    }
-
-    @JvmStatic
-    fun getStatusBarHeight(activity: Activity): Int {
-        return getStatusBarHeight(activity.window)
-    }
-
-    @JvmStatic
-    @Composable
-    fun getStatusBarHeight(): Dp {
-        // 使用LocalDensity来获取当前屏幕密度
-        val density = LocalDensity.current
-        // 获取状态栏的PaddingValues
-        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
-        // 计算状态栏高度
-        return statusBarPadding.calculateTopPadding()
-    }
-
-    @JvmStatic
-    fun getStatusBarHeight(window: Window): Int {
-        val localRect = Rect()
-        window.decorView.getWindowVisibleDisplayFrame(localRect)
-        var mStatusBarHeight = localRect.top
-        if (0 == mStatusBarHeight) {
-            try {
-                val c = Class.forName("com.android.internal.R\$dimen")
-                val o = c.newInstance()
-                val field = c.getField("status_bar_height")[o].toString().toInt()
-                mStatusBarHeight = getResources().getDimensionPixelSize(field)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        if (0 == mStatusBarHeight) {
-            val resourceId: Int = getResources().getIdentifier(
-                "status_bar_height",
-                "dimen",
-                "android"
-            )
-            if (resourceId > 0) {
-                mStatusBarHeight = getResources().getDimensionPixelSize(resourceId)
-            }
-        }
-        return mStatusBarHeight
-    }
-
-    @JvmStatic
-    fun getActionBarHeight(context: Context): Int {
-        val tv = TypedValue()
-        return if (context.theme.resolveAttribute(16843499, tv, true)) {
-            TypedValue.complexToDimensionPixelSize(tv.data, context.resources.displayMetrics)
-        } else {
-            0
-        }
     }
 
     @JvmStatic

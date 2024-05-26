@@ -1,25 +1,27 @@
 package com.mrl.pixiv.common_ui.util
 
+import android.util.Log
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.middleware.illust.IllustAction
+import com.mrl.pixiv.common.middleware.illust.IllustViewModel
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.data.Illust
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
+import org.koin.core.context.GlobalContext
+import kotlin.time.measureTime
 
-@OptIn(ExperimentalEncodingApi::class)
-fun NavHostController.navigateToPictureScreen(illust: Illust) {
-    navigate(
-        route = "${Destination.PictureScreen.route}/${
-            Base64.UrlSafe.encode(
-                Json.encodeToString(illust)
-                    .encodeToByteArray()
-            )
-        }"
-    ) {
-        restoreState = true
+fun NavHostController.navigateToPictureScreen(illust: Illust, prefix: String) {
+    measureTime {
+        val koin = GlobalContext.get()
+        val illustViewModel = koin.getOrNull<IllustViewModel>()
+        illustViewModel?.dispatch(IllustAction.SetIllust(illust.id, illust))
+        navigate(
+            route = "${Destination.PictureScreen.route}/${illust.id}?prefix=${prefix}"
+        ) {
+            restoreState = true
+        }
+    }.also {
+        Log.i("TAG", "navigateToPictureScreen: $it")
     }
 }
 

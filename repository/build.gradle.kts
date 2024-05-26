@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(project(":datasource"))
     implementation(project(":data"))
+    implementation(project(":common"))
 
     implementation(androidx.core.ktx)
     implementation(androidx.appcompat)

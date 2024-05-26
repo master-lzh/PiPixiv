@@ -72,7 +72,7 @@ internal fun HistoryScreen_(
     bookmarkState: BookmarkState = BookmarkState.INITIAL,
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
     popBack: () -> Unit = {},
-    navToPictureScreen: (Illust) -> Unit = {},
+    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
 ) {
     var searchValue by remember { mutableStateOf(TextFieldValue(state.currentSearch)) }
     val focusManager = LocalFocusManager.current

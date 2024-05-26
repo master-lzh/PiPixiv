@@ -1,6 +1,7 @@
 package com.mrl.pixiv.profile
 
 import android.os.Build
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,6 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +38,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
@@ -150,16 +153,40 @@ internal fun ProfileScreen_(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    UserAvatar(
-                        url = state.user.avatar,
-                        modifier = Modifier.size(80.dp),
-                        onClick = navToProfileDetail
-                    )
-                    Column {
-                        // 昵称
-                        Text(text = state.user.username)
-                        // ID
-                        Text(text = "ID: ${state.user.uid}")
+                    with(LocalSharedTransitionScope.currentOrThrow) {
+                        UserAvatar(
+                            url = state.user.avatar,
+                            modifier = Modifier
+                                .size(80.dp)
+                                .sharedElement(
+                                    state = rememberSharedContentState(key = "user-avatar-${state.user.uid}"),
+                                    LocalAnimatedContentScope.currentOrThrow,
+                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                ),
+                            onClick = navToProfileDetail
+                        )
+                        Column {
+                            // 昵称
+                            Text(
+                                text = state.user.username, modifier = Modifier
+                                    .sharedElement(
+                                        rememberSharedContentState(key = "user-name-${state.user.uid}"),
+                                        LocalAnimatedContentScope.currentOrThrow,
+                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                    )
+                                    .skipToLookaheadSize()
+                            )
+                            // ID
+                            Text(
+                                text = "ID: ${state.user.uid}", modifier = Modifier
+                                    .sharedElement(
+                                        rememberSharedContentState(key = "user-id-${state.user.uid}"),
+                                        LocalAnimatedContentScope.currentOrThrow,
+                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                    )
+                                    .skipToLookaheadSize()
+                            )
+                        }
                     }
                 }
             }
@@ -173,7 +200,7 @@ internal fun ProfileScreen_(
                         modifier = Modifier
                             .fillMaxWidth()
                             .throttleClick(
-                                indication = rememberRipple()
+                                indication = ripple()
                             ) {
                                 navToSetting()
                             }

@@ -46,7 +46,7 @@ fun IllustGrid(
     spanCount: Int,
     horizontalPadding: Dp = 0.dp,
     paddingValues: PaddingValues = PaddingValues(1.dp),
-    navToPictureScreen: (Illust) -> Unit,
+    navToPictureScreen: (Illust, String) -> Unit,
     canLoadMore: Boolean = true,
     onLoadMore: () -> Unit,
     loading: Boolean = false,
@@ -81,7 +81,9 @@ fun IllustGrid(
                 }
             }
         } else {
-            itemsIndexed(illusts, key = { _, item -> "illust_${item.id}" }) { index, illust ->
+            itemsIndexed(
+                illusts,
+                key = { index, item -> "illust_${index}_${item.id}" }) { index, illust ->
                 SquareIllustItem(
                     illust = illust,
                     bookmarkState = bookmarkState,

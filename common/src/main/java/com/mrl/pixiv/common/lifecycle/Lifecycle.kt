@@ -5,9 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.mrl.pixiv.util.TAG
 
 @Composable
@@ -16,11 +16,11 @@ fun OnLifecycle(
     onLifecycle: () -> Unit,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val onLifecycle by rememberUpdatedState(newValue = onLifecycle::invoke)
+    val onLifecycleCallback by rememberUpdatedState(newValue = onLifecycle)
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == lifecycleEvent) {
-                onLifecycle()
+                onLifecycleCallback()
             }
             when (event) {
                 Lifecycle.Event.ON_CREATE -> {

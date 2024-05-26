@@ -19,6 +19,9 @@ import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.middleware.follow.FollowMiddleware
 import com.mrl.pixiv.common.middleware.follow.FollowReducer
 import com.mrl.pixiv.common.middleware.follow.FollowViewModel
+import com.mrl.pixiv.common.middleware.illust.IllustMiddleware
+import com.mrl.pixiv.common.middleware.illust.IllustReducer
+import com.mrl.pixiv.common.middleware.illust.IllustViewModel
 import com.mrl.pixiv.datasource.local.SearchDataSource
 import com.mrl.pixiv.datasource.local.SettingDataSource
 import com.mrl.pixiv.datasource.local.UserAuthDataSource
@@ -161,6 +164,8 @@ val viewModelModule = module {
     viewModelOf(::HistoryViewModel)
 
     viewModelOf(::CollectionViewModel)
+
+    viewModelOf(::IllustViewModel)
 }
 
 val repositoryModule = module {
@@ -228,6 +233,8 @@ val middlewareModule = module {
     factoryOf(::HistoryMiddleware)
 
     factoryOf(::CollectionMiddleware)
+
+    factoryOf(::IllustMiddleware)
 }
 
 val reducerModule = module {
@@ -244,6 +251,7 @@ val reducerModule = module {
     singleOf(::SettingReducer)
     singleOf(::HistoryReducer)
     singleOf(::CollectionReducer)
+    singleOf(::IllustReducer)
 }
 
 fun provideAuthService(
