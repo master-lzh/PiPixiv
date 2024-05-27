@@ -11,7 +11,7 @@
 A third party Pixiv App which is entirely writen
 by [Jetpack Compose](https://developer.android.com/develop/ui/compose)
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.23-blue.svg?logo=kotlin)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.0-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/master-lzh/PiPixiv/release.yml)](https://github.com/master-lzh/PiPixiv/actions/workflows/release.yml)
 [![License: Apache-2.0](https://img.shields.io/github/license/master-lzh/PiPixiv?labelColor=27303D&color=0877d2)](/LICENSE)
 
@@ -41,10 +41,10 @@ by [Jetpack Compose](https://developer.android.com/develop/ui/compose)
 
 ### v1.1.0
 
-- [ ] Setting Page
-- [ ] Collection Page
+- [x] Setting Page
+- [x] Collection Page
 - [ ] Follow Page
-- [ ] History Page
+- [x] History Page
 
 </div>
 
