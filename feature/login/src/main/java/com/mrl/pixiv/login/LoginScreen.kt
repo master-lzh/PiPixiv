@@ -2,7 +2,7 @@ package com.mrl.pixiv.login
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Base64
+import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -37,8 +37,9 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
+import okio.ByteString.Companion.toByteString
 import org.koin.androidx.compose.koinViewModel
-import java.security.MessageDigest
+import kotlin.io.encoding.Base64
 import kotlin.random.Random
 
 private var codeVerifier = getCodeVer()
@@ -53,9 +54,8 @@ private fun getCodeVer(): String {
 }
 
 private fun getCodeChallenge(): String {
-    return Base64.encodeToString(
-        MessageDigest.getInstance("SHA-256").digest(codeVerifier.toByteArray(Charsets.US_ASCII)),
-        Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
+    return Base64.UrlSafe.encode(
+        getCodeVer().toByteArray(Charsets.UTF_8).toByteString().sha256().toByteArray(),
     ).replace("=", "")
 }
 
@@ -117,13 +117,11 @@ internal fun LoginScreen(
                 title = {},
                 actions = {
                     Button(onClick = {
-                        getCodeVer()
                         currUrl = generateWebViewUrl(false)
                     }) {
                         Text(text = stringResource(R.string.sign_in))
                     }
                     Button(onClick = {
-                        getCodeVer()
                         currUrl = generateWebViewUrl(true)
                     }) {
                         Text(text = stringResource(R.string.sign_up))
@@ -159,6 +157,7 @@ internal fun LoginScreen(
                     view: WebView?,
                     request: WebResourceRequest?
                 ): Boolean {
+                    Log.d("LoginScreen", "shouldOverrideUrlLoading: ${request?.url}")
                     if (checkUri(dispatch, request?.url!!)) {
                         return true
                     }
