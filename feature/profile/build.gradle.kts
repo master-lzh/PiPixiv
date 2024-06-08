@@ -11,7 +11,7 @@ dependencies {
     implementation(project(":repository"))
     implementation(project(":domain"))
 
-    implementation(libs.collapsing.toolbar)
+//    implementation(libs.collapsing.toolbar)
 
     implementation(androidx.core.ktx)
     implementation(androidx.appcompat)
