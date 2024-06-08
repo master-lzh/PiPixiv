@@ -1,36 +1,36 @@
 package com.mrl.pixiv.profile.detail
 
-import android.content.res.Configuration
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -38,16 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.mrl.pixiv.common.coil.BlurTransformation
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
+import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
@@ -58,12 +55,8 @@ import com.mrl.pixiv.profile.detail.components.NovelBookmarkWidget
 import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailAction
 import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailState
 import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailViewModel
-import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.copyToClipboard
 import com.mrl.pixiv.util.throttleClick
-import me.onebone.toolbar.CollapsingToolbarScaffold
-import me.onebone.toolbar.ScrollStrategy
-import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -117,115 +110,74 @@ internal fun ProfileDetailScreen(
     popBack: () -> Unit = { },
 ) {
     val userInfo = state.userInfo
-    val backgroundHeight = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_PORTRAIT -> DisplayUtil.getScreenWidthDp() / 3
-        Configuration.ORIENTATION_LANDSCAPE -> DisplayUtil.getScreenHeightDp() / 3
-        else -> DisplayUtil.getScreenWidthDp() / 3
+//    val backgroundHeight = when (LocalConfiguration.current.orientation) {
+//        Configuration.ORIENTATION_PORTRAIT -> DisplayUtil.getScreenWidthDp() / 3
+//        Configuration.ORIENTATION_LANDSCAPE -> DisplayUtil.getScreenHeightDp() / 3
+//        else -> DisplayUtil.getScreenWidthDp() / 3
+//    }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val avatarSize = 50.dp
+    val collapseHeight = with(LocalDensity.current) {
+        avatarSize + WindowInsets.statusBars.getTop(this).toDp() + 20.dp
     }
-    val collapsingToolbarScaffoldState = rememberCollapsingToolbarScaffoldState()
 
-    CollapsingToolbarScaffold(
-        modifier = modifier.fillMaxSize(),
-        state = collapsingToolbarScaffoldState,
-        toolbar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(backgroundHeight)
-            ) {
-                val backgroundUrl = userInfo.backgroundImageURL.ifEmpty {
-                    userInfo.user?.profileImageUrls?.medium
-                }
-                if (!backgroundUrl.isNullOrEmpty()) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(backgroundUrl).allowRgb565(true)
-                            .transformations(BlurTransformation(LocalContext.current))
-                            .build(),
-                        contentScale = ContentScale.FillWidth,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-            IconButton(
-                onClick = popBack,
-                modifier = Modifier
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(vertical = 10.dp)
-            ) {
-                Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .graphicsLayer {
-                        alpha = 1 - collapsingToolbarScaffoldState.toolbarState.progress
+    Screen(
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .windowInsetsPadding(WindowInsets.statusBars)
+                    ) {
+                        Row(
+                            modifier = Modifier.align(CenterStart),
+                        ) {
+                            userInfo.user?.profileImageUrls?.medium?.let {
+                                UserAvatar(
+                                    url = it,
+                                    modifier = Modifier.size(avatarSize * (2 - scrollBehavior.state.collapsedFraction)),
+                                    contentScale = ContentScale.FillWidth,
+                                )
+                            }
+                            userInfo.user?.name?.let { it1 ->
+                                Text(
+                                    modifier = Modifier
+                                        .align(CenterVertically)
+                                        .padding(start = 10.dp),
+                                    text = it1,
+                                    style = TextStyle(
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Medium,
+                                    ),
+                                )
+                            }
+                        }
                     }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .align(CenterStart)
-                        .padding(start = 50.dp)
-                        .padding(vertical = 10.dp)
-                        .graphicsLayer {
-                            alpha = 1 - collapsingToolbarScaffoldState.toolbarState.progress
-                        },
-                ) {
-                    userInfo.user?.profileImageUrls?.medium?.let {
-                        UserAvatar(
-                            url = it,
-                            modifier = Modifier.size(50.dp),
-                            contentScale = ContentScale.FillWidth,
-                        )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = popBack,
+                        modifier = Modifier
+                            .windowInsetsPadding(WindowInsets.statusBars)
+                            .padding(vertical = 10.dp)
+                    ) {
+                        Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
                     }
-                    userInfo.user?.name?.let { it1 ->
-                        Text(
-                            modifier = Modifier
-                                .align(CenterVertically)
-                                .padding(start = 10.dp),
-                            text = it1,
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                        )
-                    }
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .padding(start = 15.dp, top = backgroundHeight - 50.dp)
-                    .size(100.dp)
-                    .road(BottomStart, Alignment.TopStart)
-                    .graphicsLayer {
-                        alpha *= collapsingToolbarScaffoldState.toolbarState.progress
-                    }
-            ) {
-                userInfo.user?.profileImageUrls?.medium?.let {
-                    with(LocalSharedTransitionScope.currentOrThrow) {
-                        UserAvatar(
-                            url = it,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .sharedElement(
-                                    state = rememberSharedContentState(key = "user-avatar-${userInfo.user.id}"),
-                                    LocalAnimatedContentScope.currentOrThrow,
-                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                ),
-                        )
-                    }
-                }
-            }
+                },
+                collapsedHeight = collapseHeight,
+                expandedHeight = 300.dp,
+                windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal),
+                scrollBehavior = scrollBehavior,
+            )
         },
-        scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
-        enabled = true,
     ) {
         LazyColumn(
             modifier = Modifier
+                .padding(it)
                 .fillMaxWidth(),
         ) {
             item(key = "user_info") {
@@ -241,13 +193,13 @@ internal fun ProfileDetailScreen(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Medium,
                                 ),
-                                modifier = Modifier
-                                    .sharedElement(
-                                        rememberSharedContentState(key = "user-name-${userInfo.user.id}"),
-                                        LocalAnimatedContentScope.currentOrThrow,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    )
-                                    .skipToLookaheadSize()
+//                                modifier = Modifier
+//                                    .sharedElement(
+//                                        rememberSharedContentState(key = "user-name-${userInfo.user.id}"),
+//                                        LocalAnimatedContentScope.currentOrThrow,
+//                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+//                                    )
+//                                    .skipToLookaheadSize()
                             )
                         }
                         if (userInfo.isPremium) {
@@ -271,13 +223,13 @@ internal fun ProfileDetailScreen(
                     ) {
                         Text(
                             text = "ID: ${userInfo.user?.id}",
-                            modifier = Modifier
-                                .sharedElement(
-                                    rememberSharedContentState(key = "user-id-${userInfo.user?.id}"),
-                                    LocalAnimatedContentScope.currentOrThrow,
-                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                )
-                                .skipToLookaheadSize(),
+//                            modifier = Modifier
+//                                .sharedElement(
+//                                    rememberSharedContentState(key = "user-id-${userInfo.user?.id}"),
+//                                    LocalAnimatedContentScope.currentOrThrow,
+//                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+//                                )
+//                                .skipToLookaheadSize(),
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
