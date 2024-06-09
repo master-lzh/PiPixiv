@@ -10,4 +10,5 @@
     <string name="sharing_success">分享成功</string>
     <string name="viewed">阅读</string>
     <string name="liked">收藏！</string>
+    <string name="unknown_error">未知错误</string>
 </resources>

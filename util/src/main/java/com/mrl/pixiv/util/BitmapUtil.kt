@@ -3,6 +3,7 @@ package com.mrl.pixiv.util
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory.decodeFile
 import android.os.Environment
+import okio.Path.Companion.toPath
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
@@ -27,25 +28,32 @@ enum class PictureType(val extension: String) {
     }
 }
 
-fun Bitmap.saveToAlbum(fileName: String, type: PictureType): File? {
+fun Bitmap.saveToAlbum(
+    fileName: String,
+    type: PictureType,
+    callback: (Boolean) -> Unit = {}
+) {
     val compressFormat = when (type) {
-        PictureType.PNG -> Bitmap.CompressFormat.PNG
-        PictureType.JPEG -> Bitmap.CompressFormat.JPEG
-        PictureType.JPG -> Bitmap.CompressFormat.JPEG
+        PictureType.PNG -> android.graphics.Bitmap.CompressFormat.PNG
+        PictureType.JPEG -> android.graphics.Bitmap.CompressFormat.JPEG
+        PictureType.JPG -> android.graphics.Bitmap.CompressFormat.JPEG
     }
-    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-        .absolutePath
-        .let { path ->
-            val dir = joinPaths(path, DOWNLOAD_DIR)
-            createOrExistsDir(dir)
-            val file = joinPaths(dir, "$fileName${type.extension}")
-            FileOutputStream(file).use { out ->
-                if (compress(compressFormat, 100, out)) {
-                    return File(file)
+    try {
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            .absolutePath
+            .let { path ->
+                val dir = path.toPath() / DOWNLOAD_DIR
+                dir.toFile().mkdirs()
+                val filePath = dir / "$fileName${type.extension}"
+                FileOutputStream(filePath.toFile()).use { out ->
+                    if (compress(compressFormat, 100, out)) {
+                        callback(true)
+                    }
                 }
             }
-        }
-    return null
+    } catch (_: Exception) {
+        callback(false)
+    }
 }
 
 fun calculateImageSize(url: String): Float {
