@@ -55,6 +55,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -92,6 +93,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.Coil
 import coil.compose.AsyncImage
@@ -111,6 +114,7 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.currentOrThrow
@@ -128,6 +132,7 @@ import com.mrl.pixiv.picture.viewmodel.PictureDeeplinkViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import com.mrl.pixiv.util.AppUtil
+import com.mrl.pixiv.util.AppUtil.getString
 import com.mrl.pixiv.util.DOWNLOAD_DIR
 import com.mrl.pixiv.util.OnScrollToBottom
 import com.mrl.pixiv.util.PictureType
@@ -157,9 +162,14 @@ fun PictureScreen(
     followViewModel: FollowViewModel,
 ) {
     OnLifecycle(onLifecycle = pictureViewModel::onCreate)
+    val exception = pictureViewModel.exception.collectAsStateWithLifecycle(
+        initialValue = null,
+        lifecycle = LocalLifecycleOwner.current.lifecycle,
+    ).value
     PictureScreen(
         modifier = modifier,
         state = pictureViewModel.state,
+        exception = exception,
         bookmarkState = bookmarkViewModel.state,
         followState = followViewModel.state,
         illust = illust,
@@ -184,10 +194,15 @@ fun PictureDeeplinkScreen(
     followViewModel: FollowViewModel,
 ) {
     val illust = pictureViewModel.state.illust
+    val exception = pictureViewModel.exception.collectAsStateWithLifecycle(
+        initialValue = null,
+        lifecycle = LocalLifecycleOwner.current.lifecycle,
+    ).value
     if (illust != null) {
         PictureScreen(
             modifier = modifier,
             state = pictureViewModel.state,
+            exception = exception,
             bookmarkState = bookmarkViewModel.state,
             followState = followViewModel.state,
             illust = illust,
@@ -216,6 +231,7 @@ fun PictureDeeplinkScreen(
 @Composable
 internal fun PictureScreen(
     state: PictureState,
+    exception: Throwable?,
     bookmarkState: BookmarkState,
     followState: FollowState,
     illust: Illust,
@@ -291,6 +307,17 @@ internal fun PictureScreen(
             5
         }
     }
+
+    LaunchedEffect(exception) {
+        if (exception != null) {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    exception.message ?: getString(R.string.unknown_error)
+                )
+            }
+        }
+    }
+
     val prefix = LocalSharedKeyPrefix.current
     val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
@@ -394,7 +421,14 @@ internal fun PictureScreen(
                             .clip(CircleShape)
                     )
                 }
-            }
+            },
+            snackBarHost = {
+                SnackbarHost(snackbarHostState) {
+                    TextSnackbar(
+                        text = it.visuals.message,
+                    )
+                }
+            },
         ) {
 
             LazyVerticalStaggeredGrid(
@@ -842,12 +876,6 @@ internal fun PictureScreen(
                                             currLongClickPic.second
                                         ) {
                                             loading = false
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar(
-                                                    if (it) context.getString(R.string.download_success)
-                                                    else context.getString(R.string.download_failed)
-                                                )
-                                            }
                                         })
                                     openBottomSheet = false
                                 }

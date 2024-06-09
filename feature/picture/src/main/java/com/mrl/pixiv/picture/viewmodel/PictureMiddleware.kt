@@ -13,6 +13,7 @@ import com.mrl.pixiv.data.illust.IllustDetailQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.network.HttpManager
+import com.mrl.pixiv.picture.R
 import com.mrl.pixiv.repository.IllustRepository
 import com.mrl.pixiv.repository.SearchRepository
 import com.mrl.pixiv.repository.UserRepository
@@ -168,10 +169,11 @@ class PictureMiddleware(
                 downloadCallback(false)
                 return@launchNetwork
             }
-            val file =
-                result.drawable?.toBitmap()?.saveToAlbum("${illustId}_$index", PictureType.PNG)
-            if (file != null) {
-                downloadCallback(true)
+            result.drawable?.toBitmap()?.saveToAlbum("${illustId}_$index", PictureType.PNG) {
+                with(AppUtil.appContext) {
+                    downloadCallback(it)
+                    dispatchError(Exception(getString(if (it) R.string.download_success else R.string.download_failed)))
+                }
             }
         }
     }
