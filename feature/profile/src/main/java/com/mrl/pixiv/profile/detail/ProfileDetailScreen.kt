@@ -1,5 +1,6 @@
 package com.mrl.pixiv.profile.detail
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -42,6 +43,7 @@ import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.Screen
@@ -137,11 +139,18 @@ internal fun ProfileDetailScreen(
                             modifier = Modifier.align(CenterStart),
                         ) {
                             userInfo.user?.profileImageUrls?.medium?.let {
-                                UserAvatar(
-                                    url = it,
-                                    modifier = Modifier.size(avatarSize * (2 - scrollBehavior.state.collapsedFraction)),
-                                    contentScale = ContentScale.FillWidth,
-                                )
+                                with(LocalSharedTransitionScope.currentOrThrow) {
+                                    UserAvatar(
+                                        url = it,
+                                        modifier = Modifier.size(avatarSize * (2 - scrollBehavior.state.collapsedFraction))
+                                            .sharedElement(
+                                                state = rememberSharedContentState(key = "user-avatar-${userInfo.user.id}"),
+                                                LocalAnimatedContentScope.currentOrThrow,
+                                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                            ),
+                                        contentScale = ContentScale.FillWidth,
+                                    )
+                                }
                             }
                             userInfo.user?.name?.let { it1 ->
                                 Text(
@@ -193,13 +202,13 @@ internal fun ProfileDetailScreen(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Medium,
                                 ),
-//                                modifier = Modifier
-//                                    .sharedElement(
-//                                        rememberSharedContentState(key = "user-name-${userInfo.user.id}"),
-//                                        LocalAnimatedContentScope.currentOrThrow,
-//                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-//                                    )
-//                                    .skipToLookaheadSize()
+                                modifier = Modifier
+                                    .sharedElement(
+                                        rememberSharedContentState(key = "user-name-${userInfo.user.id}"),
+                                        LocalAnimatedContentScope.currentOrThrow,
+                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                    )
+                                    .skipToLookaheadSize()
                             )
                         }
                         if (userInfo.isPremium) {
@@ -223,13 +232,13 @@ internal fun ProfileDetailScreen(
                     ) {
                         Text(
                             text = "ID: ${userInfo.user?.id}",
-//                            modifier = Modifier
-//                                .sharedElement(
-//                                    rememberSharedContentState(key = "user-id-${userInfo.user?.id}"),
-//                                    LocalAnimatedContentScope.currentOrThrow,
-//                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-//                                )
-//                                .skipToLookaheadSize(),
+                            modifier = Modifier
+                                .sharedElement(
+                                    rememberSharedContentState(key = "user-id-${userInfo.user?.id}"),
+                                    LocalAnimatedContentScope.currentOrThrow,
+                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                                )
+                                .skipToLookaheadSize(),
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
