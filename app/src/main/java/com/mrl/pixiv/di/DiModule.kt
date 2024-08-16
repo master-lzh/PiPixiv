@@ -9,8 +9,6 @@ import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.collection.viewmodel.CollectionMiddleware
 import com.mrl.pixiv.collection.viewmodel.CollectionReducer
 import com.mrl.pixiv.collection.viewmodel.CollectionViewModel
-import com.mrl.pixiv.common.coroutine.CloseableCoroutineScope
-import com.mrl.pixiv.common.data.DispatcherEnum
 import com.mrl.pixiv.common.middleware.auth.AuthMiddleware
 import com.mrl.pixiv.common.middleware.auth.AuthReducer
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkMiddleware
@@ -84,9 +82,6 @@ import com.mrl.pixiv.splash.viewmodel.SplashMiddleware
 import com.mrl.pixiv.splash.viewmodel.SplashReducer
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
 import com.mrl.pixiv.userAuthDataStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainCoroutineDispatcher
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import org.koin.android.ext.koin.androidContext
@@ -125,15 +120,8 @@ val appModule = module {
 
     singleOf(::HttpManager)
 
-    single(named(DispatcherEnum.IO)) { Dispatchers.IO }
-
-    single(named(DispatcherEnum.MAIN)) { Dispatchers.Main.immediate }
 
     singleOf(::JSON)
-
-    factory {
-        CloseableCoroutineScope(SupervisorJob() + get<MainCoroutineDispatcher>(named(DispatcherEnum.MAIN)))
-    }
 }
 
 val viewModelModule = module {
