@@ -8,51 +8,103 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+
+val LazyStaggeredGridState.isScrollToTop: Boolean
+    @Composable
+    get() {
+        val isTop by remember {
+            derivedStateOf {
+                firstVisibleItemIndex == 0 && firstVisibleItemScrollOffset == 0
+            }
+        }
+        return isTop
+    }
+
+val LazyStaggeredGridState.isScrollToBottom: Boolean
+    @Composable
+    get() {
+        val isBottom by remember {
+            derivedStateOf {
+                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+                    ?: return@derivedStateOf false
+                lastVisibleItem.index >= layoutInfo.totalItemsCount - 1
+            }
+        }
+        return isBottom
+    }
 
 @Composable
-fun LazyListState.OnScrollToBottom(
-    onScrollToBottom: () -> Unit
+fun LazyStaggeredGridState.OnScrollToBottom(
+    loadingItemCount: Int,
+    debounceTime: Long = 300,
+    block: () -> Unit = {},
 ) {
-    val isScrollToBottom by remember {
+    val updatedBlock by rememberUpdatedState(block)
+    val shouldLoadMore by remember {
         derivedStateOf {
-            layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+                ?: return@derivedStateOf false
+            lastVisibleItem.index >= layoutInfo.totalItemsCount - 1 - loadingItemCount
         }
     }
-    LaunchedEffect(isScrollToBottom) {
-        if (isScrollToBottom) {
-            onScrollToBottom()
-        }
+    LaunchedEffect(Unit) {
+        snapshotFlow { shouldLoadMore }
+            .debounce(debounceTime)
+            .filter { it }
+            .collect {
+                updatedBlock()
+            }
     }
 }
 
 @Composable
 fun LazyGridState.OnScrollToBottom(
-    onScrollToBottom: () -> Unit
+    loadingItemCount: Int,
+    debounceTime: Long = 300,
+    block: () -> Unit = {},
 ) {
-    val isScrollToBottom by remember {
+    val updatedBlock by rememberUpdatedState(block)
+    val shouldLoadMore by remember {
         derivedStateOf {
-            layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+                ?: return@derivedStateOf false
+            lastVisibleItem.index >= layoutInfo.totalItemsCount - 1 - loadingItemCount
         }
     }
-    LaunchedEffect(isScrollToBottom) {
-        if (isScrollToBottom) {
-            onScrollToBottom()
-        }
+    LaunchedEffect(Unit) {
+        snapshotFlow { shouldLoadMore }
+            .debounce(debounceTime)
+            .filter { it }
+            .collect {
+                updatedBlock()
+            }
     }
 }
 
 @Composable
-fun LazyStaggeredGridState.OnScrollToBottom(
-    onScrollToBottom: () -> Unit
+fun LazyListState.OnScrollToBottom(
+    loadingItemCount: Int,
+    debounceTime: Long = 300,
+    block: () -> Unit = {},
 ) {
-    val isScrollToBottom by remember {
+    val updatedBlock by rememberUpdatedState(block)
+    val shouldLoadMore by remember {
         derivedStateOf {
-            layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+                ?: return@derivedStateOf false
+            lastVisibleItem.index >= layoutInfo.totalItemsCount - 1 - loadingItemCount
         }
     }
-    LaunchedEffect(isScrollToBottom) {
-        if (isScrollToBottom) {
-            onScrollToBottom()
-        }
+    LaunchedEffect(Unit) {
+        snapshotFlow { shouldLoadMore }
+            .debounce(debounceTime)
+            .filter { it }
+            .collect {
+                updatedBlock()
+            }
     }
 }

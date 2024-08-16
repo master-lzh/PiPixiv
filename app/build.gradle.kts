@@ -93,8 +93,10 @@ dependencies {
 
     implementation(libs.bundles.coil)
     implementation(libs.retrofit2)
+    implementation(libs.google.material)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
-    "baselineProfile"(project(":baselineprofile"))
+
+    baselineProfile(project(":baselineprofile"))
 }
