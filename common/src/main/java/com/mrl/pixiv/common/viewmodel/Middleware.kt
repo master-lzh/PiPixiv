@@ -18,16 +18,18 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-interface Dispatcher<A : Action> {
+interface Dispatcher<S : State, A : Action> {
     fun dispatch(action: A)
 
     fun dispatchError(throwable: Throwable?)
+
+    fun state(): S
 }
 
 abstract class Middleware<S : State, A : Action>(
     vararg closeables: Closeable,
 ) : KoinComponent {
-    private lateinit var dispatcher: Dispatcher<A>
+    private lateinit var dispatcher: Dispatcher<S, A>
     private lateinit var scope: CoroutineScope
     private val ioDispatcher by inject<CoroutineDispatcher>(named(DispatcherEnum.IO))
     private val closeables: Set<Closeable> = setOf(*closeables)
@@ -39,7 +41,7 @@ abstract class Middleware<S : State, A : Action>(
     protected fun dispatchError(throwable: Throwable?) = dispatcher.dispatchError(throwable)
 
     internal fun setDispatcher(
-        dispatcher: Dispatcher<A>,
+        dispatcher: Dispatcher<S, A>,
     ) {
         this.dispatcher = dispatcher
     }
