@@ -55,7 +55,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                splashViewModel.state.isLoading
+                splashViewModel.state().isLoading
             }
         }
         super.onCreate(savedInstanceState)
