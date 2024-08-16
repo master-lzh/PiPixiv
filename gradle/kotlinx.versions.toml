@@ -1,13 +1,12 @@
 [versions]
 kotlin_version = "2.0.0"
 ksp = "2.0.0-1.0.21"
-serialization_version = "1.6.3"
+serialization_version = "1.7.0"
 xml_serialization_version = "0.86.2"
 coroutines_version = "1.8.1"
 
 [libraries]
 reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin_version" }
-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin_version" }
 collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version = "0.3.7" }
 
 coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "coroutines_version" }

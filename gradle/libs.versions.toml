@@ -6,14 +6,15 @@ shizuku_version = "12.2.0"
 sqlite = "2.4.0"
 voyager = "1.0.0-rc08"
 richtext = "0.20.0"
-koin = "3.5.3"
-androidx-test-ext-junit = "1.1.5"
-androidx-test-espresso-espresso-core = "3.5.1"
+koin = "3.6.0-Beta4"
+koinAnnotation = "1.4.0-RC3"
+androidx-test-ext-junit = "1.2.1"
+androidx-test-espresso-espresso-core = "3.6.1"
 com-google-android-material-material = "1.12.0"
 lottie = "6.1.0"
-google-services = "4.4.1"
-firebase-bom = "33.0.0"
-firebase-crashlytics-gradle = "3.0.1"
+google-services = "4.4.2"
+firebase-bom = "33.1.2"
+firebase-crashlytics-gradle = "3.0.2"
 uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.2.4"
 protobuf-gradle = "0.9.4"
@@ -56,15 +57,17 @@ voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", 
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
 
-mockk = "io.mockk:mockk:1.13.10"
+mockk = "io.mockk:mockk:1.13.12"
 
 koin = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-annotations = { group = "io.insert-koin", name = "koin-annotations", version.ref = "koinAnnotation" }
+koin-ksp-compiler = { group = "io.insert-koin", name = "koin-ksp-compiler", version.ref = "koinAnnotation" }
 
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 
-guava = "com.google.guava:guava:33.0.0-jre"
+guava = "com.google.guava:guava:33.2.1-jre"
 
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-test-espresso-espresso-core" }
