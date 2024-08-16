@@ -25,7 +25,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply {
-                apply("pixiv.android.library")
+                apply("pixiv.android.library.compose")
 //                apply("pixiv.android.hilt")
             }
 

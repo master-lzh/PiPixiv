@@ -1,5 +1,4 @@
 plugins {
-    id("pixiv.android.library.compose")
     id("pixiv.android.feature")
 }
 
