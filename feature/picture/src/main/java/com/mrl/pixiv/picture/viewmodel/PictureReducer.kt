@@ -6,24 +6,23 @@ import kotlinx.collections.immutable.toImmutableList
 
 
 class PictureReducer : Reducer<PictureState, PictureAction> {
-    override fun reduce(state: PictureState, action: PictureAction): PictureState {
+    override fun PictureState.reduce(action: PictureAction): PictureState {
         return when (action) {
             is PictureAction.UpdateState -> action.state
-            is PictureAction.UpdateUserIllustsState -> state.copy(userIllusts = action.userIllusts.toMutableStateList())
-            is PictureAction.UpdateIllustRelatedState -> state.copy(
+            is PictureAction.UpdateUserIllustsState -> copy(userIllusts = action.userIllusts.toMutableStateList())
+            is PictureAction.UpdateIllustRelatedState -> copy(
                 illustRelated = action.illustRelated.toMutableStateList(),
                 nextUrl = action.nextUrl
             )
 
-            is PictureAction.UpdateIsBookmarkState -> state.copy(
+            is PictureAction.UpdateIsBookmarkState -> copy(
                 userIllusts = action.userIllusts.toMutableStateList(),
                 illustRelated = action.illustRelated.toMutableStateList()
             )
 
-            is PictureAction.UpdateIllust -> state.copy(illust = action.illust)
-            is PictureAction.UpdateUgoiraFrame -> state.copy(ugoiraImages = action.images.toImmutableList())
-
-            else -> state
+            is PictureAction.UpdateIllust -> copy(illust = action.illust)
+            is PictureAction.UpdateUgoiraFrame -> copy(ugoiraImages = action.images.toImmutableList())
+            else -> this
         }
     }
 }

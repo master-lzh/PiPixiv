@@ -33,8 +33,6 @@ abstract class BaseViewModel<S : State, A : Action>(
     private val actions = MutableSharedFlow<ActionImpl<S, A>>(extraBufferCapacity = BufferSize)
 
     private val _state =  MutableStateFlow(initialState)
-    val normalState
-        get() = _state.value
     val state
         @Composable
         get() = _state.asStateFlow().collectAsStateWithLifecycle().value
@@ -55,7 +53,9 @@ abstract class BaseViewModel<S : State, A : Action>(
         viewModelScope.launch {
             actions.collect { action->
                 _state.update {
-                    reducer.reduce(_state.value, action.action)
+                    reducer.run {
+                        it.reduce(action.action)
+                    }
                 }
             }
         }
