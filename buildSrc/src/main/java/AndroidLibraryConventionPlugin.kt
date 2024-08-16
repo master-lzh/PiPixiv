@@ -37,7 +37,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 34
+                defaultConfig.targetSdk = 35
 
                 buildTypes {
                     release {
@@ -61,6 +61,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
             dependencies {
                 add("implementation", androidx.findLibrary("core-ktx").get())
+                add("implementation", androidx.findLibrary("appcompat").get())
 
                 add("androidTestImplementation", kotlin("test"))
                 add("testImplementation", kotlin("test"))

@@ -8,8 +8,8 @@ android {
 
 dependencies {
     implementation(project(":util"))
+    api(libs.koin.annotations)
 
-    implementation(androidx.appcompat)
     implementation(androidx.activity.compose)
     implementation(libs.bundles.lottie)
     implementation(compose.accompanist.systemuicontroller)

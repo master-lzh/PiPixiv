@@ -10,18 +10,13 @@ bom = { group = "dev.chrisbanes.compose", name = "compose-bom", version.ref = "c
 foundation = { module = "androidx.compose.foundation:foundation" }
 animation = { module = "androidx.compose.animation:animation" }
 runtime-android = { module = "androidx.compose.runtime:runtime-android" }
-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-util = { module = "androidx.compose.ui:ui-util" }
-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 
 material3-core = { module = "androidx.compose.material3:material3" }
 material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 material-icons = { module = "androidx.compose.material:material-icons-extended" }
-
-# Here until M3's swipeable became public https://issuetracker.google.com/issues/234640556
-material-core = { module = "androidx.compose.material:material" }
 
 accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
