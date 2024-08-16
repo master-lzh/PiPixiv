@@ -15,6 +15,7 @@
  */
 
 import com.android.build.api.dsl.ApplicationExtension
+import com.mrl.pixiv.buildsrc.configureAndroidCompose
 import com.mrl.pixiv.buildsrc.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -31,6 +32,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
+                configureAndroidCompose(this)
                 defaultConfig.targetSdk = 34
             }
         }
