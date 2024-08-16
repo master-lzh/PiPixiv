@@ -1,7 +1,9 @@
 package com.mrl.pixiv.common.middleware.bookmark
 
 import com.mrl.pixiv.common.viewmodel.BaseViewModel
+import org.koin.android.annotation.KoinViewModel
 
+@KoinViewModel
 class BookmarkViewModel(
     reducer: BookmarkReducer,
     middleware: BookmarkMiddleware,
