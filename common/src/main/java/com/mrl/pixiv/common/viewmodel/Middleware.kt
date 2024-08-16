@@ -1,11 +1,9 @@
 package com.mrl.pixiv.common.viewmodel
 
 import android.util.Log
-import com.mrl.pixiv.common.data.DispatcherEnum
 import com.mrl.pixiv.common.data.Rlt
 import com.mrl.pixiv.util.NetworkExceptionUtil
 import com.mrl.pixiv.util.TAG
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,8 +13,6 @@ import kotlinx.coroutines.launch
 import okio.Closeable
 import okio.IOException
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
 interface Dispatcher<S : State, A : Action> {
     fun dispatch(action: A)
@@ -31,7 +27,7 @@ abstract class Middleware<S : State, A : Action>(
 ) : KoinComponent {
     private lateinit var dispatcher: Dispatcher<S, A>
     private lateinit var scope: CoroutineScope
-    private val ioDispatcher by inject<CoroutineDispatcher>(named(DispatcherEnum.IO))
+    private val ioDispatcher = Dispatchers.IO
     private val closeables: Set<Closeable> = setOf(*closeables)
 
     abstract suspend fun process(state: S, action: A)
