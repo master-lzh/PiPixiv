@@ -16,10 +16,6 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        register("androidApplicationCompose") {
-            id = "pixiv.android.application.compose"
-            implementationClass = "AndroidApplicationComposeConventionPlugin"
-        }
         register("androidApplication") {
             id = "pixiv.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"

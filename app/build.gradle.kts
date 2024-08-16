@@ -1,5 +1,4 @@
 plugins {
-    id("pixiv.android.application.compose")
     id("pixiv.android.application")
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
