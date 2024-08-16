@@ -49,7 +49,7 @@ guava = "com.google.guava:guava:33.2.1-jre"
 
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-test-espresso-espresso-core" }
-com-google-android-material-material = { group = "com.google.android.material", name = "material", version.ref = "com-google-android-material-material" }
+google-material = { group = "com.google.android.material", name = "material", version.ref = "com-google-android-material-material" }
 
 collapsing-toolbar = "me.onebone:toolbar-compose:2.3.5"
 

@@ -20,12 +20,8 @@ material-icons = { module = "androidx.compose.material:material-icons-extended" 
 
 accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-accompanist-themeadapter = { module = "com.google.accompanist:accompanist-themeadapter-material3", version.ref = "accompanist" }
-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
-accompanist-flowlayout = { module = 'com.google.accompanist:accompanist-flowlayout', version.ref = "accompanist" }
-accompanist-navigation = { module = 'com.google.accompanist:accompanist-navigation-animation', version.ref = "accompanist" }
 
 [bundles]
-accompanist = ["accompanist-webview", "accompanist-permissions", "accompanist-themeadapter", "accompanist-systemuicontroller", "accompanist-flowlayout", "accompanist-navigation"]
+accompanist = ["accompanist-webview", "accompanist-permissions"]
 material = ["material-icons", "material3-core", "material-icons-core"]
 baselibs = ["foundation", "ui", "ui-tooling", "ui-util"]
