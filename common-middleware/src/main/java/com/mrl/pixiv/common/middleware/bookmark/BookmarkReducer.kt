@@ -3,13 +3,14 @@ package com.mrl.pixiv.common.middleware.bookmark
 import com.mrl.pixiv.common.viewmodel.Reducer
 
 class BookmarkReducer : Reducer<BookmarkState, BookmarkAction> {
-    override fun reduce(state: BookmarkState, action: BookmarkAction): BookmarkState {
+    override fun BookmarkState.reduce(action: BookmarkAction): BookmarkState {
         return when (action) {
-            is BookmarkAction.UpdateBookmarkState -> state.apply {
+            is BookmarkAction.UpdateBookmarkState -> {
                 bookmarkStatus[action.illustId] = action.isBookmarked
+                this
             }
 
-            else -> state
+            else -> this
         }
     }
 }

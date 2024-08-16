@@ -4,13 +4,13 @@ import com.mrl.pixiv.common.viewmodel.Reducer
 
 
 class FollowReducer : Reducer<FollowState, FollowAction> {
-    override fun reduce(state: FollowState, action: FollowAction): FollowState {
+    override fun FollowState.reduce(action: FollowAction): FollowState {
         return when (action) {
-            is FollowAction.UpdateFollowState -> state.copy(
-                followStatus = state.followStatus.apply { put(action.userId, action.isFollowed) }
+            is FollowAction.UpdateFollowState -> copy(
+                followStatus = followStatus.apply { put(action.userId, action.isFollowed) }
             )
 
-            else -> state
+            else -> this
         }
     }
 }

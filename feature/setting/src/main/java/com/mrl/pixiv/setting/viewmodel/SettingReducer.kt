@@ -3,16 +3,16 @@ package com.mrl.pixiv.setting.viewmodel
 import com.mrl.pixiv.common.viewmodel.Reducer
 
 class SettingReducer : Reducer<SettingState, SettingAction> {
-    override fun reduce(state: SettingState, action: SettingAction): SettingState {
+    override fun SettingState.reduce(action: SettingAction): SettingState {
         return when (action) {
-            is SettingAction.SwitchBypassSniffing -> state.copy(enableBypassSniffing = !state.enableBypassSniffing)
-            is SettingAction.UpdateSetting -> state.copy(
+            is SettingAction.SwitchBypassSniffing -> copy(enableBypassSniffing = !enableBypassSniffing)
+            is SettingAction.UpdateSetting -> copy(
                 enableBypassSniffing = action.setting.enableBypassSniffing,
                 pictureSourceHost = action.setting.imageHost
             )
 
-            is SettingAction.UpdatePictureSourceHost -> state.copy(pictureSourceHost = action.host)
-            else -> state
+            is SettingAction.UpdatePictureSourceHost -> copy(pictureSourceHost = action.host)
+            else -> this
         }
     }
 }

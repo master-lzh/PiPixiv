@@ -5,11 +5,11 @@ import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.viewmodel.Reducer
 
 class SplashReducer : Reducer<SplashState, SplashAction> {
-    override fun reduce(state: SplashState, action: SplashAction): SplashState {
+    override fun SplashState.reduce(action: SplashAction): SplashState {
         return when (action) {
-            is SplashAction.RouteToHomeScreenIntent -> routeToHome(state)
-            is SplashAction.RouteToLoginScreenIntent -> routeToLogin(state)
-            else -> state
+            is SplashAction.RouteToHomeScreenIntent -> routeToHome(this)
+            is SplashAction.RouteToLoginScreenIntent -> routeToLogin(this)
+            else -> this
         }
     }
 
