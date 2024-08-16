@@ -84,7 +84,6 @@ dependencies {
 
     implementation(compose.bundles.accompanist)
     implementation(androidx.activity.compose)
-    implementation(androidx.appcompat)
     implementation(androidx.splashscreen)
     implementation(androidx.datastore)
     implementation(androidx.datastore.preferences)

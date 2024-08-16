@@ -52,7 +52,6 @@ fun Project.configureAndroidCompose(
             add("implementation", androidx.findLibrary("core-ktx").get())
             add("implementation", androidx.findBundle("lifecycle").get())
             add("implementation", androidx.findLibrary("navigation.compose").get())
-            add("implementation", androidx.findLibrary("constraintlayout.compose").get())
             add("implementation", androidx.findLibrary("tracing").get())
 
             add("implementation", compose.findBundle("material").get())
@@ -61,9 +60,6 @@ fun Project.configureAndroidCompose(
             add("implementation", libs.findLibrary("koin.compose").get())
 
             add("implementation", project(":data"))
-            if (commonExtension !is ApplicationExtension) {
-                add("androidTestImplementation", compose.findLibrary("ui-test-junit4").get())
-            }
         }
     }
 
