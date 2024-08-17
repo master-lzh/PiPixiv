@@ -1,5 +1,6 @@
 package com.mrl.pixiv.di.network
 
+import com.mrl.pixiv.di.network.NetworkUtil.hostnameVerifier
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
@@ -86,6 +87,7 @@ val baseHttpClient: HttpClient
     get() = httpClient(OkHttp) {
         config {
             retryOnConnectionFailure(true)
+            hostnameVerifier(hostnameVerifier)
         }
     }
 
@@ -93,5 +95,6 @@ val baseImageHttpClient: HttpClient
     get() = imageHttpClient(OkHttp) {
         config {
             retryOnConnectionFailure(true)
+            hostnameVerifier(hostnameVerifier)
         }
     }

@@ -18,7 +18,7 @@ fun authHttpClient() = baseHttpClient.apply {
         request.apply {
             url {
                 protocol = URLProtocol.HTTPS
-                host = AUTH_HOST
+                host = if (enableBypassSniffing) AUTH_HOST else hostMap[AUTH_HOST]!!
             }
             headers.remove("Authorization")
             headers["Host"] = AUTH_HOST
