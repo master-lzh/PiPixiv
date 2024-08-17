@@ -6,7 +6,6 @@ import com.mrl.pixiv.datasource.TokenManager
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.repository.SettingRepository
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.utils.io.core.toByteArray
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate.Formats.ISO
 import kotlinx.datetime.LocalDateTime
@@ -19,6 +18,7 @@ import kotlinx.datetime.toLocalDateTime
 import okio.ByteString.Companion.toByteString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import javax.net.ssl.HostnameVerifier
 
 internal const val TAG = "HttpManager"
 internal const val HashSalt =
@@ -92,4 +92,8 @@ object NetworkUtil : KoinComponent {
     private val allSetting: UserPreference = settingRepository.allSettingsSync
     val enableBypassSniffing: Boolean = allSetting.enableBypassSniffing
     val imageHost: String = allSetting.imageHost.ifEmpty { IMAGE_HOST }
+    val hostnameVerifier = HostnameVerifier { hostname, session ->
+        // 检查主机名是否是你期望连接的IP地址或域名
+        hostname in hostMap.keys || hostname in hostMap.values || hostname == imageHost || hostname == "doh.dns.sb"
+    }
 }
