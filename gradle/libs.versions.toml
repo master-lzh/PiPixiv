@@ -16,6 +16,7 @@ uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.2.4"
 protobuf-gradle = "0.9.4"
 protobuf = "4.26.0"
+kermit = "2.0.4"
 
 [libraries]
 desugar = "com.android.tools:desugar_jdk_libs:2.0.4"
@@ -61,6 +62,9 @@ uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", versi
 benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark-macro-junit4" }
 
 protobuf-kotlin-lite = { module="com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
+
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+
 
 [bundles]
 okhttp = ["okhttp-core", "okhttp-logging", "okhttp-dnsoverhttps", "retrofit2"]

@@ -16,8 +16,11 @@
 
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.LibraryExtension
+import com.mrl.pixiv.buildsrc.androidTestImplementation
 import com.mrl.pixiv.buildsrc.configureKotlinAndroid
 import com.mrl.pixiv.buildsrc.disableUnnecessaryAndroidTests
+import com.mrl.pixiv.buildsrc.implementation
+import com.mrl.pixiv.buildsrc.testImplementation
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -25,6 +28,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.kotlin
+
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -60,11 +64,11 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 }
             }
             dependencies {
-                add("implementation", androidx.findLibrary("core-ktx").get())
-                add("implementation", androidx.findLibrary("appcompat").get())
+                implementation(androidx.findLibrary("core-ktx").get())
+                implementation(androidx.findLibrary("appcompat").get())
 
-                add("androidTestImplementation", kotlin("test"))
-                add("testImplementation", kotlin("test"))
+                androidTestImplementation(kotlin("test"))
+                testImplementation(kotlin("test"))
             }
         }
     }
