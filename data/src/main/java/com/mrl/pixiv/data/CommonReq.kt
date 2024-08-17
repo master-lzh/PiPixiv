@@ -3,6 +3,7 @@ package com.mrl.pixiv.data
 import androidx.annotation.StringDef
 import androidx.compose.runtime.Stable
 import com.google.common.base.CaseFormat
+import kotlinx.serialization.json.Json
 import kotlin.reflect.full.memberProperties
 
 enum class Filter(override val value: String): IBaseEnum {
@@ -40,4 +41,10 @@ annotation class Restrict {
         const val PRIVATE = "private"
         const val ALL = "all"
     }
+}
+
+internal val JSON = Json {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+    isLenient = true
 }

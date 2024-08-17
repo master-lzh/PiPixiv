@@ -1,12 +1,40 @@
 package com.mrl.pixiv.data.user
 
-import androidx.datastore.core.Serializer
-import java.io.InputStream
-import java.io.OutputStream
+import androidx.datastore.core.okio.OkioSerializer
+import com.mrl.pixiv.data.JSON
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import okio.BufferedSink
+import okio.BufferedSource
+import okio.use
 
+@Serializable
+data class UserInfo(
+    val uid: Long,
+    val username: String,
+    val avatar: String,
+    val comment: String,
+) {
+    companion object {
+        val defaultInstance = UserInfo(
+            uid = 0,
+            username = "",
+            avatar = "",
+            comment = "",
+        )
+    }
 
-object UserInfoSerializer : Serializer<UserInfo> {
-    override val defaultValue: UserInfo = UserInfo.getDefaultInstance()
-    override suspend fun readFrom(input: InputStream): UserInfo = UserInfo.parseFrom(input)
-    override suspend fun writeTo(t: UserInfo, output: OutputStream) = t.writeTo(output)
+}
+
+object UserInfoSerializer : OkioSerializer<UserInfo> {
+    override val defaultValue: UserInfo = UserInfo.defaultInstance
+
+    override suspend fun readFrom(source: BufferedSource): UserInfo =
+        JSON.decodeFromString(source.readUtf8())
+
+    override suspend fun writeTo(t: UserInfo, sink: BufferedSink) {
+        sink.use {
+            it.writeUtf8(JSON.encodeToString(t))
+        }
+    }
 }

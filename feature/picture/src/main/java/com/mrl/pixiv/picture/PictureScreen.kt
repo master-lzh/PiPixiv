@@ -96,9 +96,9 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import coil.Coil
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.SingletonImageLoader
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.mrl.pixiv.common.coroutine.launchNetwork
@@ -950,13 +950,13 @@ private suspend fun createShareImage(
             )
         }
     if (!isFileExists(file)) {
-        val imageLoader = Coil.imageLoader(AppUtil.appContext)
+        val imageLoader = SingletonImageLoader.get(AppUtil.appContext)
         val request = ImageRequest
             .Builder(AppUtil.appContext)
             .data(currLongClickPic.second)
             .build()
         val result = imageLoader.execute(request)
-        result.drawable
+        result.image?.asDrawable(AppUtil.appContext.resources)
             ?.toBitmap()
             ?.saveToAlbum(file.nameWithoutExtension, PictureType.PNG)
             ?: return true

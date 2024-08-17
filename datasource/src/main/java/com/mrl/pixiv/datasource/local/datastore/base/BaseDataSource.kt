@@ -1,4 +1,4 @@
-package com.mrl.pixiv.datasource.local.base
+package com.mrl.pixiv.datasource.local.datastore.base
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

@@ -5,8 +5,11 @@ serialization = "1.7.0"
 xml_serialization = "0.86.2"
 coroutines = "1.8.1"
 ktor = "2.3.11"
+datetime = "0.6.0"
 
 [libraries]
+datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
+
 reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version = "0.3.7" }
 

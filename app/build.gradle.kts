@@ -69,7 +69,6 @@ dependencies {
     implementation(project(":repository"))
     implementation(project(":datasource"))
     implementation(project(":network"))
-    implementation(project(":api"))
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":common-middleware"))
@@ -83,6 +82,7 @@ dependencies {
 
 
     implementation(compose.bundles.accompanist)
+    implementation(compose.ui.text)
     implementation(androidx.activity.compose)
     implementation(androidx.splashscreen)
     implementation(androidx.datastore)
@@ -90,13 +90,17 @@ dependencies {
     implementation(androidx.profileinstaller)
     implementation(kotlinx.bundles.serialization)
     implementation(kotlinx.bundles.coroutines)
+    implementation(kotlinx.bundles.ktor)
+    implementation(kotlinx.datetime)
 
-    implementation(libs.bundles.coil)
-    implementation(libs.retrofit2)
+    implementation(libs.bundles.coil3)
     implementation(libs.google.material)
+    implementation(libs.koin)
+    implementation(libs.bundles.coil3)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
 
     baselineProfile(project(":baselineprofile"))
+    ksp(libs.koin.ksp.compiler)
 }

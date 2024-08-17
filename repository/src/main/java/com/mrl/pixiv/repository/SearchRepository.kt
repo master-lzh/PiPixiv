@@ -1,9 +1,9 @@
 package com.mrl.pixiv.repository
 
 import com.mrl.pixiv.data.search.SearchAutoCompleteQuery
+import com.mrl.pixiv.data.search.SearchHistory
 import com.mrl.pixiv.data.search.SearchIllustQuery
-import com.mrl.pixiv.data.search.searchHistory
-import com.mrl.pixiv.datasource.local.SearchDataSource
+import com.mrl.pixiv.datasource.local.datastore.SearchDataSource
 import com.mrl.pixiv.datasource.remote.SearchHttpService
 
 class SearchRepository(
@@ -14,7 +14,11 @@ class SearchRepository(
     fun deleteSearchHistory(searchWords: String) {
         searchDataSource.updateData {
             val index = it.searchHistoryList.indexOfFirst { it.keyword == searchWords }
-            it.toBuilder().removeSearchHistory(index).build()
+            it.copy(
+                searchHistoryList = it.searchHistoryList.toMutableList().apply {
+                    removeAt(index)
+                }
+            )
         }
     }
 
@@ -23,17 +27,23 @@ class SearchRepository(
             // add to search history if not exist
             val index = it.searchHistoryList.indexOfFirst { it.keyword == searchWords }
             if (index == -1) {
-                it.toBuilder().addSearchHistory(
-                    0,
-                    searchHistory {
-                        keyword = searchWords
-                        timestamp = System.currentTimeMillis()
+                it.copy(
+                    searchHistoryList = it.searchHistoryList.toMutableList().apply {
+                        add(0, SearchHistory(
+                            keyword = searchWords,
+                            timestamp = System.currentTimeMillis()
+                        ))
                     }
-                ).build()
+                )
             } else {
                 // move to first if exist
                 val searchHistory = it.searchHistoryList[index]
-                it.toBuilder().removeSearchHistory(index).addSearchHistory(0, searchHistory).build()
+                it.copy(
+                    searchHistoryList = it.searchHistoryList.toMutableList().apply {
+                        removeAt(index)
+                        add(0, searchHistory)
+                    }
+                )
             }
         }
     }

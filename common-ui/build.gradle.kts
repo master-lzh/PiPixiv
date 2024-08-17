@@ -9,7 +9,7 @@ android {
 dependencies {
 
 
-    implementation(libs.bundles.coil)
+    implementation(libs.bundles.coil3)
     implementation(kotlinx.bundles.serialization)
 
     implementation(project(":util"))

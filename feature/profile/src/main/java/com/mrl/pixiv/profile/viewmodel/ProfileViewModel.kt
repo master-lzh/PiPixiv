@@ -11,7 +11,7 @@ data class ProfileState(
 ) : State {
     companion object {
         val INITIAL = ProfileState(
-            user = UserInfo.getDefaultInstance()
+            user = UserInfo.defaultInstance
         )
     }
 }

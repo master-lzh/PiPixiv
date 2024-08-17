@@ -49,11 +49,11 @@ import com.mrl.pixiv.home.viewmodel.HomeState
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.util.AppUtil
 import com.mrl.pixiv.util.queryParams
-import com.mrl.pixiv.util.second
 import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.Duration.Companion.seconds
 
 val initRecommendedQuery = IllustRecommendedQuery(
     filter = Filter.ANDROID.value,
@@ -244,7 +244,7 @@ internal fun HomeScreen(
                     dismissRefresh = {
                         scope.launch {
                             lazyStaggeredGridState.scrollToItem(0)
-                            delay(1.second)
+                            delay(1.seconds)
                             dispatch(HomeAction.DismissLoading)
                         }
                     },
