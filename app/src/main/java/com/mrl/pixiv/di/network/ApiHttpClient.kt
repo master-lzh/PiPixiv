@@ -20,15 +20,15 @@ import org.koin.core.annotation.Single
 
 @Single
 @Named("api")
-fun apiHttpClient() =
-    baseHttpClient.apply {
+fun apiHttpClient() = baseHttpClient.apply {
         plugin(HttpSend).intercept { request ->
             addAuthHeader(request)
             request.apply {
                 url {
                     protocol = URLProtocol.HTTPS
-                    host = API_HOST
+                    host = if (enableBypassSniffing) API_HOST else hostMap[API_HOST]!!
                 }
+                headers["Host"] = API_HOST
             }
             execute(request)
         }
