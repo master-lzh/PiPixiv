@@ -47,19 +47,19 @@ fun Project.configureAndroidCompose(
 
         dependencies {
             val bom = compose.findLibrary("bom").get()
-            add("implementation", platform(bom))
+            implementation(platform(bom))
 
-            add("implementation", androidx.findLibrary("core-ktx").get())
-            add("implementation", androidx.findBundle("lifecycle").get())
-            add("implementation", androidx.findLibrary("navigation.compose").get())
-            add("implementation", androidx.findLibrary("tracing").get())
+            implementation(androidx.findLibrary("core-ktx").get())
+            implementation(androidx.findBundle("lifecycle").get())
+            implementation(androidx.findLibrary("navigation.compose").get())
+            implementation(androidx.findLibrary("tracing").get())
 
-            add("implementation", compose.findBundle("material").get())
-            add("implementation", compose.findBundle("baselibs").get())
+            implementation(compose.findBundle("material").get())
+            implementation(compose.findBundle("baselibs").get())
 
-            add("implementation", libs.findLibrary("koin.compose").get())
+            implementation(libs.findLibrary("koin.compose").get())
 
-            add("implementation", project(":data"))
+            implementation(project(":data"))
         }
     }
 

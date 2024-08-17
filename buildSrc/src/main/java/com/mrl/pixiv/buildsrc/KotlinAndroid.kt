@@ -62,6 +62,8 @@ internal fun Project.configureKotlinAndroid(
     dependencies {
         add("coreLibraryDesugaring", libs.findLibrary("desugar").get())
         add("implementation", kotlinx.findLibrary("collections-immutable").get())
+        // Kermit Logging
+        add("implementation", libs.findLibrary("kermit").get())
     }
 }
 
