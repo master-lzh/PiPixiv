@@ -60,10 +60,10 @@ internal fun Project.configureKotlinAndroid(
     val kotlinx = extensions.getByType<VersionCatalogsExtension>().named("kotlinx")
 
     dependencies {
-        add("coreLibraryDesugaring", libs.findLibrary("desugar").get())
-        add("implementation", kotlinx.findLibrary("collections-immutable").get())
+        coreLibraryDesugaring(libs.findLibrary("desugar").get())
+        implementation(kotlinx.findLibrary("collections-immutable").get())
         // Kermit Logging
-        add("implementation", libs.findLibrary("kermit").get())
+        implementation(libs.findLibrary("kermit").get())
     }
 }
 
