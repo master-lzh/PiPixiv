@@ -8,7 +8,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.mrl.pixiv.util.TAG
+
+private const val TAG = "OnLifecycle"
 
 @Composable
 fun OnLifecycle(

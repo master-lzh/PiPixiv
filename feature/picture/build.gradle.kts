@@ -14,5 +14,6 @@ dependencies {
     implementation(project(":common-middleware"))
     implementation(project(":feature:home"))
     implementation(project(":network"))
+    implementation(kotlinx.bundles.ktor)
     
 }

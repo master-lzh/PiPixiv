@@ -12,5 +12,5 @@ dependencies {
 
     implementation(androidx.activity.compose)
     implementation(libs.bundles.lottie)
-    implementation(libs.bundles.coil)
+    implementation(libs.bundles.coil3)
 }
