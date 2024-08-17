@@ -14,24 +14,6 @@ import kotlinx.collections.immutable.toImmutableMap
 import java.net.URL
 import java.net.URLDecoder
 
-val Number.second: Long
-    get() = this.toLong() * 1000
-
-val Number.minute: Long
-    get() = this.second * 60
-
-val Number.hour: Long
-    get() = this.minute * 60
-
-val Number.day: Long
-    get() = this.hour * 24
-
-val Number.week: Long
-    get() = this.day * 7
-
-val Number.month: Long
-    get() = this.day * 30
-
 val String.queryParams: ImmutableMap<String, String>
     get() {
         val queryMap = mutableMapOf<String, String>()
@@ -50,7 +32,7 @@ val String.queryParams: ImmutableMap<String, String>
     }
 
 val Any.TAG: String
-    get() = this::class.java.simpleName
+    get() = this::class.simpleName ?: "TAG"
 
 val LazyStaggeredGridState.isScrollToTop: Boolean
     get() = firstVisibleItemIndex == 0 && firstVisibleItemScrollOffset == 0

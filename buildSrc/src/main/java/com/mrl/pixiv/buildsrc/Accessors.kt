@@ -26,3 +26,7 @@ fun DependencyHandler.`testImplementation`(dependencyNotation: Any): Dependency?
 // coreLibraryDesugaring
 fun DependencyHandler.`coreLibraryDesugaring`(dependencyNotation: Any): Dependency? =
     add("coreLibraryDesugaring", dependencyNotation)
+
+// ksp
+fun DependencyHandler.`ksp`(dependencyNotation: Any): Dependency? =
+    add("ksp", dependencyNotation)

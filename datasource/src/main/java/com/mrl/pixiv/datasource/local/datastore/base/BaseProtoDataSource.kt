@@ -1,22 +1,21 @@
-package com.mrl.pixiv.datasource.local.base
+package com.mrl.pixiv.datasource.local.datastore.base
 
-import android.util.Log
 import androidx.datastore.core.DataStore
-import com.google.protobuf.GeneratedMessageLite
+import androidx.datastore.core.IOException
+import co.touchlab.kermit.Logger
 import com.mrl.pixiv.common.coroutine.launchIO
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
-import java.io.IOException
 
-abstract class BaseProtoDataSource<T : GeneratedMessageLite<T, TBuilder>, TBuilder : GeneratedMessageLite.Builder<T, TBuilder>>(
+abstract class BaseProtoDataSource<T>(
     private val dataStore: DataStore<T>
 ) : KoinComponent {
 
     val data = dataStore.data.catch {
         if (it is IOException) {
-            Log.e(this@BaseProtoDataSource::class.java.simpleName, ": ", it)
+            Logger.e("IOException: ", it, this@BaseProtoDataSource::class.simpleName!!)
             emit(defaultValue())
         } else {
             throw it
@@ -36,3 +35,4 @@ abstract class BaseProtoDataSource<T : GeneratedMessageLite<T, TBuilder>, TBuild
 
     abstract fun defaultValue(): T
 }
+

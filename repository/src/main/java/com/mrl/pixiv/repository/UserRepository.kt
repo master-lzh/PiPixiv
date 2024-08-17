@@ -7,8 +7,8 @@ import com.mrl.pixiv.data.user.UserFollowAddReq
 import com.mrl.pixiv.data.user.UserFollowDeleteReq
 import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.data.user.UserInfo
-import com.mrl.pixiv.datasource.local.UserAuthDataSource
-import com.mrl.pixiv.datasource.local.UserInfoDataSource
+import com.mrl.pixiv.datasource.local.datastore.UserAuthDataSource
+import com.mrl.pixiv.datasource.local.datastore.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.zip
