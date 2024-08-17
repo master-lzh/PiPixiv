@@ -9,7 +9,6 @@ import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
 import com.mrl.pixiv.data.user.UserBookmarksNovelQuery
 import com.mrl.pixiv.data.user.UserDetailQuery
 import com.mrl.pixiv.data.user.UserIllustsQuery
-import com.mrl.pixiv.data.user.copy
 import com.mrl.pixiv.profile.detail.state.UserInfo
 import com.mrl.pixiv.profile.detail.state.toUserInfo
 import kotlinx.coroutines.flow.first
@@ -92,11 +91,11 @@ class ProfileDetailMiddleware(
         ) {
             if (uid == Long.MIN_VALUE) {
                 userRepository.setUserInfo { userInfo ->
-                    userInfo.copy {
-                        this.uid = it.user.id
-                        username = it.user.name
+                    userInfo.copy(
+                        uid = it.user.id,
+                        username = it.user.name,
                         avatar = it.user.profileImageUrls.medium
-                    }
+                    )
                 }
             }
             dispatch(ProfileDetailAction.UpdateUserInfo(it.toUserInfo()))

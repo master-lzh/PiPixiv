@@ -1,11 +1,5 @@
 package com.mrl.pixiv.di
 
-import com.mrl.pixiv.api.IllustApi
-import com.mrl.pixiv.api.SearchApi
-import com.mrl.pixiv.api.TrendingApi
-import com.mrl.pixiv.api.UgoiraApi
-import com.mrl.pixiv.api.UserApi
-import com.mrl.pixiv.api.UserAuthApi
 import com.mrl.pixiv.collection.viewmodel.CollectionMiddleware
 import com.mrl.pixiv.collection.viewmodel.CollectionReducer
 import com.mrl.pixiv.collection.viewmodel.CollectionViewModel
@@ -20,19 +14,7 @@ import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.middleware.illust.IllustMiddleware
 import com.mrl.pixiv.common.middleware.illust.IllustReducer
 import com.mrl.pixiv.common.middleware.illust.IllustViewModel
-import com.mrl.pixiv.datasource.local.SearchDataSource
-import com.mrl.pixiv.datasource.local.SettingDataSource
-import com.mrl.pixiv.datasource.local.UserAuthDataSource
-import com.mrl.pixiv.datasource.local.UserInfoDataSource
-import com.mrl.pixiv.datasource.local.searchDataStore
-import com.mrl.pixiv.datasource.local.userInfoDataStore
-import com.mrl.pixiv.datasource.local.userPreferenceDataStore
-import com.mrl.pixiv.datasource.remote.IllustHttpService
-import com.mrl.pixiv.datasource.remote.SearchHttpService
-import com.mrl.pixiv.datasource.remote.TrendingHttpService
-import com.mrl.pixiv.datasource.remote.UgoiraHttpService
-import com.mrl.pixiv.datasource.remote.UserAuthHttpService
-import com.mrl.pixiv.datasource.remote.UserHttpService
+import com.mrl.pixiv.datasource.DatasourceModule
 import com.mrl.pixiv.domain.GetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.HasShowBookmarkTipUseCase
 import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
@@ -49,8 +31,6 @@ import com.mrl.pixiv.home.viewmodel.HomeMiddleware
 import com.mrl.pixiv.home.viewmodel.HomeReducer
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
-import com.mrl.pixiv.network.HttpManager
-import com.mrl.pixiv.network.converter.asConverterFactory
 import com.mrl.pixiv.picture.viewmodel.PictureDeeplinkViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureMiddleware
 import com.mrl.pixiv.picture.viewmodel.PictureReducer
@@ -81,22 +61,13 @@ import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import com.mrl.pixiv.splash.viewmodel.SplashMiddleware
 import com.mrl.pixiv.splash.viewmodel.SplashReducer
 import com.mrl.pixiv.splash.viewmodel.SplashViewModel
-import com.mrl.pixiv.userAuthDataStore
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
-
-enum class DataStoreEnum {
-    USER_AUTH,
-    USER_INFO,
-    SEARCH,
-    SETTING,
-}
+import org.koin.ksp.generated.defaultModule
+import org.koin.ksp.generated.module
 
 
 val JSON = Json {
@@ -106,21 +77,6 @@ val JSON = Json {
 }
 
 val appModule = module {
-    single(named(DataStoreEnum.USER_AUTH)) { androidContext().userAuthDataStore }
-
-    single(named(DataStoreEnum.USER_INFO)) { androidContext().userInfoDataStore }
-
-    single(named(DataStoreEnum.SEARCH)) { androidContext().searchDataStore }
-
-    single(named(DataStoreEnum.SETTING)) { androidContext().userPreferenceDataStore }
-
-    single {
-        JSON.asConverterFactory("application/json".toMediaType())
-    }
-
-    singleOf(::HttpManager)
-
-
     singleOf(::JSON)
 }
 
@@ -167,20 +123,6 @@ val repositoryModule = module {
     singleOf(::TrendingRepository)
     singleOf(::HistoryRepository)
     singleOf(::CollectionRepository)
-}
-
-val dataSourceModule = module {
-    single { UserAuthDataSource(get(named(DataStoreEnum.USER_AUTH))) }
-    single { UserInfoDataSource(get(named(DataStoreEnum.USER_INFO))) }
-    single { SearchDataSource(get(named(DataStoreEnum.SEARCH))) }
-    single { SettingDataSource(get(named(DataStoreEnum.SETTING))) }
-
-    single { IllustHttpService(provideCommonService(get(), IllustApi::class.java)) }
-    single { UserAuthHttpService(provideAuthService(get())) }
-    single { UserHttpService(provideCommonService(get(), UserApi::class.java)) }
-    single { SearchHttpService(provideCommonService(get(), SearchApi::class.java)) }
-    single { TrendingHttpService(provideCommonService(get(), TrendingApi::class.java)) }
-    single { UgoiraHttpService(provideCommonService(get(), UgoiraApi::class.java))}
 }
 
 val useCaseModule = module {
@@ -242,12 +184,13 @@ val reducerModule = module {
     singleOf(::IllustReducer)
 }
 
-fun provideAuthService(
-    httpManager: HttpManager,
-): UserAuthApi = httpManager.getAuthService(UserAuthApi::class.java)
-
-fun <T> provideCommonService(
-    httpManager: HttpManager,
-    clazz: Class<T>,
-): T = httpManager.getCommonService(clazz)
-
+val allModule = listOf(
+    defaultModule,
+    appModule,
+    viewModelModule,
+    repositoryModule,
+    DatasourceModule.module,
+    useCaseModule,
+    middlewareModule,
+    reducerModule,
+)

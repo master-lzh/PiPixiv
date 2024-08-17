@@ -8,9 +8,8 @@ android {
 
 dependencies {
 
-
-    implementation(libs.bundles.okhttp)
     implementation(libs.okio)
+    implementation(kotlinx.ktor.client.core)
 
     implementation(platform(libs.firebase.bom))
     api(libs.bundles.firebase)

@@ -16,7 +16,7 @@
 
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.LibraryExtension
-import com.mrl.pixiv.buildsrc.androidTestImplementation
+import com.mrl.pixiv.buildsrc.*
 import com.mrl.pixiv.buildsrc.configureKotlinAndroid
 import com.mrl.pixiv.buildsrc.disableUnnecessaryAndroidTests
 import com.mrl.pixiv.buildsrc.implementation
@@ -66,6 +66,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             dependencies {
                 implementation(androidx.findLibrary("core-ktx").get())
                 implementation(androidx.findLibrary("appcompat").get())
+                ksp(libs.findLibrary("koin.ksp.compiler").get())
 
                 androidTestImplementation(kotlin("test"))
                 testImplementation(kotlin("test"))
