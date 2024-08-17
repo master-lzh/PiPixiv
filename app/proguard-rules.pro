@@ -46,13 +46,10 @@
 -keep class kotlinx.coroutines.** { *; }
 -dontwarn kotlinx.coroutines.**
 
-# 保持 protobuf 生成的消息类不被混淆
--keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite {
-    <fields>;
-    <methods>;
-}
-
 -keep class com.mrl.pixiv.common.data.Rlt { *; }
 
 -keep class com.mrl.pixiv.data.**Req { *; }
 -keep class com.mrl.pixiv.data.**Query { *; }
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+-dontwarn org.slf4j.impl.StaticMDCBinder
+-dontwarn org.koin.ksp.generated.*
