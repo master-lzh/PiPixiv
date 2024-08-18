@@ -20,7 +20,7 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common_ui.item.SettingItem
+import com.mrl.pixiv.common.ui.item.SettingItem
 import com.mrl.pixiv.setting.R
 import com.mrl.pixiv.setting.network.components.PictureSourceWidget
 import com.mrl.pixiv.setting.viewmodel.SettingAction

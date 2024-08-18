@@ -20,9 +20,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.mrl.pixiv.collection.SelfCollectionScreen
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
-import com.mrl.pixiv.common.middleware.follow.FollowViewModel
-import com.mrl.pixiv.common.middleware.illust.IllustViewModel
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
@@ -31,6 +28,9 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.currentOrThrow
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
+import com.mrl.pixiv.common.viewmodel.follow.FollowViewModel
+import com.mrl.pixiv.common.viewmodel.illust.IllustViewModel
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel

@@ -44,11 +44,11 @@ import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common_ui.item.SettingItem
-import com.mrl.pixiv.common_ui.util.navigateToHistoryScreen
-import com.mrl.pixiv.common_ui.util.navigateToSelfCollectionScreen
-import com.mrl.pixiv.common_ui.util.navigateToSelfProfileDetailScreen
-import com.mrl.pixiv.common_ui.util.navigateToSettingScreen
+import com.mrl.pixiv.common.ui.item.SettingItem
+import com.mrl.pixiv.common.util.navigateToHistoryScreen
+import com.mrl.pixiv.common.util.navigateToSelfCollectionScreen
+import com.mrl.pixiv.common.util.navigateToSelfProfileDetailScreen
+import com.mrl.pixiv.common.util.navigateToSettingScreen
 import com.mrl.pixiv.data.setting.SettingTheme
 import com.mrl.pixiv.data.setting.getAppCompatDelegateThemeMode
 import com.mrl.pixiv.profile.viewmodel.ProfileAction

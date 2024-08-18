@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.DisplayUtil
 import com.mrl.pixiv.util.OnScrollToBottom

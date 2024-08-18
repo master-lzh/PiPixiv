@@ -38,7 +38,6 @@ include(":data")
 include(":network")
 include(":domain")
 include(":common-ui")
-include(":common-middleware")
 
 // include modules in feature folder
 file("./feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
