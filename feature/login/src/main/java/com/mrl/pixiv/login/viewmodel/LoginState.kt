@@ -1,14 +1,14 @@
-package com.mrl.pixiv.common.middleware.auth
+package com.mrl.pixiv.login.viewmodel
 
 import androidx.compose.runtime.Stable
 import com.mrl.pixiv.common.viewmodel.State
 
 @Stable
-data class AuthState(
+data class LoginState(
     val isLogin: Boolean,
 ) : State {
     companion object {
-        val INITIAL = AuthState(isLogin = false)
+        val INITIAL = LoginState(isLogin = false)
     }
 }
 

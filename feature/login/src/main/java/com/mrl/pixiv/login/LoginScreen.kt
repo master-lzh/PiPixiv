@@ -30,12 +30,12 @@ import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
-import com.mrl.pixiv.common.middleware.auth.AuthAction
-import com.mrl.pixiv.common.middleware.auth.AuthState
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
+import com.mrl.pixiv.login.viewmodel.LoginAction
+import com.mrl.pixiv.login.viewmodel.LoginState
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
 import okio.ByteString.Companion.toByteString
 import org.koin.androidx.compose.koinViewModel
@@ -66,10 +66,10 @@ fun generateWebViewUrl(create: Boolean) =
         "https://app-api.pixiv.net/web/v1/login?code_challenge=${getCodeChallenge()}&code_challenge_method=S256&client=pixiv-android"
     }
 
-private fun checkUri(dispatch: (AuthAction) -> Unit, uri: Uri): Boolean {
+private fun checkUri(dispatch: (LoginAction) -> Unit, uri: Uri): Boolean {
     if (uri.scheme == "pixiv" && uri.host == "account") {
         val code = uri.getQueryParameter("code")
-        code?.let { dispatch(AuthAction.Login(code, codeVerifier)) }
+        code?.let { dispatch(LoginAction.Login(code, codeVerifier)) }
         return true
     }
     return false
@@ -98,9 +98,9 @@ fun LoginScreen(
 @Composable
 internal fun LoginScreen(
     modifier: Modifier = Modifier,
-    state: AuthState,
+    state: LoginState,
     navToMainGraph: () -> Unit = {},
-    dispatch: (AuthAction) -> Unit,
+    dispatch: (LoginAction) -> Unit,
 ) {
     var currUrl by rememberSaveable { mutableStateOf(generateWebViewUrl(true)) }
     LaunchedEffect(state.isLogin) {
