@@ -10,7 +10,7 @@ object TokenManager : KoinComponent {
 
     init {
         launchIO {
-            authDataSource.userAccessToken.get("").collect {
+            authDataSource.userAccessToken.get().collect {
                 token = it
             }
         }
