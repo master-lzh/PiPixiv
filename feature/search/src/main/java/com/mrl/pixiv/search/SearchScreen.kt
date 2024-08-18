@@ -54,7 +54,7 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common_ui.util.navigateToSearchResultScreen
+import com.mrl.pixiv.common.util.navigateToSearchResultScreen
 import com.mrl.pixiv.search.viewmodel.SearchAction
 import com.mrl.pixiv.search.viewmodel.SearchState
 import com.mrl.pixiv.search.viewmodel.SearchViewModel

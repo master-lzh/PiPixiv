@@ -37,8 +37,8 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
-import com.mrl.pixiv.common_ui.util.navigateToSearchScreen
+import com.mrl.pixiv.common.util.navigateToOutsideSearchResultScreen
+import com.mrl.pixiv.common.util.navigateToSearchScreen
 import com.mrl.pixiv.search.R
 import com.mrl.pixiv.search.preview.components.TrendingItem
 import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewAction

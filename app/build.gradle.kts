@@ -65,13 +65,13 @@ android {
 
 dependencies {
     implementation(project(":common"))
+    implementation(project(":common-ui"))
     implementation(project(":util"))
     implementation(project(":repository"))
     implementation(project(":datasource"))
     implementation(project(":network"))
     implementation(project(":data"))
     implementation(project(":domain"))
-    implementation(project(":common-middleware"))
 
     file("../feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
         // 使用目录名称构建模块路径
