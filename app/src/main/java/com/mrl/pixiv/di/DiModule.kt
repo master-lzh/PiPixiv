@@ -3,8 +3,6 @@ package com.mrl.pixiv.di
 import com.mrl.pixiv.collection.viewmodel.CollectionMiddleware
 import com.mrl.pixiv.collection.viewmodel.CollectionReducer
 import com.mrl.pixiv.collection.viewmodel.CollectionViewModel
-import com.mrl.pixiv.common.middleware.auth.AuthMiddleware
-import com.mrl.pixiv.common.middleware.auth.AuthReducer
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkMiddleware
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkReducer
 import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
@@ -30,6 +28,8 @@ import com.mrl.pixiv.history.viewmodel.HistoryViewModel
 import com.mrl.pixiv.home.viewmodel.HomeMiddleware
 import com.mrl.pixiv.home.viewmodel.HomeReducer
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
+import com.mrl.pixiv.login.viewmodel.LoginMiddleware
+import com.mrl.pixiv.login.viewmodel.LoginReducer
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureDeeplinkViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureMiddleware
@@ -144,7 +144,7 @@ val middlewareModule = module {
 
     factoryOf(::BookmarkMiddleware)
 
-    factoryOf(::AuthMiddleware)
+    factoryOf(::LoginMiddleware)
 
     factoryOf(::ProfileMiddleware)
 
@@ -171,7 +171,7 @@ val reducerModule = module {
     singleOf(::SplashReducer)
     singleOf(::HomeReducer)
     singleOf(::BookmarkReducer)
-    singleOf(::AuthReducer)
+    singleOf(::LoginReducer)
     singleOf(::ProfileReducer)
     singleOf(::ProfileDetailReducer)
     singleOf(::PictureReducer)
