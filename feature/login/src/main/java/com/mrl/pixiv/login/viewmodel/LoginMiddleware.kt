@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.middleware.auth
+package com.mrl.pixiv.login.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.Constants
@@ -13,18 +13,18 @@ import com.mrl.pixiv.repository.AuthRepository
 import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
 
-class AuthMiddleware(
+class LoginMiddleware(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val setUserAccessTokenUseCase: SetUserAccessTokenUseCase,
     private val setUserRefreshTokenUseCase: SetUserRefreshTokenUseCase,
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
     private val setLocalUserInfoUseCase: SetLocalUserInfoUseCase,
-) : Middleware<AuthState, AuthAction>() {
-    override suspend fun process(state: AuthState, action: AuthAction) {
+) : Middleware<LoginState, LoginAction>() {
+    override suspend fun process(state: LoginState, action: LoginAction) {
         when (action) {
-            is AuthAction.Login -> login(action.code, action.codeVerifier)
-            is AuthAction.RefreshAccessToken -> refreshAccessToken()
+            is LoginAction.Login -> login(action.code, action.codeVerifier)
+            is LoginAction.RefreshAccessToken -> refreshAccessToken()
 
             else -> {}
         }
@@ -54,7 +54,7 @@ class AuthMiddleware(
             )
             requestHttpDataWithFlow(request = authRepository.login(req)) {
                 setUserInfo(it)
-                dispatch(AuthAction.LoginSuccess)
+                dispatch(LoginAction.LoginSuccess)
             }
         }
 
