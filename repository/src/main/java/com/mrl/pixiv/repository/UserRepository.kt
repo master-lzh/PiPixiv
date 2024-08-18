@@ -39,17 +39,17 @@ class UserRepository(
 
 
     // ---------------------local-------------------------
-    val userRefreshToken = userAuthDataSource.userRefreshToken.get("")
+    val userRefreshToken = userAuthDataSource.userRefreshToken.get()
     fun setUserRefreshToken(userRefreshToken: String) =
         userAuthDataSource.userRefreshToken.set(userRefreshToken)
 
 
-    val userAccessToken = userAuthDataSource.userAccessToken.get("")
+    val userAccessToken = userAuthDataSource.userAccessToken.get()
     fun setUserAccessToken(userAccessToken: String) =
         userAuthDataSource.userAccessToken.set(userAccessToken)
 
 
-    private val accessTokenExpiresTime = userAuthDataSource.accessTokenExpiresTime.get(0L)
+    private val accessTokenExpiresTime = userAuthDataSource.accessTokenExpiresTime.get()
     fun setAccessTokenExpiresTime(accessTokenExpiresTime: Long) =
         userAuthDataSource.accessTokenExpiresTime.set(accessTokenExpiresTime)
 
