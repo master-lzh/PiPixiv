@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.home.TAG
 import com.mrl.pixiv.home.viewmodel.HomeState

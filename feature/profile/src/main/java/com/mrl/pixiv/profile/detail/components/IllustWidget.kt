@@ -20,9 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
-import com.mrl.pixiv.common_ui.item.SquareIllustItem
+import com.mrl.pixiv.common.ui.item.SquareIllustItem
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 
 private const val SPAN_COUNT = 3
