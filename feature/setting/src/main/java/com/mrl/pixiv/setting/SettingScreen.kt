@@ -2,7 +2,9 @@ package com.mrl.pixiv.setting
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,8 +42,8 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common_ui.item.SettingItem
-import com.mrl.pixiv.common_ui.util.navigateToNetworkSettingScreen
+import com.mrl.pixiv.common.ui.item.SettingItem
+import com.mrl.pixiv.common.util.navigateToNetworkSettingScreen
 import com.mrl.pixiv.setting.components.DropDownSelector
 import com.mrl.pixiv.setting.viewmodel.SettingState
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
@@ -188,9 +190,9 @@ internal fun SettingScreen_(
                             try {
                                 val intent = Intent().apply {
                                     action =
-                                        android.provider.Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
+                                        Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
                                     addCategory(Intent.CATEGORY_DEFAULT)
-                                    data = android.net.Uri.parse("package:${context.packageName}")
+                                    data = Uri.parse("package:${context.packageName}")
                                     addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
                                     addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                                 }

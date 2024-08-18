@@ -41,7 +41,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 implementation(project(":common"))
                 implementation(project(":util"))
                 implementation(project(":common-ui"))
-                implementation(project(":common-middleware"))
                 implementation(project(":repository"))
 
                 testImplementation(kotlin("test"))

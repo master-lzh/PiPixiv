@@ -14,7 +14,7 @@ dependencies {
 
     implementation(project(":util"))
     implementation(project(":common"))
-    implementation(project(":common-middleware"))
+    implementation(project(":repository"))
     implementation(project(":domain"))
 
 
