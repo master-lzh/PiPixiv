@@ -15,11 +15,11 @@ class UserAuthDataSource : BaseDataSource(userAuthDataStore) {
         val KEY_ACCESS_TOKEN_EXPIRES_TIME = longPreferencesKey("access_token_expires_time")
     }
 
-    val userRefreshToken = createFiled(KEY_USER_REFRESH_TOKEN)
+    val userRefreshToken = createField(KEY_USER_REFRESH_TOKEN, "")
 
-    val userAccessToken = createFiled(KEY_USER_ACCESS_TOKEN)
+    val userAccessToken = createField(KEY_USER_ACCESS_TOKEN, "")
 
-    val accessTokenExpiresTime = createFiled(KEY_ACCESS_TOKEN_EXPIRES_TIME)
+    val accessTokenExpiresTime = createField(KEY_ACCESS_TOKEN_EXPIRES_TIME, 0L)
 }
 
 val userAuthDataStore = PreferenceDataStoreFactory.createWithPath {
