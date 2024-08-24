@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -32,7 +33,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.navigateToPictureScreen
@@ -148,7 +148,7 @@ internal fun HomeScreen(
         }
     }
 
-    Screen(
+    Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
@@ -167,7 +167,7 @@ internal fun HomeScreen(
                 }
             )
         },
-        snackBarHost = {
+        snackbarHost = {
             SnackbarHost(snackBarHostState) {
                 when (it.visuals.actionLabel) {
                     HomeSnackbar.REVOKE_UNBOOKMARK.actionLabel -> {

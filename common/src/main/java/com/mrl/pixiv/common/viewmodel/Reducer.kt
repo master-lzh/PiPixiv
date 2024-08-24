@@ -4,7 +4,7 @@ interface Reducer<S : State, A : Action> {
     /**
      * Generates a new instance of the [State] based on the [Action]
      *
-     * @receiver S the current [State]
+     * @receiver the current [State]
      * @param action the [Action] to reduce the [State] with
      * @return the reduced [State]
      */
