@@ -54,7 +54,7 @@ fun RecommendGrid(
                 width,
                 navToPictureScreen,
                 it,
-                bookmarkState,
+                bookmarkState.bookmarkStatus[it.id] ?: it.isBookmarked,
                 onBookmarkClick,
                 dispatch
             )
