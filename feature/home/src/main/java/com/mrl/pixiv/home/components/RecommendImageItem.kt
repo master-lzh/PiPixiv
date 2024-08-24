@@ -3,7 +3,6 @@ package com.mrl.pixiv.home.components
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,9 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -41,8 +38,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowRgb565
 import coil3.request.crossfade
-import coil3.request.transformations
-import coil3.transform.RoundedCornersTransformation
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.m3.IconButton
@@ -51,7 +46,6 @@ import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.BottomBookmarkSheet
 import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.IllustAiType
 import com.mrl.pixiv.data.Restrict
@@ -68,13 +62,12 @@ fun RecommendImageItem(
     width: Dp,
     navToPictureScreen: (Illust, String) -> Unit,
     illust: Illust,
-    bookmarkState: BookmarkState,
+    isBookmarked: Boolean,
     onBookmarkClick: OnBookmarkClick,
     dispatch: (BookmarkAction) -> Unit,
 ) {
     val scale = illust.height * 1.0f / illust.width
     val height = width * scale
-    val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
     val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
     val prefix = rememberSaveable { UUID.randomUUID().toString() }
@@ -84,6 +77,7 @@ fun RecommendImageItem(
     val onBookmarkLongClick = {
         showBottomSheet = true
     }
+    val context = LocalContext.current
     with(sharedTransitionScope) {
         Surface(
             modifier = Modifier
@@ -102,37 +96,28 @@ fun RecommendImageItem(
             propagateMinConstraints = false,
         ) {
             Column {
-                Box {
-                    val imageKey = "image-${illust.id}-0"
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
+                val imageKey = "image-${illust.id}-0"
+                AsyncImage(
+                    model = remember {
+                        ImageRequest.Builder(context)
                             .data(illust.imageUrls.medium).allowRgb565(true)
-                            .transformations(
-                                with(LocalDensity.current) {
-                                    RoundedCornersTransformation(
-                                        topLeft = 10.dp.toPx(),
-                                        topRight = 10.dp.toPx()
-                                    )
-                                }
-                            )
-//                        .scale(Scale.FIT)
                             .crossfade(1.seconds.inWholeMilliseconds.toInt())
                             .placeholderMemoryCacheKey(imageKey)
                             .memoryCacheKey(imageKey)
-                            .build(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .width(width)
-                            .height(height)
-                            .sharedElement(
-                                sharedTransitionScope.rememberSharedContentState(key = "${prefix}-$imageKey"),
-                                animatedVisibilityScope = animatedContentScope,
-                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                            )
-                            .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)),
-                        filterQuality = FilterQuality.None,
-                    )
-                }
+                            .build()
+                    },
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(width)
+                        .height(height)
+                        .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
+                        .sharedElement(
+                            sharedTransitionScope.rememberSharedContentState(key = "${prefix}-$imageKey"),
+                            animatedVisibilityScope = animatedContentScope,
+                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                        ),
+                    alignment = Alignment.TopCenter,
+                )
                 Row(
                     modifier = Modifier
                         .padding(start = 5.dp)
