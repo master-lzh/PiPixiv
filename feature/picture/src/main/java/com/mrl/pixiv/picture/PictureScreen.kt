@@ -124,6 +124,7 @@ import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.viewmodel.follow.FollowAction
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
 import com.mrl.pixiv.common.viewmodel.follow.FollowViewModel
+import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.picture.components.UgoiraPlayer
@@ -147,13 +148,38 @@ import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.util.UUID
 
-
 @Composable
 fun PictureScreen(
+    illustId: Long,
+    bookmarkViewModel: BookmarkViewModel,
+    followViewModel: FollowViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val illustState: IllustState = koinInject()
+    val illust = illustState.illusts[illustId]
+    if (illust != null) {
+        PictureScreen(
+            modifier = modifier,
+            illust = illust,
+            bookmarkViewModel = bookmarkViewModel,
+            followViewModel = followViewModel,
+        )
+    } else {
+        PictureDeeplinkScreen(
+            illustId = illustId,
+            bookmarkViewModel = bookmarkViewModel,
+            followViewModel = followViewModel
+        )
+    }
+}
+
+@Composable
+internal fun PictureScreen(
     modifier: Modifier = Modifier,
     illust: Illust,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
@@ -185,7 +211,7 @@ fun PictureScreen(
 }
 
 @Composable
-fun PictureDeeplinkScreen(
+internal fun PictureDeeplinkScreen(
     modifier: Modifier = Modifier,
     illustId: Long,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,

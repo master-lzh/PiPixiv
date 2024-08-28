@@ -38,11 +38,9 @@ import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.HomeBottomBar
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.viewmodel.follow.FollowViewModel
-import com.mrl.pixiv.common.viewmodel.illust.IllustViewModel
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
-import com.mrl.pixiv.picture.PictureDeeplinkScreen
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
 import com.mrl.pixiv.profile.detail.OtherProfileDetailScreen
@@ -65,7 +63,6 @@ fun MainGraph(
     val homeViewModel: HomeViewModel = koinViewModel()
     val followViewModel: FollowViewModel = koinViewModel()
     val bookmarkViewModel: BookmarkViewModel = koinViewModel()
-    val illustViewModel: IllustViewModel = koinViewModel()
 
     HandleDeeplink(navHostController)
     CompositionLocalProvider(LocalNavigator provides navHostController) {
@@ -141,7 +138,6 @@ fun MainGraph(
                             route = "${Destination.OtherProfileDetailScreen.route}/{${Destination.OtherProfileDetailScreen.userId}}",
                             arguments = listOf(
                                 navArgument(Destination.OtherProfileDetailScreen.userId) {
-//                    type = NavType.LongType
                                     defaultValue = 0L
                                 }
                             ),
@@ -178,26 +174,17 @@ fun MainGraph(
                         ) {
                             val illustId =
                                 (it.arguments?.getLong(Destination.PictureScreen.illustId)) ?: 0L
-                            val illust = illustViewModel.state.illusts[illustId]
                             val prefix =
                                 it.arguments?.getString(Destination.PictureScreen.prefix) ?: ""
                             CompositionLocalProvider(
                                 LocalAnimatedContentScope provides this,
                                 LocalSharedKeyPrefix provides prefix
                             ) {
-                                if (illust != null) {
-                                    PictureScreen(
-                                        illust = illust,
-                                        bookmarkViewModel = bookmarkViewModel,
-                                        followViewModel = followViewModel,
-                                    )
-                                } else {
-                                    PictureDeeplinkScreen(
-                                        illustId = illustId,
-                                        bookmarkViewModel = bookmarkViewModel,
-                                        followViewModel = followViewModel,
-                                    )
-                                }
+                                PictureScreen(
+                                    illustId = illustId,
+                                    bookmarkViewModel = bookmarkViewModel,
+                                    followViewModel = followViewModel,
+                                )
                             }
                         }
 
@@ -217,7 +204,7 @@ fun MainGraph(
                             val illustId =
                                 it.arguments?.getLong(Destination.PictureDeeplinkScreen.illustId)
                                     ?: 0L
-                            PictureDeeplinkScreen(
+                            PictureScreen(
                                 illustId = illustId,
                                 bookmarkViewModel = bookmarkViewModel,
                                 followViewModel = followViewModel,

@@ -4,8 +4,7 @@ import android.util.Log
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.Graph
-import com.mrl.pixiv.common.viewmodel.illust.IllustAction
-import com.mrl.pixiv.common.viewmodel.illust.IllustViewModel
+import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import com.mrl.pixiv.data.Illust
 import org.koin.core.context.GlobalContext
 import kotlin.time.measureTime
@@ -13,8 +12,8 @@ import kotlin.time.measureTime
 fun NavHostController.navigateToPictureScreen(illust: Illust, prefix: String) {
     measureTime {
         val koin = GlobalContext.get()
-        val illustViewModel = koin.getOrNull<IllustViewModel>()
-        illustViewModel?.dispatch(IllustAction.SetIllust(illust.id, illust))
+        val illustState = koin.getOrNull<IllustState>()
+        illustState?.setIllust(illust.id, illust)
         navigate(
             route = "${Destination.PictureScreen.route}/${illust.id}?prefix=${prefix}"
         ) {
