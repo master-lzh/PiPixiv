@@ -4,6 +4,7 @@ import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.common.viewmodel.BaseViewModel
 import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.setting.UserPreference
+import org.koin.android.annotation.KoinViewModel
 
 data class SettingState(
     val enableBypassSniffing: Boolean,
@@ -27,6 +28,7 @@ sealed class SettingAction : Action {
     data class UpdatePictureSourceHost(val host: String) : SettingAction()
 }
 
+@KoinViewModel
 class SettingViewModel(
     reducer: SettingReducer,
     middleware: SettingMiddleware,

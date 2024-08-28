@@ -3,8 +3,9 @@ package com.mrl.pixiv.picture.viewmodel
 import androidx.compose.runtime.toMutableStateList
 import com.mrl.pixiv.common.viewmodel.Reducer
 import kotlinx.collections.immutable.toImmutableList
+import org.koin.core.annotation.Single
 
-
+@Single
 class PictureReducer : Reducer<PictureState, PictureAction> {
     override fun PictureState.reduce(action: PictureAction): PictureState {
         return when (action) {

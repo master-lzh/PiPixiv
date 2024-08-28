@@ -12,8 +12,9 @@ import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.profile.detail.state.UserInfo
 import com.mrl.pixiv.profile.detail.state.toUserInfo
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Factory
 
-
+@Factory
 class ProfileDetailMiddleware(
     private val userRepository: com.mrl.pixiv.repository.UserRepository,
 ) : Middleware<ProfileDetailState, ProfileDetailAction>() {

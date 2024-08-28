@@ -4,7 +4,9 @@ import com.mrl.pixiv.data.user.UserInfo
 import com.mrl.pixiv.repository.SettingRepository
 import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single
 class GetLocalUserInfoUseCase(
     private val userRepository: UserRepository
 ) {
@@ -13,6 +15,7 @@ class GetLocalUserInfoUseCase(
     }
 }
 
+@Single
 class SetLocalUserInfoUseCase(
     private val userRepository: UserRepository
 ) {
@@ -21,6 +24,7 @@ class SetLocalUserInfoUseCase(
     }
 }
 
+@Single
 class HasShowBookmarkTipUseCase(
     private val settingRepository: SettingRepository
 ) {
@@ -29,6 +33,7 @@ class HasShowBookmarkTipUseCase(
     }
 }
 
+@Single
 class SetShowBookmarkTipUseCase(
     private val settingRepository: SettingRepository
 ) {

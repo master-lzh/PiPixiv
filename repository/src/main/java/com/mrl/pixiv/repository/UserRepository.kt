@@ -12,7 +12,9 @@ import com.mrl.pixiv.datasource.local.datastore.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.zip
+import org.koin.core.annotation.Single
 
+@Single
 class UserRepository(
     private val userHttpService: UserHttpService,
     private val userAuthDataSource: UserAuthDataSource,

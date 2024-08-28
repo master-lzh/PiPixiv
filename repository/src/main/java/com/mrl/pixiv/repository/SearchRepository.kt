@@ -5,7 +5,9 @@ import com.mrl.pixiv.data.search.SearchHistory
 import com.mrl.pixiv.data.search.SearchIllustQuery
 import com.mrl.pixiv.datasource.local.datastore.SearchDataSource
 import com.mrl.pixiv.datasource.remote.SearchHttpService
+import org.koin.core.annotation.Single
 
+@Single
 class SearchRepository(
     private val searchHttpService: SearchHttpService,
     private val searchDataSource: SearchDataSource,

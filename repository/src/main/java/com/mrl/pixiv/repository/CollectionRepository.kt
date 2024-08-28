@@ -6,7 +6,9 @@ import com.mrl.pixiv.data.user.UserBookmarksNovelQuery
 import com.mrl.pixiv.datasource.local.datastore.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single
 class CollectionRepository(
     private val userHttpService: UserHttpService,
     private val userInfoDataSource: UserInfoDataSource
