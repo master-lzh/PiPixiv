@@ -13,7 +13,7 @@ class SearchMiddleware(
 ) : Middleware<SearchState, SearchAction>() {
     override suspend fun process(state: SearchState, action: SearchAction) {
         when (action) {
-            is SearchAction.SearchIllust -> searchIllust(state, action)
+            is SearchAction.SearchIllust -> searchIllust(action)
             is SearchAction.SearchIllustNext -> searchIllustNext(action)
             is SearchAction.SearchAutoComplete -> searchAutoComplete(action)
             is SearchAction.AddSearchHistory -> addSearchHistory(action)
@@ -73,15 +73,15 @@ class SearchMiddleware(
         }
     }
 
-    private fun searchIllust(state: SearchState, action: SearchAction.SearchIllust) {
+    private fun searchIllust(action: SearchAction.SearchIllust) {
         launchNetwork {
             requestHttpDataWithFlow(
                 request = searchRepository.searchIllust(
                     SearchIllustQuery(
                         word = action.searchWords,
-                        sort = state.searchFilter.sort,
-                        searchTarget = state.searchFilter.searchTarget,
-                        searchAiType = state.searchFilter.searchAiType,
+                        sort = state().searchFilter.sort,
+                        searchTarget = state().searchFilter.searchTarget,
+                        searchAiType = state().searchFilter.searchAiType,
                     )
                 ),
             ) {
