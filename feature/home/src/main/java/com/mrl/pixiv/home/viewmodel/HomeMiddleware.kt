@@ -17,12 +17,9 @@ class HomeMiddleware(
 ) : Middleware<HomeState, HomeAction>() {
     override suspend fun process(state: HomeState, action: HomeAction) {
         when (action) {
-            is HomeAction.LoadMoreIllustRecommendedIntent -> loadMoreIllustRecommended(
-                state,
-                action
-            )
+            is HomeAction.LoadMoreIllustRecommendedIntent -> loadMoreIllustRecommended(action)
 
-            is HomeAction.RefreshIllustRecommendedIntent -> refreshIllustRecommended(state, action)
+            is HomeAction.RefreshIllustRecommendedIntent -> refreshIllustRecommended(action)
             is HomeAction.RefreshTokenIntent -> refreshToken()
             is HomeAction.CollectExceptionFlow-> collectExceptionFlow()
 
@@ -45,7 +42,6 @@ class HomeMiddleware(
     }
 
     private fun refreshIllustRecommended(
-        state: HomeState,
         action: HomeAction.RefreshIllustRecommendedIntent
     ) {
         launchNetwork {
@@ -55,7 +51,7 @@ class HomeMiddleware(
                 val imageList = handleRecommendResp(it)
                 dispatch(
                     HomeAction.UpdateState(
-                        state.copy(
+                        state().copy(
                             recommendImageList = imageList.toImmutableList(),
                             isRefresh = false,
                             nextUrl = it.nextURL
@@ -71,22 +67,21 @@ class HomeMiddleware(
     }
 
     private fun loadMoreIllustRecommended(
-        state: HomeState,
         action: HomeAction.LoadMoreIllustRecommendedIntent
     ) {
         launchNetwork {
             if (action.queryMap == null) {
                 return@launchNetwork
             }
-            dispatch(HomeAction.UpdateState(state.copy(loadMore = true)))
+            dispatch(HomeAction.UpdateState(state().copy(loadMore = true)))
             requestHttpDataWithFlow(
                 request = illustRepository.loadMoreIllustRecommended(action.queryMap)
             ) {
                 val imageList = handleRecommendResp(it)
                 dispatch(
                     HomeAction.UpdateState(
-                        state.copy(
-                            recommendImageList = (state.recommendImageList + imageList).toImmutableList(),
+                        state().copy(
+                            recommendImageList = (state().recommendImageList + imageList).toImmutableList(),
                             isRefresh = false,
                             nextUrl = it.nextURL
                         )
