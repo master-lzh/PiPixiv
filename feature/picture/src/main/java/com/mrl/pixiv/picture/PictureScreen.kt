@@ -121,9 +121,7 @@ import com.mrl.pixiv.common.util.popBackToMainScreen
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
-import com.mrl.pixiv.common.viewmodel.follow.FollowAction
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
-import com.mrl.pixiv.common.viewmodel.follow.FollowViewModel
 import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Type
@@ -157,23 +155,20 @@ import java.util.UUID
 fun PictureScreen(
     illustId: Long,
     bookmarkViewModel: BookmarkViewModel,
-    followViewModel: FollowViewModel,
     modifier: Modifier = Modifier,
+    illustState: IllustState = koinInject(),
 ) {
-    val illustState: IllustState = koinInject()
     val illust = illustState.illusts[illustId]
     if (illust != null) {
         PictureScreen(
             modifier = modifier,
             illust = illust,
             bookmarkViewModel = bookmarkViewModel,
-            followViewModel = followViewModel,
         )
     } else {
         PictureDeeplinkScreen(
             illustId = illustId,
             bookmarkViewModel = bookmarkViewModel,
-            followViewModel = followViewModel
         )
     }
 }
@@ -185,7 +180,6 @@ internal fun PictureScreen(
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
     bookmarkViewModel: BookmarkViewModel,
-    followViewModel: FollowViewModel,
 ) {
     OnLifecycle(onLifecycle = pictureViewModel::onCreate)
     val exception = pictureViewModel.exception.collectAsStateWithLifecycle(
@@ -197,13 +191,11 @@ internal fun PictureScreen(
         state = pictureViewModel.state,
         exception = exception,
         bookmarkState = bookmarkViewModel.state,
-        followState = followViewModel.state,
         illust = illust,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         popBackStack = navHostController::popBackStack,
         dispatch = pictureViewModel::dispatch,
         bookmarkDispatch = bookmarkViewModel::dispatch,
-        followDispatch = followViewModel::dispatch,
         navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
         popBackToHomeScreen = navHostController::popBackToMainScreen,
         navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
@@ -217,7 +209,6 @@ internal fun PictureDeeplinkScreen(
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     pictureViewModel: PictureDeeplinkViewModel = koinViewModel { parametersOf(illustId) },
     bookmarkViewModel: BookmarkViewModel,
-    followViewModel: FollowViewModel,
 ) {
     val illust = pictureViewModel.state.illust
     val exception = pictureViewModel.exception.collectAsStateWithLifecycle(
@@ -230,13 +221,11 @@ internal fun PictureDeeplinkScreen(
             state = pictureViewModel.state,
             exception = exception,
             bookmarkState = bookmarkViewModel.state,
-            followState = followViewModel.state,
             illust = illust,
             navToPictureScreen = navHostController::navigateToPictureScreen,
             popBackStack = navHostController::popBackStack,
             dispatch = pictureViewModel::dispatch,
             bookmarkDispatch = bookmarkViewModel::dispatch,
-            followDispatch = followViewModel::dispatch,
             navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
             popBackToHomeScreen = navHostController::popBackToMainScreen,
             navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
@@ -259,14 +248,13 @@ internal fun PictureScreen(
     state: PictureState,
     exception: Throwable?,
     bookmarkState: BookmarkState,
-    followState: FollowState,
     illust: Illust,
     modifier: Modifier = Modifier,
+    followState: FollowState = koinInject(),
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
     bookmarkDispatch: (BookmarkAction) -> Unit = {},
-    followDispatch: (FollowAction) -> Unit = {},
     navToSearchResultScreen: (String) -> Unit = {},
     popBackToHomeScreen: () -> Unit = {},
     navToUserDetailScreen: (Long) -> Unit = {},
@@ -304,7 +292,7 @@ internal fun PictureScreen(
     val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
     val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
 
-    val isFollowed = followState.followStatus[illust.user.id] ?: false
+    val isFollowed = followState.state()[illust.user.id] ?: false
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
@@ -703,7 +691,7 @@ internal fun PictureScreen(
                                     )
                                     .padding(horizontal = 10.dp, vertical = 8.dp)
                                     .throttleClick {
-                                        followDispatch(FollowAction.UnFollowUser(illust.user.id))
+                                        followState.unFollowUser(illust.user.id)
                                     },
                                 text = stringResource(R.string.followed),
                                 style = TextStyle(
@@ -723,7 +711,7 @@ internal fun PictureScreen(
                                     )
                                     .padding(horizontal = 10.dp, vertical = 8.dp)
                                     .throttleClick {
-                                        followDispatch(FollowAction.FollowUser(illust.user.id))
+                                        followState.followUser(illust.user.id)
                                     },
                                 text = stringResource(R.string.follow),
                                 style = TextStyle(

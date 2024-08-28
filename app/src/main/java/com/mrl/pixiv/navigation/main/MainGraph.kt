@@ -37,7 +37,6 @@ import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.HomeBottomBar
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
-import com.mrl.pixiv.common.viewmodel.follow.FollowViewModel
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
@@ -61,7 +60,6 @@ fun MainGraph(
     navHostController: NavHostController = rememberNavController()
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
-    val followViewModel: FollowViewModel = koinViewModel()
     val bookmarkViewModel: BookmarkViewModel = koinViewModel()
 
     HandleDeeplink(navHostController)
@@ -183,7 +181,6 @@ fun MainGraph(
                                 PictureScreen(
                                     illustId = illustId,
                                     bookmarkViewModel = bookmarkViewModel,
-                                    followViewModel = followViewModel,
                                 )
                             }
                         }
@@ -207,7 +204,6 @@ fun MainGraph(
                             PictureScreen(
                                 illustId = illustId,
                                 bookmarkViewModel = bookmarkViewModel,
-                                followViewModel = followViewModel,
                             )
                         }
 
