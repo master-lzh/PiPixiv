@@ -5,7 +5,9 @@ import com.mrl.pixiv.data.search.SearchAutoCompleteQuery
 import com.mrl.pixiv.data.search.SearchIllustQuery
 import com.mrl.pixiv.repository.SearchRepository
 import com.mrl.pixiv.util.queryParams
+import org.koin.core.annotation.Factory
 
+@Factory
 class SearchMiddleware(
     private val searchRepository: SearchRepository,
 ) : Middleware<SearchState, SearchAction>() {

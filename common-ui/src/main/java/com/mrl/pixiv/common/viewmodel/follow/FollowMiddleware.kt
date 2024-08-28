@@ -5,8 +5,9 @@ import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.user.UserFollowAddReq
 import com.mrl.pixiv.data.user.UserFollowDeleteReq
 import com.mrl.pixiv.repository.UserRepository
+import org.koin.core.annotation.Factory
 
-
+@Factory
 class FollowMiddleware(
     private val userRepository: UserRepository,
 ) : Middleware<FollowState, FollowAction>() {

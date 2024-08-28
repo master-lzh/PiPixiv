@@ -7,7 +7,9 @@ import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import com.mrl.pixiv.data.illust.IllustRelatedQuery
 import com.mrl.pixiv.datasource.remote.IllustHttpService
 import com.mrl.pixiv.datasource.remote.UgoiraHttpService
+import org.koin.core.annotation.Single
 
+@Single
 class IllustRepository(
     private val illustHttpService: IllustHttpService,
     private val ugoiraHttpService: UgoiraHttpService,
