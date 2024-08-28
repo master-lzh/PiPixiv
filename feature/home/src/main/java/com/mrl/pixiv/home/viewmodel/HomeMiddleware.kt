@@ -8,7 +8,9 @@ import com.mrl.pixiv.home.R
 import com.mrl.pixiv.repository.IllustRepository
 import com.mrl.pixiv.util.ToastUtil
 import kotlinx.collections.immutable.toImmutableList
+import org.koin.core.annotation.Factory
 
+@Factory
 class HomeMiddleware(
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
     private val illustRepository: IllustRepository,
@@ -21,7 +23,7 @@ class HomeMiddleware(
             )
 
             is HomeAction.RefreshIllustRecommendedIntent -> refreshIllustRecommended(state, action)
-            is HomeAction.RefreshTokenIntent -> refreshToken(state)
+            is HomeAction.RefreshTokenIntent -> refreshToken()
             is HomeAction.CollectExceptionFlow-> collectExceptionFlow()
 
             else -> {}
@@ -34,7 +36,7 @@ class HomeMiddleware(
         }
     }
 
-    private fun refreshToken(state: HomeState) {
+    private fun refreshToken() {
         launchNetwork {
             refreshUserAccessTokenUseCase {
                 ToastUtil.safeShortToast(R.string.refresh_token_success)

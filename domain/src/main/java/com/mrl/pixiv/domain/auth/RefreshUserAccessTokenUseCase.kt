@@ -10,7 +10,9 @@ import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.repository.AuthRepository
 import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single
 class RefreshUserAccessTokenUseCase(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,

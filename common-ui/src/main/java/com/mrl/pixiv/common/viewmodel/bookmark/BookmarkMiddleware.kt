@@ -4,7 +4,9 @@ import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.illust.IllustBookmarkAddReq
 import com.mrl.pixiv.data.illust.IllustBookmarkDeleteReq
 import com.mrl.pixiv.repository.IllustRepository
+import org.koin.core.annotation.Factory
 
+@Factory
 class BookmarkMiddleware(
     private val illustRepository: IllustRepository,
 ) : Middleware<BookmarkState, BookmarkAction>() {

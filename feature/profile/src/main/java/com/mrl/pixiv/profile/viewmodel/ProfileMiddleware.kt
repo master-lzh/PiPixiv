@@ -7,7 +7,9 @@ import com.mrl.pixiv.repository.SettingRepository
 import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
+import org.koin.core.annotation.Factory
 
+@Factory
 class ProfileMiddleware(
     private val userRepository: UserRepository,
     private val settingRepository: SettingRepository,

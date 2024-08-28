@@ -2,7 +2,9 @@ package com.mrl.pixiv.collection.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Reducer
 import kotlinx.collections.immutable.toImmutableList
+import org.koin.core.annotation.Single
 
+@Single
 class CollectionReducer : Reducer<CollectionState, CollectionAction> {
     override fun CollectionState.reduce(action: CollectionAction): CollectionState {
         return when (action) {

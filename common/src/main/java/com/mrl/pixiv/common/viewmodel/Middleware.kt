@@ -36,6 +36,8 @@ abstract class Middleware<S : State, A : Action>(
 
     protected fun dispatchError(throwable: Throwable?) = dispatcher.dispatchError(throwable)
 
+    protected fun state() = dispatcher.state()
+
     internal fun setDispatcher(
         dispatcher: Dispatcher<S, A>,
     ) {

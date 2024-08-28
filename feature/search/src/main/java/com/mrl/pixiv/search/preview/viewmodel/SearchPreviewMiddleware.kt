@@ -4,7 +4,9 @@ import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.repository.SearchRepository
 import com.mrl.pixiv.repository.TrendingRepository
+import org.koin.core.annotation.Factory
 
+@Factory
 class SearchPreviewMiddleware(
     private val trendingRepository: TrendingRepository,
     private val searchRepository: SearchRepository,

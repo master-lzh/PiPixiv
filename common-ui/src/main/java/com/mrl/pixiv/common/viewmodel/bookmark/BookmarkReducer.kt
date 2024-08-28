@@ -1,7 +1,9 @@
 package com.mrl.pixiv.common.viewmodel.bookmark
 
 import com.mrl.pixiv.common.viewmodel.Reducer
+import org.koin.core.annotation.Single
 
+@Single
 class BookmarkReducer : Reducer<BookmarkState, BookmarkAction> {
     override fun BookmarkState.reduce(action: BookmarkAction): BookmarkState {
         return when (action) {

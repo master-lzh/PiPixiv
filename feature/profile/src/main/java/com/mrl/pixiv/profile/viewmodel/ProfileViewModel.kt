@@ -5,6 +5,7 @@ import com.mrl.pixiv.common.viewmodel.BaseViewModel
 import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.setting.SettingTheme
 import com.mrl.pixiv.data.user.UserInfo
+import org.koin.android.annotation.KoinViewModel
 
 data class ProfileState(
     val user: UserInfo
@@ -23,6 +24,7 @@ sealed class ProfileAction : Action {
     data class UpdateUserInfo(val userInfo: UserInfo) : ProfileAction()
 }
 
+@KoinViewModel
 class ProfileViewModel(
     reducer: ProfileReducer,
     middleware: ProfileMiddleware,

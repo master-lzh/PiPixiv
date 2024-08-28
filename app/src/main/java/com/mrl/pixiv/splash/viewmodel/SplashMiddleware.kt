@@ -8,7 +8,9 @@ import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.repository.AuthRepository
 import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Factory
 
+@Factory
 class SplashMiddleware(
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
     private val userRepository: UserRepository,

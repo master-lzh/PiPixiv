@@ -2,7 +2,9 @@ package com.mrl.pixiv.profile.detail.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Reducer
 import kotlinx.collections.immutable.toImmutableList
+import org.koin.core.annotation.Single
 
+@Single
 class ProfileDetailReducer : Reducer<ProfileDetailState, ProfileDetailAction> {
     override fun ProfileDetailState.reduce(
         action: ProfileDetailAction

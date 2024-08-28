@@ -6,6 +6,7 @@ import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.search.TrendingTag
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import org.koin.android.annotation.KoinViewModel
 
 
 sealed class SearchPreviewAction : Action {
@@ -27,6 +28,7 @@ data class SearchPreviewState(
     }
 }
 
+@KoinViewModel
 class SearchPreviewViewModel(
     reducer: SearchPreviewReducer,
     middleware: SearchPreviewMiddleware,

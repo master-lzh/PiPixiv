@@ -1,9 +1,11 @@
 package com.mrl.pixiv.domain
 
 import com.mrl.pixiv.repository.UserRepository
+import org.koin.core.annotation.Single
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
 
+@Single
 class SetUserAccessTokenUseCase(
     private val userRepository: UserRepository
 ) {
@@ -17,6 +19,7 @@ class SetUserAccessTokenUseCase(
     }
 }
 
+@Single
 class SetUserRefreshTokenUseCase(
     private val userRepository: UserRepository
 ) {

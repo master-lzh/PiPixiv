@@ -1,7 +1,9 @@
 package com.mrl.pixiv.setting.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Reducer
+import org.koin.core.annotation.Single
 
+@Single
 class SettingReducer : Reducer<SettingState, SettingAction> {
     override fun SettingState.reduce(action: SettingAction): SettingState {
         return when (action) {

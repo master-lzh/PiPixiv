@@ -5,6 +5,7 @@ import com.mrl.pixiv.common.viewmodel.Action
 import com.mrl.pixiv.common.viewmodel.BaseViewModel
 import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.Illust
+import org.koin.android.annotation.KoinViewModel
 
 data class IllustState(
     val illusts: LruCache<Long, Illust>,
@@ -20,7 +21,7 @@ sealed class IllustAction : Action {
     data class SetIllust(val illustId: Long, val illust: Illust) : IllustAction()
 }
 
-
+@KoinViewModel
 class IllustViewModel(
     reducer: IllustReducer,
     authMiddleware: IllustMiddleware,
