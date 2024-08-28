@@ -4,7 +4,9 @@ import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.repository.SettingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
+import org.koin.core.annotation.Factory
 
+@Factory
 class SettingMiddleware(
     private val settingRepository: SettingRepository
 ) : Middleware<SettingState, SettingAction>() {

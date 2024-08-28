@@ -29,6 +29,7 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.withTimeoutOrNull
+import org.koin.core.annotation.Factory
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import java.io.File
@@ -36,7 +37,7 @@ import java.io.FileOutputStream
 import java.util.zip.ZipFile
 import kotlin.time.Duration.Companion.seconds
 
-
+@Factory
 class PictureMiddleware(
     private val illustRepository: IllustRepository,
     private val userRepository: UserRepository,
@@ -47,8 +48,8 @@ class PictureMiddleware(
         when (action) {
             is PictureAction.GetIllustDetail -> getIllustDetail(action.illustId)
             is PictureAction.AddSearchHistory -> addSearchHistory(action.keyword)
-            is PictureAction.GetUserIllustsIntent -> getUserIllusts(state, action.userId)
-            is PictureAction.GetIllustRelatedIntent -> getIllustRelated(state, action.illustId)
+            is PictureAction.GetUserIllustsIntent -> getUserIllusts(action.userId)
+            is PictureAction.GetIllustRelatedIntent -> getIllustRelated(action.illustId)
             is PictureAction.LoadMoreIllustRelatedIntent -> loadMoreIllustRelated(
                 state,
                 action.queryMap
@@ -251,7 +252,7 @@ class PictureMiddleware(
             }
         }
 
-    private fun getIllustRelated(state: PictureState, illustId: Long) =
+    private fun getIllustRelated(illustId: Long) =
         launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRepository.getIllustRelated(
@@ -270,7 +271,7 @@ class PictureMiddleware(
             }
         }
 
-    private fun getUserIllusts(state: PictureState, userId: Long) {
+    private fun getUserIllusts(userId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
                 request = userRepository.getUserIllusts(

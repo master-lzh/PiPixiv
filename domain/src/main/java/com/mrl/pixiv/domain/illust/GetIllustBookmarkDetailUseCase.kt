@@ -3,7 +3,9 @@ package com.mrl.pixiv.domain.illust
 import com.mrl.pixiv.common.network.safeHttpCall
 import com.mrl.pixiv.data.illust.IllustBookmarkDetailResp
 import com.mrl.pixiv.repository.IllustRepository
+import org.koin.core.annotation.Single
 
+@Single
 class GetIllustBookmarkDetailUseCase(
     private val illustRepository: IllustRepository,
 ) {

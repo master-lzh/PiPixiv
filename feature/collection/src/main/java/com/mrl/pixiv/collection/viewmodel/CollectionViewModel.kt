@@ -10,6 +10,7 @@ import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.user.BookmarkTag
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import org.koin.android.annotation.KoinViewModel
 
 @Stable
 data class CollectionState(
@@ -76,6 +77,7 @@ sealed class CollectionAction : Action {
     ) : CollectionAction()
 }
 
+@KoinViewModel
 class CollectionViewModel(
     uid: Long,
     middleware: CollectionMiddleware,

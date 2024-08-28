@@ -4,7 +4,9 @@ import android.os.Build
 import com.mrl.pixiv.data.setting.SettingTheme
 import com.mrl.pixiv.datasource.local.datastore.SettingDataSource
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
+@Single
 class SettingRepository(
     private val settingDataSource: SettingDataSource
 ) {

@@ -7,7 +7,9 @@ import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
 import com.mrl.pixiv.repository.CollectionRepository
 import com.mrl.pixiv.util.queryParams
 import kotlinx.collections.immutable.toImmutableList
+import org.koin.core.annotation.Factory
 
+@Factory
 class CollectionMiddleware(
     private val collectionRepository: CollectionRepository
 ) : Middleware<CollectionState, CollectionAction>() {
