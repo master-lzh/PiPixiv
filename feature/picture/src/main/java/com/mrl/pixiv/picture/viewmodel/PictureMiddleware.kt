@@ -51,13 +51,12 @@ class PictureMiddleware(
             is PictureAction.GetUserIllustsIntent -> getUserIllusts(action.userId)
             is PictureAction.GetIllustRelatedIntent -> getIllustRelated(action.illustId)
             is PictureAction.LoadMoreIllustRelatedIntent -> loadMoreIllustRelated(
-                state,
                 action.queryMap
             )
 
-            is PictureAction.BookmarkIllust -> bookmark(state, action.illustId)
+            is PictureAction.BookmarkIllust -> bookmark(action.illustId)
 
-            is PictureAction.UnBookmarkIllust -> unBookmark(state, action.illustId)
+            is PictureAction.UnBookmarkIllust -> unBookmark(action.illustId)
             is PictureAction.DownloadIllust -> downloadIllust(
                 action.illustId,
                 action.index,
@@ -186,7 +185,7 @@ class PictureMiddleware(
         }
     }
 
-    private fun unBookmark(state: PictureState, illustId: Long) {
+    private fun unBookmark(illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRepository.postIllustBookmarkDelete(
@@ -197,12 +196,12 @@ class PictureMiddleware(
             ) {
                 dispatch(
                     PictureAction.UpdateIsBookmarkState(
-                        userIllusts = state.userIllusts.apply {
+                        userIllusts = state().userIllusts.apply {
                             indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
                                 set(it, get(it).copy(isBookmarked = false))
                             }
                         },
-                        illustRelated = state.illustRelated.apply {
+                        illustRelated = state().illustRelated.apply {
                             indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
                                 set(it, get(it).copy(isBookmarked = false))
                             }
@@ -213,19 +212,19 @@ class PictureMiddleware(
         }
     }
 
-    private fun bookmark(state: PictureState, illustId: Long) {
+    private fun bookmark(illustId: Long) {
         launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRepository.postIllustBookmarkAdd(IllustBookmarkAddReq(illustId))
             ) {
                 dispatch(
                     PictureAction.UpdateIsBookmarkState(
-                        userIllusts = state.userIllusts.apply {
+                        userIllusts = state().userIllusts.apply {
                             indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
                                 set(it, get(it).copy(isBookmarked = true))
                             }
                         },
-                        illustRelated = state.illustRelated.apply {
+                        illustRelated = state().illustRelated.apply {
                             indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
                                 set(it, get(it).copy(isBookmarked = true))
                             }
@@ -236,7 +235,7 @@ class PictureMiddleware(
         }
     }
 
-    private fun loadMoreIllustRelated(state: PictureState, queryMap: Map<String, String>?) =
+    private fun loadMoreIllustRelated(queryMap: Map<String, String>?) =
         launchNetwork {
             requestHttpDataWithFlow(
                 request = illustRepository.loadMoreIllustRelated(
@@ -245,7 +244,7 @@ class PictureMiddleware(
             ) {
                 dispatch(
                     PictureAction.UpdateIllustRelatedState(
-                        illustRelated = state.illustRelated + it.illusts,
+                        illustRelated = state().illustRelated + it.illusts,
                         nextUrl = it.nextURL
                     )
                 )
