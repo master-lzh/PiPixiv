@@ -292,7 +292,7 @@ internal fun PictureScreen(
     val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
     val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
 
-    val isFollowed = followState.state()[illust.user.id] ?: false
+    val isFollowed = followState.state[illust.user.id] ?: false
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
