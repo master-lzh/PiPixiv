@@ -1,26 +1,22 @@
 package com.mrl.pixiv.common.viewmodel.follow
 
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.viewmodel.GlobalState
 import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.user.UserFollowAddReq
 import com.mrl.pixiv.data.user.UserFollowDeleteReq
 import com.mrl.pixiv.repository.UserRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toPersistentMap
 import org.koin.core.annotation.Single
 
 @Single
 class FollowState(
     private val userRepository: UserRepository,
-) : GlobalState<Map<Long, Boolean>>() {
-    private val _followStatus: MutableStateFlow<Map<Long, Boolean>> = MutableStateFlow(emptyMap())
-    val followStatus = _followStatus.asStateFlow()
-
-    @Composable
-    override fun state(): Map<Long, Boolean> = followStatus.collectAsStateWithLifecycle().value
+) : GlobalState<ImmutableMap<Long, Boolean>>(
+    initialSate = persistentMapOf()
+) {
 
     fun followUser(userId: Long) {
         launchNetwork {
@@ -43,6 +39,8 @@ class FollowState(
     }
 
     private fun updateFollowState(userId: Long, isFollowed: Boolean) {
-        _followStatus.value += (userId to isFollowed)
+        updateState {
+            it.toPersistentMap().put(userId, isFollowed)
+        }
     }
 }
