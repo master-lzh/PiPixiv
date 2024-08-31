@@ -45,7 +45,6 @@ import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.BottomBookmarkSheet
 import com.mrl.pixiv.common.ui.lightBlue
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.IllustAiType
 import com.mrl.pixiv.data.Restrict
@@ -63,8 +62,7 @@ fun RecommendImageItem(
     navToPictureScreen: (Illust, String) -> Unit,
     illust: Illust,
     isBookmarked: Boolean,
-    onBookmarkClick: OnBookmarkClick,
-    dispatch: (BookmarkAction) -> Unit,
+    onBookmarkClick: (String, List<String>?) -> Unit,
 ) {
     val scale = illust.height * 1.0f / illust.width
     val height = width * scale
@@ -158,7 +156,7 @@ fun RecommendImageItem(
 
                     IconButton(
                         onClick = {
-                            onBookmarkClick(illust.id, isBookmarked, Restrict.PUBLIC, null)
+                            onBookmarkClick(Restrict.PUBLIC, null)
                         },
                         modifier = Modifier.sharedElement(
                             rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
@@ -231,10 +229,7 @@ fun RecommendImageItem(
         getIllustBookmarkDetailUseCase = getIllustBookmarkDetailUseCase,
         illust = illust,
         bottomSheetState = bottomSheetState,
-        onBookmarkClick = { restrict, tags ->
-            onBookmarkClick(illust.id, isBookmarked, restrict, tags)
-        },
-        isBookmarked = isBookmarked,
-        dispatch = dispatch
+        onBookmarkClick = onBookmarkClick,
+        isBookmarked = isBookmarked
     )
 }
