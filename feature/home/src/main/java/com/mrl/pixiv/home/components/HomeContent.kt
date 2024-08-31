@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.home.TAG
@@ -21,19 +20,15 @@ fun HomeContent(
     state: HomeState,
     bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,
-    onBookmarkClick: OnBookmarkClick,
     dismissRefresh: () -> Unit,
     onScrollToBottom: () -> Unit,
-    dispatch: (BookmarkAction) -> Unit
 ) {
     RecommendGrid(
         navToPictureScreen = navToPictureScreen,
         bookmarkState = bookmarkState,
         lazyStaggeredGridState = lazyStaggeredGridState,
         recommendImageList = state.recommendImageList.toImmutableList(),
-        onBookmarkClick = onBookmarkClick,
         onScrollToBottom = onScrollToBottom,
-        dispatch = dispatch,
     )
 
     LaunchedEffect(state.isRefresh) {

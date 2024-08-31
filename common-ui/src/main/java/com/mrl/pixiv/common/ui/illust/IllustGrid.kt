@@ -29,22 +29,21 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.util.OnScrollToBottom
 import com.mrl.pixiv.util.isEven
 import kotlinx.collections.immutable.ImmutableList
+import org.koin.compose.koinInject
 
 @Composable
 fun IllustGrid(
+    illusts: ImmutableList<Illust>,
+    spanCount: Int,
     modifier: Modifier = Modifier,
     lazyGridState: LazyGridState = rememberLazyGridState(),
-    illusts: ImmutableList<Illust>,
-    bookmarkState: BookmarkState,
-    dispatch: (BookmarkAction) -> Unit,
-    spanCount: Int,
     horizontalPadding: Dp = 0.dp,
+    bookmarkState: BookmarkState = koinInject(),
     paddingValues: PaddingValues = PaddingValues(1.dp),
     navToPictureScreen: (Illust, String) -> Unit,
     canLoadMore: Boolean = true,
@@ -83,11 +82,19 @@ fun IllustGrid(
         } else {
             itemsIndexed(
                 illusts,
-                key = { index, item -> "illust_${index}_${item.id}" }) { index, illust ->
+                key = { index, item -> "illust_${index}_${item.id}" }
+            ) { index, illust ->
+                val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
                 SquareIllustItem(
                     illust = illust,
-                    bookmarkState = bookmarkState,
-                    dispatch = dispatch,
+                    isBookmarked = isBookmarked,
+                    onBookmarkClick = { restrict: String, tags: List<String>? ->
+                        if (isBookmarked) {
+                            bookmarkState.deleteBookmarkIllust(illust.id)
+                        } else {
+                            bookmarkState.bookmarkIllust(illust.id, restrict, tags)
+                        }
+                    },
                     spanCount = spanCount,
                     horizontalPadding = horizontalPadding,
                     paddingValues = paddingValues,

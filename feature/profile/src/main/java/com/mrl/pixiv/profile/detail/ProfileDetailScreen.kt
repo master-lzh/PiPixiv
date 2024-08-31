@@ -47,9 +47,6 @@ import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.navigateToPictureScreen
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.profile.R
 import com.mrl.pixiv.profile.detail.components.IllustWidget
@@ -66,18 +63,15 @@ import org.koin.core.parameter.parametersOf
 fun SelfProfileDetailScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
-    bookmarkViewModel: BookmarkViewModel,
     profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(Long.MIN_VALUE) },
 ) {
     OnLifecycle(onLifecycle = profileDetailViewModel::onStart)
     ProfileDetailScreen(
         modifier = modifier,
         state = profileDetailViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        popBack = { navHostController.popBackStack() },
         dispatch = profileDetailViewModel::dispatch,
+        popBack = { navHostController.popBackStack() },
     )
 }
 
@@ -86,18 +80,15 @@ fun OtherProfileDetailScreen(
     uid: Long,
     modifier: Modifier = Modifier,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
-    bookmarkViewModel: BookmarkViewModel,
     profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(uid) },
 ) {
     OnLifecycle(onLifecycle = profileDetailViewModel::onStart)
     ProfileDetailScreen(
         modifier = modifier,
         state = profileDetailViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        popBack = { navHostController.popBackStack() },
         dispatch = profileDetailViewModel::dispatch,
+        popBack = { navHostController.popBackStack() },
     )
 }
 
@@ -105,8 +96,6 @@ fun OtherProfileDetailScreen(
 internal fun ProfileDetailScreen(
     modifier: Modifier = Modifier,
     state: ProfileDetailState,
-    bookmarkState: BookmarkState,
-    bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
     dispatch: (ProfileDetailAction) -> Unit,
     popBack: () -> Unit = { },
@@ -276,8 +265,6 @@ internal fun ProfileDetailScreen(
                             R.string.illustration_count,
                             state.userInfo.totalIllusts
                         ),
-                        bookmarkState = bookmarkState,
-                        bookmarkDispatch = bookmarkDispatch,
                         navToPictureScreen = navToPictureScreen,
                         illusts = state.userIllusts
                     )
@@ -290,8 +277,6 @@ internal fun ProfileDetailScreen(
                     IllustWidget(
                         title = stringResource(R.string.illust_and_manga_liked),
                         endText = stringResource(R.string.view_all),
-                        bookmarkState = bookmarkState,
-                        bookmarkDispatch = bookmarkDispatch,
                         navToPictureScreen = navToPictureScreen,
                         illusts = state.userBookmarksIllusts
                     )

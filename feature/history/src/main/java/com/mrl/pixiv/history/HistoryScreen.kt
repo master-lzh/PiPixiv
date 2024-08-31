@@ -34,9 +34,6 @@ import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.IllustGrid
 import com.mrl.pixiv.common.util.navigateToPictureScreen
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.history.viewmodel.HistoryAction
 import com.mrl.pixiv.history.viewmodel.HistoryState
@@ -48,7 +45,6 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HistoryScreen(
     modifier: Modifier = Modifier,
-    bookmarkViewModel: BookmarkViewModel = koinViewModel(),
     viewModel: HistoryViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
@@ -56,8 +52,6 @@ fun HistoryScreen(
         modifier = modifier,
         state = viewModel.state,
         dispatch = viewModel::dispatch,
-        bookmarkState = bookmarkViewModel.state,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
         popBack = { navHostController.popBackStack() },
         navToPictureScreen = navHostController::navigateToPictureScreen
     )
@@ -69,8 +63,6 @@ internal fun HistoryScreen_(
     modifier: Modifier = Modifier,
     state: HistoryState = HistoryState.INITIAL,
     dispatch: (HistoryAction) -> Unit = {},
-    bookmarkState: BookmarkState = BookmarkState.INITIAL,
-    bookmarkDispatch: (BookmarkAction) -> Unit = {},
     popBack: () -> Unit = {},
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
 ) {
@@ -120,20 +112,18 @@ internal fun HistoryScreen_(
     ) {
         val lazyGridState = rememberLazyGridState()
         IllustGrid(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(horizontal = 8.dp),
-            lazyGridState = lazyGridState,
             illusts = state.illusts.filter {
                 it.title.contains(searchValue.text, ignoreCase = true) || it.user.name.contains(
                     searchValue.text,
                     ignoreCase = true
                 )
             }.toImmutableList(),
-            bookmarkState = bookmarkState,
-            dispatch = bookmarkDispatch,
             spanCount = 2,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(horizontal = 8.dp),
+            lazyGridState = lazyGridState,
             navToPictureScreen = navToPictureScreen,
             canLoadMore = state.illustNextUrl != null,
             onLoadMore = {

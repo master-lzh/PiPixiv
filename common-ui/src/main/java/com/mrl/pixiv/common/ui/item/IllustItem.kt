@@ -65,8 +65,6 @@ import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.lightBlue
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common_ui.R
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.IllustAiType
@@ -84,8 +82,8 @@ import java.util.UUID
 @Composable
 fun SquareIllustItem(
     illust: Illust,
-    bookmarkState: BookmarkState,
-    dispatch: (BookmarkAction) -> Unit,
+    isBookmarked: Boolean,
+    onBookmarkClick: (String, List<String>?) -> Unit,
     spanCount: Int,
     horizontalPadding: Dp = 0.dp,
     paddingValues: PaddingValues = PaddingValues(1.dp),
@@ -98,17 +96,7 @@ fun SquareIllustItem(
     val getIllustBookmarkDetailUseCase = koinInject<GetIllustBookmarkDetailUseCase>()
     val hasShowBookmarkTipUseCase = koinInject<HasShowBookmarkTipUseCase>()
     val setShowBookmarkTipUseCase = koinInject<SetShowBookmarkTipUseCase>()
-    val isBookmarked = bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
     var showPopupTip by remember { mutableStateOf(false) }
-    val onBookmarkClick = { restrict: String, tags: List<String>? ->
-        dispatch(
-            if (isBookmarked) {
-                BookmarkAction.IllustBookmarkDeleteIntent(illust.id)
-            } else {
-                BookmarkAction.IllustBookmarkAddIntent(illust.id, restrict, tags)
-            }
-        )
-    }
     val prefix = rememberSaveable { UUID.randomUUID().toString() }
     val onClick = {
         navToPictureScreen(illust.copy(isBookmarked = isBookmarked), prefix)
@@ -257,8 +245,7 @@ fun SquareIllustItem(
         illust = illust,
         bottomSheetState = bottomSheetState,
         onBookmarkClick = onBookmarkClick,
-        isBookmarked = isBookmarked,
-        dispatch = dispatch
+        isBookmarked = isBookmarked
     )
 }
 
@@ -271,7 +258,6 @@ fun BottomBookmarkSheet(
     bottomSheetState: SheetState,
     onBookmarkClick: (String, List<String>?) -> Unit,
     isBookmarked: Boolean,
-    dispatch: (BookmarkAction) -> Unit
 ) {
     if (showBottomSheet) {
         var publicSwitch by remember { mutableStateOf(true) }
@@ -324,12 +310,9 @@ fun BottomBookmarkSheet(
                     if (isBookmarked) {
                         TextButton(
                             onClick = {
-                                dispatch(
-                                    BookmarkAction.IllustBookmarkAddIntent(
-                                        illust.id,
-                                        if (publicSwitch) Restrict.PUBLIC else Restrict.PRIVATE,
-                                        selectedTagsIndex.map { allTags[it].first }
-                                    )
+                                onBookmarkClick(
+                                    if (publicSwitch) Restrict.PUBLIC else Restrict.PRIVATE,
+                                    selectedTagsIndex.map { allTags[it].first }
                                 )
                                 hideBottomSheet()
                             },
