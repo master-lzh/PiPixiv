@@ -36,9 +36,7 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.navigateToPictureScreen
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.illust.IllustRecommendedQuery
@@ -53,6 +51,7 @@ import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import kotlin.time.Duration.Companion.seconds
 
 val initRecommendedQuery = IllustRecommendedQuery(
@@ -85,14 +84,11 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     homeViewModel: HomeViewModel = koinViewModel(),
-    bookmarkViewModel: BookmarkViewModel,
 ) {
     OnLifecycle(lifecycleEvent = Lifecycle.Event.ON_CREATE, onLifecycle = homeViewModel::onCreate)
     HomeScreen(
         modifier = modifier,
         state = homeViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         onRefresh = homeViewModel::onRefresh,
         onScrollToBottom = homeViewModel::onScrollToBottom,
@@ -105,12 +101,11 @@ fun HomeScreen(
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     state: HomeState,
-    bookmarkState: BookmarkState,
-    bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust, String) -> Unit,
     onRefresh: () -> Unit,
     onScrollToBottom: () -> Unit,
     dispatch: (HomeAction) -> Unit = {},
+    bookmarkState: BookmarkState = koinInject(),
 ) {
     val context = LocalContext.current
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
@@ -128,7 +123,7 @@ internal fun HomeScreen(
                 SnackbarResult.Dismissed -> {}
 
                 SnackbarResult.ActionPerformed -> {
-                    bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(id))
+                    bookmarkState.bookmarkIllust(id)
                 }
             }
         }
@@ -231,16 +226,6 @@ internal fun HomeScreen(
                     state = state,
                     bookmarkState = bookmarkState,
                     lazyStaggeredGridState = lazyStaggeredGridState,
-                    onBookmarkClick = { id, bookmark, restrict, tags ->
-                        if (bookmark) {
-                            bookmarkDispatch(BookmarkAction.IllustBookmarkDeleteIntent(id))
-                            onUnBookmark(id)
-                        } else {
-                            bookmarkDispatch(
-                                BookmarkAction.IllustBookmarkAddIntent(id, restrict, tags)
-                            )
-                        }
-                    },
                     dismissRefresh = {
                         scope.launch {
                             lazyStaggeredGridState.scrollToItem(0)
@@ -248,8 +233,7 @@ internal fun HomeScreen(
                             dispatch(HomeAction.DismissLoading)
                         }
                     },
-                    onScrollToBottom = onScrollToBottom,
-                    dispatch = bookmarkDispatch
+                    onScrollToBottom = onScrollToBottom
                 )
             }
         }

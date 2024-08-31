@@ -36,7 +36,6 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.HomeBottomBar
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
@@ -60,7 +59,6 @@ fun MainGraph(
     navHostController: NavHostController = rememberNavController()
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
-    val bookmarkViewModel: BookmarkViewModel = koinViewModel()
 
     HandleDeeplink(navHostController)
     CompositionLocalProvider(LocalNavigator provides navHostController) {
@@ -95,7 +93,6 @@ fun MainGraph(
                                 HomeScreen(
                                     modifier = Modifier.padding(bottom = bottomPadding),
                                     homeViewModel = homeViewModel,
-                                    bookmarkViewModel = bookmarkViewModel,
                                 )
                             }
                         }
@@ -125,9 +122,7 @@ fun MainGraph(
                             route = Destination.SelfProfileDetailScreen.route,
                         ) {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
-                                SelfProfileDetailScreen(
-                                    bookmarkViewModel = bookmarkViewModel
-                                )
+                                SelfProfileDetailScreen()
                             }
                         }
 
@@ -148,8 +143,7 @@ fun MainGraph(
                             CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
                                 OtherProfileDetailScreen(
                                     uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId)
-                                        ?: 0L,
-                                    bookmarkViewModel = bookmarkViewModel
+                                        ?: 0L
                                 )
                             }
                         }
@@ -180,7 +174,6 @@ fun MainGraph(
                             ) {
                                 PictureScreen(
                                     illustId = illustId,
-                                    bookmarkViewModel = bookmarkViewModel,
                                 )
                             }
                         }
@@ -203,7 +196,6 @@ fun MainGraph(
                                     ?: 0L
                             PictureScreen(
                                 illustId = illustId,
-                                bookmarkViewModel = bookmarkViewModel,
                             )
                         }
 
@@ -235,7 +227,6 @@ fun MainGraph(
                                         route = Destination.SearchResultsScreen.route,
                                     ) {
                                         SearchResultScreen(
-                                            bookmarkViewModel = bookmarkViewModel,
                                             searchViewModel = searchViewModel,
                                             navHostController = navHostController
                                         )
@@ -259,7 +250,6 @@ fun MainGraph(
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                                 OutsideSearchResultsScreen(
                                     searchWord = searchWord,
-                                    bookmarkViewModel = bookmarkViewModel,
                                 )
                             }
 
@@ -310,9 +300,7 @@ fun MainGraph(
                             route = Destination.SelfCollectionScreen.route,
                         ) {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                                SelfCollectionScreen(
-                                    bookmarkViewModel = bookmarkViewModel
-                                )
+                                SelfCollectionScreen()
                             }
                         }
                     }
