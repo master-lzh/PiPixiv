@@ -50,9 +50,6 @@ import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.IllustGrid
 import com.mrl.pixiv.common.util.navigateToPictureScreen
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkAction
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkViewModel
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.search.SearchSort
 import com.mrl.pixiv.data.search.SearchTarget
@@ -69,18 +66,15 @@ import org.koin.androidx.compose.koinViewModel
 fun SearchResultScreen(
     modifier: Modifier = Modifier,
     searchNavHostController: NavHostController = LocalNavigator.currentOrThrow,
-    bookmarkViewModel: BookmarkViewModel,
     searchViewModel: SearchViewModel = koinViewModel(),
     navHostController: NavHostController,
 ) {
     SearchResultScreen_(
         modifier = modifier,
         state = searchViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
         popBack = searchNavHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
         dispatch = searchViewModel::dispatch,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
     )
 }
 
@@ -88,7 +82,6 @@ fun SearchResultScreen(
 fun OutsideSearchResultsScreen(
     modifier: Modifier = Modifier,
     searchWord: String,
-    bookmarkViewModel: BookmarkViewModel,
     searchViewModel: SearchViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
@@ -100,11 +93,9 @@ fun OutsideSearchResultsScreen(
     SearchResultScreen_(
         modifier = modifier,
         state = searchViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
         popBack = navHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
         dispatch = searchViewModel::dispatch,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
     )
 }
 
@@ -121,8 +112,6 @@ internal fun SearchResultScreen_(
     popBack: () -> Unit = {},
     naviToPic: (Illust, String) -> Unit = { _, _ -> },
     dispatch: (SearchAction) -> Unit = {},
-    bookmarkDispatch: (BookmarkAction) -> Unit = {},
-    bookmarkState: BookmarkState = BookmarkState.INITIAL,
 ) {
     val showBottomSheet = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -175,21 +164,19 @@ internal fun SearchResultScreen_(
             modifier = modifier.padding(it),
         ) {
             IllustGrid(
+                illusts = state.searchResults,
+                spanCount = spanCount,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 8.dp),
-                illusts = state.searchResults,
-                bookmarkState = bookmarkState,
-                dispatch = bookmarkDispatch,
-                spanCount = spanCount,
                 navToPictureScreen = naviToPic,
-                loading = state.loading,
                 canLoadMore = state.nextUrl != null,
                 onLoadMore = {
                     if (state.nextUrl != null) {
                         dispatch(SearchAction.SearchIllustNext(state.nextUrl))
                     }
-                }
+                },
+                loading = state.loading
             )
         }
 
