@@ -3,6 +3,7 @@ package com.mrl.pixiv.picture.viewmodel
 import android.util.Log
 import androidx.core.graphics.drawable.toBitmap
 import coil3.SingletonImageLoader
+import coil3.asDrawable
 import coil3.request.ImageRequest
 import com.mrl.pixiv.common.data.HttpClientEnum
 import com.mrl.pixiv.common.viewmodel.Middleware
