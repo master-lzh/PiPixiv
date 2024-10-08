@@ -97,6 +97,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil3.SingletonImageLoader
+import coil3.asDrawable
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
