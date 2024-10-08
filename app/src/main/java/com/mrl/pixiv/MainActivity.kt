@@ -16,11 +16,11 @@ import androidx.core.content.getSystemService
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import coil3.ImageLoader
-import coil3.asCoilImage
+import coil3.asImage
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
-import coil3.network.ktor.KtorNetworkFetcherFactory
+import coil3.network.ktor2.KtorNetworkFetcherFactory
 import coil3.request.allowRgb565
 import com.mrl.pixiv.common.activity.BaseActivity
 import com.mrl.pixiv.common.data.HttpClientEnum
@@ -48,7 +48,7 @@ class MainActivity : BaseActivity() {
     @Composable
     override fun BuildContent() {
         val errorImage =
-            AppCompatResources.getDrawable(this, R.drawable.ic_error_outline_24)?.asCoilImage()
+            AppCompatResources.getDrawable(this, R.drawable.ic_error_outline_24)?.asImage()
         setSingletonImageLoaderFactory { context ->
             ImageLoader.Builder(context)
                 .error(errorImage)
@@ -64,8 +64,8 @@ class MainActivity : BaseActivity() {
                     add(KtorNetworkFetcherFactory(imageHttpClient))
                 }
                 // Coil spawns a new thread for every image load by default
-                .fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
-                .decoderDispatcher(Dispatchers.IO.limitedParallelism(2))
+                .fetcherCoroutineContext(Dispatchers.IO.limitedParallelism(8))
+                .decoderCoroutineContext(Dispatchers.IO.limitedParallelism(2))
                 .build()
         }
         LaunchedEffect(Unit) {
