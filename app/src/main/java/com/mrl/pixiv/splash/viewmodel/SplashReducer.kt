@@ -18,13 +18,13 @@ class SplashReducer : Reducer<SplashState, SplashAction> {
     private fun routeToLogin(state: SplashState) =
         state.copy(
             isLoading = false,
-            startDestination = Destination.LoginScreen.route
+            startDestination = Destination.LoginScreen::class
         )
 
     private fun routeToHome(state: SplashState): SplashState =
         state.copy(
             isLoading = false,
-            startDestination = Graph.MAIN
+            startDestination = Graph.Main::class
         )
 
 }
