@@ -13,18 +13,16 @@ import kotlinx.serialization.Transient
 
 @Serializable
 sealed class Destination(
-    val route: String,
     @Transient
     val title: @Composable () -> String = { "" },
     @Transient
-    val icon: @Composable (() -> Unit)? = {},
+    val icon: @Composable() (() -> Unit)? = {},
 ) {
     @Serializable
-    data object LoginScreen : Destination(route = "login_screen")
+    data object LoginScreen : Destination()
 
     @Serializable
     data object HomeScreen : Destination(
-        route = "home_screen",
         title = { stringResource(R.string.home) },
         icon = {
             Icon(
@@ -36,7 +34,6 @@ sealed class Destination(
 
     @Serializable
     data object SearchPreviewScreen : Destination(
-        route = "search_preview_screen",
         title = { stringResource(R.string.search) },
         icon = {
             Icon(
@@ -48,7 +45,6 @@ sealed class Destination(
 
     @Serializable
     data object ProfileScreen : Destination(
-        route = "profile_screen",
         title = { stringResource(R.string.my) },
         icon = {
             Icon(
@@ -59,41 +55,41 @@ sealed class Destination(
     )
 
     @Serializable
-    data object SelfProfileDetailScreen : Destination(route = "self_profile_detail_screen")
+    data object SelfProfileDetailScreen : Destination()
 
     @Serializable
     data class OtherProfileDetailScreen(
         val userId: Long,
-    ) : Destination(route = "other_profile_detail_screen")
+    ) : Destination()
 
     @Serializable
     data class PictureScreen(
         val illustId: Long,
         val prefix: String,
-    ) : Destination(route = "picture_screen")
+    ) : Destination()
 
     @Serializable
     data class PictureDeeplinkScreen(
         val illustId: Long,
-    ) : Destination(route = "picture_deeplink_screen")
+    ) : Destination()
 
     @Serializable
-    data object SearchScreen : Destination(route = "search_screen")
+    data object SearchScreen : Destination()
 
     @Serializable
     data class SearchResultsScreen(
-        val searchWord: String,
-    ) : Destination(route = "search_results_screen")
+        val searchWords: String,
+    ) : Destination()
 
     @Serializable
-    data object SettingScreen : Destination(route = "setting_screen")
+    data object SettingScreen : Destination()
 
     @Serializable
-    data object NetworkSettingScreen : Destination(route = "network_setting_screen")
+    data object NetworkSettingScreen : Destination()
 
     @Serializable
-    data object HistoryScreen : Destination(route = "history_screen")
+    data object HistoryScreen : Destination()
 
     @Serializable
-    data object SelfCollectionScreen : Destination(route = "self_collection_screen")
+    data object SelfCollectionScreen : Destination()
 }
