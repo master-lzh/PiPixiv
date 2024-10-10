@@ -8,11 +8,12 @@ import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.auth.GrantType
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.annotation.KoinViewModel
+import kotlin.reflect.KClass
 
 @Stable
 data class SplashState(
     val isLoading: Boolean,
-    val startDestination: String?,
+    val startDestination: KClass<*>?,
 ) : State {
     companion object {
         val INITIAL = SplashState(

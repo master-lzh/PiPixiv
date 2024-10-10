@@ -87,7 +87,7 @@ fun LoginScreen(
         state = loginViewModel.state,
         navToMainGraph = {
             navHostController.popBackStack()
-            navHostController.navigate(Graph.MAIN)
+            navHostController.navigate(Graph.Main)
         },
         dispatch = loginViewModel::dispatch,
     )
