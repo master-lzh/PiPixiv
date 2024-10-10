@@ -88,7 +88,7 @@ fun SearchScreen(
 internal fun SearchScreen_(
     modifier: Modifier = Modifier,
     state: SearchState = SearchState.INITIAL,
-    navigateToResult: () -> Unit = {},
+    navigateToResult: (String) -> Unit = {},
     dispatch: (SearchAction) -> Unit = {},
     popBack: () -> Unit = {},
 ) {
@@ -170,15 +170,9 @@ internal fun SearchScreen_(
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                                 keyboardActions = KeyboardActions(
                                     onSearch = {
-                                        dispatch(SearchAction.ClearSearchResult)
-                                        dispatch(
-                                            SearchAction.SearchIllust(
-                                                searchWords = textState.text,
-                                            )
-                                        )
                                         dispatch(SearchAction.AddSearchHistory(textState.text))
                                         focusRequester.freeFocus()
-                                        navigateToResult()
+                                        navigateToResult(textState.text)
                                     }
                                 )
                             )
@@ -222,11 +216,9 @@ internal fun SearchScreen_(
                             .padding(vertical = 4.dp)
                             .throttleClick {
                                 dispatch(SearchAction.UpdateSearchWords(it.keyword))
-                                dispatch(SearchAction.ClearSearchResult)
-                                dispatch(SearchAction.SearchIllust(searchWords = it.keyword))
                                 dispatch(SearchAction.AddSearchHistory(it.keyword))
                                 focusRequester.freeFocus()
-                                navigateToResult()
+                                navigateToResult(it.keyword)
                             }
                             .animateItem(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -254,11 +246,9 @@ internal fun SearchScreen_(
                         .padding(vertical = 4.dp)
                         .throttleClick {
                             dispatch(SearchAction.UpdateSearchWords(word.name))
-                            dispatch(SearchAction.ClearSearchResult)
-                            dispatch(SearchAction.SearchIllust(searchWords = word.name))
                             dispatch(SearchAction.AddSearchHistory(word.name))
                             focusRequester.freeFocus()
-                            navigateToResult()
+                            navigateToResult(word.name)
                         },
                     verticalArrangement = Arrangement.Center,
                 ) {
