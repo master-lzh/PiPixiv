@@ -8,21 +8,22 @@ import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.login.LoginScreen
 import com.mrl.pixiv.navigation.main.MainGraph
+import kotlin.reflect.KClass
 
 @Composable
 fun RootNavigationGraph(
     navHostController: NavHostController,
-    startDestination: String
+    startDestination: KClass<*>,
 ) {
     NavHost(
         navController = navHostController,
-        route = Graph.ROOT,
-        startDestination = startDestination
+        startDestination = startDestination,
+        route = Graph.Root::class
     ) {
-        composable(Destination.LoginScreen.route) {
+        composable<Destination.LoginScreen> {
             LoginScreen(navHostController = navHostController)
         }
-        composable(route = Graph.MAIN) {
+        composable<Graph.Main> {
             MainGraph()
         }
     }
