@@ -198,7 +198,7 @@ fun MainGraph(
                                     }
                                     composable<Destination.SearchResultsScreen> {
                                         SearchResultScreen(
-                                            searchViewModel = searchViewModel,
+                                            searchWords = it.toRoute<Destination.SearchResultsScreen>().searchWords,
                                             navHostController = navHostController
                                         )
                                     }
@@ -209,10 +209,10 @@ fun MainGraph(
                         // 外部搜索结果页
                         composable<Destination.SearchResultsScreen> {
                             val searchWord =
-                                it.toRoute<Destination.SearchResultsScreen>().searchWord
+                                it.toRoute<Destination.SearchResultsScreen>().searchWords
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                                 OutsideSearchResultsScreen(
-                                    searchWord = searchWord,
+                                    searchWords = searchWord,
                                 )
                             }
 

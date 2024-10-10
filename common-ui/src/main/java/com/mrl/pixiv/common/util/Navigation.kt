@@ -28,8 +28,8 @@ fun NavHostController.navigateToSearchScreen() {
     }
 }
 
-fun NavHostController.navigateToSearchResultScreen() {
-    navigate(route = Destination.SearchResultsScreen("")) {
+fun NavHostController.navigateToSearchResultScreen(searchWord: String) {
+    navigate(route = Destination.SearchResultsScreen(searchWord)) {
         launchSingleTop = true
     }
 }
