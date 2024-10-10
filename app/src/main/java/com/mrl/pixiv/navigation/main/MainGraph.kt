@@ -20,13 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import androidx.navigation.toRoute
 import com.mrl.pixiv.collection.SelfCollectionScreen
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
@@ -77,16 +78,15 @@ fun MainGraph(
                 CompositionLocalProvider(LocalSharedTransitionScope provides this) {
                     NavHost(
                         navController = navHostController,
-                        route = Graph.MAIN,
-                        startDestination = Destination.HomeScreen.route,
+                        route = Graph.Main::class,
+                        startDestination = Destination.HomeScreen,
                     ) {
                         // 首页
-                        composable(
-                            route = Destination.HomeScreen.route,
+                        composable<Destination.HomeScreen>(
                             deepLinks = DestinationsDeepLink.HomePattern.map {
-                                navDeepLink {
-                                    uriPattern = it
-                                }
+                                navDeepLink<Destination.HomeScreen>(
+                                    basePath = it
+                                )
                             },
                         ) {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
@@ -98,18 +98,14 @@ fun MainGraph(
                         }
 
                         // 搜索预览页
-                        composable(
-                            route = Destination.SearchPreviewScreen.route,
-                        ) {
+                        composable<Destination.SearchPreviewScreen> {
                             SearchPreviewScreen(
                                 modifier = Modifier.padding(bottom = bottomPadding),
                             )
                         }
 
                         // 个人主页
-                        composable(
-                            route = Destination.ProfileScreen.route,
-                        ) {
+                        composable<Destination.ProfileScreen> {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                                 ProfileScreen(
                                     modifier = Modifier.padding(bottom = bottomPadding),
@@ -118,91 +114,70 @@ fun MainGraph(
                         }
 
                         // 个人详情页
-                        composable(
-                            route = Destination.SelfProfileDetailScreen.route,
-                        ) {
+                        composable<Destination.SelfProfileDetailScreen> {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
                                 SelfProfileDetailScreen()
                             }
                         }
 
                         // 他人详情页
-                        composable(
-                            route = "${Destination.OtherProfileDetailScreen.route}/{${Destination.OtherProfileDetailScreen.userId}}",
-                            arguments = listOf(
-                                navArgument(Destination.OtherProfileDetailScreen.userId) {
-                                    defaultValue = 0L
-                                }
-                            ),
+                        composable<Destination.OtherProfileDetailScreen>(
                             deepLinks = DestinationsDeepLink.ProfileDetailPattern.map {
-                                navDeepLink {
-                                    uriPattern = it
-                                }
+                                navDeepLink<Destination.OtherProfileDetailScreen>(
+                                    basePath = it
+                                )
                             },
                         ) {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
+                                val args = it.toRoute<Destination.OtherProfileDetailScreen>()
                                 OtherProfileDetailScreen(
-                                    uid = it.arguments?.getLong(Destination.OtherProfileDetailScreen.userId)
-                                        ?: 0L
+                                    uid = args.userId
                                 )
                             }
                         }
 
                         // 作品详情页
-                        composable(
-                            route = "${Destination.PictureScreen.route}/{${Destination.PictureScreen.illustId}}?prefix={${Destination.PictureScreen.prefix}}",
-                            arguments = listOf(
-                                navArgument(Destination.PictureScreen.illustId) {
-                                    defaultValue = 0L
-                                },
-                                navArgument(Destination.PictureScreen.prefix) {
-                                    defaultValue = ""
-                                }
-                            ),
+                        composable<Destination.PictureScreen>(
                             enterTransition = { scaleIn(initialScale = 0.9f) + fadeIn() },
                             exitTransition = { scaleOut(targetScale = 1.1f) + fadeOut() },
                             popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
                             popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
                         ) {
-                            val illustId =
-                                (it.arguments?.getLong(Destination.PictureScreen.illustId)) ?: 0L
-                            val prefix =
-                                it.arguments?.getString(Destination.PictureScreen.prefix) ?: ""
+                            val args = it.toRoute<Destination.PictureScreen>()
                             CompositionLocalProvider(
                                 LocalAnimatedContentScope provides this,
-                                LocalSharedKeyPrefix provides prefix
+                                LocalSharedKeyPrefix provides args.prefix
+                            ) {
+                                PictureScreen(
+                                    illustId = args.illustId,
+                                )
+                            }
+                        }
+
+                        composable<Destination.PictureDeeplinkScreen>(
+                            deepLinks = DestinationsDeepLink.PicturePattern.map {
+                                navDeepLink<Destination.PictureDeeplinkScreen>(
+                                    basePath = it
+                                )
+                            },
+                            enterTransition = { scaleIn(initialScale = 0.9f) + fadeIn() },
+                            exitTransition = { scaleOut(targetScale = 1.1f) + fadeOut() },
+                            popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
+                            popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
+                        ) {
+                            val illustId = it.toRoute<Destination.PictureDeeplinkScreen>().illustId
+                            CompositionLocalProvider(
+                                LocalAnimatedContentScope provides this,
                             ) {
                                 PictureScreen(
                                     illustId = illustId,
                                 )
                             }
-                        }
 
-                        composable(
-                            route = "${Destination.PictureDeeplinkScreen.route}/{${Destination.PictureDeeplinkScreen.illustId}}",
-                            arguments = listOf(
-                                navArgument(Destination.PictureDeeplinkScreen.illustId) {
-                                    defaultValue = 0L
-                                }
-                            ),
-                            deepLinks = DestinationsDeepLink.PicturePattern.map {
-                                navDeepLink {
-                                    uriPattern = it
-                                }
-                            },
-                        ) {
-                            val illustId =
-                                it.arguments?.getLong(Destination.PictureDeeplinkScreen.illustId)
-                                    ?: 0L
-                            PictureScreen(
-                                illustId = illustId,
-                            )
                         }
 
                         // 搜索页
-                        composable(
-                            route = Destination.SearchScreen.route,
-                        ) {
+                        composable<Destination.SearchScreen> {
                             val searchViewModel: SearchViewModel =
                                 koinViewModel(viewModelStoreOwner = it)
                             val searchNavHostController = rememberNavController()
@@ -212,20 +187,16 @@ fun MainGraph(
                             ) {
                                 NavHost(
                                     navController = searchNavHostController,
-                                    route = Graph.SEARCH,
-                                    startDestination = Destination.SearchScreen.route
+                                    route = Graph.Search::class,
+                                    startDestination = Destination.SearchScreen
                                 ) {
-                                    composable(
-                                        route = Destination.SearchScreen.route,
-                                    ) {
+                                    composable<Destination.SearchScreen> {
                                         SearchScreen(
                                             navHostController = navHostController,
                                             searchViewModel = searchViewModel
                                         )
                                     }
-                                    composable(
-                                        route = Destination.SearchResultsScreen.route,
-                                    ) {
+                                    composable<Destination.SearchResultsScreen> {
                                         SearchResultScreen(
                                             searchViewModel = searchViewModel,
                                             navHostController = navHostController
@@ -236,17 +207,9 @@ fun MainGraph(
                         }
 
                         // 外部搜索结果页
-                        composable(
-                            route = "${Destination.SearchResultsScreen.route}/{${Destination.SearchResultsScreen.searchWord}}",
-                            arguments = listOf(
-                                navArgument(Destination.SearchResultsScreen.searchWord) {
-                                    defaultValue = ""
-                                }
-                            ),
-                        ) {
+                        composable<Destination.SearchResultsScreen> {
                             val searchWord =
-                                (it.arguments?.getString(Destination.SearchResultsScreen.searchWord))
-                                    ?: ""
+                                it.toRoute<Destination.SearchResultsScreen>().searchWord
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                                 OutsideSearchResultsScreen(
                                     searchWord = searchWord,
@@ -256,20 +219,16 @@ fun MainGraph(
                         }
 
                         // 设置页
-                        composable(
-                            route = Destination.SettingScreen.route,
-                        ) {
+                        composable<Destination.SettingScreen> {
                             val settingViewModel: SettingViewModel =
                                 koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
                             val settingNavHostController = rememberNavController()
                             CompositionLocalProvider(LocalNavigator provides settingNavHostController) {
                                 NavHost(
                                     navController = settingNavHostController,
-                                    startDestination = Destination.SettingScreen.route
+                                    startDestination = Destination.SettingScreen
                                 ) {
-                                    composable(
-                                        route = Destination.SettingScreen.route,
-                                    ) {
+                                    composable<Destination.SettingScreen> {
                                         SettingScreen(
                                             viewModel = settingViewModel,
                                             mainNavHostController = navHostController
@@ -277,9 +236,7 @@ fun MainGraph(
                                     }
 
                                     // 网络设置页
-                                    composable(
-                                        route = Destination.NetworkSettingScreen.route,
-                                    ) {
+                                    composable<Destination.NetworkSettingScreen> {
                                         NetworkSettingScreen(viewModel = settingViewModel)
                                     }
                                 }
@@ -287,18 +244,14 @@ fun MainGraph(
                         }
 
                         // 历史记录
-                        composable(
-                            route = Destination.HistoryScreen.route,
-                        ) {
+                        composable<Destination.HistoryScreen> {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                                 HistoryScreen()
                             }
                         }
 
                         // 本人收藏页
-                        composable(
-                            route = Destination.SelfCollectionScreen.route,
-                        ) {
+                        composable<Destination.SelfCollectionScreen> {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                                 SelfCollectionScreen()
                             }
@@ -322,11 +275,19 @@ private fun HandleDeeplink(
             val data = intent.data ?: return@LaunchedEffect
             when {
                 DestinationsDeepLink.illustRegex.matches(data.toString()) -> {
-                    navHostController.navigate("${Destination.PictureDeeplinkScreen.route}/${data.lastPathSegment}")
+                    navHostController.navigate(
+                        Destination.PictureDeeplinkScreen(
+                            data.lastPathSegment?.toLong() ?: 0
+                        )
+                    )
                 }
 
                 DestinationsDeepLink.userRegex.matches(data.toString()) -> {
-                    navHostController.navigate("${Destination.OtherProfileDetailScreen.route}/${data.lastPathSegment}")
+                    navHostController.navigate(
+                        Destination.OtherProfileDetailScreen(
+                            data.lastPathSegment?.toLong() ?: 0
+                        )
+                    )
                 }
             }
         }
@@ -339,11 +300,9 @@ private fun bottomBarVisibility(
 ): Boolean {
     var bottomBarState by rememberSaveable { mutableStateOf(false) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    bottomBarState = when (navBackStackEntry?.destination?.route) {
-        Destination.HomeScreen.route -> true
-        Destination.SearchPreviewScreen.route -> true
-        Destination.ProfileScreen.route -> true
-        else -> false
-    }
+    navController.currentDestination?.hasRoute(Destination.HomeScreen::class)
+    bottomBarState = navBackStackEntry?.destination?.hasRoute<Destination.HomeScreen>() == true ||
+            navBackStackEntry?.destination?.hasRoute<Destination.SearchPreviewScreen>() == true ||
+            navBackStackEntry?.destination?.hasRoute<Destination.ProfileScreen>() == true
     return bottomBarState
 }

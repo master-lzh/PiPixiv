@@ -14,9 +14,7 @@ fun NavHostController.navigateToPictureScreen(illust: Illust, prefix: String) {
         val koin = GlobalContext.get()
         val illustState = koin.getOrNull<IllustState>()
         illustState?.setIllust(illust.id, illust)
-        navigate(
-            route = "${Destination.PictureScreen.route}/${illust.id}?prefix=${prefix}"
-        ) {
+        navigate(Destination.PictureScreen(illust.id, prefix)) {
             restoreState = true
         }
     }.also {
@@ -25,53 +23,53 @@ fun NavHostController.navigateToPictureScreen(illust: Illust, prefix: String) {
 }
 
 fun NavHostController.navigateToSearchScreen() {
-    navigate(route = Destination.SearchScreen.route) {
+    navigate(route = Destination.SearchScreen) {
         launchSingleTop = true
     }
 }
 
 fun NavHostController.navigateToSearchResultScreen() {
-    navigate(route = Destination.SearchResultsScreen.route) {
+    navigate(route = Destination.SearchResultsScreen("")) {
         launchSingleTop = true
     }
 }
 
 fun NavHostController.navigateToOutsideSearchResultScreen(searchWord: String) {
-    navigate(route = "${Destination.SearchResultsScreen.route}/$searchWord") {
+    navigate(route = Destination.SearchResultsScreen(searchWord)) {
 
     }
 }
 
 fun NavHostController.navigateToMainScreen() {
-    navigate(route = Graph.MAIN) {
+    navigate(route = Graph.Main) {
         launchSingleTop = true
     }
 }
 
 fun NavHostController.popBackToMainScreen() {
-    popBackStack(route = Destination.HomeScreen.route, inclusive = false)
+    popBackStack(route = Destination.HomeScreen, inclusive = false)
 }
 
 fun NavHostController.navigateToSelfProfileDetailScreen() {
-    navigate(route = Destination.SelfProfileDetailScreen.route)
+    navigate(route = Destination.SelfProfileDetailScreen)
 }
 
 fun NavHostController.navigateToOtherProfileDetailScreen(userId: Long) {
-    navigate(route = "${Destination.OtherProfileDetailScreen.route}/$userId")
+    navigate(route = Destination.OtherProfileDetailScreen(userId))
 }
 
 fun NavHostController.navigateToSettingScreen() {
-    navigate(route = Destination.SettingScreen.route)
+    navigate(route = Destination.SettingScreen)
 }
 
 fun NavHostController.navigateToNetworkSettingScreen() {
-    navigate(route = Destination.NetworkSettingScreen.route)
+    navigate(route = Destination.NetworkSettingScreen)
 }
 
 fun NavHostController.navigateToHistoryScreen() {
-    navigate(route = Destination.HistoryScreen.route)
+    navigate(route = Destination.HistoryScreen)
 }
 
 fun NavHostController.navigateToSelfCollectionScreen() {
-    navigate(route = Destination.SelfCollectionScreen.route)
+    navigate(route = Destination.SelfCollectionScreen)
 }

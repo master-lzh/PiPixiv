@@ -101,6 +101,7 @@ class PictureViewModel(
     }
 }
 
+@KoinViewModel
 class PictureDeeplinkViewModel(
     illustId: Long,
     reducer: PictureReducer,
