@@ -23,6 +23,7 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
@@ -46,30 +47,26 @@ fun Project.configureAndroidCompose(
 
         dependencies {
             val bom = compose.findLibrary("bom").get()
-            add("implementation", platform(bom))
+            implementation(platform(bom))
 
-            add("implementation", androidx.findLibrary("core-ktx").get())
-            add("implementation", androidx.findBundle("lifecycle").get())
-            add("implementation", androidx.findLibrary("navigation.compose").get())
-            add("implementation", androidx.findLibrary("constraintlayout.compose").get())
-            add("implementation", androidx.findLibrary("tracing").get())
+            implementation(androidx.findLibrary("core-ktx").get())
+            implementation(androidx.findBundle("lifecycle").get())
+            implementation(androidx.findLibrary("navigation.compose").get())
+            implementation(androidx.findLibrary("tracing").get())
 
-            add("implementation", compose.findBundle("material").get())
-            add("implementation", compose.findBundle("baselibs").get())
+            implementation(compose.findBundle("material").get())
+            implementation(compose.findBundle("baselibs").get())
 
-            add("implementation", libs.findLibrary("koin.compose").get())
+            implementation(libs.findLibrary("koin.compose").get())
 
-            add("implementation", project(":data"))
-            if (commonExtension !is ApplicationExtension) {
-                add("androidTestImplementation", compose.findLibrary("ui-test-junit4").get())
-            }
+            implementation(project(":data"))
         }
     }
 
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             freeCompilerArgs.addAll(buildComposeMetricsParameters())
-            apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
+            languageVersion.set(KotlinVersion.KOTLIN_2_0)
         }
     }
 }

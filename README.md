@@ -12,7 +12,7 @@
 
 一个完全由 [Jetpack Compose](https://developer.android.com/develop/ui/compose) 编写的第三方 Pixiv 应用
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.24-blue.svg?logo=kotlin)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/master-lzh/PiPixiv/release.yml)](https://github.com/master-lzh/PiPixiv/actions/workflows/release.yml)
 [![License: Apache-2.0](https://img.shields.io/github/license/master-lzh/PiPixiv?labelColor=27303D&color=0877d2)](/LICENSE)
 
@@ -32,19 +32,19 @@
 * 搜索插图，按照人气、最新等排序。
 * 收藏插图/关注作者。
 * 查看插图详情和推荐插图。
-* 下载原始插图。
+* 长按图片下载原始插图。
 
 ### 待办事项
 
-* 翻译
-* 深度链接支持（从 https://www.pixiv.net/illust/xxxxxx 打开）
+- [x] 翻译
+- [x] 深度链接支持（从 https://www.pixiv.net/illust/xxxxxx 打开）
 * 更多...
 
 ### v1.1.0
-- [ ] 重构网络层，将OkHttp换成Ktor
-- [ ] 优化datastore
-- [ ] 将一些全局状态重构成单例模式，简化代码，便于依赖注入
-- [ ] 适配新的导航
+- [x] 重构网络层，将OkHttp换成Ktor
+- [x] 优化datastore
+- [x] 将一些全局状态重构成单例模式，简化代码，便于依赖注入
+- [x] 适配新的导航
 - [x] 设置页面
 - [x] 收藏页面
 - [ ] 关注页面

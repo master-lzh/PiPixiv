@@ -6,12 +6,11 @@
 
 # PiPixiv [App](#)
 
-### Third party Pixiv Client
+### Third-party Pixiv Client
 
-A third party Pixiv App which is entirely writen
-by [Jetpack Compose](https://developer.android.com/develop/ui/compose)
+A third-party Pixiv App entirely written by [Jetpack Compose](https://developer.android.com/develop/ui/compose)
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.23-blue.svg?logo=kotlin)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/master-lzh/PiPixiv/release.yml)](https://github.com/master-lzh/PiPixiv/actions/workflows/release.yml)
 [![License: Apache-2.0](https://img.shields.io/github/license/master-lzh/PiPixiv?labelColor=27303D&color=0877d2)](/LICENSE)
 
@@ -20,31 +19,34 @@ by [Jetpack Compose](https://developer.android.com/develop/ui/compose)
 [![GitHub Release](https://img.shields.io/github/v/release/master-lzh/PiPixiv?label=Stable)](https://github.com/master-lzh/PiPixiv/releases)
 [![GitHub downloads](https://img.shields.io/github/downloads/master-lzh/PiPixiv/total?label=downloads&labelColor=27303D&color=0D1117&logo=github&logoColor=FFFFFF&style=flat)](https://github.com/master-lzh/PiPixiv/releases)
 
-### Support **[Android 5.0]()** or higher
+### Supports **[Android 5.0]()** or higher
 
-## Feature
+## Features
 
 <div align="left">
 
-* Login with Pixiv account.
-* Home page recommended illustrations.
-* Search illustrations, sorted by popularity, newest, etc.
-* Collection of illustrations/Follow the author.
+* Log in using a Pixiv account.
+* Homepage recommended illustrations.
+* Search illustrations and sort by popularity, latest, etc.
+* Bookmark illustrations/Follow artists.
 * View illustration details and recommended illustrations.
-* Download the original illustration.
+* Long press on an image to download the original illustration.
 
-### TODO
+### To-do List
 
-* Translation
-* Deep link support (open from https://www.pixiv.net/illust/xxxxxx)
+- [x] Translation
+- [x] Deep link support (open from https://www.pixiv.net/illust/xxxxxx)
 * More...
 
 ### v1.1.0
-
-- [ ] Setting Page
-- [ ] Collection Page
-- [ ] Follow Page
-- [ ] History Page
+- [x] Refactor the network layer, replacing OkHttp with Ktor
+- [x] Optimize datastore
+- [x] Refactor some global states into a singleton pattern for code simplification and easier dependency injection
+- [x] Adapt new navigation
+- [x] Settings page
+- [x] Favourites page
+- [ ] Followed page
+- [x] History page
 
 </div>
 
@@ -59,16 +61,15 @@ by [Jetpack Compose](https://developer.android.com/develop/ui/compose)
 [![Star History](https://starchart.cc/master-lzh/PiPixiv.svg?variant=adaptive)](https://starchart.cc/master-lzh/PiPixiv)
 
 
-## Credits
+## Acknowledgments
 <div align="left">
 
-This project makes use of several open-source project:
-- **[Coil](https://github.com/coil-kt/coil)**: An image loading library for Android backed by Kotlin Coroutines
+This project uses or references several open-source projects:
+- **[Coil](https://github.com/coil-kt/coil)**: An Android image loading library supported by Kotlin Coroutines
 - **[Koin](https://github.com/InsertKoinIO/koin)**: A pragmatic lightweight dependency injection framework for Kotlin developers
-- **[Mihon](https://github.com/mihonapp/mihon)**: Discover and read manga, webtoons, comics, and more. Refer to the function of switching application language
-- **[pixez-flutter](https://github.com/Notsfsssf/pixez-flutter)**: Refer to the login implementation plan
+- **[Mihon](https://github.com/mihonapp/mihon)**: Discover and read manga, webtoons, comics, etc. Reference application language switching feature
+- **[pixez-flutter](https://github.com/Notsfsssf/pixez-flutter)**: Reference login implementation
 
 </div>
 
 </div>
-

@@ -27,6 +27,7 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
@@ -36,7 +37,7 @@ internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     commonExtension.apply {
-        compileSdk = 34
+        compileSdk = 35
 
         defaultConfig {
             minSdk = 21
@@ -59,8 +60,10 @@ internal fun Project.configureKotlinAndroid(
     val kotlinx = extensions.getByType<VersionCatalogsExtension>().named("kotlinx")
 
     dependencies {
-        add("coreLibraryDesugaring", libs.findLibrary("desugar").get())
-        add("implementation", kotlinx.findLibrary("collections-immutable").get())
+        coreLibraryDesugaring(libs.findLibrary("desugar").get())
+        implementation(kotlinx.findLibrary("collections-immutable").get())
+        // Kermit Logging
+        implementation(libs.findLibrary("kermit").get())
     }
 }
 
@@ -85,6 +88,7 @@ private fun Project.configureKotlin() {
     // Use withType to workaround https://youtrack.jetbrains.com/issue/KT-55947
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
+            languageVersion.set(KotlinVersion.KOTLIN_2_0)
             // Set JVM target to 11
             jvmTarget.set(JvmTarget.JVM_11)
             // Treat all Kotlin warnings as errors (disabled by default)
@@ -107,6 +111,7 @@ private fun Project.configureKotlin() {
                     "-opt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
                     "-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi",
                     "-opt-in=coil3.annotation.ExperimentalCoilApi",
+                    "-opt-in=kotlin.io.encoding.ExperimentalEncodingApi",
                     "-Xstring-concat=inline"
                 )
             )

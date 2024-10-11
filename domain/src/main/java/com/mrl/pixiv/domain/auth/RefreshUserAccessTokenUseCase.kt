@@ -4,14 +4,15 @@ import com.mrl.pixiv.common.coroutine.launchIO
 import com.mrl.pixiv.common.network.safeHttpCall
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.GrantType
-import com.mrl.pixiv.data.user.userInfo
 import com.mrl.pixiv.domain.SetLocalUserInfoUseCase
 import com.mrl.pixiv.domain.SetUserAccessTokenUseCase
 import com.mrl.pixiv.domain.SetUserRefreshTokenUseCase
 import com.mrl.pixiv.repository.AuthRepository
 import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single
 class RefreshUserAccessTokenUseCase(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
@@ -32,11 +33,11 @@ class RefreshUserAccessTokenUseCase(
             launchIO {
                 it.user?.let { authUser ->
                     setLocalUserInfoUseCase {
-                        userInfo {
-                            uid = authUser.id.toLongOrNull() ?: 0
-                            username = authUser.name
-                            avatar = authUser.profileImageUrls.px50X50
-                        }
+                        it.copy(
+                            uid = authUser.id.toLongOrNull() ?: 0,
+                            username = authUser.name,
+                            avatar = authUser.profileImageUrls.px50X50,
+                        )
                     }
                 }
                 setUserAccessTokenUseCase(it.accessToken)

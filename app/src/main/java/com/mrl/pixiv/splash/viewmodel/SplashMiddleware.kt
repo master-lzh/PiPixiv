@@ -3,11 +3,14 @@ package com.mrl.pixiv.splash.viewmodel
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.data.auth.GrantType
+import com.mrl.pixiv.datasource.TokenManager
 import com.mrl.pixiv.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.repository.AuthRepository
 import com.mrl.pixiv.repository.UserRepository
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Factory
 
+@Factory
 class SplashMiddleware(
     private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
     private val userRepository: UserRepository,
@@ -70,6 +73,8 @@ class SplashMiddleware(
 
     private fun isLogin() {
         launchIO {
+            // 初始化TokenManager类，触发init代码块，从本地数据源加载token
+            TokenManager.token
             if (userRepository.isLogin.first()) {
                 dispatch(SplashAction.IsNeedRefreshTokenIntent)
             } else {

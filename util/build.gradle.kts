@@ -1,6 +1,5 @@
 plugins {
     id("pixiv.android.library.compose")
-    id("pixiv.android.library")
 }
 
 android {
@@ -9,11 +8,8 @@ android {
 
 dependencies {
 
-    implementation(androidx.core.ktx)
-    implementation(androidx.appcompat)
-    implementation(libs.com.google.android.material.material)
-    implementation(libs.bundles.okhttp)
     implementation(libs.okio)
+    implementation(kotlinx.ktor.client.core)
 
     implementation(platform(libs.firebase.bom))
     api(libs.bundles.firebase)
@@ -22,7 +18,5 @@ dependencies {
     implementation(compose.foundation)
     implementation(compose.ui)
 
-    testImplementation(libs.junit.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    
 }

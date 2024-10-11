@@ -2,19 +2,20 @@ package com.mrl.pixiv.history.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Reducer
 import kotlinx.collections.immutable.toImmutableList
+import org.koin.core.annotation.Single
 
+@Single
 class HistoryReducer : Reducer<HistoryState, HistoryAction> {
-    override fun reduce(state: HistoryState, action: HistoryAction): HistoryState {
+    override fun HistoryState.reduce(action: HistoryAction): HistoryState {
         return when (action) {
-            is HistoryAction.UpdateHistory -> state.copy(
-                illusts = (state.illusts + action.illusts).toImmutableList(),
+            is HistoryAction.UpdateHistory -> copy(
+                illusts = (illusts + action.illusts).toImmutableList(),
                 illustNextUrl = action.nextUrl,
                 loading = false
             )
 
-            is HistoryAction.UpdateSearch -> state.copy(currentSearch = action.search)
-
-            else -> state
+            is HistoryAction.UpdateSearch -> copy(currentSearch = action.search)
+            else -> this
         }
     }
 }

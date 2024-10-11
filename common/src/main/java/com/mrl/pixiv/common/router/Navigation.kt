@@ -8,16 +8,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.mrl.pixiv.common.R
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 sealed class Destination(
-    val route: String,
+    @Transient
     val title: @Composable () -> String = { "" },
-    val icon: @Composable (() -> Unit)? = {},
+    @Transient
+    val icon: @Composable() (() -> Unit)? = {},
 ) {
-    data object LoginScreen : Destination(route = "login_screen")
+    @Serializable
+    data object LoginScreen : Destination()
 
+    @Serializable
     data object HomeScreen : Destination(
-        route = "home_screen",
         title = { stringResource(R.string.home) },
         icon = {
             Icon(
@@ -27,8 +32,8 @@ sealed class Destination(
         }
     )
 
+    @Serializable
     data object SearchPreviewScreen : Destination(
-        route = "search_preview_screen",
         title = { stringResource(R.string.search) },
         icon = {
             Icon(
@@ -38,8 +43,8 @@ sealed class Destination(
         }
     )
 
+    @Serializable
     data object ProfileScreen : Destination(
-        route = "profile_screen",
         title = { stringResource(R.string.my) },
         icon = {
             Icon(
@@ -49,32 +54,42 @@ sealed class Destination(
         }
     )
 
-    data object SelfProfileDetailScreen : Destination(route = "self_profile_detail_screen")
+    @Serializable
+    data object SelfProfileDetailScreen : Destination()
 
-    data object OtherProfileDetailScreen : Destination(route = "other_profile_detail_screen") {
-        const val userId = "userId"
-    }
+    @Serializable
+    data class OtherProfileDetailScreen(
+        val userId: Long,
+    ) : Destination()
 
-    data object PictureScreen : Destination(route = "picture_screen") {
-        const val illustId = "illustId"
-        const val prefix = "prefix"
-    }
+    @Serializable
+    data class PictureScreen(
+        val illustId: Long,
+        val prefix: String,
+    ) : Destination()
 
-    data object PictureDeeplinkScreen : Destination(route = "picture_deeplink_screen") {
-        const val illustId = "illustId"
-    }
+    @Serializable
+    data class PictureDeeplinkScreen(
+        val illustId: Long,
+    ) : Destination()
 
-    data object SearchScreen : Destination(route = "search_screen")
+    @Serializable
+    data object SearchScreen : Destination()
 
-    data object SearchResultsScreen : Destination(route = "search_results_screen") {
-        const val searchWord = "search_keyword"
-    }
+    @Serializable
+    data class SearchResultsScreen(
+        val searchWords: String,
+    ) : Destination()
 
-    data object SettingScreen : Destination(route = "setting_screen")
+    @Serializable
+    data object SettingScreen : Destination()
 
-    data object NetworkSettingScreen : Destination(route = "network_setting_screen")
+    @Serializable
+    data object NetworkSettingScreen : Destination()
 
-    data object HistoryScreen : Destination(route = "history_screen")
+    @Serializable
+    data object HistoryScreen : Destination()
 
-    data object SelfCollectionScreen : Destination(route = "self_collection_screen")
+    @Serializable
+    data object SelfCollectionScreen : Destination()
 }

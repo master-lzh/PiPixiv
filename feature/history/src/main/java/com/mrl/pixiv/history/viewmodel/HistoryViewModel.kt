@@ -6,6 +6,7 @@ import com.mrl.pixiv.common.viewmodel.State
 import com.mrl.pixiv.data.Illust
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import org.koin.android.annotation.KoinViewModel
 
 data class HistoryState(
     val loading: Boolean,
@@ -30,7 +31,7 @@ sealed class HistoryAction : Action {
     data class UpdateSearch(val search: String) : HistoryAction()
 }
 
-
+@KoinViewModel
 class HistoryViewModel(
     reducer: HistoryReducer,
     middleware: HistoryMiddleware,

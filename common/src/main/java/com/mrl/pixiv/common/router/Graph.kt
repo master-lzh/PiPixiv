@@ -1,7 +1,13 @@
 package com.mrl.pixiv.common.router
 
-object Graph {
-    const val ROOT = "root"
-    const val MAIN = "main"
-    const val SEARCH = "search"
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed class Graph {
+    @Serializable
+    data object Root : Graph()
+    @Serializable
+    data object Main : Graph()
+    @Serializable
+    data object Search : Graph()
 }

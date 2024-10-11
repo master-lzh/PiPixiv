@@ -1,5 +1,4 @@
 plugins {
-    id("pixiv.android.application.compose")
     id("pixiv.android.application")
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
@@ -15,8 +14,8 @@ android {
 
     defaultConfig {
         applicationId = "com.mrl.pixiv"
-        versionCode = 108
-        versionName = "1.0.8"
+        versionCode = 109
+        versionName = "1.0.9"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -44,6 +43,7 @@ android {
         }
         debug {
             isMinifyEnabled = false
+            versionNameSuffix = "-debug"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -66,14 +66,13 @@ android {
 
 dependencies {
     implementation(project(":common"))
+    implementation(project(":common-ui"))
     implementation(project(":util"))
     implementation(project(":repository"))
     implementation(project(":datasource"))
     implementation(project(":network"))
-    implementation(project(":api"))
     implementation(project(":data"))
     implementation(project(":domain"))
-    implementation(project(":common-middleware"))
 
     file("../feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
         // 使用目录名称构建模块路径
@@ -84,19 +83,25 @@ dependencies {
 
 
     implementation(compose.bundles.accompanist)
+    implementation(compose.ui.text)
     implementation(androidx.activity.compose)
-    implementation(androidx.appcompat)
     implementation(androidx.splashscreen)
     implementation(androidx.datastore)
     implementation(androidx.datastore.preferences)
     implementation(androidx.profileinstaller)
     implementation(kotlinx.bundles.serialization)
     implementation(kotlinx.bundles.coroutines)
+    implementation(kotlinx.bundles.ktor)
+    implementation(kotlinx.datetime)
 
-    implementation(libs.bundles.coil)
-    implementation(libs.retrofit2)
+    implementation(libs.bundles.coil3)
+    implementation(libs.google.material)
+    implementation(libs.koin)
+    implementation(libs.bundles.coil3)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
-    "baselineProfile"(project(":baselineprofile"))
+
+    baselineProfile(project(":baselineprofile"))
+    ksp(libs.koin.ksp.compiler)
 }
