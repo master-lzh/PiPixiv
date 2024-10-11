@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
@@ -64,22 +63,16 @@ fun RecommendGrid(
             }
         }
 
-        when (recommendImageList.loadState.append) {
-            is LoadState.Loading -> { // Pagination Loading UI
-                items(LOADING_ITEM_COUNT) {
-                    RecommendSkeleton(size = width)
-                }
-            }
-
-            else -> {}
-        }
-
-//        if (recommendImageList.isNotEmpty()) {
-//            itemsIndexed(
-//                List(LOADING_ITEM_COUNT) { 0 },
-//                key = { index, _ -> "loading-$index" }) { _, _ ->
-//                RecommendSkeleton(size = width)
+//        when (recommendImageList.loadState.append) {
+//            is LoadState.Loading -> { // Pagination Loading UI
+//                itemsIndexed(
+//                    List(LOADING_ITEM_COUNT) { 0 },
+//                    key = { index, _ -> "loading-$index" }) { _, _ ->
+//                    RecommendSkeleton(size = width)
+//                }
 //            }
+//
+//            else -> {}
 //        }
     }
 }
