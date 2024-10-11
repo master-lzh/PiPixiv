@@ -11,7 +11,5 @@ dependencies {
     implementation(project(":repository"))
     implementation(project(":domain"))
 
-
-
-    
+    implementation(androidx.bundles.paging)
 }

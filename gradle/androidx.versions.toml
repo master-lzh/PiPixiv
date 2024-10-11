@@ -11,6 +11,7 @@ splashscreen = "1.0.1"
 profileinstaller = "1.4.1"
 navigation = "2.8.2"
 datastore = "1.1.1"
+paging = "3.3.2"
 
 [libraries]
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -36,6 +37,9 @@ navigation-compose = { module = "androidx.navigation:navigation-compose", versio
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
+paging = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
@@ -45,4 +49,5 @@ baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprof
 
 [bundles]
 lifecycle = ["lifecycle-common", "lifecycle-process", "lifecycle-runtime-compose", "lifecycle-viewmodel-compose"]
+paging = ["paging", "paging-compose"]
 workmanager = ["work-runtime", "guava"]

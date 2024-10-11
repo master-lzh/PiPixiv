@@ -31,48 +31,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.data.Filter
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.data.illust.IllustRecommendedQuery
 import com.mrl.pixiv.home.components.HomeContent
 import com.mrl.pixiv.home.components.HomeTopBar
 import com.mrl.pixiv.home.viewmodel.HomeAction
-import com.mrl.pixiv.home.viewmodel.HomeState
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.util.AppUtil
-import com.mrl.pixiv.util.queryParams
 import com.mrl.pixiv.util.throttleClick
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import kotlin.time.Duration.Companion.seconds
-
-val initRecommendedQuery = IllustRecommendedQuery(
-    filter = Filter.ANDROID.value,
-    includeRankingIllusts = true,
-    includePrivacyPolicy = true
-)
-const val TAG = "HomeScreen"
-fun HomeViewModel.onRefresh() {
-    dispatch(
-        HomeAction.RefreshIllustRecommendedIntent(initRecommendedQuery)
-    )
-}
-
-fun HomeViewModel.onScrollToBottom() {
-    dispatch(
-        HomeAction.LoadMoreIllustRecommendedIntent(
-            queryMap = state().nextUrl.queryParams
-        )
-    )
-}
 
 
 internal enum class HomeSnackbar(val actionLabel: String) {
@@ -86,12 +63,23 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = koinViewModel(),
 ) {
     OnLifecycle(lifecycleEvent = Lifecycle.Event.ON_CREATE, onLifecycle = homeViewModel::onCreate)
+    val context = LocalContext.current
+    val recommendImageList = homeViewModel.recommendImageList.collectAsLazyPagingItems()
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit) {
+        homeViewModel.exception.collect {
+            it?.let {
+                snackbarHostState.showSnackbar(
+                    it.message ?: context.getString(R.string.unknown_error)
+                )
+            }
+        }
+    }
     HomeScreen(
         modifier = modifier,
-        state = homeViewModel.state,
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        onRefresh = homeViewModel::onRefresh,
-        onScrollToBottom = homeViewModel::onScrollToBottom,
+        onRefresh = recommendImageList::refresh,
+        recommendImageList = recommendImageList,
         dispatch = homeViewModel::dispatch,
     )
 }
@@ -100,10 +88,9 @@ fun HomeScreen(
 @Composable
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
-    state: HomeState,
     navToPictureScreen: (Illust, String) -> Unit,
     onRefresh: () -> Unit,
-    onScrollToBottom: () -> Unit,
+    recommendImageList: LazyPagingItems<Illust>,
     dispatch: (HomeAction) -> Unit = {},
     bookmarkState: BookmarkState = koinInject(),
 ) {
@@ -128,18 +115,10 @@ internal fun HomeScreen(
             }
         }
     }
-    LaunchedEffect(state.isRefresh) {
-        if (state.isRefresh) {
-            pullRefreshState.animateToThreshold()
-        }
-    }
-    LaunchedEffect(state.exception) {
-        if (state.exception != null) {
-            scope.launch {
-                snackBarHostState.showSnackbar(
-                    state.exception.message ?: context.getString(R.string.unknown_error)
-                )
-            }
+    LaunchedEffect(recommendImageList.loadState.refresh) {
+        when (recommendImageList.loadState.refresh) {
+            is LoadState.Loading -> pullRefreshState.animateToThreshold()
+            else -> pullRefreshState.animateToHidden()
         }
     }
 
@@ -151,13 +130,7 @@ internal fun HomeScreen(
                 actions = {
                     HomeTopBar(
                         onRefreshToken = { dispatch(HomeAction.RefreshTokenIntent) },
-                        onRefresh = {
-                            dispatch(
-                                HomeAction.RefreshIllustRecommendedIntent(
-                                    initRecommendedQuery
-                                )
-                            )
-                        }
+                        onRefresh = onRefresh
                     )
                 }
             )
@@ -193,7 +166,7 @@ internal fun HomeScreen(
             }
         },
         floatingActionButton = {
-            if (state.recommendImageList.isNotEmpty()) {
+            if (recommendImageList.itemCount > 0) {
                 FloatingActionButton(
                     modifier = Modifier,
 //                        .offset { offsetAnimation },
@@ -213,7 +186,7 @@ internal fun HomeScreen(
         }
     ) {
         PullToRefreshBox(
-            isRefreshing = state.isRefresh,
+            isRefreshing = recommendImageList.loadState.refresh is LoadState.Loading,
             onRefresh = onRefresh,
             modifier = Modifier.padding(it),
             state = pullRefreshState
@@ -222,18 +195,10 @@ internal fun HomeScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 HomeContent(
+                    recommendImageList = recommendImageList,
                     navToPictureScreen = navToPictureScreen,
-                    state = state,
                     bookmarkState = bookmarkState,
                     lazyStaggeredGridState = lazyStaggeredGridState,
-                    dismissRefresh = {
-                        scope.launch {
-                            lazyStaggeredGridState.scrollToItem(0)
-                            delay(1.seconds)
-                            dispatch(HomeAction.DismissLoading)
-                        }
-                    },
-                    onScrollToBottom = onScrollToBottom
                 )
             }
         }
