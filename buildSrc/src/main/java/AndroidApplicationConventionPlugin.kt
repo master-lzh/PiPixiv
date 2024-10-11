@@ -15,6 +15,7 @@
  */
 
 import com.android.build.api.dsl.ApplicationExtension
+import com.mrl.pixiv.buildsrc.configureAndroidCompose
 import com.mrl.pixiv.buildsrc.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -26,11 +27,14 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
+                apply("org.jetbrains.kotlin.plugin.compose")
+                apply("com.google.devtools.ksp")
             }
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 34
+                configureAndroidCompose(this)
+                defaultConfig.targetSdk = 35
             }
         }
     }

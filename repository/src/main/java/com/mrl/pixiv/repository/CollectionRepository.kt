@@ -3,10 +3,12 @@ package com.mrl.pixiv.repository
 import com.mrl.pixiv.data.user.UserBookmarkTagsQuery
 import com.mrl.pixiv.data.user.UserBookmarksIllustQuery
 import com.mrl.pixiv.data.user.UserBookmarksNovelQuery
-import com.mrl.pixiv.datasource.local.UserInfoDataSource
+import com.mrl.pixiv.datasource.local.datastore.UserInfoDataSource
 import com.mrl.pixiv.datasource.remote.UserHttpService
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single
 class CollectionRepository(
     private val userHttpService: UserHttpService,
     private val userInfoDataSource: UserInfoDataSource

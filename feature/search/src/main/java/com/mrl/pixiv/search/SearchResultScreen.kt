@@ -45,66 +45,58 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common_ui.illust.IllustGrid
-import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
+import com.mrl.pixiv.common.ui.illust.IllustGrid
+import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.search.SearchSort
 import com.mrl.pixiv.data.search.SearchTarget
-import com.mrl.pixiv.search.viewmodel.SearchAction
-import com.mrl.pixiv.search.viewmodel.SearchState
-import com.mrl.pixiv.search.viewmodel.SearchViewModel
+import com.mrl.pixiv.search.viewmodel.result.SearchResultAction
+import com.mrl.pixiv.search.viewmodel.result.SearchResultState
+import com.mrl.pixiv.search.viewmodel.result.SearchResultViewModel
 import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun SearchResultScreen(
+    searchWords: String,
     modifier: Modifier = Modifier,
     searchNavHostController: NavHostController = LocalNavigator.currentOrThrow,
-    bookmarkViewModel: BookmarkViewModel,
-    searchViewModel: SearchViewModel = koinViewModel(),
+    searchResultViewModel: SearchResultViewModel = koinViewModel { parametersOf(searchWords) },
     navHostController: NavHostController,
 ) {
     SearchResultScreen_(
         modifier = modifier,
-        state = searchViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
+        state = searchResultViewModel.state,
         popBack = searchNavHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
-        dispatch = searchViewModel::dispatch,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
+        dispatch = searchResultViewModel::dispatch,
     )
 }
 
 @Composable
 fun OutsideSearchResultsScreen(
+    searchWords: String,
     modifier: Modifier = Modifier,
-    searchWord: String,
-    bookmarkViewModel: BookmarkViewModel,
-    searchViewModel: SearchViewModel = koinViewModel(),
+    searchResultViewModel: SearchResultViewModel = koinViewModel { parametersOf(searchWords) },
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
-    val currentSearch by remember { mutableStateOf(searchWord) }
+    val currentSearch by remember { mutableStateOf(searchWords) }
     LaunchedEffect(currentSearch) {
-        searchViewModel.dispatch(SearchAction.UpdateSearchWords(currentSearch))
-        searchViewModel.dispatch(SearchAction.SearchIllust(searchWords = currentSearch))
+        searchResultViewModel.dispatch(SearchResultAction.SearchIllust(searchWords = currentSearch))
     }
     SearchResultScreen_(
         modifier = modifier,
-        state = searchViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
+        state = searchResultViewModel.state,
         popBack = navHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
-        dispatch = searchViewModel::dispatch,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
+        dispatch = searchResultViewModel::dispatch,
     )
 }
 
@@ -117,12 +109,10 @@ fun OutsideSearchResultsScreen(
 @Composable
 internal fun SearchResultScreen_(
     modifier: Modifier = Modifier,
-    state: SearchState = SearchState.INITIAL,
+    state: SearchResultState = SearchResultState.INITIAL,
     popBack: () -> Unit = {},
     naviToPic: (Illust, String) -> Unit = { _, _ -> },
-    dispatch: (SearchAction) -> Unit = {},
-    bookmarkDispatch: (BookmarkAction) -> Unit = {},
-    bookmarkState: BookmarkState = BookmarkState.INITIAL,
+    dispatch: (SearchResultAction) -> Unit = {},
 ) {
     val showBottomSheet = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -171,25 +161,23 @@ internal fun SearchResultScreen_(
     ) {
         PullToRefreshBox(
             isRefreshing = state.refreshing,
-            onRefresh = { dispatch(SearchAction.SearchIllust(state.searchWords)) },
+            onRefresh = { dispatch(SearchResultAction.SearchIllust(state.searchWords)) },
             modifier = modifier.padding(it),
         ) {
             IllustGrid(
+                illusts = state.searchResults,
+                spanCount = spanCount,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 8.dp),
-                illusts = state.searchResults,
-                bookmarkState = bookmarkState,
-                dispatch = bookmarkDispatch,
-                spanCount = spanCount,
                 navToPictureScreen = naviToPic,
-                loading = state.loading,
                 canLoadMore = state.nextUrl != null,
                 onLoadMore = {
                     if (state.nextUrl != null) {
-                        dispatch(SearchAction.SearchIllustNext(state.nextUrl))
+                        dispatch(SearchResultAction.SearchIllustNext(state.nextUrl))
                     }
-                }
+                },
+                loading = state.loading
             )
         }
 
@@ -205,8 +193,8 @@ private fun FilterBottomSheet(
     showBottomSheet: MutableState<Boolean>,
     launch: (suspend CoroutineScope.() -> Unit) -> Job,
     bottomSheetState: SheetState,
-    state: SearchState,
-    dispatch: (SearchAction) -> Unit,
+    state: SearchResultState,
+    dispatch: (SearchResultAction) -> Unit,
 ) {
     val context = LocalContext.current
     ModalBottomSheet(
@@ -244,9 +232,9 @@ private fun FilterBottomSheet(
             Text(
                 text = stringResource(R.string.apply),
                 modifier = Modifier.throttleClick {
-                    dispatch(SearchAction.ClearSearchResult)
+//                    dispatch(SearchResultAction.ClearSearchResult)
                     dispatch(
-                        SearchAction.SearchIllust(searchWords = state.searchWords)
+                        SearchResultAction.SearchIllust(searchWords = state.searchWords)
                     )
                     showBottomSheet.value = false
                     launch { bottomSheetState.hide() }
@@ -260,7 +248,7 @@ private fun FilterBottomSheet(
                     onClick = {
                         selectedTargetIndex = searchTargetMap.keys.indexOf(key)
                         dispatch(
-                            SearchAction.UpdateFilter(
+                            SearchResultAction.UpdateFilter(
                                 filter.copy(searchTarget = key)
                             )
                         )
@@ -283,7 +271,7 @@ private fun FilterBottomSheet(
                     onClick = {
                         selectedSortIndex = searchSortMap.keys.indexOf(key)
                         dispatch(
-                            SearchAction.UpdateFilter(
+                            SearchResultAction.UpdateFilter(
                                 filter.copy(sort = key)
                             )
                         )

@@ -20,10 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
-import com.mrl.pixiv.common_ui.item.SquareIllustItem
+import com.mrl.pixiv.common.ui.item.SquareIllustItem
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
+import org.koin.compose.koinInject
 
 private const val SPAN_COUNT = 3
 private const val MAX_SHOW_ILLUST_COUNT = 6
@@ -33,10 +33,9 @@ private const val MAX_SHOW_ILLUST_COUNT = 6
 fun IllustWidget(
     title: String,
     endText: String,
-    bookmarkState: BookmarkState,
-    bookmarkDispatch: (BookmarkAction) -> Unit,
     navToPictureScreen: (Illust, String) -> Unit,
     illusts: List<Illust>,
+    bookmarkState: BookmarkState = koinInject(),
 ) {
     val horizontalPadding = 16.dp
     Column(
@@ -76,10 +75,17 @@ fun IllustWidget(
         ) {
             illusts.take(MAX_SHOW_ILLUST_COUNT).forEach {
                 val illust = it
+                val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
                 SquareIllustItem(
                     illust = illust,
-                    bookmarkState = bookmarkState,
-                    dispatch = bookmarkDispatch,
+                    isBookmarked = isBookmarked,
+                    onBookmarkClick = { restrict: String, tags: List<String>? ->
+                        if (isBookmarked) {
+                            bookmarkState.deleteBookmarkIllust(illust.id)
+                        } else {
+                            bookmarkState.bookmarkIllust(illust.id, restrict, tags)
+                        }
+                    },
                     spanCount = SPAN_COUNT,
                     horizontalPadding = horizontalPadding,
                     navToPictureScreen = navToPictureScreen,

@@ -2,7 +2,9 @@ package com.mrl.pixiv.history.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Middleware
 import com.mrl.pixiv.repository.HistoryRepository
+import org.koin.core.annotation.Factory
 
+@Factory
 class HistoryMiddleware(
     private val historyRepository: HistoryRepository
 ) : Middleware<HistoryState, HistoryAction>() {

@@ -41,15 +41,12 @@ import com.mrl.pixiv.collection.components.FilterDialog
 import com.mrl.pixiv.collection.viewmodel.CollectionAction
 import com.mrl.pixiv.collection.viewmodel.CollectionState
 import com.mrl.pixiv.collection.viewmodel.CollectionViewModel
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
+import com.mrl.pixiv.common.ui.illust.IllustGrid
 import com.mrl.pixiv.common.ui.lightBlue
-import com.mrl.pixiv.common_ui.illust.IllustGrid
-import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
+import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.data.Restrict
 import kotlinx.coroutines.launch
@@ -59,16 +56,13 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun SelfCollectionScreen(
     modifier: Modifier = Modifier,
-    bookmarkViewModel: BookmarkViewModel,
     collectionViewModel: CollectionViewModel = koinViewModel { parametersOf(Long.MIN_VALUE) },
     navHostController: NavHostController = LocalNavigator.currentOrThrow
 ) {
     CollectionScreen_(
         modifier = modifier,
         state = collectionViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
         dispatch = collectionViewModel::dispatch,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
         popBack = { navHostController.popBackStack() },
         navToPictureScreen = navHostController::navigateToPictureScreen
     )
@@ -79,9 +73,7 @@ fun SelfCollectionScreen(
 fun CollectionScreen_(
     modifier: Modifier = Modifier,
     state: CollectionState = CollectionState.INITIAL,
-    bookmarkState: BookmarkState = BookmarkState.INITIAL,
     dispatch: (CollectionAction) -> Unit = {},
-    bookmarkDispatch: (BookmarkAction) -> Unit = {},
     popBack: () -> Unit = {},
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> }
 ) {
@@ -122,14 +114,12 @@ fun CollectionScreen_(
             state = pullRefreshState
         ) {
             IllustGrid(
+                illusts = state.userBookmarksIllusts,
+                spanCount = 2,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 8.dp),
                 lazyGridState = lazyGridState,
-                illusts = state.userBookmarksIllusts,
-                bookmarkState = bookmarkState,
-                dispatch = bookmarkDispatch,
-                spanCount = 2,
                 navToPictureScreen = navToPictureScreen,
                 canLoadMore = state.illustNextUrl != null,
                 onLoadMore = {

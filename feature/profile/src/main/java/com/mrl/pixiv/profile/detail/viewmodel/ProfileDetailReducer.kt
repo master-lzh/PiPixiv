@@ -2,18 +2,19 @@ package com.mrl.pixiv.profile.detail.viewmodel
 
 import com.mrl.pixiv.common.viewmodel.Reducer
 import kotlinx.collections.immutable.toImmutableList
+import org.koin.core.annotation.Single
 
+@Single
 class ProfileDetailReducer : Reducer<ProfileDetailState, ProfileDetailAction> {
-    override fun reduce(
-        state: ProfileDetailState,
+    override fun ProfileDetailState.reduce(
         action: ProfileDetailAction
     ): ProfileDetailState {
         return when (action) {
-            is ProfileDetailAction.UpdateUserInfo -> state.copy(userInfo = action.userInfo)
-            is ProfileDetailAction.UpdateUserBookmarksIllusts -> state.copy(userBookmarksIllusts = action.illusts.toImmutableList())
-            is ProfileDetailAction.UpdateUserBookmarksNovels -> state.copy(userBookmarksNovels = action.novels.toImmutableList())
-            is ProfileDetailAction.UpdateUserIllusts -> state.copy(userIllusts = action.illusts.toImmutableList())
-            else -> state
+            is ProfileDetailAction.UpdateUserInfo -> copy(userInfo = action.userInfo)
+            is ProfileDetailAction.UpdateUserBookmarksIllusts -> copy(userBookmarksIllusts = action.illusts.toImmutableList())
+            is ProfileDetailAction.UpdateUserBookmarksNovels -> copy(userBookmarksNovels = action.novels.toImmutableList())
+            is ProfileDetailAction.UpdateUserIllusts -> copy(userIllusts = action.illusts.toImmutableList())
+            else -> this
         }
     }
 }

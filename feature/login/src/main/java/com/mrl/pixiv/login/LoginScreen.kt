@@ -2,7 +2,7 @@ package com.mrl.pixiv.login
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Base64
+import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -30,15 +30,16 @@ import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
-import com.mrl.pixiv.common.middleware.auth.AuthAction
-import com.mrl.pixiv.common.middleware.auth.AuthState
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
+import com.mrl.pixiv.login.viewmodel.LoginAction
+import com.mrl.pixiv.login.viewmodel.LoginState
 import com.mrl.pixiv.login.viewmodel.LoginViewModel
+import okio.ByteString.Companion.toByteString
 import org.koin.androidx.compose.koinViewModel
-import java.security.MessageDigest
+import kotlin.io.encoding.Base64
 import kotlin.random.Random
 
 private var codeVerifier = getCodeVer()
@@ -53,9 +54,8 @@ private fun getCodeVer(): String {
 }
 
 private fun getCodeChallenge(): String {
-    return Base64.encodeToString(
-        MessageDigest.getInstance("SHA-256").digest(codeVerifier.toByteArray(Charsets.US_ASCII)),
-        Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
+    return Base64.UrlSafe.encode(
+        getCodeVer().toByteArray(Charsets.UTF_8).toByteString().sha256().toByteArray(),
     ).replace("=", "")
 }
 
@@ -66,10 +66,10 @@ fun generateWebViewUrl(create: Boolean) =
         "https://app-api.pixiv.net/web/v1/login?code_challenge=${getCodeChallenge()}&code_challenge_method=S256&client=pixiv-android"
     }
 
-private fun checkUri(dispatch: (AuthAction) -> Unit, uri: Uri): Boolean {
+private fun checkUri(dispatch: (LoginAction) -> Unit, uri: Uri): Boolean {
     if (uri.scheme == "pixiv" && uri.host == "account") {
         val code = uri.getQueryParameter("code")
-        code?.let { dispatch(AuthAction.Login(code, codeVerifier)) }
+        code?.let { dispatch(LoginAction.Login(code, codeVerifier)) }
         return true
     }
     return false
@@ -87,7 +87,7 @@ fun LoginScreen(
         state = loginViewModel.state,
         navToMainGraph = {
             navHostController.popBackStack()
-            navHostController.navigate(Graph.MAIN)
+            navHostController.navigate(Graph.Main)
         },
         dispatch = loginViewModel::dispatch,
     )
@@ -98,9 +98,9 @@ fun LoginScreen(
 @Composable
 internal fun LoginScreen(
     modifier: Modifier = Modifier,
-    state: AuthState,
+    state: LoginState,
     navToMainGraph: () -> Unit = {},
-    dispatch: (AuthAction) -> Unit,
+    dispatch: (LoginAction) -> Unit,
 ) {
     var currUrl by rememberSaveable { mutableStateOf(generateWebViewUrl(true)) }
     LaunchedEffect(state.isLogin) {
@@ -117,13 +117,11 @@ internal fun LoginScreen(
                 title = {},
                 actions = {
                     Button(onClick = {
-                        getCodeVer()
                         currUrl = generateWebViewUrl(false)
                     }) {
                         Text(text = stringResource(R.string.sign_in))
                     }
                     Button(onClick = {
-                        getCodeVer()
                         currUrl = generateWebViewUrl(true)
                     }) {
                         Text(text = stringResource(R.string.sign_up))
@@ -159,6 +157,7 @@ internal fun LoginScreen(
                     view: WebView?,
                     request: WebResourceRequest?
                 ): Boolean {
+                    Log.d("LoginScreen", "shouldOverrideUrlLoading: ${request?.url}")
                     if (checkUri(dispatch, request?.url!!)) {
                         return true
                     }

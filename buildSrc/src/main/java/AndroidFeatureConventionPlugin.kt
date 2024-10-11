@@ -14,6 +14,9 @@
  *   limitations under the License.
  */
 
+import com.mrl.pixiv.buildsrc.androidTestImplementation
+import com.mrl.pixiv.buildsrc.implementation
+import com.mrl.pixiv.buildsrc.testImplementation
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
@@ -25,7 +28,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply {
-                apply("pixiv.android.library")
+                apply("pixiv.android.library.compose")
 //                apply("pixiv.android.hilt")
             }
 
@@ -35,30 +38,24 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
             val compose = extensions.getByType<VersionCatalogsExtension>().named("compose")
 
             dependencies {
-                add("implementation", project(":common"))
-                add("implementation", project(":util"))
-                add("implementation", project(":common-ui"))
-                add("implementation", project(":common-middleware"))
-                add("implementation", project(":repository"))
-//                add("implementation", project(":core:designsystem"))
-//                add("implementation", project(":core:data"))
-//                add("implementation", project(":core:common"))
-//                add("implementation", project(":core:domain"))
-//                add("implementation", project(":core:analytics"))
+                implementation(project(":common"))
+                implementation(project(":util"))
+                implementation(project(":common-ui"))
+                implementation(project(":repository"))
 
-                add("testImplementation", kotlin("test"))
-                add("androidTestImplementation", kotlin("test"))
+                testImplementation(kotlin("test"))
+                androidTestImplementation(kotlin("test"))
 
-                add("implementation", libs.findBundle("coil").get())
-                add("implementation", libs.findLibrary("koin").get())
+                implementation(libs.findBundle("coil3").get())
+                implementation(libs.findLibrary("koin").get())
 
-                add("implementation", androidx.findBundle("lifecycle").get())
+                implementation(androidx.findBundle("lifecycle").get())
 
-                add("implementation", kotlinx.findBundle("coroutines").get())
-                add("implementation", kotlinx.findBundle("serialization").get())
-                add("implementation", kotlinx.findLibrary("reflect").get())
+                implementation(kotlinx.findBundle("coroutines").get())
+                implementation(kotlinx.findBundle("serialization").get())
+                implementation(kotlinx.findLibrary("reflect").get())
 
-                add("implementation", compose.findBundle("accompanist").get())
+                implementation(compose.findBundle("accompanist").get())
             }
         }
     }

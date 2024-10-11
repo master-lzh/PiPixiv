@@ -55,6 +55,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -92,35 +93,37 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import coil.Coil
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.SingletonImageLoader
+import coil3.asDrawable
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkAction
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkState
-import com.mrl.pixiv.common.middleware.bookmark.BookmarkViewModel
-import com.mrl.pixiv.common.middleware.follow.FollowAction
-import com.mrl.pixiv.common.middleware.follow.FollowState
-import com.mrl.pixiv.common.middleware.follow.FollowViewModel
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.deepBlue
-import com.mrl.pixiv.common_ui.item.SquareIllustItem
-import com.mrl.pixiv.common_ui.util.navigateToOtherProfileDetailScreen
-import com.mrl.pixiv.common_ui.util.navigateToOutsideSearchResultScreen
-import com.mrl.pixiv.common_ui.util.navigateToPictureScreen
-import com.mrl.pixiv.common_ui.util.popBackToMainScreen
+import com.mrl.pixiv.common.ui.item.SquareIllustItem
+import com.mrl.pixiv.common.util.navigateToOtherProfileDetailScreen
+import com.mrl.pixiv.common.util.navigateToOutsideSearchResultScreen
+import com.mrl.pixiv.common.util.navigateToPictureScreen
+import com.mrl.pixiv.common.util.popBackToMainScreen
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
+import com.mrl.pixiv.common.viewmodel.follow.FollowState
+import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import com.mrl.pixiv.data.Illust
+import com.mrl.pixiv.data.Restrict
 import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.picture.components.UgoiraPlayer
 import com.mrl.pixiv.picture.viewmodel.PictureAction
@@ -128,6 +131,7 @@ import com.mrl.pixiv.picture.viewmodel.PictureDeeplinkViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import com.mrl.pixiv.util.AppUtil
+import com.mrl.pixiv.util.AppUtil.getString
 import com.mrl.pixiv.util.DOWNLOAD_DIR
 import com.mrl.pixiv.util.OnScrollToBottom
 import com.mrl.pixiv.util.PictureType
@@ -142,32 +146,50 @@ import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.util.UUID
 
-
 @Composable
 fun PictureScreen(
+    illustId: Long,
+    modifier: Modifier = Modifier,
+    illustState: IllustState = koinInject(),
+) {
+    val illust = illustState.illusts[illustId]
+    if (illust != null) {
+        PictureScreen(
+            modifier = modifier,
+            illust = illust,
+        )
+    } else {
+        PictureDeeplinkScreen(
+            illustId = illustId,
+        )
+    }
+}
+
+@Composable
+internal fun PictureScreen(
     modifier: Modifier = Modifier,
     illust: Illust,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
-    bookmarkViewModel: BookmarkViewModel,
-    followViewModel: FollowViewModel,
 ) {
     OnLifecycle(onLifecycle = pictureViewModel::onCreate)
+    val exception = pictureViewModel.exception.collectAsStateWithLifecycle(
+        initialValue = null,
+        lifecycle = LocalLifecycleOwner.current.lifecycle,
+    ).value
     PictureScreen(
-        modifier = modifier,
         state = pictureViewModel.state,
-        bookmarkState = bookmarkViewModel.state,
-        followState = followViewModel.state,
+        exception = exception,
         illust = illust,
+        modifier = modifier,
         navToPictureScreen = navHostController::navigateToPictureScreen,
         popBackStack = navHostController::popBackStack,
         dispatch = pictureViewModel::dispatch,
-        bookmarkDispatch = bookmarkViewModel::dispatch,
-        followDispatch = followViewModel::dispatch,
         navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
         popBackToHomeScreen = navHostController::popBackToMainScreen,
         navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
@@ -175,27 +197,26 @@ fun PictureScreen(
 }
 
 @Composable
-fun PictureDeeplinkScreen(
+internal fun PictureDeeplinkScreen(
     modifier: Modifier = Modifier,
     illustId: Long,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     pictureViewModel: PictureDeeplinkViewModel = koinViewModel { parametersOf(illustId) },
-    bookmarkViewModel: BookmarkViewModel,
-    followViewModel: FollowViewModel,
 ) {
     val illust = pictureViewModel.state.illust
+    val exception = pictureViewModel.exception.collectAsStateWithLifecycle(
+        initialValue = null,
+        lifecycle = LocalLifecycleOwner.current.lifecycle,
+    ).value
     if (illust != null) {
         PictureScreen(
-            modifier = modifier,
             state = pictureViewModel.state,
-            bookmarkState = bookmarkViewModel.state,
-            followState = followViewModel.state,
+            exception = exception,
             illust = illust,
+            modifier = modifier,
             navToPictureScreen = navHostController::navigateToPictureScreen,
             popBackStack = navHostController::popBackStack,
             dispatch = pictureViewModel::dispatch,
-            bookmarkDispatch = bookmarkViewModel::dispatch,
-            followDispatch = followViewModel::dispatch,
             navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
             popBackToHomeScreen = navHostController::popBackToMainScreen,
             navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
@@ -216,15 +237,14 @@ fun PictureDeeplinkScreen(
 @Composable
 internal fun PictureScreen(
     state: PictureState,
-    bookmarkState: BookmarkState,
-    followState: FollowState,
+    exception: Throwable?,
     illust: Illust,
     modifier: Modifier = Modifier,
+    bookmarkState: BookmarkState = koinInject(),
+    followState: FollowState = koinInject(),
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
-    bookmarkDispatch: (BookmarkAction) -> Unit = {},
-    followDispatch: (FollowAction) -> Unit = {},
     navToSearchResultScreen: (String) -> Unit = {},
     popBackToHomeScreen: () -> Unit = {},
     navToUserDetailScreen: (Long) -> Unit = {},
@@ -262,7 +282,15 @@ internal fun PictureScreen(
     val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
     val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
 
-    val isFollowed = followState.followStatus[illust.user.id] ?: false
+    val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
+    val onBookmarkClick = { restrict: String, tags: List<String>? ->
+        if (isBookmarked) {
+            bookmarkState.deleteBookmarkIllust(illust.id)
+        } else {
+            bookmarkState.bookmarkIllust(illust.id, restrict, tags)
+        }
+    }
+    val isFollowed = followState.state[illust.user.id] ?: false
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
@@ -291,6 +319,17 @@ internal fun PictureScreen(
             5
         }
     }
+
+    LaunchedEffect(exception) {
+        if (exception != null) {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    exception.message ?: getString(R.string.unknown_error)
+                )
+            }
+        }
+    }
+
     val prefix = LocalSharedKeyPrefix.current
     val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
@@ -366,25 +405,14 @@ internal fun PictureScreen(
                             placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
                         )
                         .throttleClick {
-                            if (bookmarkState.bookmarkStatus[illust.id] == true) {
-                                bookmarkDispatch(
-                                    BookmarkAction.IllustBookmarkDeleteIntent(
-                                        illust.id
-                                    )
-                                )
-                            } else {
-                                bookmarkDispatch(BookmarkAction.IllustBookmarkAddIntent(illust.id))
-                            }
+                            onBookmarkClick(Restrict.PUBLIC, null)
                         }
                         .shadow(5.dp, CircleShape)
                         .background(
                             if (!isSystemInDarkTheme()) Color.White else Color.DarkGray,
                         )
                         .padding(10.dp)
-
                 ) {
-                    val isBookmarked =
-                        bookmarkState.bookmarkStatus[illust.id] ?: illust.isBookmarked
                     Icon(
                         imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                         contentDescription = null,
@@ -394,7 +422,14 @@ internal fun PictureScreen(
                             .clip(CircleShape)
                     )
                 }
-            }
+            },
+            snackBarHost = {
+                SnackbarHost(snackbarHostState) {
+                    TextSnackbar(
+                        text = it.visuals.message,
+                    )
+                }
+            },
         ) {
 
             LazyVerticalStaggeredGrid(
@@ -643,7 +678,7 @@ internal fun PictureScreen(
                                     )
                                     .padding(horizontal = 10.dp, vertical = 8.dp)
                                     .throttleClick {
-                                        followDispatch(FollowAction.UnFollowUser(illust.user.id))
+                                        followState.unFollowUser(illust.user.id)
                                     },
                                 text = stringResource(R.string.followed),
                                 style = TextStyle(
@@ -663,7 +698,7 @@ internal fun PictureScreen(
                                     )
                                     .padding(horizontal = 10.dp, vertical = 8.dp)
                                     .throttleClick {
-                                        followDispatch(FollowAction.FollowUser(illust.user.id))
+                                        followState.followUser(illust.user.id)
                                     },
                                 text = stringResource(R.string.follow),
                                 style = TextStyle(
@@ -685,15 +720,19 @@ internal fun PictureScreen(
                         CompositionLocalProvider(
                             LocalSharedKeyPrefix provides otherPrefix
                         ) {
-                            state.userIllusts.subList(
-                                0,
-                                minOf(userSpanCount, state.userIllusts.size)
-                            )
+                            state.userIllusts.take(minOf(userSpanCount, state.userIllusts.size))
                                 .forEach {
+                                    val innerIsBookmarked = bookmarkState.state[it.id] ?: it.isBookmarked
                                     SquareIllustItem(
                                         illust = it,
-                                        bookmarkState = bookmarkState,
-                                        dispatch = bookmarkDispatch,
+                                        isBookmarked = innerIsBookmarked,
+                                        onBookmarkClick = { restrict: String, tags: List<String>? ->
+                                            if (innerIsBookmarked) {
+                                                bookmarkState.deleteBookmarkIllust(it.id)
+                                            } else {
+                                                bookmarkState.bookmarkIllust(it.id, restrict, tags)
+                                            }
+                                        },
                                         spanCount = minOf(userSpanCount, state.userIllusts.size),
                                         horizontalPadding = 15.dp,
                                         paddingValues = PaddingValues(2.dp),
@@ -723,11 +762,18 @@ internal fun PictureScreen(
                     key = { _, it -> "${illust.id}_related_${it.id}" },
                     contentType = { _, _ -> "related_illusts" }
                 ) { index, it ->
+                    val innerIsBookmarked = bookmarkState.state[it.id] ?: it.isBookmarked
                     // 相关作品
                     SquareIllustItem(
                         illust = it,
-                        bookmarkState = bookmarkState,
-                        dispatch = bookmarkDispatch,
+                        isBookmarked = innerIsBookmarked,
+                        onBookmarkClick = { restrict: String, tags: List<String>? ->
+                            if (innerIsBookmarked) {
+                                bookmarkState.deleteBookmarkIllust(it.id)
+                            } else {
+                                bookmarkState.bookmarkIllust(it.id, restrict, tags)
+                            }
+                        },
                         spanCount = relatedSpanCount,
                         paddingValues = PaddingValues(5.dp),
                         shouldShowTip = index == 0,
@@ -842,12 +888,6 @@ internal fun PictureScreen(
                                             currLongClickPic.second
                                         ) {
                                             loading = false
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar(
-                                                    if (it) context.getString(R.string.download_success)
-                                                    else context.getString(R.string.download_failed)
-                                                )
-                                            }
                                         })
                                     openBottomSheet = false
                                 }
@@ -922,13 +962,13 @@ private suspend fun createShareImage(
             )
         }
     if (!isFileExists(file)) {
-        val imageLoader = Coil.imageLoader(AppUtil.appContext)
+        val imageLoader = SingletonImageLoader.get(AppUtil.appContext)
         val request = ImageRequest
             .Builder(AppUtil.appContext)
             .data(currLongClickPic.second)
             .build()
         val result = imageLoader.execute(request)
-        result.drawable
+        result.image?.asDrawable(AppUtil.appContext.resources)
             ?.toBitmap()
             ?.saveToAlbum(file.nameWithoutExtension, PictureType.PNG)
             ?: return true
