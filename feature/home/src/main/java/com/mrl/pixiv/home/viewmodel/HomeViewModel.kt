@@ -33,7 +33,7 @@ class HomeViewModel(
     middlewares = listOf(homeMiddleware),
     initialState = HomeState.INITIAL
 ), KoinComponent {
-    val recommendImageList = Pager(PagingConfig(pageSize = 20, prefetchDistance = 5)) {
+    val recommendImageList = Pager(PagingConfig(pageSize = 20)) {
         get<IllustRecommendedPagingSource>()
     }.flow.cachedIn(viewModelScope)
 
