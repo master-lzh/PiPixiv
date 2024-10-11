@@ -14,8 +14,8 @@ android {
 
     defaultConfig {
         applicationId = "com.mrl.pixiv"
-        versionCode = 108
-        versionName = "1.0.8"
+        versionCode = 109
+        versionName = "1.0.9"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -43,6 +43,7 @@ android {
         }
         debug {
             isMinifyEnabled = false
+            versionNameSuffix = "-debug"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
