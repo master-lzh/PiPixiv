@@ -457,7 +457,7 @@ internal fun PictureScreen(
                                 illust.metaPages?.get(index)?.let {
                                     AsyncImage(
                                         model = ImageRequest.Builder(LocalContext.current)
-                                            .data(it.imageUrls?.large)
+                                            .data(it.imageUrls?.medium)
                                             .placeholderMemoryCacheKey("image-${illust.id}-$index")
                                             .build(),
                                         contentDescription = null,
@@ -487,7 +487,7 @@ internal fun PictureScreen(
                             } else {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current)
-                                        .data(illust.imageUrls.large)
+                                        .data(illust.imageUrls.medium)
                                         .placeholderMemoryCacheKey("image-${illust.id}-$index")
                                         .build(),
                                     contentDescription = null,
