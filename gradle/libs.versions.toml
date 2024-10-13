@@ -28,9 +28,7 @@ okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 coil3-core = { module = "io.coil-kt.coil3:coil-core", version.ref = "coil3" }
 coil3-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil3" }
 coil3-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
-coil3-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor2", version = "3.0.0-alpha10" }
-# TODO replace to this line if coil-network-ktor2 3.0.0-rc01 is released
-# coil3-network-okhttp = { module = "io.coil-kt.coil3:coil-network-ktor2", version.ref = "coil3" }
+coil3-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor2", version.ref = "coil3" }
 
 richtext-commonmark = { module = "com.halilibo.compose-richtext:richtext-commonmark", version.ref = "richtext" }
 richtext-m3 = { module = "com.halilibo.compose-richtext:richtext-ui-material3", version.ref = "richtext" }
