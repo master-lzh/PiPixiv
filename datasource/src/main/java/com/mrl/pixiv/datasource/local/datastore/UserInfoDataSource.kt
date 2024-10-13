@@ -19,7 +19,7 @@ val userInfoDataStore = DataStoreFactory.create(
         fileSystem = FileSystem.SYSTEM,
         serializer = UserInfoSerializer,
         producePath = {
-            dataStorePath("user_info.json")
+            dataStorePath("user_info.pb")
         },
     ),
 )

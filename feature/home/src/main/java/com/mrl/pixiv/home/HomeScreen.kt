@@ -41,8 +41,8 @@ import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.home.components.HomeContent
 import com.mrl.pixiv.home.components.HomeTopBar
+import com.mrl.pixiv.home.components.RecommendGrid
 import com.mrl.pixiv.home.viewmodel.HomeAction
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import com.mrl.pixiv.util.AppUtil
@@ -194,7 +194,7 @@ internal fun HomeScreen(
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                HomeContent(
+                RecommendGrid(
                     recommendImageList = recommendImageList,
                     navToPictureScreen = navToPictureScreen,
                     bookmarkState = bookmarkState,

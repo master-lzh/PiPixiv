@@ -19,7 +19,7 @@ val searchDataStore = DataStoreFactory.create(
         fileSystem = FileSystem.SYSTEM,
         serializer = SearchSerializer,
         producePath = {
-            dataStorePath("search.json")
+            dataStorePath("search.pb")
         },
     ),
 )
