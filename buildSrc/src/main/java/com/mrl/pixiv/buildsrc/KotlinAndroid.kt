@@ -113,6 +113,7 @@ private fun Project.configureKotlin() {
                     "-opt-in=coil3.annotation.ExperimentalCoilApi",
                     "-opt-in=kotlin.io.encoding.ExperimentalEncodingApi",
                     "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+                    "-opt-in=kotlin.uuid.ExperimentalUuidApi",
                     "-Xstring-concat=inline"
                 )
             )

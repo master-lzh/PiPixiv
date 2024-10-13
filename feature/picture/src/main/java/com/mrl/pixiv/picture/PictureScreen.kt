@@ -149,7 +149,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import java.io.File
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Composable
 fun PictureScreen(
@@ -716,7 +716,7 @@ internal fun PictureScreen(
                             .padding(horizontal = 15.dp)
                             .padding(top = 10.dp)
                     ) {
-                        val otherPrefix = rememberSaveable { UUID.randomUUID().toString() }
+                        val otherPrefix = rememberSaveable { Uuid.random().toHexString() }
                         CompositionLocalProvider(
                             LocalSharedKeyPrefix provides otherPrefix
                         ) {
