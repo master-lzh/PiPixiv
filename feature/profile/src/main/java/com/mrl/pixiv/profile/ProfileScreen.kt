@@ -156,13 +156,7 @@ internal fun ProfileScreen_(
                     with(LocalSharedTransitionScope.currentOrThrow) {
                         UserAvatar(
                             url = state.user.avatar,
-                            modifier = Modifier
-                                .size(80.dp)
-                                .sharedElement(
-                                    state = rememberSharedContentState(key = "user-avatar-${state.user.uid}"),
-                                    LocalAnimatedContentScope.currentOrThrow,
-                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                ),
+                            modifier = Modifier.size(80.dp),
                             onClick = navToProfileDetail
                         )
                         Column {
