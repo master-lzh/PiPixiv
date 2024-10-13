@@ -52,8 +52,8 @@ import com.mrl.pixiv.data.Type
 import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.util.throttleClick
 import org.koin.compose.koinInject
-import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
+import kotlin.uuid.Uuid
 
 
 @Composable
@@ -68,7 +68,7 @@ fun RecommendImageItem(
     val height = width * scale
     val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
-    val prefix = rememberSaveable { UUID.randomUUID().toString() }
+    val prefix = rememberSaveable { Uuid.random().toHexString() }
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
     val getIllustBookmarkDetailUseCase = koinInject<GetIllustBookmarkDetailUseCase>()

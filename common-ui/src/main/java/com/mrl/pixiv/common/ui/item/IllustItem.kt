@@ -77,7 +77,7 @@ import com.mrl.pixiv.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.util.throttleClick
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Composable
 fun SquareIllustItem(
@@ -97,7 +97,7 @@ fun SquareIllustItem(
     val hasShowBookmarkTipUseCase = koinInject<HasShowBookmarkTipUseCase>()
     val setShowBookmarkTipUseCase = koinInject<SetShowBookmarkTipUseCase>()
     var showPopupTip by remember { mutableStateOf(false) }
-    val prefix = rememberSaveable { UUID.randomUUID().toString() }
+    val prefix = rememberSaveable { Uuid.random().toHexString() }
     val onClick = {
         navToPictureScreen(illust.copy(isBookmarked = isBookmarked), prefix)
     }
