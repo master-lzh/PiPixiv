@@ -26,6 +26,7 @@ data class SearchIllustQuery(
     val startDate: String? = null,
     val endDate: String? = null,
     val searchAiType: SearchAiType = SearchAiType.HIDE_AI,
+    val offset: Int = 0,
 ) : IBaseQueryMap
 
 

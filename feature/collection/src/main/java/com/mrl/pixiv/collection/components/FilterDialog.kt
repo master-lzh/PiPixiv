@@ -49,15 +49,10 @@ fun FilterDialog(
     userBookmarkTagsIllust: ImmutableList<BookmarkTag>,
     @Restrict restrict: String,
     filterTag: String,
-    dispatch: (CollectionAction) -> Unit
+    dispatch: (CollectionAction) -> Unit,
+    onSelected: (String) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val onSelected = { tag: String ->
-        when (selectedTab) {
-            0 -> dispatch(CollectionAction.UpdateFilterTag(Restrict.PUBLIC, tag))
-            1 -> dispatch(CollectionAction.UpdateFilterTag(Restrict.PRIVATE, tag))
-        }
-    }
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
             modifier = modifier.fillMaxWidth(),
