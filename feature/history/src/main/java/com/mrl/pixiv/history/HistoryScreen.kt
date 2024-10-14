@@ -24,9 +24,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.filter
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.m3.TextField
@@ -38,8 +40,8 @@ import com.mrl.pixiv.data.Illust
 import com.mrl.pixiv.history.viewmodel.HistoryAction
 import com.mrl.pixiv.history.viewmodel.HistoryState
 import com.mrl.pixiv.history.viewmodel.HistoryViewModel
-import com.mrl.pixiv.util.queryParams
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -49,6 +51,7 @@ fun HistoryScreen(
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
     HistoryScreen_(
+        illusts = viewModel.illusts,
         modifier = modifier,
         state = viewModel.state,
         dispatch = viewModel::dispatch,
@@ -57,9 +60,9 @@ fun HistoryScreen(
     )
 }
 
-@Preview
 @Composable
 internal fun HistoryScreen_(
+    illusts: Flow<PagingData<Illust>>,
     modifier: Modifier = Modifier,
     state: HistoryState = HistoryState.INITIAL,
     dispatch: (HistoryAction) -> Unit = {},
@@ -69,6 +72,7 @@ internal fun HistoryScreen_(
     var searchValue by remember { mutableStateOf(TextFieldValue(state.currentSearch)) }
     val focusManager = LocalFocusManager.current
     Screen(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
@@ -112,12 +116,14 @@ internal fun HistoryScreen_(
     ) {
         val lazyGridState = rememberLazyGridState()
         IllustGrid(
-            illusts = state.illusts.filter {
-                it.title.contains(searchValue.text, ignoreCase = true) || it.user.name.contains(
-                    searchValue.text,
-                    ignoreCase = true
-                )
-            }.toImmutableList(),
+            illusts = illusts.map {
+                it.filter {
+                    it.title.contains(
+                        searchValue.text,
+                        ignoreCase = true
+                    ) || it.user.name.contains(searchValue.text, ignoreCase = true)
+                }
+            }.collectAsLazyPagingItems(),
             spanCount = 2,
             modifier = Modifier
                 .fillMaxSize()
@@ -125,13 +131,6 @@ internal fun HistoryScreen_(
                 .padding(horizontal = 8.dp),
             lazyGridState = lazyGridState,
             navToPictureScreen = navToPictureScreen,
-            canLoadMore = state.illustNextUrl != null,
-            onLoadMore = {
-                if (state.illustNextUrl != null) {
-                    dispatch(HistoryAction.LoadHistory(state.illustNextUrl.queryParams))
-                }
-            },
-            loading = state.loading,
         )
     }
 }

@@ -37,6 +37,8 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.HomeBottomBar
+import com.mrl.pixiv.common.viewmodel.LocalGlobalStore
+import com.mrl.pixiv.common.viewmodel.globalStore
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.viewmodel.HomeViewModel
@@ -62,7 +64,10 @@ fun MainGraph(
     val homeViewModel: HomeViewModel = koinViewModel()
 
     HandleDeeplink(navHostController)
-    CompositionLocalProvider(LocalNavigator provides navHostController) {
+    CompositionLocalProvider(
+        LocalNavigator provides navHostController,
+        LocalGlobalStore provides globalStore()
+    ) {
         SharedTransitionLayout {
             Scaffold(
                 bottomBar = {
@@ -253,7 +258,8 @@ fun MainGraph(
                         // 本人收藏页
                         composable<Destination.SelfCollectionScreen> {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                                SelfCollectionScreen()
+                                val uid = LocalGlobalStore.current.userInfo.uid
+                                SelfCollectionScreen(uid)
                             }
                         }
                     }

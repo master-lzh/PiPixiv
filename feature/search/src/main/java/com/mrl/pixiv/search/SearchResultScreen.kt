@@ -27,7 +27,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,10 +40,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
@@ -74,6 +74,7 @@ fun SearchResultScreen(
     SearchResultScreen_(
         modifier = modifier,
         state = searchResultViewModel.state,
+        searchResults = searchResultViewModel.searchResults.collectAsLazyPagingItems(),
         popBack = searchNavHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
         dispatch = searchResultViewModel::dispatch,
@@ -87,13 +88,10 @@ fun OutsideSearchResultsScreen(
     searchResultViewModel: SearchResultViewModel = koinViewModel { parametersOf(searchWords) },
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
-    val currentSearch by remember { mutableStateOf(searchWords) }
-    LaunchedEffect(currentSearch) {
-        searchResultViewModel.dispatch(SearchResultAction.SearchIllust(searchWords = currentSearch))
-    }
     SearchResultScreen_(
         modifier = modifier,
         state = searchResultViewModel.state,
+        searchResults = searchResultViewModel.searchResults.collectAsLazyPagingItems(),
         popBack = navHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
         dispatch = searchResultViewModel::dispatch,
@@ -101,15 +99,11 @@ fun OutsideSearchResultsScreen(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(
-    showSystemUi = false, showBackground = false,
-    device = "id:pixel_7_pro", wallpaper = Wallpapers.NONE,
-    uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL
-)
 @Composable
 internal fun SearchResultScreen_(
     modifier: Modifier = Modifier,
     state: SearchResultState = SearchResultState.INITIAL,
+    searchResults: LazyPagingItems<Illust>,
     popBack: () -> Unit = {},
     naviToPic: (Illust, String) -> Unit = { _, _ -> },
     dispatch: (SearchResultAction) -> Unit = {},
@@ -160,29 +154,29 @@ internal fun SearchResultScreen_(
         }
     ) {
         PullToRefreshBox(
-            isRefreshing = state.refreshing,
-            onRefresh = { dispatch(SearchResultAction.SearchIllust(state.searchWords)) },
+            isRefreshing = searchResults.loadState.refresh is LoadState.Loading,
+            onRefresh = { searchResults.refresh() },
             modifier = modifier.padding(it),
         ) {
             IllustGrid(
-                illusts = state.searchResults,
+                illusts = searchResults,
                 spanCount = spanCount,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 8.dp),
-                navToPictureScreen = naviToPic,
-                canLoadMore = state.nextUrl != null,
-                onLoadMore = {
-                    if (state.nextUrl != null) {
-                        dispatch(SearchResultAction.SearchIllustNext(state.nextUrl))
-                    }
-                },
-                loading = state.loading
+                navToPictureScreen = naviToPic
             )
         }
 
         if (showBottomSheet.value) {
-            FilterBottomSheet(showBottomSheet, launchDefault, bottomSheetState, state, dispatch)
+            FilterBottomSheet(
+                showBottomSheet,
+                launchDefault,
+                bottomSheetState,
+                state,
+                searchResults,
+                dispatch
+            )
         }
     }
 }
@@ -194,6 +188,7 @@ private fun FilterBottomSheet(
     launch: (suspend CoroutineScope.() -> Unit) -> Job,
     bottomSheetState: SheetState,
     state: SearchResultState,
+    searchResults: LazyPagingItems<Illust>,
     dispatch: (SearchResultAction) -> Unit,
 ) {
     val context = LocalContext.current
@@ -233,9 +228,7 @@ private fun FilterBottomSheet(
                 text = stringResource(R.string.apply),
                 modifier = Modifier.throttleClick {
 //                    dispatch(SearchResultAction.ClearSearchResult)
-                    dispatch(
-                        SearchResultAction.SearchIllust(searchWords = state.searchWords)
-                    )
+                    searchResults.refresh()
                     showBottomSheet.value = false
                     launch { bottomSheetState.hide() }
                 })

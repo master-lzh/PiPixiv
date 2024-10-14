@@ -10,4 +10,6 @@ dependencies {
     implementation(project(":repository"))
     implementation(project(":domain"))
     implementation(project(":util"))
+
+    implementation(androidx.bundles.paging)
 }
