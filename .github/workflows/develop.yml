@@ -62,14 +62,18 @@ jobs:
         run: ./gradlew assembleFossRelease -PapplyFirebasePlugins=false --stacktrace
 
       - name: Get release file apk path
-        id: releaseApk
-        run: echo "apkfile=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
+        id: releaseApks
+        run: |
+          RELEASE_APKS=$(find app/build/outputs/apk/*/release/*.apk)
+          echo "release_apks=$RELEASE_APKS" >> $GITHUB_OUTPUT
+          echo "Found APKs:"
+          echo "$RELEASE_APKS"
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: ${{ steps.releaseApk.outputs.apkfile }}
+          name: release-apks
+          path: ${{ steps.releaseApks.outputs.release_apks }}
 
       - name: Get tag name
         if: startsWith(github.ref, 'refs/tags/v')
@@ -91,5 +95,5 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            ${{ steps.releaseApk.outputs.apkfile }}
+            ${{ steps.releaseApks.outputs.release_apks }}
 
