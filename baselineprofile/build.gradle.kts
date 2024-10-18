@@ -17,6 +17,16 @@ android {
         jvmTarget = "1.8"
     }
 
+    flavorDimensions += "version"
+    productFlavors {
+        create("default") {
+            dimension = flavorDimensionList[0]
+        }
+        create("foss") {
+            dimension = flavorDimensionList[0]
+        }
+    }
+
     defaultConfig {
         minSdk = 28
         targetSdk = 35

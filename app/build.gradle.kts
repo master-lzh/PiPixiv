@@ -1,8 +1,12 @@
+import com.android.build.gradle.internal.api.ApkVariantOutputImpl
+
 plugins {
     id("pixiv.android.application")
-    alias(libs.plugins.google.services)
-    alias(libs.plugins.firebase.crashlytics)
     alias(androidx.plugins.baselineprofile)
+}
+if (project.findProperty("applyFirebasePlugins") == "true") {
+    pluginManager.apply(libs.plugins.google.services.get().pluginId)
+    pluginManager.apply(libs.plugins.firebase.crashlytics.get().pluginId)
 }
 
 android {
@@ -14,8 +18,8 @@ android {
 
     defaultConfig {
         applicationId = "com.mrl.pixiv"
-        versionCode = 109
-        versionName = "1.0.9"
+        versionCode = 10010
+        versionName = "1.0.10"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -31,6 +35,17 @@ android {
         }
     }
 
+    flavorDimensions += "version"
+    productFlavors {
+        create("default") {
+            isDefault = true
+            dimension = flavorDimensionList[0]
+        }
+        create("foss") {
+            dimension = flavorDimensionList[0]
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -39,7 +54,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isMinifyEnabled = false
@@ -58,10 +73,12 @@ android {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
         }
     }
-    setProperty(
-        "archivesBaseName",
-        "${rootProject.name}-v${defaultConfig.versionName}"
-    )
+    applicationVariants.configureEach {
+        outputs.configureEach {
+            (this as? ApkVariantOutputImpl)?.outputFileName =
+                "${rootProject.name}-v${defaultConfig.versionName}-$name.apk"
+        }
+    }
 }
 
 dependencies {
@@ -99,8 +116,8 @@ dependencies {
     implementation(libs.koin)
     implementation(libs.bundles.coil3)
 
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.bundles.firebase)
+    "defaultImplementation"(platform(libs.firebase.bom))
+    "defaultImplementation"(libs.bundles.firebase)
 
     baselineProfile(project(":baselineprofile"))
     ksp(libs.koin.ksp.compiler)

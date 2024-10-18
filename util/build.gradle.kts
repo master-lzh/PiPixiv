@@ -11,12 +11,13 @@ dependencies {
     implementation(libs.okio)
     implementation(kotlinx.ktor.client.core)
 
-    implementation(platform(libs.firebase.bom))
-    api(libs.bundles.firebase)
+    "defaultImplementation"(platform(libs.firebase.bom))
+    "defaultApi"(libs.bundles.firebase)
+
 
     implementation(compose.animation)
     implementation(compose.foundation)
     implementation(compose.ui)
 
-    
+
 }
