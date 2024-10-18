@@ -65,9 +65,12 @@ jobs:
         id: releaseApks
         run: |
           RELEASE_APKS=$(find app/build/outputs/apk/*/release/*.apk)
-          echo "release_apks=$RELEASE_APKS" >> $GITHUB_OUTPUT
           echo "Found APKs:"
           echo "$RELEASE_APKS"
+          delimiter="|"
+          echo "release_apks<<$delimiter" >> $GITHUB_OUTPUT
+          echo "$RELEASE_APKS" >> $GITHUB_OUTPUT
+          echo "$delimiter" >> $GITHUB_OUTPUT
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v4
