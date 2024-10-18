@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -27,18 +26,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemKey
 import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.data.Illust
-import com.mrl.pixiv.util.OnScrollToBottom
 import com.mrl.pixiv.util.isEven
-import kotlinx.collections.immutable.ImmutableList
 import org.koin.compose.koinInject
 
 @Composable
 fun IllustGrid(
-    illusts: ImmutableList<Illust>,
+    illusts: LazyPagingItems<Illust>,
     spanCount: Int,
     modifier: Modifier = Modifier,
     lazyGridState: LazyGridState = rememberLazyGridState(),
@@ -46,14 +46,11 @@ fun IllustGrid(
     bookmarkState: BookmarkState = koinInject(),
     paddingValues: PaddingValues = PaddingValues(1.dp),
     navToPictureScreen: (Illust, String) -> Unit,
-    canLoadMore: Boolean = true,
-    onLoadMore: () -> Unit,
-    loading: Boolean = false,
     leadingContent: (LazyGridScope.() -> Unit)? = null,
 ) {
     var currentLoadingItem by rememberSaveable { mutableIntStateOf(0) }
-    LaunchedEffect(illusts.size) {
-        currentLoadingItem = if (illusts.size.isEven()) {
+    LaunchedEffect(illusts.itemCount) {
+        currentLoadingItem = if (illusts.itemCount.isEven()) {
             4
         } else {
             5
@@ -68,7 +65,7 @@ fun IllustGrid(
     ) {
         leadingContent?.invoke(this)
 
-        if (loading) {
+        if (illusts.loadState.refresh is LoadState.Loading && illusts.itemCount == 0) {
             item(key = "loading", span = { GridItemSpan(spanCount) }) {
                 Box(
                     modifier = Modifier
@@ -79,32 +76,32 @@ fun IllustGrid(
                     CircularProgressIndicator()
                 }
             }
-        } else {
-            itemsIndexed(
-                illusts,
-                key = { index, item -> "illust_${index}_${item.id}" }
-            ) { index, illust ->
-                val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
-                SquareIllustItem(
-                    illust = illust,
-                    isBookmarked = isBookmarked,
-                    onBookmarkClick = { restrict: String, tags: List<String>? ->
-                        if (isBookmarked) {
-                            bookmarkState.deleteBookmarkIllust(illust.id)
-                        } else {
-                            bookmarkState.bookmarkIllust(illust.id, restrict, tags)
-                        }
-                    },
-                    spanCount = spanCount,
-                    horizontalPadding = horizontalPadding,
-                    paddingValues = paddingValues,
-                    shouldShowTip = index == 0,
-                    navToPictureScreen = navToPictureScreen,
-                )
-            }
+        }
+        items(
+            illusts.itemCount,
+            key = illusts.itemKey { it.id }
+        ) { index ->
+            val illust = illusts[index] ?: return@items
+            val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
+            SquareIllustItem(
+                illust = illust,
+                isBookmarked = isBookmarked,
+                onBookmarkClick = { restrict: String, tags: List<String>? ->
+                    if (isBookmarked) {
+                        bookmarkState.deleteBookmarkIllust(illust.id)
+                    } else {
+                        bookmarkState.bookmarkIllust(illust.id, restrict, tags)
+                    }
+                },
+                spanCount = spanCount,
+                horizontalPadding = horizontalPadding,
+                paddingValues = paddingValues,
+                shouldShowTip = index == 0,
+                navToPictureScreen = navToPictureScreen,
+            )
         }
 
-        if (canLoadMore) {
+        if (illusts.loadState.refresh !is LoadState.Loading && !illusts.loadState.append.endOfPaginationReached) {
             items(currentLoadingItem, key = { "loading_$it" }) {
                 Surface(
                     Modifier
@@ -118,13 +115,9 @@ fun IllustGrid(
                 }
             }
         }
+
         item(key = "spacer") {
             Spacer(modifier = Modifier.height(8.dp))
-        }
-    }
-    lazyGridState.OnScrollToBottom(loadingItemCount = currentLoadingItem) {
-        if (canLoadMore && !loading) {
-            onLoadMore()
         }
     }
 }

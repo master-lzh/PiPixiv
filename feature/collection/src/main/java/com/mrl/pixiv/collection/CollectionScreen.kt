@@ -33,10 +33,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.collection.components.FilterDialog
 import com.mrl.pixiv.collection.viewmodel.CollectionAction
 import com.mrl.pixiv.collection.viewmodel.CollectionState
@@ -55,22 +56,24 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun SelfCollectionScreen(
+    uid: Long,
     modifier: Modifier = Modifier,
-    collectionViewModel: CollectionViewModel = koinViewModel { parametersOf(Long.MIN_VALUE) },
+    collectionViewModel: CollectionViewModel = koinViewModel { parametersOf(uid) },
     navHostController: NavHostController = LocalNavigator.currentOrThrow
 ) {
     CollectionScreen_(
         modifier = modifier,
         state = collectionViewModel.state,
+        userBookmarksIllusts = collectionViewModel.userBookmarksIllusts.collectAsLazyPagingItems(),
         dispatch = collectionViewModel::dispatch,
-        popBack = { navHostController.popBackStack() },
+        popBack = navHostController::popBackStack,
         navToPictureScreen = navHostController::navigateToPictureScreen
     )
 }
 
-@Preview(name = "Phone", device = Devices.PHONE, showSystemUi = true)
 @Composable
 fun CollectionScreen_(
+    userBookmarksIllusts: LazyPagingItems<Illust>,
     modifier: Modifier = Modifier,
     state: CollectionState = CollectionState.INITIAL,
     dispatch: (CollectionAction) -> Unit = {},
@@ -101,33 +104,19 @@ fun CollectionScreen_(
         val pullRefreshState = rememberPullToRefreshState()
 
         PullToRefreshBox(
-            isRefreshing = state.refreshing,
-            onRefresh = {
-                dispatch(
-                    CollectionAction.LoadUserBookmarksIllusts(
-                        state.restrict,
-                        state.filterTag
-                    )
-                )
-            },
+            isRefreshing = userBookmarksIllusts.loadState.refresh is LoadState.Loading,
+            onRefresh = { userBookmarksIllusts.refresh() },
             modifier = Modifier.padding(it),
             state = pullRefreshState
         ) {
             IllustGrid(
-                illusts = state.userBookmarksIllusts,
+                illusts = userBookmarksIllusts,
                 spanCount = 2,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 8.dp),
                 lazyGridState = lazyGridState,
                 navToPictureScreen = navToPictureScreen,
-                canLoadMore = state.illustNextUrl != null,
-                onLoadMore = {
-                    if (state.illustNextUrl != null) {
-                        dispatch(CollectionAction.LoadMoreUserBookmarksIllusts(state.illustNextUrl))
-                    }
-                },
-                loading = state.loading,
                 leadingContent = {
                     item(key = "leading", span = { GridItemSpan(2) }) {
                         Spacer(modifier = Modifier.height(50.dp))
@@ -147,6 +136,7 @@ fun CollectionScreen_(
                             if (state.restrict != Restrict.PUBLIC) {
                                 scope.launch { pagerState.animateScrollToPage(0) }
                                 dispatch(CollectionAction.UpdateRestrict(Restrict.PUBLIC))
+                                userBookmarksIllusts.refresh()
                             }
                         },
                         colors = ButtonDefaults.filledTonalButtonColors().copy(
@@ -165,6 +155,7 @@ fun CollectionScreen_(
                             if (state.restrict != Restrict.PRIVATE) {
                                 scope.launch { pagerState.animateScrollToPage(1) }
                                 dispatch(CollectionAction.UpdateRestrict(Restrict.PRIVATE))
+                                userBookmarksIllusts.refresh()
                             }
                         },
                         colors = ButtonDefaults.filledTonalButtonColors().copy(
@@ -194,7 +185,14 @@ fun CollectionScreen_(
                 userBookmarkTagsIllust = state.userBookmarkTagsIllust,
                 restrict = state.restrict,
                 filterTag = state.filterTag,
-                dispatch = dispatch
+                dispatch = dispatch,
+                onSelected = { tag: String ->
+                    when (selectedTab) {
+                        0 -> dispatch(CollectionAction.UpdateFilterTag(Restrict.PUBLIC, tag))
+                        1 -> dispatch(CollectionAction.UpdateFilterTag(Restrict.PRIVATE, tag))
+                    }
+                    userBookmarksIllusts.refresh()
+                }
             )
         }
     }

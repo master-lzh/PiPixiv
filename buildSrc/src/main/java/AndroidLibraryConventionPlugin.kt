@@ -16,10 +16,11 @@
 
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.LibraryExtension
-import com.mrl.pixiv.buildsrc.*
+import com.mrl.pixiv.buildsrc.androidTestImplementation
 import com.mrl.pixiv.buildsrc.configureKotlinAndroid
 import com.mrl.pixiv.buildsrc.disableUnnecessaryAndroidTests
 import com.mrl.pixiv.buildsrc.implementation
+import com.mrl.pixiv.buildsrc.ksp
 import com.mrl.pixiv.buildsrc.testImplementation
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -42,6 +43,16 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
                 defaultConfig.targetSdk = 35
+
+                flavorDimensions += "version"
+                productFlavors {
+                    create("default") {
+                        dimension = flavorDimensionList[0]
+                    }
+                    create("foss") {
+                        dimension = flavorDimensionList[0]
+                    }
+                }
             }
             extensions.configure<LibraryAndroidComponentsExtension> {
                 disableUnnecessaryAndroidTests(target)

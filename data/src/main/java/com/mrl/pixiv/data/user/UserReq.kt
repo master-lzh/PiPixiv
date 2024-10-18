@@ -20,6 +20,7 @@ data class UserBookmarksIllustQuery(
     val restrict: String,
     val userId: Long,
     val tag: String = "",
+    val maxBookmarkId: Long? = null,
 ) : IBaseQueryMap
 
 data class UserBookmarksNovelQuery(

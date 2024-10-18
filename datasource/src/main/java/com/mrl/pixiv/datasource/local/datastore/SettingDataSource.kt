@@ -19,7 +19,7 @@ val userPreferenceDataStore = DataStoreFactory.create(
         fileSystem = FileSystem.SYSTEM,
         serializer = UserPreferenceSerializer,
         producePath = {
-            dataStorePath("user_preference.json")
+            dataStorePath("user_preference.pb")
         },
     ),
 )

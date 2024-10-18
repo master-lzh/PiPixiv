@@ -131,12 +131,8 @@ internal fun ProfileDetailScreen(
                                 with(LocalSharedTransitionScope.currentOrThrow) {
                                     UserAvatar(
                                         url = it,
-                                        modifier = Modifier.size(avatarSize * (2 - scrollBehavior.state.collapsedFraction))
-                                            .sharedElement(
-                                                state = rememberSharedContentState(key = "user-avatar-${userInfo.user.id}"),
-                                                LocalAnimatedContentScope.currentOrThrow,
-                                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                            ),
+                                        modifier = Modifier
+                                            .size(avatarSize * (2 - scrollBehavior.state.collapsedFraction)),
                                         contentScale = ContentScale.FillWidth,
                                     )
                                 }

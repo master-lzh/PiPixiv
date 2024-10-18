@@ -5,10 +5,10 @@ import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 
-val firebaseAnalytics
+private val firebaseAnalytics
     get() = Firebase.analytics
 
-val firebaseCrashlytics
+private val firebaseCrashlytics
     get() = Firebase.crashlytics
 
 

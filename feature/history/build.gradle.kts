@@ -8,4 +8,6 @@ android {
 
 dependencies {
     implementation(project(":repository"))
+
+    implementation(androidx.bundles.paging)
 }

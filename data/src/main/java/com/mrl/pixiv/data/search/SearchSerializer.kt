@@ -1,9 +1,10 @@
 package com.mrl.pixiv.data.search
 
 import androidx.datastore.core.okio.OkioSerializer
-import com.mrl.pixiv.data.JSON
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 import okio.BufferedSink
 import okio.BufferedSource
 import okio.use
@@ -30,11 +31,11 @@ object SearchSerializer : OkioSerializer<Search> {
     override val defaultValue: Search = Search.defaultInstance
 
     override suspend fun readFrom(source: BufferedSource): Search =
-        JSON.decodeFromString(source.readUtf8())
+        ProtoBuf.decodeFromByteArray(source.readByteArray())
 
     override suspend fun writeTo(t: Search, sink: BufferedSink) {
         sink.use {
-            it.writeUtf8(JSON.encodeToString(t))
+            it.write(ProtoBuf.encodeToByteArray(t))
         }
     }
 }

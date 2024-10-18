@@ -149,7 +149,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import java.io.File
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 @Composable
 fun PictureScreen(
@@ -457,7 +457,7 @@ internal fun PictureScreen(
                                 illust.metaPages?.get(index)?.let {
                                     AsyncImage(
                                         model = ImageRequest.Builder(LocalContext.current)
-                                            .data(it.imageUrls?.large)
+                                            .data(it.imageUrls?.medium)
                                             .placeholderMemoryCacheKey("image-${illust.id}-$index")
                                             .build(),
                                         contentDescription = null,
@@ -487,7 +487,7 @@ internal fun PictureScreen(
                             } else {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current)
-                                        .data(illust.imageUrls.large)
+                                        .data(illust.imageUrls.medium)
                                         .placeholderMemoryCacheKey("image-${illust.id}-$index")
                                         .build(),
                                     contentDescription = null,
@@ -716,7 +716,7 @@ internal fun PictureScreen(
                             .padding(horizontal = 15.dp)
                             .padding(top = 10.dp)
                     ) {
-                        val otherPrefix = rememberSaveable { UUID.randomUUID().toString() }
+                        val otherPrefix = rememberSaveable { Uuid.random().toHexString() }
                         CompositionLocalProvider(
                             LocalSharedKeyPrefix provides otherPrefix
                         ) {
