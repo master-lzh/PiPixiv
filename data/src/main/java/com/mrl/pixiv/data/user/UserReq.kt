@@ -46,8 +46,8 @@ data class UserBookmarkTagsQuery(
 ) : IBaseQueryMap
 
 data class UserFollowingQuery(
-    val filter: Filter,
+    val filter: Filter = Filter.ANDROID,
     val userId: Long,
-    val restrict: String,
-    val offset: Int,
+    val restrict: String = Restrict.PUBLIC,
+    val offset: Int? = null,
 ) : IBaseQueryMap
