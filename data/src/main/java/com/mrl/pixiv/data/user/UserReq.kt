@@ -44,3 +44,10 @@ data class UserBookmarkTagsQuery(
     @Restrict
     val restrict: String,
 ) : IBaseQueryMap
+
+data class UserFollowingQuery(
+    val filter: Filter,
+    val userId: Long,
+    val restrict: String,
+    val offset: Int,
+) : IBaseQueryMap
