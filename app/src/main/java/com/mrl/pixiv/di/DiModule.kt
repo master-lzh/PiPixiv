@@ -1,5 +1,6 @@
 package com.mrl.pixiv.di
 
+import com.mrl.pixiv.AppModule
 import com.mrl.pixiv.collection.CollectionModule
 import com.mrl.pixiv.common.CommonModule
 import com.mrl.pixiv.datasource.DatasourceModule
@@ -15,7 +16,6 @@ import com.mrl.pixiv.search.SearchModule
 import com.mrl.pixiv.setting.SettingModule
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Single
-import org.koin.ksp.generated.defaultModule
 import org.koin.ksp.generated.module
 
 @Single
@@ -39,7 +39,7 @@ val featureModule = arrayOf(
 )
 
 val allModule = listOf(
-    defaultModule,
+    AppModule.module,
     CommonModule.module,
     RepositoryModule.module,
     DatasourceModule.module,
