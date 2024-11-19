@@ -5,7 +5,6 @@ import com.mrl.pixiv.collection.CollectionModule
 import com.mrl.pixiv.common.CommonModule
 import com.mrl.pixiv.datasource.DatasourceModule
 import com.mrl.pixiv.domain.DomainModule
-import com.mrl.pixiv.follow.FollowModule
 import com.mrl.pixiv.history.HistoryModule
 import com.mrl.pixiv.home.HomeModule
 import com.mrl.pixiv.login.LoginModule
@@ -35,7 +34,6 @@ val featureModule = arrayOf(
     ProfileModule.module,
     SearchModule.module,
     SettingModule.module,
-    FollowModule.module,
 )
 
 val allModule = listOf(
