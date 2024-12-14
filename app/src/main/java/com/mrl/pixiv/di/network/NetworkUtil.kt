@@ -28,8 +28,8 @@ internal const val IMAGE_HOST = "i.pximg.net"
 internal const val STATIC_IMAGE_HOST = "s.pximg.net"
 internal const val AUTH_HOST = "oauth.secure.pixiv.net"
 internal val hostMap: Map<String, String> = mapOf(
-    API_HOST to "210.140.131.199",
-    AUTH_HOST to "210.140.131.219",
+    API_HOST to "210.140.139.155",
+    AUTH_HOST to "210.140.139.155",
     IMAGE_HOST to "210.140.92.144",
     STATIC_IMAGE_HOST to "210.140.92.143",
     "doh" to "doh.dns.sb",
