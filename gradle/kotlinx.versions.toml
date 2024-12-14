@@ -1,10 +1,9 @@
 [versions]
-kotlin = "2.0.21"
-ksp = "2.0.21-1.0.25"
+kotlin = "2.1.0"
+ksp = "2.1.0-1.0.29"
 serialization = "1.7.3"
-xml_serialization = "0.86.2"
 coroutines = "1.9.0"
-ktor = "2.3.12"
+ktor = "3.0.2"
 datetime = "0.6.1"
 collections-immutable = "0.3.8"
 

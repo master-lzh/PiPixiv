@@ -1,7 +1,7 @@
 [versions]
 junit = "4.13.2"
 okio = "3.9.1"
-coil3 = "3.0.0-rc01"
+coil3 = "3.0.0"
 richtext = "0.20.0"
 koin = "4.0.0"
 koinAnnotation = "1.4.0-RC3"
@@ -10,12 +10,10 @@ androidx-test-espresso-espresso-core = "3.6.1"
 com-google-android-material-material = "1.12.0"
 lottie = "6.5.2"
 google-services = "4.4.2"
-firebase-bom = "33.6.0"
+firebase-bom = "33.7.0"
 firebase-crashlytics-gradle = "3.0.2"
 uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.3.3"
-protobuf-gradle = "0.9.4"
-protobuf = "4.26.0"
 kermit = "2.0.4"
 
 [libraries]
@@ -58,7 +56,6 @@ firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-cra
 uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark-macro-junit4" }
 
-protobuf-kotlin-lite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
@@ -72,4 +69,3 @@ firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
 [plugins]
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-gradle" }
-protubuf = { id = "com.google.protobuf", version.ref = "protobuf-gradle" }
