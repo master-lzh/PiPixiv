@@ -19,7 +19,7 @@ import coil3.asImage
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
-import coil3.network.ktor2.KtorNetworkFetcherFactory
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.allowRgb565
 import com.mrl.pixiv.common.activity.BaseActivity
 import com.mrl.pixiv.common.data.HttpClientEnum

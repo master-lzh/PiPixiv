@@ -262,6 +262,12 @@ fun MainGraph(
                                 SelfCollectionScreen(uid)
                             }
                         }
+
+                        composable<Destination.FollowingScreen>() {
+                            CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+
+                            }
+                        }
                     }
                 }
             }

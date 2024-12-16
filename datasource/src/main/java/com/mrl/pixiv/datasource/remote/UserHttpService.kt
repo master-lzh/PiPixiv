@@ -10,6 +10,8 @@ import com.mrl.pixiv.data.user.UserDetailQuery
 import com.mrl.pixiv.data.user.UserDetailResp
 import com.mrl.pixiv.data.user.UserFollowAddReq
 import com.mrl.pixiv.data.user.UserFollowDeleteReq
+import com.mrl.pixiv.data.user.UserFollowingQuery
+import com.mrl.pixiv.data.user.UserFollowingResp
 import com.mrl.pixiv.data.user.UserHistoryIllustsResp
 import com.mrl.pixiv.data.user.UserIllustsQuery
 import com.mrl.pixiv.data.user.UserIllustsResp
@@ -64,7 +66,7 @@ class UserHttpService(
             "/v1/user/follow/add",
             formParameters = parameters {
                 userFollowAddReq.toMap().forEach { (key, value) ->
-                    append(key, value.toString())
+                    append(key, value)
                 }
             }
         )
@@ -74,7 +76,7 @@ class UserHttpService(
             "/v1/user/follow/delete",
             formParameters = parameters {
                 userFollowDeleteReq.toMap().forEach { (key, value) ->
-                    append(key, value.toString())
+                    append(key, value)
                 }
             }
         )
@@ -99,6 +101,13 @@ class UserHttpService(
     suspend fun getUserBookmarkTagsNovel(userBookmarkTagsQuery: UserBookmarkTagsQuery) =
         httpClient.safeGet<UserBookmarkTagsResp>("/v1/user/bookmark-tags/novel") {
             userBookmarkTagsQuery.toMap().forEach { (key, value) ->
+                parameter(key, value)
+            }
+        }
+
+    suspend fun getUserFollowing(userFollowingQuery: UserFollowingQuery) =
+        httpClient.safeGet<UserFollowingResp>("/v1/user/following") {
+            userFollowingQuery.toMap().forEach { (key, value) ->
                 parameter(key, value)
             }
         }

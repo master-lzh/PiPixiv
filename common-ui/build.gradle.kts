@@ -8,6 +8,7 @@ android {
 
 dependencies {
     implementation(androidx.bundles.paging)
+    implementation(platform(libs.coil3.bom))
     implementation(libs.bundles.coil3)
     implementation(kotlinx.bundles.serialization)
 

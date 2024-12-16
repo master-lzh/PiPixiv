@@ -46,6 +46,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 testImplementation(kotlin("test"))
                 androidTestImplementation(kotlin("test"))
 
+                implementation(platform(libs.findLibrary("coil3-bom").get()))
                 implementation(libs.findBundle("coil3").get())
                 implementation(libs.findLibrary("koin").get())
 

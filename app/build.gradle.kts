@@ -111,10 +111,10 @@ dependencies {
     implementation(kotlinx.bundles.ktor)
     implementation(kotlinx.datetime)
 
+    implementation(platform(libs.coil3.bom))
     implementation(libs.bundles.coil3)
     implementation(libs.google.material)
     implementation(libs.koin)
-    implementation(libs.bundles.coil3)
 
     "defaultImplementation"(platform(libs.firebase.bom))
     "defaultImplementation"(libs.bundles.firebase)

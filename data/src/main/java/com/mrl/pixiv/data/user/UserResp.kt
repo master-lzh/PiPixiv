@@ -60,3 +60,19 @@ data class UserBookmarkTagsResp (
     val nextUrl: String? = null
 )
 
+@Serializable
+data class UserFollowingResp(
+    val userPreviews: List<UserPreview>,
+
+    @SerialName("next_url")
+    val nextUrl: String? = null
+) {
+    @Serializable
+    data class UserPreview(
+        val user: User,
+        val illusts: List<Illust>,
+        val novels: List<Novel>,
+        @SerialName("is_muted")
+        val isMuted: Boolean
+    )
+}

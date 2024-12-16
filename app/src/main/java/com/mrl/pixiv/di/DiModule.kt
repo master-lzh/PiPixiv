@@ -33,7 +33,7 @@ val featureModule = arrayOf(
     PictureModule.module,
     ProfileModule.module,
     SearchModule.module,
-    SettingModule.module
+    SettingModule.module,
 )
 
 val allModule = listOf(

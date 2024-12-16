@@ -92,4 +92,9 @@ sealed class Destination(
 
     @Serializable
     data object SelfCollectionScreen : Destination()
+
+    @Serializable
+    data class FollowingScreen(
+        val userId: Long,
+    ) : Destination()
 }
