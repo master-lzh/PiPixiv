@@ -1,0 +1,8 @@
+<ul>
+<li>Log in using a Pixiv account.</li>
+<li>Homepage recommended illustrations.</li>
+<li>Search illustrations and sort by popularity, latest, etc.</li>
+<li>Bookmark illustrations/Follow artists.</li>
+<li>View illustration details and recommended illustrations.</li>
+<li>Long press on an image to download the original illustration.</li>
+</ul>
