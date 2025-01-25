@@ -16,3 +16,6 @@ local.properties
 /.idea/
 /*.jks
 /.kotlin/
+/app/default
+/app/foss
+*.base64.txt
