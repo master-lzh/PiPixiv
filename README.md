@@ -20,6 +20,7 @@
 
 [![GitHub Release](https://img.shields.io/github/v/release/master-lzh/PiPixiv?label=稳定版)](https://github.com/master-lzh/PiPixiv/releases)
 [![GitHub downloads](https://img.shields.io/github/downloads/master-lzh/PiPixiv/total?label=下载量&labelColor=27303D&color=0D1117&logo=github&logoColor=FFFFFF&style=flat)](https://github.com/master-lzh/PiPixiv/releases)
+[![F-Droid Version](https://img.shields.io/f-droid/v/com.mrl.pixiv)](https://f-droid.org/packages/com.mrl.pixiv/)
 
 ### 支持 **[Android 5.0]()** 或更高版本
 
