@@ -1,6 +1,6 @@
 [versions]
 junit = "4.13.2"
-okio = "3.9.1"
+okio = "3.10.2"
 coil3 = "3.1.0"
 richtext = "0.20.0"
 koin = "4.0.2"
