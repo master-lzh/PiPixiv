@@ -5,6 +5,10 @@ plugins {
 
 android {
     namespace = "com.mrl.pixiv.common"
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
