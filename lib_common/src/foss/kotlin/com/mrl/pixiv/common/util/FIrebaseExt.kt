@@ -1,5 +1,8 @@
 package com.mrl.pixiv.common.util
 
+fun Application.initializeFirebase() {
+
+}
 
 fun logEvent(event: String, params: Map<String, Any>? = null) {
     // todo foss lib

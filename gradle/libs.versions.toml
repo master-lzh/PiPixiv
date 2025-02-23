@@ -51,8 +51,8 @@ google-material = { group = "com.google.android.material", name = "material", ve
 collapsing-toolbar = "me.onebone:toolbar-compose:2.3.5"
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
-firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
-firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 
 uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark-macro-junit4" }
@@ -66,7 +66,7 @@ koin = ["koin", "koin-compose", "koin-annotations"]
 coil3 = ["coil3-core", "coil3-gif", "coil3-compose", "coil3-network-ktor3"]
 richtext = ["richtext-commonmark", "richtext-m3"]
 lottie = ["lottie", "lottie-compose"]
-firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
+firebase = ["firebase-analytics", "firebase-crashlytics"]
 
 [plugins]
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

@@ -5,9 +5,6 @@ import android.content.Context
 import coil3.PlatformContext
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
-import com.google.firebase.initialize
 import com.mrl.pixiv.common.coroutine.launchIO
 import com.mrl.pixiv.common.data.search.Search
 import com.mrl.pixiv.common.data.setting.UserPreference
@@ -16,7 +13,7 @@ import com.mrl.pixiv.common.data.user.UserInfo
 import com.mrl.pixiv.common.domain.setting.GetAppThemeUseCase
 import com.mrl.pixiv.common.util.AppUtil
 import com.mrl.pixiv.common.util.deleteFiles
-import com.mrl.pixiv.common.util.isDebug
+import com.mrl.pixiv.common.util.initializeFirebase
 import com.mrl.pixiv.common.util.isFileExists
 import com.mrl.pixiv.di.allModule
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -104,11 +101,6 @@ class App : Application() {
             userPreference.await()
             userInfo.await()
         }
-    }
-
-    private fun initializeFirebase() {
-        Firebase.initialize(this)
-        Firebase.crashlytics.isCrashlyticsCollectionEnabled = !isDebug
     }
 }
 

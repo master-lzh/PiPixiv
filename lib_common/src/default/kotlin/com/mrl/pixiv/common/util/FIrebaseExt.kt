@@ -1,15 +1,22 @@
 package com.mrl.pixiv.common.util
 
+import android.app.Application
 import android.os.Bundle
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.crashlytics.crashlytics
+import com.google.firebase.initialize
 
 private val firebaseAnalytics
     get() = Firebase.analytics
 
 private val firebaseCrashlytics
     get() = Firebase.crashlytics
+
+fun Application.initializeFirebase() {
+    Firebase.initialize(this)
+    Firebase.crashlytics.isCrashlyticsCollectionEnabled = !isDebug
+}
 
 
 fun logEvent(event: String, params: Map<String, Any>? = null) {
