@@ -1,5 +1,7 @@
 package com.mrl.pixiv.common.util
 
+import android.app.Application
+
 fun Application.initializeFirebase() {
 
 }
