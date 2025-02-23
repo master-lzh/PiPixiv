@@ -1,0 +1,38 @@
+package com.mrl.pixiv.profile.viewmodel
+
+import com.mrl.pixiv.common.data.setting.SettingTheme
+import com.mrl.pixiv.common.data.setting.setAppCompatDelegateThemeMode
+import com.mrl.pixiv.common.repository.SettingRepository
+import com.mrl.pixiv.common.repository.UserRepository
+import com.mrl.pixiv.common.viewmodel.Middleware
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import org.koin.core.annotation.Factory
+
+@Factory
+class ProfileMiddleware(
+    private val userRepository: UserRepository,
+    private val settingRepository: SettingRepository,
+) : Middleware<ProfileState, ProfileAction>() {
+    override suspend fun process(state: ProfileState, action: ProfileAction) {
+        when (action) {
+            is ProfileAction.GetUserInfo -> getUserInfo()
+            is ProfileAction.ChangeAppTheme -> changeAppTheme(action.theme)
+            else -> Unit
+        }
+    }
+
+    private fun changeAppTheme(theme: SettingTheme) {
+        settingRepository.setSettingTheme(theme)
+        setAppCompatDelegateThemeMode(theme)
+    }
+
+    private fun getUserInfo() {
+        launchIO {
+            userRepository.userInfo.flowOn(Dispatchers.Main).collect { userInfo ->
+                dispatch(ProfileAction.UpdateUserInfo(userInfo))
+            }
+        }
+    }
+
+}

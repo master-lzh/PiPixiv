@@ -30,20 +30,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "PiPixiv"
 include(":app")
-include(":common")
-include(":util")
-include(":repository")
-include(":datasource")
-include(":data")
-include(":network")
-include(":domain")
-include(":common-ui")
-
-// include modules in feature folder
-file("./feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
-    // 使用目录名称构建模块路径
-    val moduleName = ":feature:${moduleDir.name}"
-    println("module name: $moduleName")
-    include(moduleName)
-}
+include(":lib_common")
+include(":lib_feature")
+include(":lib_strings")
 include(":baselineprofile")

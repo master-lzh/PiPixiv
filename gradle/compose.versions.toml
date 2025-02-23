@@ -3,7 +3,6 @@ compose-bom = "2025.02.00"
 accompanist = "0.34.0"
 
 [libraries]
-
 bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 foundation = { module = "androidx.compose.foundation:foundation" }
 animation = { module = "androidx.compose.animation:animation" }

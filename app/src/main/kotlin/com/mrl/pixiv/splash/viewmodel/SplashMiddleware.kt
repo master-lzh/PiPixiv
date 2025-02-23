@@ -1,0 +1,88 @@
+package com.mrl.pixiv.splash.viewmodel
+
+import com.mrl.pixiv.common.data.auth.AuthTokenFieldReq
+import com.mrl.pixiv.common.data.auth.GrantType
+import com.mrl.pixiv.common.datasource.TokenManager
+import com.mrl.pixiv.common.domain.auth.RefreshUserAccessTokenUseCase
+import com.mrl.pixiv.common.repository.AuthRepository
+import com.mrl.pixiv.common.repository.UserRepository
+import com.mrl.pixiv.common.viewmodel.Middleware
+import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Factory
+
+@Factory
+class SplashMiddleware(
+    private val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase,
+    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository,
+) : Middleware<SplashState, SplashAction>() {
+    override suspend fun process(state: SplashState, action: SplashAction) {
+        when (action) {
+            is SplashAction.IsLoginIntent -> isLogin()
+            is SplashAction.IsNeedRefreshTokenIntent -> isNeedRefreshToken()
+            is SplashAction.RefreshAccessTokenAndRouteIntent -> refreshAccessToken(action.grantType)
+            is SplashAction.RefreshAccessTokenIntent -> refreshAccessToken()
+
+            else -> {}
+        }
+    }
+
+    private fun refreshAccessToken() =
+        launchNetwork {
+            refreshUserAccessTokenUseCase()
+        }
+
+
+    private fun refreshAccessToken(grantType: GrantType) {
+        launchNetwork(
+            onError = {
+                dispatch(SplashAction.RouteToLoginScreenIntent)
+            }
+        ) {
+            if (userRepository.isNeedRefreshToken.first()) {
+                val userRefreshToken = userRepository.userRefreshToken.first()
+                val req = AuthTokenFieldReq(
+                    grantType = grantType.value,
+                    refreshToken = userRefreshToken
+                )
+                requestHttpDataWithFlow(
+                    request = authRepository.login(req),
+                    failedCallback = {
+                        dispatch(SplashAction.RouteToLoginScreenIntent)
+                    }
+                ) {
+                    setUserRefreshToken(it.refreshToken)
+                    setUserAccessToken(it.accessToken)
+                    dispatch(SplashAction.RouteToHomeScreenIntent)
+                }
+            } else {
+                dispatch(SplashAction.RouteToHomeScreenIntent)
+            }
+        }
+    }
+
+    private fun isNeedRefreshToken() {
+        launchIO {
+            if (userRepository.isNeedRefreshToken.first()) {
+                dispatch(SplashAction.RefreshAccessTokenAndRouteIntent(GrantType.REFRESH_TOKEN))
+            } else {
+                dispatch(SplashAction.RouteToHomeScreenIntent)
+            }
+        }
+    }
+
+    private fun isLogin() {
+        launchIO {
+            // 初始化TokenManager类，触发init代码块，从本地数据源加载token
+            TokenManager.token
+            if (userRepository.isLogin.first()) {
+                dispatch(SplashAction.IsNeedRefreshTokenIntent)
+            } else {
+                dispatch(SplashAction.RouteToLoginScreenIntent)
+            }
+        }
+    }
+
+    private fun setUserRefreshToken(refreshToken: String) = userRepository.setUserRefreshToken(refreshToken)
+    private fun setUserAccessToken(accessToken: String) = userRepository.setUserAccessToken(accessToken)
+}
