@@ -5,24 +5,15 @@ import android.content.Context
 import coil3.PlatformContext
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
-import com.mrl.pixiv.common.coroutine.launchIO
-import com.mrl.pixiv.common.data.search.Search
-import com.mrl.pixiv.common.data.setting.UserPreference
 import com.mrl.pixiv.common.data.setting.setAppCompatDelegateThemeMode
-import com.mrl.pixiv.common.data.user.UserInfo
 import com.mrl.pixiv.common.domain.setting.GetAppThemeUseCase
 import com.mrl.pixiv.common.util.AppUtil
-import com.mrl.pixiv.common.util.deleteFiles
 import com.mrl.pixiv.common.util.initializeFirebase
-import com.mrl.pixiv.common.util.isFileExists
 import com.mrl.pixiv.di.allModule
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.protobuf.ProtoBuf
 import okio.Path.Companion.toOkioPath
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -44,7 +35,6 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        migrateJsonToProtobuf()
         instance = this
         initializeFirebase()
         AppUtil.init(this)
@@ -55,51 +45,6 @@ class App : Application() {
         }
         GlobalScope.launch {
             setAppCompatDelegateThemeMode(getAppThemeUseCase().first())
-        }
-    }
-
-    private fun migrateJsonToProtobuf() {
-        val json = Json {
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-            isLenient = true
-        }
-        GlobalScope.launchIO {
-            val search = async {
-                val file = filesDir.resolve("datastore/search.json")
-                if (isFileExists(file)) {
-                    val text = file.readText()
-                    val search = json.decodeFromString(Search.serializer(), text)
-                    val byteArray = ProtoBuf.encodeToByteArray(Search.serializer(), search)
-                    filesDir.resolve("datastore/search.pb").writeBytes(byteArray)
-                    deleteFiles(file)
-                }
-            }
-            val userPreference = async {
-                val file = filesDir.resolve("datastore/user_preference.json")
-                if (isFileExists(file)) {
-                    val text = file.readText()
-                    val userPreference = json.decodeFromString(UserPreference.serializer(), text)
-                    val byteArray =
-                        ProtoBuf.encodeToByteArray(UserPreference.serializer(), userPreference)
-                    filesDir.resolve("datastore/user_preference.pb").writeBytes(byteArray)
-                    deleteFiles(file)
-                }
-            }
-            val userInfo = async {
-                val file = filesDir.resolve("datastore/user_info.json")
-                if (isFileExists(file)) {
-                    val text = file.readText()
-                    val userInfo = json.decodeFromString(UserInfo.serializer(), text)
-                    val byteArray =
-                        ProtoBuf.encodeToByteArray(UserInfo.serializer(), userInfo)
-                    filesDir.resolve("datastore/user_info.pb").writeBytes(byteArray)
-                    deleteFiles(file)
-                }
-            }
-            search.await()
-            userPreference.await()
-            userInfo.await()
         }
     }
 }

@@ -55,4 +55,7 @@ dependencies {
     "defaultApi"(libs.bundles.firebase)
     // Guava
     api(libs.guava)
+    // MMKV
+    api(libs.mmkv)
+    api(libs.mmkv.kotlin)
 }
