@@ -57,7 +57,7 @@ fun MMKVOwner.mmkvStringSet(default: Set<String>? = null) =
 fun MMKVOwner.mmkvBytes(default: ByteArray = byteArrayOf()) =
     MMKVProperty(MMKV_KMP::takeByteArray, MMKV_KMP::set, default)
 
-inline fun <reified V : Any> MMKVOwner.mmkvSerializable(defaultValue: V) =
+inline fun <reified V : Any?> MMKVOwner.mmkvSerializable(defaultValue: V) =
     MMKVSerializableProperty(serializer(), defaultValue)
 
 fun <V> MMKVProperty<V>.asStateFlow() = MMKVStateFlowProperty(this)

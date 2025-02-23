@@ -1,6 +1,5 @@
 package com.mrl.pixiv.common.mmkv
 
-import com.ctrip.flight.mmkv.mmkvWithID
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.protobuf.ProtoBuf
 import kotlin.properties.ReadWriteProperty
@@ -15,16 +14,16 @@ class MMKVSerializableProperty<V>(
     private val defaultValue: V
 ) : ReadWriteProperty<MMKVOwner, V> {
     override fun getValue(thisRef: MMKVOwner, property: KProperty<*>): V =
-        mmkvWithID(thisRef.id).takeByteArray(property.name)?.let {
+        thisRef.kv.takeByteArray(property.name)?.let {
             mmkvProtobuf.decodeFromByteArray(serializer, it)
         } ?: defaultValue
 
     override fun setValue(thisRef: MMKVOwner, property: KProperty<*>, value: V) {
         if (value != null) {
-            mmkvWithID(thisRef.id)[property.name] =
+            thisRef.kv[property.name] =
                 mmkvProtobuf.encodeToByteArray(serializer, value)
         } else {
-            mmkvWithID(thisRef.id).removeValueForKey(property.name)
+            thisRef.kv.removeValueForKey(property.name)
         }
     }
 }
