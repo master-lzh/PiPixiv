@@ -11,7 +11,7 @@ import org.koin.core.annotation.Single
 
 @Single(binds = [SearchDataSource::class])
 class SearchDataSource : BaseProtoDataSource<Search>(searchDataStore) {
-    override fun defaultValue(): Search = Search.defaultInstance
+    override fun defaultValue(): Search = Search()
 }
 
 val searchDataStore = DataStoreFactory.create(
