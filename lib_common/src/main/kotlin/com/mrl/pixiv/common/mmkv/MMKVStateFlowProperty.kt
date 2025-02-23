@@ -19,6 +19,18 @@ class MMKVStateFlowProperty<V>(
         ).also { cache = it }
 }
 
+class MMKVStateFlowSerializableProperty<V>(
+    private val mmkvSerializableProperty: MMKVSerializableProperty<V>
+) : ReadOnlyProperty<MMKVOwner, MutableStateFlow<V>> {
+    private var cache: MutableStateFlow<V>? = null
+
+    override fun getValue(thisRef: MMKVOwner, property: KProperty<*>): MutableStateFlow<V> =
+        cache ?: MMKVFlow(
+            { mmkvSerializableProperty.getValue(thisRef, property) },
+            { mmkvSerializableProperty.setValue(thisRef, property, it) }
+        ).also { cache = it }
+}
+
 class MMKVFlow<V>(
     private val getValue: () -> V,
     private val setValue: (V) -> Unit,

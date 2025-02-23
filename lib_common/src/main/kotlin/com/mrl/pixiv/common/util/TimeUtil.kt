@@ -1,12 +1,30 @@
 package com.mrl.pixiv.common.util
 
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
+
+fun currentTimeMillis() = Clock.System.now().toEpochMilliseconds()
+
 
 fun convertUtcStringToLocalDateTime(utcString: String): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-    val zonedDateTime = ZonedDateTime.parse(utcString)
-    val localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime()
+    val currentTimeZone = TimeZone.currentSystemDefault()
+    val instant = Instant.parse(utcString)
+    val localDateTime = instant.toLocalDateTime(currentTimeZone)
+    val formatter = LocalDateTime.Format {
+        year()
+        char('-')
+        monthNumber()
+        char('-')
+        dayOfMonth()
+        char(' ')
+        hour()
+        char(':')
+        minute()
+    }
     return localDateTime.format(formatter)
 }

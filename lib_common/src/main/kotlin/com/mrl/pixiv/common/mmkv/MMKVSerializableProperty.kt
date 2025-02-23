@@ -13,13 +13,13 @@ private val mmkvProtobuf = ProtoBuf {
 class MMKVSerializableProperty<V>(
     private val serializer: KSerializer<V>,
     private val defaultValue: V
-) : ReadWriteProperty<MMKVApp, V> {
-    override fun getValue(thisRef: MMKVApp, property: KProperty<*>): V =
+) : ReadWriteProperty<MMKVOwner, V> {
+    override fun getValue(thisRef: MMKVOwner, property: KProperty<*>): V =
         mmkvWithID(thisRef.id).takeByteArray(property.name)?.let {
             mmkvProtobuf.decodeFromByteArray(serializer, it)
         } ?: defaultValue
 
-    override fun setValue(thisRef: MMKVApp, property: KProperty<*>, value: V) {
+    override fun setValue(thisRef: MMKVOwner, property: KProperty<*>, value: V) {
         if (value != null) {
             mmkvWithID(thisRef.id)[property.name] =
                 mmkvProtobuf.encodeToByteArray(serializer, value)

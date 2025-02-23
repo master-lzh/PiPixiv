@@ -12,18 +12,18 @@ interface MMKVOwner {
 /**
  * 存储用户无关对数据
  */
-abstract class MMKVApp : MMKVOwner {
-    override val id = "pixiv.app"
-    override val kv = mmkvWithID(id)
+interface MMKVApp : MMKVOwner {
+    override val id get() = "pixiv.app"
+    override val kv get() = mmkvWithID(id)
 }
 
 /**
  * 当前用户级别的key-value存储实现该接口
  * 退出登录后会被清除
  */
-abstract class MMKVUser : MMKVOwner {
-    override val id = "pixiv.user"
-    override val kv = mmkvWithID(id)
+interface MMKVUser : MMKVOwner {
+    override val id get() = "pixiv.user"
+    override val kv get() = mmkvWithID(id)
 }
 
 internal operator fun MMKV_KMP.set(key: String, value: ByteArray?) = if (value == null) {
@@ -61,6 +61,8 @@ inline fun <reified V : Any> MMKVOwner.mmkvSerializable(defaultValue: V) =
     MMKVSerializableProperty(serializer(), defaultValue)
 
 fun <V> MMKVProperty<V>.asStateFlow() = MMKVStateFlowProperty(this)
+
+fun <V> MMKVSerializableProperty<V>.asStateFlow() = MMKVStateFlowSerializableProperty(this)
 
 fun MMKVOwner.clearAll() = kv.clearAll()
 

@@ -11,15 +11,8 @@ import okio.use
 
 @Serializable
 data class Search(
-    val searchHistoryList: List<SearchHistory>,
-) {
-    companion object {
-        val defaultInstance = Search(
-            searchHistoryList = emptyList(),
-        )
-    }
-
-}
+    val searchHistoryList: List<SearchHistory> = emptyList(),
+)
 
 @Serializable
 data class SearchHistory(
@@ -28,7 +21,7 @@ data class SearchHistory(
 )
 
 object SearchSerializer : OkioSerializer<Search> {
-    override val defaultValue: Search = Search.defaultInstance
+    override val defaultValue: Search = Search()
 
     override suspend fun readFrom(source: BufferedSource): Search =
         ProtoBuf.decodeFromByteArray(source.readByteArray())

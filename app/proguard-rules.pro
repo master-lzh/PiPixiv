@@ -53,3 +53,6 @@
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 -dontwarn org.slf4j.impl.StaticMDCBinder
 -dontwarn org.koin.ksp.generated.*
+
+-keep class de.jensklingenberg.ktorfit.** { *; }
+-keepclassmembers class de.jensklingenberg.ktorfit.** { *; }

@@ -40,7 +40,7 @@ internal fun Project.configureKotlinAndroid(
         compileSdk = 35
 
         defaultConfig {
-            minSdk = 21
+            minSdk = 23
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             proguardFiles.add(file("consumer-rules.pro"))
         }
