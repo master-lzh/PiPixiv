@@ -1,20 +1,16 @@
-package com.mrl.pixiv.di.network
+package com.mrl.pixiv.common.util
 
 import androidx.compose.ui.text.intl.Locale
 import com.mrl.pixiv.common.data.setting.UserPreference
-import com.mrl.pixiv.common.datasource.TokenManager
+import com.mrl.pixiv.common.datasource.local.mmkv.AuthManager
 import com.mrl.pixiv.common.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.common.repository.SettingRepository
 import io.ktor.client.request.HttpRequestBuilder
-import kotlinx.datetime.Clock
+import io.ktor.http.encodedPath
+import kotlinx.datetime.*
 import kotlinx.datetime.LocalDate.Formats.ISO
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
 import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
-import kotlinx.datetime.offsetIn
-import kotlinx.datetime.toLocalDateTime
 import okio.ByteString.Companion.toByteString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -59,7 +55,7 @@ internal fun encode(text: String): String {
     return ""
 }
 
-fun addAuthHeader(request: HttpRequestBuilder) {
+suspend fun addAuthHeader(request: HttpRequestBuilder) {
     val local = Locale.current
     val instantNow = Clock.System.now()
     val isoDate = "${
@@ -72,9 +68,9 @@ fun addAuthHeader(request: HttpRequestBuilder) {
             "User-Agent",
             "PixivAndroidApp/5.0.166 (Android 14; 2210132C)"
         )
-//            if (request.host != AUTH_HOST || request.host != hostMap[AUTH_HOST]) {
-        set("Authorization", "Bearer ${TokenManager.token}")
-//            }
+        if (!request.url.encodedPath.contains("/auth/token")) {
+            set("Authorization", "Bearer ${AuthManager.requireUserAccessToken()}")
+        }
         set("Accept-Language", "${local.language}_${local.region}")
         set("App-OS", "Android")
         set("App-OS-Version", "14")

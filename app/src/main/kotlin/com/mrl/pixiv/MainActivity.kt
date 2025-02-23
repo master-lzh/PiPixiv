@@ -23,21 +23,19 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.allowRgb565
 import com.mrl.pixiv.common.activity.BaseActivity
 import com.mrl.pixiv.common.data.HttpClientEnum
-import com.mrl.pixiv.common.lifecycle.OnLifecycle
+import com.mrl.pixiv.common.viewmodel.asState
+import com.mrl.pixiv.common.viewmodel.state
 import com.mrl.pixiv.navigation.root.RootNavigationGraph
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
-import com.mrl.pixiv.splash.viewmodel.SplashAction
-import com.mrl.pixiv.splash.viewmodel.SplashViewModel
+import com.mrl.pixiv.splash.SplashViewModel
 import com.mrl.pixiv.theme.PiPixivTheme
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.compose.KoinContext
 import org.koin.core.qualifier.named
-import kotlin.time.Duration.Companion.minutes
 
 class MainActivity : BaseActivity() {
     private val splashViewModel: SplashViewModel by viewModel()
@@ -69,22 +67,17 @@ class MainActivity : BaseActivity() {
                     .decoderCoroutineContext(Dispatchers.IO.limitedParallelism(2))
                     .build()
             }
-            LaunchedEffect(Unit) {
-                while (true) {
-                    delay(30.minutes)
-                    splashViewModel.dispatch(SplashAction.RefreshAccessTokenIntent)
-                }
-            }
+
             LaunchedEffect(Unit) {
                 handleIntent(intent)
             }
-            OnLifecycle(onLifecycle = splashViewModel::onStart)
             PiPixivTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    splashViewModel.state.startDestination?.let {
+                    val state = splashViewModel.asState()
+                    state.startDestination?.let {
                         RootNavigationGraph(
                             navHostController = rememberNavController(),
                             startDestination = it
@@ -98,7 +91,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                splashViewModel.state().isLoading
+                splashViewModel.state.isLoading
             }
         }
         super.onCreate(savedInstanceState)

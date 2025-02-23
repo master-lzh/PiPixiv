@@ -1,23 +1,13 @@
 package com.mrl.pixiv.navigation.main
 
 import androidx.activity.ComponentActivity
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -46,15 +36,15 @@ import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
 import com.mrl.pixiv.profile.detail.OtherProfileDetailScreen
 import com.mrl.pixiv.profile.detail.SelfProfileDetailScreen
-import com.mrl.pixiv.search.OutsideSearchResultsScreen
-import com.mrl.pixiv.search.SearchResultScreen
 import com.mrl.pixiv.search.SearchScreen
+import com.mrl.pixiv.search.SearchViewModel
 import com.mrl.pixiv.search.preview.SearchPreviewScreen
-import com.mrl.pixiv.search.viewmodel.SearchViewModel
+import com.mrl.pixiv.search.result.OutsideSearchResultsScreen
+import com.mrl.pixiv.search.result.SearchResultScreen
 import com.mrl.pixiv.setting.SettingScreen
 import com.mrl.pixiv.setting.network.NetworkSettingScreen
 import com.mrl.pixiv.setting.viewmodel.SettingViewModel
-import com.mrl.pixiv.splash.viewmodel.SplashViewModel
+import com.mrl.pixiv.splash.SplashViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -226,7 +216,7 @@ fun MainGraph(
                         // 设置页
                         composable<Destination.SettingScreen> {
                             val settingViewModel: SettingViewModel =
-                                koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
+                                koinViewModel(viewModelStoreOwner = LocalActivity.current as ComponentActivity)
                             val settingNavHostController = rememberNavController()
                             CompositionLocalProvider(LocalNavigator provides settingNavHostController) {
                                 NavHost(
@@ -280,7 +270,7 @@ private fun HandleDeeplink(
     navHostController: NavHostController
 ) {
     val splashViewModel: SplashViewModel =
-        koinViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
+        koinViewModel(viewModelStoreOwner = LocalActivity.current as ComponentActivity)
     val intent = splashViewModel.intent.collectAsStateWithLifecycle().value
     LaunchedEffect(intent) {
         if (intent != null) {

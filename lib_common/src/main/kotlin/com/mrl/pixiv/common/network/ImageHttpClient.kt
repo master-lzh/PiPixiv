@@ -1,6 +1,6 @@
-package com.mrl.pixiv.di.network
+package com.mrl.pixiv.common.network
 
-import com.mrl.pixiv.di.network.NetworkUtil.imageHost
+import com.mrl.pixiv.common.util.NetworkUtil.imageHost
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.plugin
 import io.ktor.http.URLProtocol

@@ -1,19 +1,21 @@
 package com.mrl.pixiv.common.viewmodel
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import okio.IOException
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
-// 定义通用状态容器
-sealed interface UiState<out T> {
-    object Loading : UiState<Nothing>
-    data class Success<T>(val data: T) : UiState<T>
-}
+
 
 // 定义副作用（包括错误）
 sealed interface SideEffect {
@@ -24,17 +26,34 @@ sealed interface SideEffect {
 // 事件入口基类
 interface ViewIntent
 
+val <S, I : ViewIntent> BaseMviViewModel<S, I>.state: S
+    get() = uiState.value
+
+@Composable
+fun <S, I : ViewIntent> BaseMviViewModel<S, I>.asState(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
+    context: CoroutineContext = EmptyCoroutineContext
+): S {
+    val state by uiState.collectAsStateWithLifecycle(
+        lifecycleOwner = lifecycleOwner,
+        minActiveState = minActiveState,
+        context = context
+    )
+    return state
+}
+
 /**
  * MVI 架构基础 ViewModel
  * @param initialState 初始状态
  */
-abstract class BaseMviViewModel<State : UiState<*>, Intent : ViewIntent>(
+abstract class BaseMviViewModel<State, Intent : ViewIntent>(
     initialState: State
 ) : ViewModel() {
 
     // 使用 StateFlow 管理状态
-    private val _state = MutableStateFlow(initialState)
-    val state = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(initialState)
+    val uiState = _uiState.asStateFlow()
 
     // 使用 SharedFlow 管理副作用（包括错误）
     private val _sideEffect = MutableSharedFlow<SideEffect>()
@@ -63,7 +82,7 @@ abstract class BaseMviViewModel<State : UiState<*>, Intent : ViewIntent>(
      * 更新状态（使用 reducer 模式保证不可变性）
      */
     protected fun updateState(reducer: State.() -> State) {
-        _state.update { it.reducer() }
+        _uiState.update { it.reducer() }
     }
 
     /**
@@ -79,4 +98,53 @@ abstract class BaseMviViewModel<State : UiState<*>, Intent : ViewIntent>(
     protected suspend fun handleError(throwable: Throwable) {
         sendEffect(SideEffect.Error(throwable))
     }
+
+    protected fun launchIO(
+        start: CoroutineStart = CoroutineStart.DEFAULT,
+        onError: (Throwable) -> Unit = {},
+        block: suspend CoroutineScope.() -> Unit
+    ): Job =
+        launchCatch(
+            context = Dispatchers.IO,
+            start = start,
+            onError = onError,
+            block = block
+        )
+
+
+    protected fun launchUI(
+        start: CoroutineStart = CoroutineStart.DEFAULT,
+        onError: (Throwable) -> Unit = {},
+        block: suspend CoroutineScope.() -> Unit
+    ): Job =
+        launchCatch(
+            context = Dispatchers.Main,
+            start = start,
+            onError = onError,
+            block = block
+        )
+
+    protected fun launchCatch(
+        context: CoroutineContext = EmptyCoroutineContext,
+        start: CoroutineStart = CoroutineStart.DEFAULT,
+        onError: (Throwable) -> Unit = { it.printStackTrace() },
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job {
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+            onError(throwable)
+        }
+        return viewModelScope.launch(context + exceptionHandler, start) {
+            runCatching { block.invoke(this) }
+                .onFailure {
+                    throw if (it is CancellationException) {
+                        CancelException(it)
+                    } else {
+                        it
+                    }
+                }
+        }
+    }
 }
+
+class CancelException(cause: Exception) : IOException(cause.message.orEmpty(), cause)

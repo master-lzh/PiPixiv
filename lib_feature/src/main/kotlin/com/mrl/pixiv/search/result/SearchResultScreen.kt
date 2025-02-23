@@ -1,39 +1,14 @@
-package com.mrl.pixiv.search
+package com.mrl.pixiv.search.result
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterAlt
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
@@ -55,9 +30,7 @@ import com.mrl.pixiv.common.ui.illust.IllustGrid
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.util.throttleClick
-import com.mrl.pixiv.search.viewmodel.result.SearchResultAction
-import com.mrl.pixiv.search.viewmodel.result.SearchResultState
-import com.mrl.pixiv.search.viewmodel.result.SearchResultViewModel
+import com.mrl.pixiv.common.viewmodel.asState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -72,9 +45,10 @@ fun SearchResultScreen(
     searchResultViewModel: SearchResultViewModel = koinViewModel { parametersOf(searchWords) },
     navHostController: NavHostController,
 ) {
+    val state = searchResultViewModel.asState()
     SearchResultScreen_(
         modifier = modifier,
-        state = searchResultViewModel.state,
+        state = state,
         searchResults = searchResultViewModel.searchResults.collectAsLazyPagingItems(),
         popBack = searchNavHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
@@ -89,9 +63,10 @@ fun OutsideSearchResultsScreen(
     searchResultViewModel: SearchResultViewModel = koinViewModel { parametersOf(searchWords) },
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
+    val state = searchResultViewModel.asState()
     SearchResultScreen_(
         modifier = modifier,
-        state = searchResultViewModel.state,
+        state = state,
         searchResults = searchResultViewModel.searchResults.collectAsLazyPagingItems(),
         popBack = navHostController::popBackStack,
         naviToPic = navHostController::navigateToPictureScreen,
@@ -103,7 +78,7 @@ fun OutsideSearchResultsScreen(
 @Composable
 internal fun SearchResultScreen_(
     modifier: Modifier = Modifier,
-    state: SearchResultState = SearchResultState.INITIAL,
+    state: SearchResultState = SearchResultState(),
     searchResults: LazyPagingItems<Illust>,
     popBack: () -> Unit = {},
     naviToPic: (Illust, String) -> Unit = { _, _ -> },
