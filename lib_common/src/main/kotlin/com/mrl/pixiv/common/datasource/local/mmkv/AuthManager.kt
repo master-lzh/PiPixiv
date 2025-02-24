@@ -41,5 +41,5 @@ object AuthManager : MMKVUser {
         get() = userRefreshToken.isNotEmpty() && userAccessToken.isNotEmpty() && accessTokenExpiresTime > currentTimeMillis()
 
     val isNeedRefreshToken: Boolean
-        get() = accessTokenExpiresTime <= currentTimeMillis()
+        get() = accessTokenExpiresTime != 0L && accessTokenExpiresTime <= currentTimeMillis()
 }

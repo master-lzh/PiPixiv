@@ -1,10 +1,10 @@
 [versions]
 kotlin = "2.1.10"
-ksp = "2.1.10-1.0.29"
+ksp = "2.1.10-1.0.30"
 serialization = "1.8.0"
 coroutines = "1.10.1"
 ktor = "3.1.0"
-ktorfit = "2.2.0"
+ktorfit = "2.3.0"
 datetime = "0.6.2"
 collections-immutable = "0.3.8"
 
