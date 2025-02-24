@@ -2,8 +2,8 @@ buildscript {
 
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id(androidx.plugins.android.application.get().pluginId) apply false
-    id(androidx.plugins.android.library.get().pluginId) apply false
+    alias(androidx.plugins.android.application) apply false
+    alias(androidx.plugins.android.library) apply false
     alias(kotlinx.plugins.serialization) apply false
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.firebase.crashlytics) apply false

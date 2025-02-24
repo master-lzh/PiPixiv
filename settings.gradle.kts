@@ -11,6 +11,7 @@ if (localFile.exists()) {
 }
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
