@@ -59,7 +59,7 @@ class SplashViewModel : BaseMviViewModel<SplashState, SplashAction>(
     }
 
     private fun isLogin() {
-        if (AuthManager.isLogin) {
+        if (AuthManager.hasTokens) {
             isNeedRefreshToken()
         } else {
             routeToLogin()

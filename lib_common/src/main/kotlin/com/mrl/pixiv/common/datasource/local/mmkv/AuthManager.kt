@@ -32,14 +32,15 @@ object AuthManager : MMKVUser {
                     accessTokenExpiresTime = currentTimeMillis() + resp.expiresIn * 1000
                 }
                 userAccessToken
-            }.onFailure {
-                it
             }.getOrNull().orEmpty()
         }
 
-    val isLogin: Boolean
-        get() = userRefreshToken.isNotEmpty() && userAccessToken.isNotEmpty() && accessTokenExpiresTime > currentTimeMillis()
+    val hasTokens: Boolean
+        get() = userRefreshToken.isNotEmpty() && userAccessToken.isNotEmpty()
 
     val isNeedRefreshToken: Boolean
         get() = accessTokenExpiresTime != 0L && accessTokenExpiresTime <= currentTimeMillis()
+
+    val isLogin: Boolean
+        get() = hasTokens && accessTokenExpiresTime > currentTimeMillis()
 }

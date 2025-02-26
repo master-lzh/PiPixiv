@@ -29,13 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.common.data.Illust
-import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.currentOrThrow
@@ -46,8 +44,6 @@ import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.home.components.HomeTopBar
 import com.mrl.pixiv.home.components.RecommendGrid
-import com.mrl.pixiv.home.viewmodel.HomeAction
-import com.mrl.pixiv.home.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -63,19 +59,7 @@ fun HomeScreen(
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     homeViewModel: HomeViewModel = koinViewModel(),
 ) {
-    OnLifecycle(lifecycleEvent = Lifecycle.Event.ON_CREATE, onLifecycle = homeViewModel::onCreate)
-    val context = LocalContext.current
     val recommendImageList = homeViewModel.recommendImageList.collectAsLazyPagingItems()
-    val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(Unit) {
-        homeViewModel.exception.collect {
-            it?.let {
-                snackbarHostState.showSnackbar(
-                    it.message ?: context.getString(RString.unknown_error)
-                )
-            }
-        }
-    }
     HomeScreen(
         modifier = modifier,
         navToPictureScreen = navHostController::navigateToPictureScreen,

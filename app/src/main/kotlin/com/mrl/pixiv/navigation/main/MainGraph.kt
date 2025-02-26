@@ -31,7 +31,7 @@ import com.mrl.pixiv.common.viewmodel.LocalGlobalStore
 import com.mrl.pixiv.common.viewmodel.globalStore
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
-import com.mrl.pixiv.home.viewmodel.HomeViewModel
+import com.mrl.pixiv.home.HomeViewModel
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
 import com.mrl.pixiv.profile.detail.OtherProfileDetailScreen

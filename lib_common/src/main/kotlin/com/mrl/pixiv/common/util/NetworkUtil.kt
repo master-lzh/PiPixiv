@@ -3,14 +3,18 @@ package com.mrl.pixiv.common.util
 import androidx.compose.ui.text.intl.Locale
 import com.mrl.pixiv.common.data.setting.UserPreference
 import com.mrl.pixiv.common.datasource.local.mmkv.AuthManager
-import com.mrl.pixiv.common.domain.auth.RefreshUserAccessTokenUseCase
 import com.mrl.pixiv.common.repository.SettingRepository
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.encodedPath
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate.Formats.ISO
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
 import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
+import kotlinx.datetime.offsetIn
+import kotlinx.datetime.toLocalDateTime
 import okio.ByteString.Companion.toByteString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -84,7 +88,6 @@ suspend fun addAuthHeader(request: HttpRequestBuilder) {
 
 object NetworkUtil : KoinComponent {
     private val settingRepository: SettingRepository by inject()
-    val refreshUserAccessTokenUseCase: RefreshUserAccessTokenUseCase by inject()
     private val allSetting: UserPreference = settingRepository.allSettingsSync
     val enableBypassSniffing: Boolean = allSetting.enableBypassSniffing
     val imageHost: String = allSetting.imageHost.ifEmpty { IMAGE_HOST }
