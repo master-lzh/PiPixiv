@@ -24,7 +24,6 @@ import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.search.SearchSort
 import com.mrl.pixiv.common.data.search.SearchTarget
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.IllustGrid
 import com.mrl.pixiv.common.util.RString
@@ -95,7 +94,7 @@ internal fun SearchResultScreen_(
         Configuration.ORIENTATION_LANDSCAPE -> 4
         else -> 2
     }
-    Screen(
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = {

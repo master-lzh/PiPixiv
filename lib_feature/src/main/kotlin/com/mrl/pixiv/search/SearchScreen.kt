@@ -31,7 +31,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.DebounceUtil
@@ -81,7 +80,7 @@ internal fun SearchScreen_(
     }
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-    Screen(
+    Scaffold(
         modifier = modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null

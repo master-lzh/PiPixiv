@@ -2,36 +2,12 @@ package com.mrl.pixiv.profile
 
 import android.os.Build
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Bookmarks
-import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.History
-import androidx.compose.material.icons.rounded.Palette
-import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,16 +19,10 @@ import com.mrl.pixiv.common.data.setting.getAppCompatDelegateThemeMode
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
-import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.SettingItem
-import com.mrl.pixiv.common.util.RString
-import com.mrl.pixiv.common.util.navigateToHistoryScreen
-import com.mrl.pixiv.common.util.navigateToSelfCollectionScreen
-import com.mrl.pixiv.common.util.navigateToSelfProfileDetailScreen
-import com.mrl.pixiv.common.util.navigateToSettingScreen
-import com.mrl.pixiv.common.util.throttleClick
+import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.profile.viewmodel.ProfileAction
 import com.mrl.pixiv.profile.viewmodel.ProfileState
 import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
@@ -100,7 +70,7 @@ internal fun ProfileScreen_(
     navToHistory: () -> Unit = {},
     navToCollection: () -> Unit = {},
 ) {
-    Screen(
+    Scaffold(
         topBar = {
             var expanded by remember { mutableStateOf(false) }
             TopAppBar(

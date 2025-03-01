@@ -20,60 +20,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.staggeredgrid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Download
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Share
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -107,35 +63,13 @@ import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
-import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
-import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
-import com.mrl.pixiv.common.ui.Screen
+import com.mrl.pixiv.common.ui.*
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.components.m3.Surface
-import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common.ui.deepBlue
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
-import com.mrl.pixiv.common.util.AppUtil
+import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.util.AppUtil.getString
-import com.mrl.pixiv.common.util.DOWNLOAD_DIR
-import com.mrl.pixiv.common.util.OnScrollToBottom
-import com.mrl.pixiv.common.util.PictureType
-import com.mrl.pixiv.common.util.RString
-import com.mrl.pixiv.common.util.calculateImageSize
-import com.mrl.pixiv.common.util.convertUtcStringToLocalDateTime
-import com.mrl.pixiv.common.util.isEven
-import com.mrl.pixiv.common.util.isFileExists
-import com.mrl.pixiv.common.util.joinPaths
-import com.mrl.pixiv.common.util.navigateToOtherProfileDetailScreen
-import com.mrl.pixiv.common.util.navigateToOutsideSearchResultScreen
-import com.mrl.pixiv.common.util.navigateToPictureScreen
-import com.mrl.pixiv.common.util.popBackToMainScreen
-import com.mrl.pixiv.common.util.queryParams
-import com.mrl.pixiv.common.util.saveToAlbum
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
 import com.mrl.pixiv.common.viewmodel.illust.IllustState
@@ -234,7 +168,7 @@ internal fun PictureDeeplinkScreen(
 
 
 @OptIn(ExperimentalPermissionsApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
     state: PictureState,
@@ -335,7 +269,7 @@ internal fun PictureScreen(
     val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
     with(sharedTransitionScope) {
-        Screen(
+        Scaffold(
             modifier = modifier.sharedBounds(
                 rememberSharedContentState(key = "${prefix}-card-${illust.id}"),
                 animatedContentScope,
@@ -424,7 +358,7 @@ internal fun PictureScreen(
                     )
                 }
             },
-            snackBarHost = {
+            snackbarHost = {
                 SnackbarHost(snackbarHostState) {
                     TextSnackbar(
                         text = it.visuals.message,
@@ -432,7 +366,6 @@ internal fun PictureScreen(
                 }
             },
         ) {
-
             LazyVerticalStaggeredGrid(
                 state = lazyStaggeredGridState,
                 columns = StaggeredGridCells.Fixed(relatedSpanCount),

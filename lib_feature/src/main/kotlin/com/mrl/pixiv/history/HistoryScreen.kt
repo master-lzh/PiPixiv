@@ -9,15 +9,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -31,7 +24,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.filter
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.Screen
 import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
 import com.mrl.pixiv.common.ui.currentOrThrow
@@ -72,7 +64,7 @@ internal fun HistoryScreen_(
 ) {
     var searchValue by remember { mutableStateOf(TextFieldValue(state.currentSearch)) }
     val focusManager = LocalFocusManager.current
-    Screen(
+    Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(

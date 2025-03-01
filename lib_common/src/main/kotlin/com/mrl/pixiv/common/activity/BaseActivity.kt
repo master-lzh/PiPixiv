@@ -5,7 +5,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
-import androidx.core.view.WindowCompat
 
 abstract class BaseActivity : AppCompatActivity() {
     protected val TAG = this::class.simpleName
@@ -15,7 +14,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContent { BuildContent() }
     }
