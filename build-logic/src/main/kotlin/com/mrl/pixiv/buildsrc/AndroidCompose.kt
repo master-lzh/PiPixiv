@@ -18,11 +18,7 @@ package com.mrl.pixiv.buildsrc
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
@@ -31,40 +27,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 fun Project.configureAndroidCompose(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
-    val compose = extensions.getByType<VersionCatalogsExtension>().named("compose")
-    val androidx = extensions.getByType<VersionCatalogsExtension>().named("androidx")
-    val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
-
     commonExtension.apply {
         buildFeatures {
-            this.compose = true
-        }
-
-//        composeOptions {
-//            kotlinCompilerExtensionVersion = compose.findVersion("compiler").get().toString()
-//        }
-
-        dependencies {
-            val bom = compose.findLibrary("bom").get()
-            implementation(platform(bom))
-
-            implementation(androidx.findLibrary("core-ktx").get())
-            implementation(androidx.findBundle("lifecycle").get())
-            implementation(androidx.findLibrary("navigation.compose").get())
-            implementation(androidx.findLibrary("tracing").get())
-
-            implementation(compose.findBundle("material").get())
-            implementation(compose.findBundle("baselibs").get())
-
-            implementation(libs.findLibrary("koin.compose").get())
-
+            compose = true
         }
     }
 
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             freeCompilerArgs.addAll(buildComposeMetricsParameters())
-            languageVersion.set(KotlinVersion.KOTLIN_2_0)
         }
     }
 }

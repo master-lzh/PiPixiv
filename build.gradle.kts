@@ -4,9 +4,11 @@ buildscript {
 plugins {
     alias(androidx.plugins.android.application) apply false
     alias(androidx.plugins.android.library) apply false
+    alias(androidx.plugins.android.test) apply false
+    alias(kotlinx.plugins.android) apply false
     alias(kotlinx.plugins.serialization) apply false
-    alias(libs.plugins.google.services) apply false
-    alias(libs.plugins.firebase.crashlytics) apply false
     alias(kotlinx.plugins.compose.compiler) apply false
     alias(kotlinx.plugins.ktorfit) apply false
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
 }

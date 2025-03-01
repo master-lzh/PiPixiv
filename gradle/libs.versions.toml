@@ -1,5 +1,4 @@
 [versions]
-junit = "4.13.2"
 okio = "3.10.2"
 coil3 = "3.1.0"
 richtext = "0.20.0"
@@ -7,7 +6,6 @@ koin = "4.0.2"
 koinAnnotation = "2.0.0-RC5"
 androidx-test-ext-junit = "1.2.1"
 androidx-test-espresso-espresso-core = "3.6.1"
-com-google-android-material-material = "1.12.0"
 lottie = "6.6.2"
 google-services = "4.4.2"
 firebase-bom = "33.10.0"
@@ -22,7 +20,6 @@ desugar = "2.1.5"
 [libraries]
 desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 
-junit-junit = { module = "junit:junit", version.ref = "junit" }
 
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
@@ -34,8 +31,6 @@ coil3-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3" }
 
 richtext-commonmark = { module = "com.halilibo.compose-richtext:richtext-commonmark", version.ref = "richtext" }
 richtext-m3 = { module = "com.halilibo.compose-richtext:richtext-ui-material3", version.ref = "richtext" }
-
-
 
 koin = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
@@ -49,9 +44,6 @@ guava = "com.google.guava:guava:33.3.1-jre"
 
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-test-espresso-espresso-core" }
-google-material = { group = "com.google.android.material", name = "material", version.ref = "com-google-android-material-material" }
-
-collapsing-toolbar = "me.onebone:toolbar-compose:2.3.5"
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }

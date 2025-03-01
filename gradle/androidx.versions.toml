@@ -1,16 +1,15 @@
 [versions]
-agp = "8.8.1"
+agp = "8.8.2"
 lifecycle = "2.8.7"
 appcompat = "1.7.0"
 baselineprofile = "1.3.3"
 tracing = "1.2.0"
-activity-compose = "1.10.0"
-annotation = "1.9.1"
+activity-compose = "1.10.1"
 core-ktx = "1.15.0"
 splashscreen = "1.0.1"
 profileinstaller = "1.4.1"
-navigation = "2.8.7"
-datastore = "1.1.2"
+navigation = "2.8.8"
+datastore = "1.1.3"
 paging = "3.3.6"
 work = "2.10.0"
 
@@ -18,7 +17,6 @@ work = "2.10.0"
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }

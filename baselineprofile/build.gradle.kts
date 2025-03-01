@@ -1,6 +1,6 @@
 plugins {
-    id(androidx.plugins.android.test.get().pluginId)
-    id(kotlinx.plugins.android.get().pluginId)
+    alias(androidx.plugins.android.test)
+    alias(kotlinx.plugins.android)
     alias(androidx.plugins.baselineprofile)
 }
 

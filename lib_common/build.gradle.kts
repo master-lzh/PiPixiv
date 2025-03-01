@@ -14,6 +14,7 @@ android {
 
 dependencies {
     api(project(":lib_strings"))
+
     // core-ktx
     api(androidx.core.ktx)
     api(androidx.appcompat)
@@ -32,18 +33,23 @@ dependencies {
     api(platform(compose.bom))
     api(compose.bundles.baselibs)
     api(androidx.activity.compose)
-    // Accompanist
     api(compose.bundles.accompanist)
+    // Navigation
+    api(androidx.navigation.compose)
     // Koin
     api(libs.bundles.koin)
+    ksp(libs.koin.ksp.compiler)
     // Ktor
     api(kotlinx.bundles.ktor)
     // Coroutines
+    api(platform(kotlinx.coroutines.bom))
     api(kotlinx.bundles.coroutines)
     // Serialization
     api(kotlinx.bundles.serialization)
     // DateTime
     api(kotlinx.datetime)
+    // KotlinX Collections Immutable
+    api(kotlinx.collections.immutable)
     // Reflect
     api(kotlinx.reflect)
     // Coil3
@@ -59,4 +65,7 @@ dependencies {
     // MMKV
     api(libs.mmkv)
     api(libs.mmkv.kotlin)
+    // Logger
+    api(libs.kermit)
+
 }

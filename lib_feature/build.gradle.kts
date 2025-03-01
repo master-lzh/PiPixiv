@@ -1,5 +1,5 @@
 plugins {
-    id("pixiv.android.feature")
+    id("pixiv.android.library.compose")
 }
 
 android {
@@ -8,4 +8,6 @@ android {
 
 dependencies {
     implementation(project(":lib_common"))
+
+    ksp(libs.koin.ksp.compiler)
 }

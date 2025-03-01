@@ -6,11 +6,8 @@ accompanist = "0.34.0"
 bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 foundation = { module = "androidx.compose.foundation:foundation" }
 animation = { module = "androidx.compose.animation:animation" }
-runtime-android = { module = "androidx.compose.runtime:runtime-android" }
 ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
-ui-util = { module = "androidx.compose.ui:ui-util" }
-ui-text = { module = "androidx.compose.ui:ui-text" }
 
 material3-core = { module = "androidx.compose.material3:material3" }
 material-icons-core = { module = "androidx.compose.material:material-icons-core" }
@@ -21,5 +18,4 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 
 [bundles]
 accompanist = ["accompanist-webview", "accompanist-permissions"]
-material = ["material-icons", "material3-core", "material-icons-core"]
-baselibs = ["foundation", "ui", "ui-tooling", "ui-util"]
+baselibs = ["foundation", "animation", "ui", "ui-tooling", "material-icons", "material3-core", "material-icons-core"]
