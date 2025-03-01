@@ -10,16 +10,17 @@ androidx-test-espresso-espresso-core = "3.6.1"
 com-google-android-material-material = "1.12.0"
 lottie = "6.6.2"
 google-services = "4.4.2"
-firebase-bom = "33.9.0"
+firebase-bom = "33.10.0"
 firebase-crashlytics-gradle = "3.0.3"
 uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.3.3"
 kermit = "2.0.5"
-mmkv = "2.1.0-v7a-support"
+mmkv = "2.1.0-32bit-support"
 mmkv-kotlin = "1.2.16"
+desugar = "2.1.5"
 
 [libraries]
-desugar = "com.android.tools:desugar_jdk_libs:2.1.4"
+desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 
 junit-junit = { module = "junit:junit", version.ref = "junit" }
 
