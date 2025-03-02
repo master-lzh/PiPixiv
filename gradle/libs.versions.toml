@@ -1,4 +1,5 @@
 [versions]
+material = "1.12.0"
 okio = "3.10.2"
 coil3 = "3.1.0"
 richtext = "0.20.0"
@@ -21,6 +22,7 @@ desugar = "2.1.5"
 desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 
 
+material = { module = "com.google.android.material:material", version.ref = "material" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 coil3-bom = { module = "io.coil-kt.coil3:coil-bom", version.ref = "coil3" }

@@ -67,5 +67,5 @@ dependencies {
     api(libs.mmkv.kotlin)
     // Logger
     api(libs.kermit)
-
+    api(libs.material)
 }
