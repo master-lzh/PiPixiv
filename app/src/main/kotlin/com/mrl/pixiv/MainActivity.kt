@@ -2,15 +2,15 @@ package com.mrl.pixiv
 
 import android.app.ActivityManager
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
 import androidx.core.content.getSystemService
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
@@ -26,7 +26,6 @@ import com.mrl.pixiv.common.data.HttpClientEnum
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.common.viewmodel.state
 import com.mrl.pixiv.navigation.root.RootNavigationGraph
-import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import com.mrl.pixiv.splash.SplashViewModel
 import com.mrl.pixiv.theme.PiPixivTheme
 import io.ktor.client.HttpClient
@@ -39,12 +38,21 @@ import org.koin.core.qualifier.named
 
 class MainActivity : BaseActivity() {
     private val splashViewModel: SplashViewModel by viewModel()
-    private val settingViewModel: SettingViewModel by viewModel()
     private val imageHttpClient: HttpClient by inject(named(HttpClientEnum.IMAGE))
 
 
     @Composable
     override fun BuildContent() {
+        val isSystemInDarkTheme = isSystemInDarkTheme()
+        LaunchedEffect(isSystemInDarkTheme) {
+            // Draw edge-to-edge and set system bars color to transparent
+            val lightStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.BLACK)
+            val darkStyle = SystemBarStyle.dark(Color.TRANSPARENT)
+            enableEdgeToEdge(
+                statusBarStyle = if (isSystemInDarkTheme) darkStyle else lightStyle,
+                navigationBarStyle = if (isSystemInDarkTheme) darkStyle else lightStyle,
+            )
+        }
         KoinContext {
             val errorImage =
                 AppCompatResources.getDrawable(this, R.drawable.ic_error_outline_24)?.asImage()
@@ -72,17 +80,12 @@ class MainActivity : BaseActivity() {
                 handleIntent(intent)
             }
             PiPixivTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val state = splashViewModel.asState()
-                    state.startDestination?.let {
-                        RootNavigationGraph(
-                            navHostController = rememberNavController(),
-                            startDestination = it
-                        )
-                    }
+                val state = splashViewModel.asState()
+                state.startDestination?.let {
+                    RootNavigationGraph(
+                        navHostController = rememberNavController(),
+                        startDestination = it
+                    )
                 }
             }
         }
