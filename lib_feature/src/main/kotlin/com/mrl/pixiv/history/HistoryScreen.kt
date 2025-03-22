@@ -30,9 +30,7 @@ import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.IllustGrid
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
-import com.mrl.pixiv.history.viewmodel.HistoryAction
-import com.mrl.pixiv.history.viewmodel.HistoryState
-import com.mrl.pixiv.history.viewmodel.HistoryViewModel
+import com.mrl.pixiv.common.viewmodel.asState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.koinViewModel
@@ -46,7 +44,7 @@ fun HistoryScreen(
     HistoryScreen_(
         illusts = viewModel.illusts,
         modifier = modifier,
-        state = viewModel.state,
+        state = viewModel.asState(),
         dispatch = viewModel::dispatch,
         popBack = { navHostController.popBackStack() },
         navToPictureScreen = navHostController::navigateToPictureScreen
@@ -57,7 +55,7 @@ fun HistoryScreen(
 internal fun HistoryScreen_(
     illusts: Flow<PagingData<Illust>>,
     modifier: Modifier = Modifier,
-    state: HistoryState = HistoryState.INITIAL,
+    state: HistoryState = HistoryState(),
     dispatch: (HistoryAction) -> Unit = {},
     popBack: () -> Unit = {},
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },

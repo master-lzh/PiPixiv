@@ -5,9 +5,7 @@ import com.mrl.pixiv.common.viewmodel.Middleware
 import org.koin.core.annotation.Factory
 
 @Factory
-class SettingMiddleware(
-    private val settingRepository: SettingRepository
-) : Middleware<SettingState, SettingAction>() {
+class SettingMiddleware: Middleware<SettingState, SettingAction>() {
     override suspend fun process(state: SettingState, action: SettingAction) {
         when (action) {
             is SettingAction.LoadSetting -> loadSetting()
@@ -18,12 +16,12 @@ class SettingMiddleware(
     }
 
     private fun savePictureSourceHost(host: String) {
-        settingRepository.setPictureSourceHost(host)
+        SettingRepository.setPictureSourceHost(host)
         dispatch(SettingAction.UpdatePictureSourceHost(host))
     }
 
     private fun switchBypassSniffing() {
-        settingRepository.setEnableBypassSniffing(!state().enableBypassSniffing)
+        SettingRepository.setEnableBypassSniffing(!state().enableBypassSniffing)
     }
 
     private fun loadSetting() {

@@ -116,7 +116,10 @@ fun SquareIllustItem(
                     .memoryCacheKey(imageKey)
                     .build(),
                 contentDescription = null,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                onError = {
+                    it.result.throwable
+                }
             )
 
             Row(

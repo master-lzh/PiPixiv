@@ -1,6 +1,7 @@
 package com.mrl.pixiv.common.data.setting
 
 import androidx.datastore.core.okio.OkioSerializer
+import com.mrl.pixiv.common.util.IMAGE_HOST
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
@@ -14,7 +15,7 @@ data class UserPreference(
     val theme: String = SettingTheme.SYSTEM.name,
     val enableBypassSniffing: Boolean = false,
     val isR18Enabled: Boolean = false,
-    val imageHost: String = "i.pximg.net",
+    val imageHost: String = IMAGE_HOST,
     val hasShowBookmarkTip: Boolean = false,
 ) {
     companion object {
