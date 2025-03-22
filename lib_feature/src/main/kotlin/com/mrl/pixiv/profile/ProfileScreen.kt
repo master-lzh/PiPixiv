@@ -18,7 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.data.setting.SettingTheme
 import com.mrl.pixiv.common.data.setting.getAppCompatDelegateThemeMode
-import com.mrl.pixiv.common.datasource.local.mmkv.UserManager
+import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
@@ -71,7 +71,7 @@ internal fun ProfileScreen_(
     navToHistory: () -> Unit = {},
     navToCollection: () -> Unit = {},
 ) {
-    val userInfo by UserManager.userInfoFlow.collectAsStateWithLifecycle()
+    val userInfo by requireUserInfoFlow.collectAsStateWithLifecycle()
     LifecycleResumeEffect(Unit) {
         dispatch(ProfileAction.GetUserInfo)
         onPauseOrDispose {}

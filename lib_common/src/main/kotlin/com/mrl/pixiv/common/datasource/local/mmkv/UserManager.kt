@@ -18,9 +18,12 @@ import kotlinx.coroutines.flow.update
 val requireUserInfoValue
     get() = UserManager.userInfoFlow.value
 
+val requireUserInfoFlow
+    get() = UserManager.userInfoFlow
+
 object UserManager : MMKVUser {
     private val userInfo by mmkvSerializable(UserDetailResp()).asMutableStateFlow()
-    val userInfoFlow = userInfo.asStateFlow()
+    internal val userInfoFlow = userInfo.asStateFlow()
 
     internal fun updateUserInfo(
         id: Long,

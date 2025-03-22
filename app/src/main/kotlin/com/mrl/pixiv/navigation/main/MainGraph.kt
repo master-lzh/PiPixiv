@@ -19,7 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mrl.pixiv.collection.SelfCollectionScreen
-import com.mrl.pixiv.common.datasource.local.mmkv.UserManager
+import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
@@ -246,7 +246,7 @@ fun MainGraph(
                         // 本人收藏页
                         composable<Destination.SelfCollectionScreen> {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                                val userInfo by UserManager.userInfoFlow.collectAsStateWithLifecycle()
+                                val userInfo by requireUserInfoFlow.collectAsStateWithLifecycle()
                                 SelfCollectionScreen(userInfo.user.id)
                             }
                         }
