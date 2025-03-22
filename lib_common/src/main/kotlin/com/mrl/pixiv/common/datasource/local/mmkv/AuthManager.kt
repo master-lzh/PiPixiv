@@ -1,7 +1,9 @@
 package com.mrl.pixiv.common.datasource.local.mmkv
 
 import com.mrl.pixiv.common.coroutine.withIOContext
+import com.mrl.pixiv.common.data.Constants
 import com.mrl.pixiv.common.data.auth.AuthTokenFieldReq
+import com.mrl.pixiv.common.data.auth.AuthTokenResp
 import com.mrl.pixiv.common.data.auth.GrantType
 import com.mrl.pixiv.common.mmkv.MMKVUser
 import com.mrl.pixiv.common.mmkv.mmkvLong
@@ -27,20 +29,36 @@ object AuthManager : MMKVUser {
                             refreshToken = userRefreshToken
                         )
                     )
-                    userAccessToken = resp.accessToken
-                    userRefreshToken = resp.refreshToken
-                    accessTokenExpiresTime = currentTimeMillis() + resp.expiresIn * 1000
-                    if (resp.user != null) {
-                        UserManager.updateUserInfo(
-                            resp.user.id.toLong(),
-                            resp.user.name,
-                            resp.user.account
-                        )
-                    }
+                    updateUserInfo(resp)
                 }
                 userAccessToken
             }.getOrNull().orEmpty()
         }
+
+    suspend fun login(code: String, codeVerifier: String) {
+        val resp = PixivRepository.login(
+            AuthTokenFieldReq(
+                grantType = GrantType.AUTHORIZATION_CODE.value,
+                code = code,
+                codeVerifier = codeVerifier,
+                redirectUri = Constants.PIXIV_LOGIN_REDIRECT_URL,
+            )
+        )
+        updateUserInfo(resp)
+    }
+
+    private fun updateUserInfo(resp: AuthTokenResp) {
+        userAccessToken = resp.accessToken
+        userRefreshToken = resp.refreshToken
+        accessTokenExpiresTime = currentTimeMillis() + resp.expiresIn * 1000
+        if (resp.user != null) {
+            UserManager.updateUserInfo(
+                resp.user.id.toLong(),
+                resp.user.name,
+                resp.user.account
+            )
+        }
+    }
 
     val hasTokens: Boolean
         get() = userRefreshToken.isNotEmpty() && userAccessToken.isNotEmpty()
