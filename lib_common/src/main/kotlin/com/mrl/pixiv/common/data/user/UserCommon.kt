@@ -30,25 +30,25 @@ data class Profile(
     val jobID: Long = 0,
 
     @SerialName("total_follow_users")
-    val totalFollowUsers: Long,
+    val totalFollowUsers: Long = 0,
 
     @SerialName("total_mypixiv_users")
-    val totalMypixivUsers: Long,
+    val totalMypixivUsers: Long = 0,
 
     @SerialName("total_illusts")
-    val totalIllusts: Long,
+    val totalIllusts: Long = 0,
 
     @SerialName("total_manga")
-    val totalManga: Long,
+    val totalManga: Long = 0,
 
     @SerialName("total_novels")
-    val totalNovels: Long,
+    val totalNovels: Long = 0,
 
     @SerialName("total_illust_series")
-    val totalIllustSeries: Long,
+    val totalIllustSeries: Long = 0,
 
     @SerialName("total_novel_series")
-    val totalNovelSeries: Long,
+    val totalNovelSeries: Long = 0,
 
     @SerialName("background_image_url")
     val backgroundImageURL: String = "",
@@ -63,10 +63,10 @@ data class Profile(
     val pawooURL: String = "",
 
     @SerialName("is_premium")
-    val isPremium: Boolean,
+    val isPremium: Boolean = false,
 
     @SerialName("is_using_custom_profile_image")
-    val isUsingCustomProfileImage: Boolean
+    val isUsingCustomProfileImage: Boolean = false
 )
 
 @Serializable

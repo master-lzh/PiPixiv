@@ -129,12 +129,12 @@ enum class Type(val value: String) {
 @Serializable
 @Immutable
 data class User(
-    val id: Long,
-    val name: String,
-    val account: String,
+    val id: Long = 0,
+    val name: String = "",
+    val account: String = "",
 
     @SerialName("profile_image_urls")
-    val profileImageUrls: ProfileImageUrls,
+    val profileImageUrls: ProfileImageUrls = ProfileImageUrls(),
 
     val comment: String = "",
 

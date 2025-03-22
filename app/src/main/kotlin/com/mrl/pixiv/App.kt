@@ -16,8 +16,14 @@ import com.mrl.pixiv.common.util.initializeFirebase
 import com.mrl.pixiv.common.util.isFileExists
 import com.mrl.pixiv.di.allModule
 import com.tencent.mmkv.MMKV
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -82,7 +88,7 @@ class App : Application() {
                 }
             }
             val userPreference = async {
-                val file = filesDir.resolve("datastore/user_preference.json")
+                val file = filesDir.resolve("datastore/user_preference.pb")
                 if (isFileExists(file)) {
                     val bytes = file.readBytes()
                     mmkv.encode("userPreference", bytes)
@@ -90,7 +96,7 @@ class App : Application() {
                 }
             }
             val userInfo = async {
-                val file = filesDir.resolve("datastore/user_info.json")
+                val file = filesDir.resolve("datastore/user_info.pb")
                 if (isFileExists(file)) {
                     val bytes = file.readBytes()
                     mmkv.encode("userInfo", bytes)

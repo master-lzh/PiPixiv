@@ -26,7 +26,7 @@ data class AuthTokenResp(
 @Serializable
 data class AuthUser(
     @SerialName("profile_image_urls")
-    val profileImageUrls: ProfileImageUrls,
+    val profileImageUrls: ProfileImageUrls = ProfileImageUrls(),
 
     val id: String = "",
     val name: String = "",
@@ -36,16 +36,16 @@ data class AuthUser(
     val mailAddress: String = "",
 
     @SerialName("is_premium")
-    val isPremium: Boolean,
+    val isPremium: Boolean = false,
 
     @SerialName("x_restrict")
-    val xRestrict: Long,
+    val xRestrict: Long = 0,
 
     @SerialName("is_mail_authorized")
-    val isMailAuthorized: Boolean,
+    val isMailAuthorized: Boolean = false,
 
     @SerialName("require_policy_agreement")
-    val requirePolicyAgreement: Boolean
+    val requirePolicyAgreement: Boolean = true
 )
 
 @Serializable

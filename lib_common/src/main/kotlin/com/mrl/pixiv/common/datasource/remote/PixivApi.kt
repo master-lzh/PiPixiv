@@ -7,9 +7,20 @@ import com.mrl.pixiv.common.data.illust.IllustBookmarkDetailResp
 import com.mrl.pixiv.common.data.illust.IllustDetailResp
 import com.mrl.pixiv.common.data.illust.IllustRecommendedResp
 import com.mrl.pixiv.common.data.illust.IllustRelatedResp
-import com.mrl.pixiv.common.data.search.*
+import com.mrl.pixiv.common.data.search.SearchAiType
+import com.mrl.pixiv.common.data.search.SearchAutoCompleteResp
+import com.mrl.pixiv.common.data.search.SearchIllustResp
+import com.mrl.pixiv.common.data.search.SearchSort
+import com.mrl.pixiv.common.data.search.SearchTarget
+import com.mrl.pixiv.common.data.search.TrendingTagsResp
 import com.mrl.pixiv.common.data.ugoira.UgoiraMetadataResp
-import com.mrl.pixiv.common.data.user.*
+import com.mrl.pixiv.common.data.user.UserBookmarkTagsResp
+import com.mrl.pixiv.common.data.user.UserBookmarksIllustResp
+import com.mrl.pixiv.common.data.user.UserDetailResp
+import com.mrl.pixiv.common.data.user.UserFollowingResp
+import com.mrl.pixiv.common.data.user.UserHistoryIllustsResp
+import com.mrl.pixiv.common.data.user.UserIllustsResp
+import com.mrl.pixiv.common.data.user.UserNovelsResp
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Query
@@ -97,20 +108,20 @@ interface PixivApi {
     @GET("v1/ugoira/metadata")
     suspend fun getUgoiraMetadata(
         @Query("illust_id") illustId: Long,
-    ): IllustRecommendedResp
+    ): UgoiraMetadataResp
 
-    @GET("v1/user/detail")
+    @GET("v2/user/detail")
     suspend fun getUserDetail(
         @Query("filter") filter: String = Filter.ANDROID.value,
         @Query("user_id") userId: Long,
-    ): UgoiraMetadataResp
+    ): UserDetailResp
 
     @GET("v1/user/illusts")
     suspend fun getUserIllusts(
         @Query("filter") filter: String = Filter.ANDROID.value,
         @Query("user_id") userId: Long,
         @Query("type") type: String,
-    ): IllustRecommendedResp
+    ): UserIllustsResp
 
     @GET("v1/user/bookmarks/illust")
     suspend fun getUserBookmarksIllust(
@@ -118,19 +129,19 @@ interface PixivApi {
         @Query("user_id") userId: Long,
         @Query("tag") tag: String = "",
         @Query("max_bookmark_id") maxBookmarkId: Long? = null,
-    ): UserIllustsResp
+    ): UserBookmarksIllustResp
 
     @GET("v1/user/bookmarks/illust")
     suspend fun loadMoreUserBookmarksIllust(
         @QueryMap queryMap: Map<String, String>,
-    ): IllustRecommendedResp
+    ): UserBookmarksIllustResp
 
     @GET("v1/user/bookmarks/novel")
     suspend fun getUserBookmarksNovels(
         @Query("restrict") restrict: String,
         @Query("user_id") userId: Long,
         @Query("tag") tag: String = "",
-    ): UserBookmarksIllustResp
+    ): UserNovelsResp
 
     @POST("v1/user/follow/add")
     suspend fun followUser(

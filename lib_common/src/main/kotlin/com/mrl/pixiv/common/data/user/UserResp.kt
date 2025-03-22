@@ -18,13 +18,13 @@ data class UserIllustsResp(
 
 @Serializable
 data class UserDetailResp(
-    val user: User,
-    val profile: Profile,
+    val user: User = User(),
+    val profile: Profile = Profile(),
 
     @SerialName("profile_publicity")
-    val profilePublicity: ProfilePublicity,
+    val profilePublicity: ProfilePublicity? = null,
 
-    val workspace: Workspace
+    val workspace: Workspace? = null
 )
 
 @Serializable
@@ -36,7 +36,7 @@ data class UserBookmarksIllustResp(
 )
 
 @Serializable
-data class UserNovelsResp (
+data class UserNovelsResp(
     val novels: List<Novel>,
 
     @SerialName("next_url")
@@ -52,7 +52,7 @@ data class UserHistoryIllustsResp(
 )
 
 @Serializable
-data class UserBookmarkTagsResp (
+data class UserBookmarkTagsResp(
     @SerialName("bookmark_tags")
     val bookmarkTags: List<BookmarkTag>,
 

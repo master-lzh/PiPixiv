@@ -11,11 +11,11 @@ import okio.use
 
 @Serializable
 data class UserPreference(
-    val theme: String,
-    val enableBypassSniffing: Boolean,
-    val isR18Enabled: Boolean,
-    val imageHost: String,
-    val hasShowBookmarkTip: Boolean,
+    val theme: String = SettingTheme.SYSTEM.name,
+    val enableBypassSniffing: Boolean = false,
+    val isR18Enabled: Boolean = false,
+    val imageHost: String = "i.pximg.net",
+    val hasShowBookmarkTip: Boolean = false,
 ) {
     companion object {
         val defaultInstance = UserPreference(

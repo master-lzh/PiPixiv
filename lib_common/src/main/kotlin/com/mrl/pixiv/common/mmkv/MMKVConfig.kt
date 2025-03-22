@@ -60,9 +60,9 @@ fun MMKVOwner.mmkvBytes(default: ByteArray = byteArrayOf()) =
 inline fun <reified V : Any?> MMKVOwner.mmkvSerializable(defaultValue: V) =
     MMKVSerializableProperty(serializer(), defaultValue)
 
-fun <V> MMKVProperty<V>.asStateFlow() = MMKVStateFlowProperty(this)
+fun <V> MMKVProperty<V>.asMutableStateFlow() = MMKVStateFlowProperty(this)
 
-fun <V> MMKVSerializableProperty<V>.asStateFlow() = MMKVStateFlowSerializableProperty(this)
+fun <V> MMKVSerializableProperty<V>.asMutableStateFlow() = MMKVStateFlowSerializableProperty(this)
 
 fun MMKVOwner.clearAll() = kv.clearAll()
 

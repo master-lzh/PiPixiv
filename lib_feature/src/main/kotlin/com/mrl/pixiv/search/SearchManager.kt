@@ -3,13 +3,13 @@ package com.mrl.pixiv.search
 import com.mrl.pixiv.common.data.search.Search
 import com.mrl.pixiv.common.data.search.SearchHistory
 import com.mrl.pixiv.common.mmkv.MMKVUser
-import com.mrl.pixiv.common.mmkv.asStateFlow
+import com.mrl.pixiv.common.mmkv.asMutableStateFlow
 import com.mrl.pixiv.common.mmkv.mmkvSerializable
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 object SearchManager: MMKVUser {
-    private val searchHistory by mmkvSerializable(Search()).asStateFlow()
+    private val searchHistory by mmkvSerializable(Search()).asMutableStateFlow()
     val searchHistoryFlow = searchHistory.asStateFlow()
 
     fun deleteSearchHistory(searchWords: String) {
