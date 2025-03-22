@@ -21,9 +21,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.collection.components.FilterDialog
-import com.mrl.pixiv.collection.viewmodel.CollectionAction
-import com.mrl.pixiv.collection.viewmodel.CollectionState
-import com.mrl.pixiv.collection.viewmodel.CollectionViewModel
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.ui.LocalNavigator
@@ -32,6 +29,7 @@ import com.mrl.pixiv.common.ui.illust.IllustGrid
 import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
+import com.mrl.pixiv.common.viewmodel.asState
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -45,7 +43,7 @@ fun SelfCollectionScreen(
 ) {
     CollectionScreen_(
         modifier = modifier,
-        state = collectionViewModel.state,
+        state = collectionViewModel.asState(),
         userBookmarksIllusts = collectionViewModel.userBookmarksIllusts.collectAsLazyPagingItems(),
         dispatch = collectionViewModel::dispatch,
         popBack = navHostController::popBackStack,
@@ -57,7 +55,7 @@ fun SelfCollectionScreen(
 fun CollectionScreen_(
     userBookmarksIllusts: LazyPagingItems<Illust>,
     modifier: Modifier = Modifier,
-    state: CollectionState = CollectionState.INITIAL,
+    state: CollectionState = CollectionState(),
     dispatch: (CollectionAction) -> Unit = {},
     popBack: () -> Unit = {},
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> }

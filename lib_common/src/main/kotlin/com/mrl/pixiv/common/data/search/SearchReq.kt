@@ -27,7 +27,23 @@ data class SearchIllustQuery(
     val endDate: String? = null,
     val searchAiType: SearchAiType = SearchAiType.HIDE_AI,
     val offset: Int = 0,
-) : IBaseQueryMap
+) {
+    fun toMap(): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        map["filter"] = filter.value
+        map["include_translated_tag_results"] = includeTranslatedTagResults.toString()
+        map["merge_plain_keyword_results"] = mergePlainKeywordResults.toString()
+        map["word"] = word
+        map["sort"] = sort.value
+        map["search_target"] = searchTarget.value
+        bookmarkNumMin?.let { map["bookmark_num_min"] = it.toString() }
+        bookmarkNumMax?.let { map["bookmark_num_max"] = it.toString() }
+        startDate?.let { map["start_date"] = it }
+        endDate?.let { map["end_date"] = it }
+        map["search_ai_type"] = searchAiType.value.toString()
+        map["offset"] = offset.toString()
+        return map
+    }}
 
 
 enum class SearchAiType(override val value: Int) : IBaseEnum {

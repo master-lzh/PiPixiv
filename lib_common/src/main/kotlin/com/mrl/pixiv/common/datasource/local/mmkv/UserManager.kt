@@ -15,6 +15,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+val requireUserInfoValue
+    get() = UserManager.userInfoFlow.value
+
 object UserManager : MMKVUser {
     private val userInfo by mmkvSerializable(UserDetailResp()).asMutableStateFlow()
     val userInfoFlow = userInfo.asStateFlow()
