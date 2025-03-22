@@ -20,8 +20,7 @@ class MMKVSerializableProperty<V>(
 
     override fun setValue(thisRef: MMKVOwner, property: KProperty<*>, value: V) {
         if (value != null) {
-            thisRef.kv[property.name] =
-                mmkvProtobuf.encodeToByteArray(serializer, value)
+            thisRef.kv[property.name] = mmkvProtobuf.encodeToByteArray(serializer, value)
         } else {
             thisRef.kv.removeValueForKey(property.name)
         }

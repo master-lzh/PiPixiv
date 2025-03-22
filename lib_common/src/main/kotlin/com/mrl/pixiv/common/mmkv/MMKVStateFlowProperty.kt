@@ -48,6 +48,6 @@ class MMKVFlow<V>(
 
     override fun compareAndSet(expect: V, update: V): Boolean =
         flow.compareAndSet(expect, update).also { setSuccess ->
-            if (setSuccess) setValue(value)
+            if (setSuccess) setValue(update)
         }
 }
