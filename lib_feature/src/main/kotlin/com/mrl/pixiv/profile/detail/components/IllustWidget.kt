@@ -1,13 +1,6 @@
 package com.mrl.pixiv.profile.detail.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material3.HorizontalDivider
@@ -23,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import org.koin.compose.koinInject
+import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 
 private const val SPAN_COUNT = 3
 private const val MAX_SHOW_ILLUST_COUNT = 6
@@ -35,7 +28,6 @@ fun IllustWidget(
     endText: String,
     navToPictureScreen: (Illust, String) -> Unit,
     illusts: List<Illust>,
-    bookmarkState: BookmarkState = koinInject(),
 ) {
     val horizontalPadding = 16.dp
     Column(
@@ -75,15 +67,15 @@ fun IllustWidget(
         ) {
             illusts.take(MAX_SHOW_ILLUST_COUNT).forEach {
                 val illust = it
-                val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
+                val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
                 SquareIllustItem(
                     illust = illust,
                     isBookmarked = isBookmarked,
                     onBookmarkClick = { restrict: String, tags: List<String>? ->
                         if (isBookmarked) {
-                            bookmarkState.deleteBookmarkIllust(illust.id)
+                            BookmarkState.deleteBookmarkIllust(illust.id)
                         } else {
-                            bookmarkState.bookmarkIllust(illust.id, restrict, tags)
+                            BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                         }
                     },
                     spanCount = SPAN_COUNT,

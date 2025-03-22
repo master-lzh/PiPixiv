@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mrl.pixiv.collection.SelfCollectionScreen
+import com.mrl.pixiv.common.datasource.local.mmkv.UserManager
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
@@ -27,8 +28,6 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.HomeBottomBar
-import com.mrl.pixiv.common.viewmodel.LocalGlobalStore
-import com.mrl.pixiv.common.viewmodel.globalStore
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.HomeViewModel
@@ -56,7 +55,6 @@ fun MainGraph(
     HandleDeeplink(navHostController)
     CompositionLocalProvider(
         LocalNavigator provides navHostController,
-        LocalGlobalStore provides globalStore()
     ) {
         SharedTransitionLayout {
             Scaffold(
@@ -248,8 +246,8 @@ fun MainGraph(
                         // 本人收藏页
                         composable<Destination.SelfCollectionScreen> {
                             CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                                val uid = LocalGlobalStore.current.userInfo.uid
-                                SelfCollectionScreen(uid)
+                                val userInfo by UserManager.userInfoFlow.collectAsStateWithLifecycle()
+                                SelfCollectionScreen(userInfo.user.id)
                             }
                         }
 

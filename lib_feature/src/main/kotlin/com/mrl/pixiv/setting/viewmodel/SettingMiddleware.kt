@@ -2,8 +2,6 @@ package com.mrl.pixiv.setting.viewmodel
 
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.viewmodel.Middleware
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
 import org.koin.core.annotation.Factory
 
 @Factory
@@ -30,9 +28,9 @@ class SettingMiddleware(
 
     private fun loadSetting() {
         launchIO {
-            settingRepository.allSettings.flowOn(Dispatchers.Main).collect {
-                dispatch(SettingAction.UpdateSetting(it))
-            }
+//            settingRepository.allSettings.flowOn(Dispatchers.Main).collect {
+//                dispatch(SettingAction.UpdateSetting(it))
+//            }
         }
     }
 }

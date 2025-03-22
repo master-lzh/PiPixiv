@@ -1,27 +1,11 @@
 package com.mrl.pixiv.common.ui.illust
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridScope
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -34,7 +18,7 @@ import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
 import com.mrl.pixiv.common.util.isEven
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import org.koin.compose.koinInject
+import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 
 @Composable
 fun IllustGrid(
@@ -43,7 +27,6 @@ fun IllustGrid(
     modifier: Modifier = Modifier,
     lazyGridState: LazyGridState = rememberLazyGridState(),
     horizontalPadding: Dp = 0.dp,
-    bookmarkState: BookmarkState = koinInject(),
     paddingValues: PaddingValues = PaddingValues(1.dp),
     navToPictureScreen: (Illust, String) -> Unit,
     leadingContent: (LazyGridScope.() -> Unit)? = null,
@@ -82,15 +65,15 @@ fun IllustGrid(
             key = illusts.itemKey { it.id }
         ) { index ->
             val illust = illusts[index] ?: return@items
-            val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
+            val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
             SquareIllustItem(
                 illust = illust,
                 isBookmarked = isBookmarked,
                 onBookmarkClick = { restrict: String, tags: List<String>? ->
                     if (isBookmarked) {
-                        bookmarkState.deleteBookmarkIllust(illust.id)
+                        BookmarkState.deleteBookmarkIllust(illust.id)
                     } else {
-                        bookmarkState.bookmarkIllust(illust.id, restrict, tags)
+                        BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                     }
                 },
                 spanCount = spanCount,

@@ -16,6 +16,7 @@ import androidx.paging.compose.itemKey
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.util.DisplayUtil
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
+import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 
 private const val LOADING_ITEM_COUNT = 4
 private const val INCLUDE_EDGE = true
@@ -24,7 +25,6 @@ private const val INCLUDE_EDGE = true
 fun RecommendGrid(
     recommendImageList: LazyPagingItems<Illust>,
     navToPictureScreen: (Illust, String) -> Unit,
-    bookmarkState: BookmarkState,
     lazyStaggeredGridState: LazyStaggeredGridState,
 ) {
     val spanCount = when (LocalConfiguration.current.orientation) {
@@ -46,7 +46,7 @@ fun RecommendGrid(
         items(recommendImageList.itemCount, key = recommendImageList.itemKey { it.id }) {
             val illust = recommendImageList[it]
             if (illust != null) {
-                val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
+                val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
                 RecommendImageItem(
                     width = width,
                     navToPictureScreen = navToPictureScreen,
@@ -54,9 +54,9 @@ fun RecommendGrid(
                     isBookmarked = isBookmarked,
                     onBookmarkClick = { restrict, tags ->
                         if (isBookmarked) {
-                            bookmarkState.deleteBookmarkIllust(illust.id)
+                            BookmarkState.deleteBookmarkIllust(illust.id)
                         } else {
-                            bookmarkState.bookmarkIllust(illust.id, restrict, tags)
+                            BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                         }
                     }
                 )

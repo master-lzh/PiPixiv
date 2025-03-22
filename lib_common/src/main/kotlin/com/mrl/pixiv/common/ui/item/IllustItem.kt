@@ -2,14 +2,7 @@ package com.mrl.pixiv.common.ui.item
 
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,26 +11,10 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.FileCopy
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,12 +25,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
+import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -63,9 +35,8 @@ import com.mrl.pixiv.common.data.IllustAiType
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.data.illust.BookmarkDetailTag
-import com.mrl.pixiv.common.domain.HasShowBookmarkTipUseCase
-import com.mrl.pixiv.common.domain.SetShowBookmarkTipUseCase
 import com.mrl.pixiv.common.domain.illust.GetIllustBookmarkDetailUseCase
+import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.m3.IconButton
@@ -76,7 +47,6 @@ import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.throttleClick
 import kotlinx.coroutines.delay
-import org.koin.compose.koinInject
 import kotlin.uuid.Uuid
 
 @Composable
@@ -93,16 +63,14 @@ fun SquareIllustItem(
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
-    val getIllustBookmarkDetailUseCase = koinInject<GetIllustBookmarkDetailUseCase>()
-    val hasShowBookmarkTipUseCase = koinInject<HasShowBookmarkTipUseCase>()
-    val setShowBookmarkTipUseCase = koinInject<SetShowBookmarkTipUseCase>()
     var showPopupTip by remember { mutableStateOf(false) }
     val prefix = rememberSaveable { Uuid.random().toHexString() }
     val onClick = {
         navToPictureScreen(illust.copy(isBookmarked = isBookmarked), prefix)
     }
     LaunchedEffect(Unit) {
-        showPopupTip = shouldShowTip && !hasShowBookmarkTipUseCase()
+        showPopupTip =
+            shouldShowTip && !SettingRepository.userPreferenceFlow.value.hasShowBookmarkTip
     }
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
     with(LocalSharedTransitionScope.currentOrThrow) {
@@ -219,7 +187,7 @@ fun SquareIllustItem(
                 }
                 if (showPopupTip) {
                     LaunchedEffect(Unit) {
-                        setShowBookmarkTipUseCase(true)
+                        SettingRepository.setHasShowBookmarkTip(true)
                         delay(3000)
                         showPopupTip = false
                     }
@@ -241,7 +209,6 @@ fun SquareIllustItem(
     BottomBookmarkSheet(
         showBottomSheet = showBottomSheet,
         hideBottomSheet = { showBottomSheet = false },
-        getIllustBookmarkDetailUseCase = getIllustBookmarkDetailUseCase,
         illust = illust,
         bottomSheetState = bottomSheetState,
         onBookmarkClick = onBookmarkClick,
@@ -253,7 +220,6 @@ fun SquareIllustItem(
 fun BottomBookmarkSheet(
     showBottomSheet: Boolean,
     hideBottomSheet: () -> Unit,
-    getIllustBookmarkDetailUseCase: GetIllustBookmarkDetailUseCase,
     illust: Illust,
     bottomSheetState: SheetState,
     onBookmarkClick: (String, List<String>?) -> Unit,
@@ -263,7 +229,7 @@ fun BottomBookmarkSheet(
         var publicSwitch by remember { mutableStateOf(true) }
         val illustBookmarkDetailTags = remember { mutableStateListOf<BookmarkDetailTag>() }
         LaunchedEffect(Unit) {
-            getIllustBookmarkDetailUseCase(illust.id) {
+            GetIllustBookmarkDetailUseCase.invoke(illust.id) {
                 publicSwitch = it.bookmarkDetail.restrict == Restrict.PUBLIC
                 illustBookmarkDetailTags.clear()
                 illustBookmarkDetailTags.addAll(it.bookmarkDetail.tags)

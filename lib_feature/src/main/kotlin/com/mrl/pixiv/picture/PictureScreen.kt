@@ -71,7 +71,9 @@ import com.mrl.pixiv.common.ui.item.SquareIllustItem
 import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.util.AppUtil.getString
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
+import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
+import com.mrl.pixiv.common.viewmodel.follow.requireFollowState
 import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import com.mrl.pixiv.picture.components.UgoiraPlayer
 import com.mrl.pixiv.picture.viewmodel.PictureAction
@@ -175,8 +177,6 @@ internal fun PictureScreen(
     exception: Throwable?,
     illust: Illust,
     modifier: Modifier = Modifier,
-    bookmarkState: BookmarkState = koinInject(),
-    followState: FollowState = koinInject(),
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
@@ -217,15 +217,15 @@ internal fun PictureScreen(
     val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
     val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
 
-    val isBookmarked = bookmarkState.state[illust.id] ?: illust.isBookmarked
+    val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
     val onBookmarkClick = { restrict: String, tags: List<String>? ->
         if (isBookmarked) {
-            bookmarkState.deleteBookmarkIllust(illust.id)
+            BookmarkState.deleteBookmarkIllust(illust.id)
         } else {
-            bookmarkState.bookmarkIllust(illust.id, restrict, tags)
+            BookmarkState.bookmarkIllust(illust.id, restrict, tags)
         }
     }
-    val isFollowed = followState.state[illust.user.id] ?: false
+    val isFollowed = requireFollowState[illust.user.id] == true
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
@@ -612,7 +612,7 @@ internal fun PictureScreen(
                                     )
                                     .padding(horizontal = 10.dp, vertical = 8.dp)
                                     .throttleClick {
-                                        followState.unFollowUser(illust.user.id)
+                                        FollowState.unFollowUser(illust.user.id)
                                     },
                                 text = stringResource(RString.followed),
                                 style = TextStyle(
@@ -632,7 +632,7 @@ internal fun PictureScreen(
                                     )
                                     .padding(horizontal = 10.dp, vertical = 8.dp)
                                     .throttleClick {
-                                        followState.followUser(illust.user.id)
+                                        FollowState.followUser(illust.user.id)
                                     },
                                 text = stringResource(RString.follow),
                                 style = TextStyle(
@@ -656,15 +656,15 @@ internal fun PictureScreen(
                         ) {
                             state.userIllusts.take(minOf(userSpanCount, state.userIllusts.size))
                                 .forEach {
-                                    val innerIsBookmarked = bookmarkState.state[it.id] ?: it.isBookmarked
+                                    val innerIsBookmarked = requireBookmarkState[it.id] ?: it.isBookmarked
                                     SquareIllustItem(
                                         illust = it,
                                         isBookmarked = innerIsBookmarked,
                                         onBookmarkClick = { restrict: String, tags: List<String>? ->
                                             if (innerIsBookmarked) {
-                                                bookmarkState.deleteBookmarkIllust(it.id)
+                                                BookmarkState.deleteBookmarkIllust(it.id)
                                             } else {
-                                                bookmarkState.bookmarkIllust(it.id, restrict, tags)
+                                                BookmarkState.bookmarkIllust(it.id, restrict, tags)
                                             }
                                         },
                                         spanCount = minOf(userSpanCount, state.userIllusts.size),
@@ -696,16 +696,16 @@ internal fun PictureScreen(
                     key = { _, it -> "${illust.id}_related_${it.id}" },
                     contentType = { _, _ -> "related_illusts" }
                 ) { index, it ->
-                    val innerIsBookmarked = bookmarkState.state[it.id] ?: it.isBookmarked
+                    val innerIsBookmarked = requireBookmarkState[it.id] ?: it.isBookmarked
                     // 相关作品
                     SquareIllustItem(
                         illust = it,
                         isBookmarked = innerIsBookmarked,
                         onBookmarkClick = { restrict: String, tags: List<String>? ->
                             if (innerIsBookmarked) {
-                                bookmarkState.deleteBookmarkIllust(it.id)
+                                BookmarkState.deleteBookmarkIllust(it.id)
                             } else {
-                                bookmarkState.bookmarkIllust(it.id, restrict, tags)
+                                BookmarkState.bookmarkIllust(it.id, restrict, tags)
                             }
                         },
                         spanCount = relatedSpanCount,

@@ -1,18 +1,14 @@
 package com.mrl.pixiv.common.domain.illust
 
+import com.mrl.pixiv.common.coroutine.launchProcess
+import com.mrl.pixiv.common.coroutine.withIOContext
 import com.mrl.pixiv.common.data.illust.IllustBookmarkDetailResp
-import com.mrl.pixiv.common.network.safeHttpCall
-import com.mrl.pixiv.common.repository.IllustRepository
-import org.koin.core.annotation.Single
+import com.mrl.pixiv.common.repository.PixivRepository
 
-@Single
-class GetIllustBookmarkDetailUseCase(
-    private val illustRepository: IllustRepository,
-) {
-    suspend operator fun invoke(illustId: Long, onSuccess: (IllustBookmarkDetailResp) -> Unit) =
-        safeHttpCall(
-            request = illustRepository.getIllustBookmarkDetail(illustId),
-        ) {
-            onSuccess(it)
+object GetIllustBookmarkDetailUseCase{
+    operator fun invoke(illustId: Long, onSuccess: (IllustBookmarkDetailResp) -> Unit) =
+        launchProcess {
+            val resp = withIOContext { PixivRepository.getIllustBookmarkDetail(illustId) }
+            onSuccess(resp)
         }
 }

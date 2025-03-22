@@ -2,41 +2,41 @@ package com.mrl.pixiv.common.repository
 
 import android.os.Build
 import com.mrl.pixiv.common.data.setting.SettingTheme
-import com.mrl.pixiv.common.datasource.local.datastore.SettingDataSource
-import kotlinx.coroutines.flow.map
-import org.koin.core.annotation.Single
+import com.mrl.pixiv.common.data.setting.UserPreference
+import com.mrl.pixiv.common.mmkv.MMKVUser
+import com.mrl.pixiv.common.mmkv.asMutableStateFlow
+import com.mrl.pixiv.common.mmkv.mmkvSerializable
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
-@Single
-class SettingRepository(
-    private val settingDataSource: SettingDataSource
-) {
-    val allSettings = settingDataSource.data
-    val allSettingsSync = settingDataSource.syncData
+object SettingRepository : MMKVUser {
+    private val userPreference by mmkvSerializable(UserPreference()).asMutableStateFlow()
+    val userPreferenceFlow = userPreference.asStateFlow()
 
-    val settingTheme = settingDataSource.data.map {
-        enumValueOf<SettingTheme>(
-            it.theme.ifEmpty {
+    val settingTheme
+        get() = enumValueOf<SettingTheme>(
+            userPreferenceFlow.value.theme.ifEmpty {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) SettingTheme.SYSTEM.toString() else SettingTheme.LIGHT.toString()
             }
         )
-    }
 
-    fun setSettingTheme(theme: SettingTheme) = settingDataSource.updateData {
+    fun setSettingTheme(theme: SettingTheme) = userPreference.update {
         it.copy(theme = theme.toString())
     }
 
-    val enableBypassSniffing = settingDataSource.data.map { it.enableBypassSniffing }
-    fun setEnableBypassSniffing(enable: Boolean) = settingDataSource.updateData {
+    fun setEnableBypassSniffing(enable: Boolean) = userPreference.update {
         it.copy(enableBypassSniffing = enable)
     }
 
-    val pictureSourceHost = settingDataSource.data.map { it.imageHost }
-    fun setPictureSourceHost(host: String) = settingDataSource.updateData {
+    fun setPictureSourceHost(host: String) = userPreference.update {
         it.copy(imageHost = host)
     }
 
-    val hasShowBookmarkTip = settingDataSource.data.map { it.hasShowBookmarkTip }
-    fun setHasShowBookmarkTip(hasShow: Boolean) = settingDataSource.updateData {
+    fun setHasShowBookmarkTip(hasShow: Boolean) = userPreference.update {
         it.copy(hasShowBookmarkTip = hasShow)
+    }
+
+    fun updateSettings(block: (UserPreference) -> UserPreference) {
+        userPreference.update(block)
     }
 }

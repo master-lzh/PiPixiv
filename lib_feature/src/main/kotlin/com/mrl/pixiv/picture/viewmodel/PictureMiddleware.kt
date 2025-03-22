@@ -16,18 +16,13 @@ import com.mrl.pixiv.common.data.user.UserIllustsQuery
 import com.mrl.pixiv.common.repository.IllustRepository
 import com.mrl.pixiv.common.repository.SearchRepository
 import com.mrl.pixiv.common.repository.UserRepository
-import com.mrl.pixiv.common.util.AppUtil
-import com.mrl.pixiv.common.util.PictureType
-import com.mrl.pixiv.common.util.RString
-import com.mrl.pixiv.common.util.TAG
-import com.mrl.pixiv.common.util.saveToAlbum
-import com.mrl.pixiv.common.util.toBitmap
+import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.viewmodel.Middleware
 import io.ktor.client.HttpClient
 import io.ktor.client.request.request
-import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.isSuccess
+import io.ktor.http.takeFrom
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.Factory
@@ -42,7 +37,6 @@ import kotlin.time.Duration.Companion.seconds
 class PictureMiddleware(
     private val illustRepository: IllustRepository,
     private val userRepository: UserRepository,
-    private val searchRepository: SearchRepository,
 ) : Middleware<PictureState, PictureAction>() {
     private val imageOkHttpClient: HttpClient by inject(named(HttpClientEnum.IMAGE))
     override suspend fun process(state: PictureState, action: PictureAction) {
@@ -89,7 +83,7 @@ class PictureMiddleware(
                         } else {
                             val zipUrl = it.ugoiraMetadata.zipUrls.medium
                             val response = imageOkHttpClient.request {
-                                url(zipUrl)
+                                url.takeFrom(zipUrl)
                             }
                             if (response.status.isSuccess()) {
                                 response.bodyAsChannel().toInputStream().use { inputStream ->
@@ -154,7 +148,7 @@ class PictureMiddleware(
     }
 
     private fun addSearchHistory(keyword: String) {
-        searchRepository.addSearchHistory(keyword)
+        SearchRepository.addSearchHistory(keyword)
     }
 
     private fun downloadIllust(

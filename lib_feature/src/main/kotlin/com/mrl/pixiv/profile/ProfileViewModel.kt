@@ -16,9 +16,7 @@ sealed class ProfileAction : ViewIntent {
 }
 
 @KoinViewModel
-class ProfileViewModel(
-    private val settingRepository: SettingRepository,
-) : BaseMviViewModel<ProfileState, ProfileAction>(
+class ProfileViewModel: BaseMviViewModel<ProfileState, ProfileAction>(
     initialState = ProfileState,
 ) {
     override suspend fun handleIntent(intent: ProfileAction) {
@@ -29,7 +27,7 @@ class ProfileViewModel(
     }
 
     private fun changeAppTheme(theme: SettingTheme) {
-        settingRepository.updateSettings {
+        SettingRepository.updateSettings {
             it.copy(theme = theme.name)
         }
         setAppCompatDelegateThemeMode(theme)

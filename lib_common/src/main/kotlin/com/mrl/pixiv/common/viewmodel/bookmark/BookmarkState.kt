@@ -1,51 +1,32 @@
 package com.mrl.pixiv.common.viewmodel.bookmark
 
-import com.mrl.pixiv.common.coroutine.launchNetwork
+import androidx.compose.runtime.mutableStateMapOf
+import com.mrl.pixiv.common.coroutine.launchProcess
 import com.mrl.pixiv.common.data.Restrict
-import com.mrl.pixiv.common.data.illust.IllustBookmarkAddReq
-import com.mrl.pixiv.common.data.illust.IllustBookmarkDeleteReq
-import com.mrl.pixiv.common.repository.IllustRepository
-import com.mrl.pixiv.common.viewmodel.GlobalState
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toPersistentMap
-import org.koin.core.annotation.Single
+import com.mrl.pixiv.common.repository.PixivRepository
+import kotlinx.coroutines.Dispatchers
 
-@Single
-class BookmarkState(
-    private val illustRepository: IllustRepository,
-) : GlobalState<ImmutableMap<Long, Boolean>>(
-    initialSate = persistentMapOf()
-) {
+val requireBookmarkState
+    get() = BookmarkState.state
+
+object BookmarkState {
+    internal val state = mutableStateMapOf<Long, Boolean>()
+
     fun bookmarkIllust(
         illustId: Long,
         restrict: String = Restrict.PUBLIC,
         tags: List<String>? = null
     ) {
-        launchNetwork {
-            requestHttpDataWithFlow(
-                request = illustRepository.postIllustBookmarkAdd(
-                    IllustBookmarkAddReq(illustId, restrict, tags)
-                )
-            ) {
-                updateState {
-                    it.toPersistentMap().put(illustId, true)
-                }
-            }
+        launchProcess(Dispatchers.IO) {
+            PixivRepository.postIllustBookmarkAdd(illustId, restrict, tags)
+            state[illustId] = true
         }
     }
 
     fun deleteBookmarkIllust(illustId: Long) {
-        launchNetwork {
-            requestHttpDataWithFlow(
-                request = illustRepository.postIllustBookmarkDelete(
-                    IllustBookmarkDeleteReq(illustId)
-                )
-            ) {
-                updateState {
-                    it.toPersistentMap().put(illustId, false)
-                }
-            }
+        launchProcess(Dispatchers.IO) {
+            PixivRepository.postIllustBookmarkDelete(illustId)
+            state[illustId] = false
         }
     }
 }
