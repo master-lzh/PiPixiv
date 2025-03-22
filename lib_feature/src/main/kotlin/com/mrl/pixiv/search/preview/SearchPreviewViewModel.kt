@@ -3,9 +3,9 @@ package com.mrl.pixiv.search.preview
 import com.mrl.pixiv.common.data.Filter
 import com.mrl.pixiv.common.data.search.TrendingTag
 import com.mrl.pixiv.common.repository.PixivRepository
+import com.mrl.pixiv.common.repository.SearchRepository
 import com.mrl.pixiv.common.viewmodel.BaseMviViewModel
 import com.mrl.pixiv.common.viewmodel.ViewIntent
-import com.mrl.pixiv.search.SearchManager
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -38,7 +38,7 @@ class SearchPreviewViewModel : BaseMviViewModel<SearchPreviewState, SearchPrevie
     }
 
     private fun addSearchHistory(keyword: String) {
-        SearchManager.addSearchHistory(keyword)
+        SearchRepository.addSearchHistory(keyword)
     }
 
     private fun loadTrendingTags() {

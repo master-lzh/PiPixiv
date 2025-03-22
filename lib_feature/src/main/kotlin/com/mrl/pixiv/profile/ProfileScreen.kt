@@ -13,9 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.data.setting.SettingTheme
 import com.mrl.pixiv.common.data.setting.getAppCompatDelegateThemeMode
+import com.mrl.pixiv.common.datasource.local.mmkv.UserManager
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
@@ -23,9 +26,7 @@ import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.SettingItem
 import com.mrl.pixiv.common.util.*
-import com.mrl.pixiv.profile.viewmodel.ProfileAction
-import com.mrl.pixiv.profile.viewmodel.ProfileState
-import com.mrl.pixiv.profile.viewmodel.ProfileViewModel
+import com.mrl.pixiv.common.viewmodel.asState
 import org.koin.androidx.compose.koinViewModel
 
 private val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -49,7 +50,7 @@ fun ProfileScreen(
 ) {
     ProfileScreen_(
         modifier = modifier,
-        state = viewModel.state,
+        state = viewModel.asState(),
         dispatch = viewModel::dispatch,
         navToProfileDetail = navHostController::navigateToSelfProfileDetailScreen,
         navToSetting = navHostController::navigateToSettingScreen,
@@ -63,13 +64,18 @@ fun ProfileScreen(
 @Composable
 internal fun ProfileScreen_(
     modifier: Modifier = Modifier,
-    state: ProfileState = ProfileState.INITIAL,
+    state: ProfileState = ProfileState,
     dispatch: (ProfileAction) -> Unit = {},
     navToProfileDetail: () -> Unit = {},
     navToSetting: () -> Unit = {},
     navToHistory: () -> Unit = {},
     navToCollection: () -> Unit = {},
 ) {
+    val userInfo by UserManager.userInfoFlow.collectAsStateWithLifecycle()
+    LifecycleResumeEffect(Unit) {
+        dispatch(ProfileAction.GetUserInfo)
+        onPauseOrDispose {}
+    }
     Scaffold(
         topBar = {
             var expanded by remember { mutableStateOf(false) }
@@ -126,16 +132,17 @@ internal fun ProfileScreen_(
                 ) {
                     with(LocalSharedTransitionScope.currentOrThrow) {
                         UserAvatar(
-                            url = state.user.avatar,
+                            url = userInfo.user.profileImageUrls.medium,
                             modifier = Modifier.size(80.dp),
                             onClick = navToProfileDetail
                         )
                         Column {
                             // 昵称
                             Text(
-                                text = state.user.username, modifier = Modifier
+                                text = userInfo.user.name,
+                                modifier = Modifier
                                     .sharedElement(
-                                        rememberSharedContentState(key = "user-name-${state.user.uid}"),
+                                        rememberSharedContentState(key = "user-name-${userInfo.user.id}"),
                                         LocalAnimatedContentScope.currentOrThrow,
                                         placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
                                     )
@@ -143,9 +150,10 @@ internal fun ProfileScreen_(
                             )
                             // ID
                             Text(
-                                text = "ID: ${state.user.uid}", modifier = Modifier
+                                text = "ID: ${userInfo.user.id}",
+                                modifier = Modifier
                                     .sharedElement(
-                                        rememberSharedContentState(key = "user-id-${state.user.uid}"),
+                                        rememberSharedContentState(key = "user-id-${userInfo.user.id}"),
                                         LocalAnimatedContentScope.currentOrThrow,
                                         placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
                                     )

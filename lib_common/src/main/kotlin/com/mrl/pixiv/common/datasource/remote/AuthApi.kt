@@ -45,5 +45,5 @@ interface AuthApi {
         @Field("code_verifier") codeVerifier: String,
         @Field("get_secure_url") getSecureUrl: Int,
         @Field("include_policy") includePolicy: Boolean,
-    )
+    ): AuthTokenResp
 }

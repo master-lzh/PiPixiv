@@ -6,6 +6,7 @@ import com.mrl.pixiv.common.data.search.SearchAiType
 import com.mrl.pixiv.common.data.search.SearchSort
 import com.mrl.pixiv.common.data.search.SearchTarget
 import com.mrl.pixiv.common.repository.PixivRepository
+import com.mrl.pixiv.common.repository.SearchRepository
 import com.mrl.pixiv.common.viewmodel.BaseMviViewModel
 import com.mrl.pixiv.common.viewmodel.ViewIntent
 import kotlinx.collections.immutable.ImmutableList
@@ -62,11 +63,11 @@ class SearchViewModel : BaseMviViewModel<SearchState, SearchAction>(
     }
 
     private fun addSearchHistory(action: SearchAction.AddSearchHistory) {
-        SearchManager.addSearchHistory(action.searchWords)
+        SearchRepository.addSearchHistory(action.searchWords)
     }
 
     private fun deleteSearchHistory(action: SearchAction.DeleteSearchHistory) {
-        SearchManager.deleteSearchHistory(action.searchWords)
+        SearchRepository.deleteSearchHistory(action.searchWords)
     }
 
     private fun searchAutoComplete(action: SearchAction.SearchAutoComplete) {

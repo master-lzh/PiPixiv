@@ -38,7 +38,7 @@ class HomeViewModel : BaseMviViewModel<HomeState, HomeAction>(
 
     private fun refreshToken() {
         launchIO {
-            AuthManager.requireUserAccessToken()
+            AuthManager.requireUserAccessToken(force = true)
             ToastUtil.safeShortToast(RString.refresh_token_success)
         }
     }

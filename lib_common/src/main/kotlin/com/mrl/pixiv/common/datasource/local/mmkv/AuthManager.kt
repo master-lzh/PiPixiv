@@ -14,13 +14,13 @@ object AuthManager : MMKVUser {
     private var userAccessToken by mmkvString()
     private var accessTokenExpiresTime: Long by mmkvLong()
 
-    suspend fun requireUserAccessToken(): String =
+    suspend fun requireUserAccessToken(force: Boolean = false): String =
         withIOContext {
             return@withIOContext runCatching {
                 if (userAccessToken.isEmpty()) {
                     throw IllegalStateException("User access token is empty")
                 }
-                if (isNeedRefreshToken) {
+                if (isNeedRefreshToken || force) {
                     val resp = PixivRepository.refreshToken(
                         AuthTokenFieldReq(
                             grantType = GrantType.REFRESH_TOKEN.value,
@@ -30,6 +30,13 @@ object AuthManager : MMKVUser {
                     userAccessToken = resp.accessToken
                     userRefreshToken = resp.refreshToken
                     accessTokenExpiresTime = currentTimeMillis() + resp.expiresIn * 1000
+                    if (resp.user != null) {
+                        UserManager.updateUserInfo(
+                            resp.user.id.toLong(),
+                            resp.user.name,
+                            resp.user.account
+                        )
+                    }
                 }
                 userAccessToken
             }.getOrNull().orEmpty()

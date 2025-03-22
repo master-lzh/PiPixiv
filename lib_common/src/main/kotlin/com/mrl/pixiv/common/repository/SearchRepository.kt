@@ -1,20 +1,19 @@
 package com.mrl.pixiv.common.repository
 
-import com.mrl.pixiv.common.data.search.SearchAutoCompleteQuery
+import com.mrl.pixiv.common.data.search.Search
 import com.mrl.pixiv.common.data.search.SearchHistory
-import com.mrl.pixiv.common.data.search.SearchIllustQuery
-import com.mrl.pixiv.common.datasource.local.datastore.SearchDataSource
-import com.mrl.pixiv.common.datasource.remote.SearchHttpService
-import org.koin.core.annotation.Single
+import com.mrl.pixiv.common.mmkv.MMKVUser
+import com.mrl.pixiv.common.mmkv.asMutableStateFlow
+import com.mrl.pixiv.common.mmkv.mmkvSerializable
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
-@Single
-class SearchRepository(
-    private val searchHttpService: SearchHttpService,
-    private val searchDataSource: SearchDataSource,
-) {
-    val searchLocalSource = searchDataSource.data
+object SearchRepository : MMKVUser {
+    private val searchHistory by mmkvSerializable(Search()).asMutableStateFlow()
+    val searchHistoryFlow = searchHistory.asStateFlow()
+
     fun deleteSearchHistory(searchWords: String) {
-        searchDataSource.updateData {
+        searchHistory.update {
             val index = it.searchHistoryList.indexOfFirst { it.keyword == searchWords }
             it.copy(
                 searchHistoryList = it.searchHistoryList.toMutableList().apply {
@@ -25,16 +24,18 @@ class SearchRepository(
     }
 
     fun addSearchHistory(searchWords: String) {
-        searchDataSource.updateData {
+        searchHistory.update {
             // add to search history if not exist
             val index = it.searchHistoryList.indexOfFirst { it.keyword == searchWords }
             if (index == -1) {
                 it.copy(
                     searchHistoryList = it.searchHistoryList.toMutableList().apply {
-                        add(0, SearchHistory(
-                            keyword = searchWords,
-                            timestamp = System.currentTimeMillis()
-                        ))
+                        add(
+                            0, SearchHistory(
+                                keyword = searchWords,
+                                timestamp = System.currentTimeMillis()
+                            )
+                        )
                     }
                 )
             } else {
@@ -49,12 +50,4 @@ class SearchRepository(
             }
         }
     }
-    suspend fun searchIllust(searchIllustQuery: SearchIllustQuery) =
-        searchHttpService.searchIllust(searchIllustQuery)
-
-    suspend fun searchIllustNext(queryMap: Map<String, String>) =
-        searchHttpService.searchIllust(queryMap)
-
-    suspend fun searchAutoComplete(searchAutoCompleteQuery: SearchAutoCompleteQuery) =
-        searchHttpService.searchAutoComplete(searchAutoCompleteQuery)
 }

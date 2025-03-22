@@ -10,22 +10,15 @@ import com.mrl.pixiv.common.datasource.local.datastore.UserAuthDataSource.Compan
 import com.mrl.pixiv.common.datasource.local.datastore.UserAuthDataSource.Companion.KEY_USER_ACCESS_TOKEN
 import com.mrl.pixiv.common.datasource.local.datastore.UserAuthDataSource.Companion.KEY_USER_REFRESH_TOKEN
 import com.mrl.pixiv.common.datasource.local.datastore.userAuthDataStore
-import com.mrl.pixiv.common.domain.setting.GetAppThemeUseCase
+import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.util.AppUtil
 import com.mrl.pixiv.common.util.initializeFirebase
 import com.mrl.pixiv.common.util.isFileExists
 import com.mrl.pixiv.di.allModule
 import com.tencent.mmkv.MMKV
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import okio.Path.Companion.toOkioPath
-import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -35,9 +28,6 @@ class App : Application() {
     companion object {
         lateinit var instance: App
     }
-
-    private val getAppThemeUseCase: GetAppThemeUseCase by inject()
-
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
@@ -55,9 +45,7 @@ class App : Application() {
             modules(allModule)
         }
         migrateDataStoreToMMKV()
-        GlobalScope.launch {
-            setAppCompatDelegateThemeMode(getAppThemeUseCase().first())
-        }
+        setAppCompatDelegateThemeMode(SettingRepository.settingTheme)
     }
 
     private fun migrateDataStoreToMMKV() {

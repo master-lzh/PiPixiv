@@ -52,6 +52,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.lifecycle.OnLifecycle
+import com.mrl.pixiv.common.repository.SearchRepository
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.currentOrThrow
@@ -90,7 +91,7 @@ internal fun SearchScreen_(
 ) {
     val dispatch = searchViewModel::dispatch
     val state = searchViewModel.asState()
-    val searchHistory by SearchManager.searchHistoryFlow.collectAsStateWithLifecycle()
+    val searchHistory by SearchRepository.searchHistoryFlow.collectAsStateWithLifecycle()
     var textState by remember { mutableStateOf(TextFieldValue(state.searchWords)) }
     val focusRequester = remember { FocusRequester() }
     OnLifecycle(Lifecycle.Event.ON_RESUME) {
