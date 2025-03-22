@@ -1,13 +1,26 @@
 package com.mrl.pixiv.search.preview
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,10 +40,8 @@ import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToOutsideSearchResultScreen
 import com.mrl.pixiv.common.util.navigateToSearchScreen
+import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.search.preview.components.TrendingItem
-import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewAction
-import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewState
-import com.mrl.pixiv.search.preview.viewmodel.SearchPreviewViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -41,7 +52,7 @@ fun SearchPreviewScreen(
 ) {
     SearchPreviewScreen_(
         modifier = modifier,
-        state = viewModel.state,
+        state = viewModel.asState(),
         dispatch = viewModel::dispatch,
         navToSearchScreen = navHostController::navigateToSearchScreen,
         navToSearchResultsScreen = navHostController::navigateToOutsideSearchResultScreen
@@ -53,7 +64,7 @@ fun SearchPreviewScreen(
 @Composable
 internal fun SearchPreviewScreen_(
     modifier: Modifier = Modifier,
-    state: SearchPreviewState = SearchPreviewState.INITIAL,
+    state: SearchPreviewState = SearchPreviewState(),
     dispatch: (SearchPreviewAction) -> Unit = {},
     navToSearchScreen: () -> Unit = {},
     navToSearchResultsScreen: (String) -> Unit = {},
