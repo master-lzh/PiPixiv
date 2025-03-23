@@ -459,13 +459,13 @@ internal fun PictureScreen(
                         ) {
                             UserAvatar(
                                 url = illust.user.profileImageUrls.medium,
-                                onClick = {
-                                    navToUserDetailScreen(illust.user.id)
-                                },
                                 modifier = Modifier
                                     .padding(start = 20.dp)
                                     .size(30.dp)
                                     .align(Alignment.CenterVertically),
+                                onClick = {
+                                    navToUserDetailScreen(illust.user.id)
+                                },
                             )
                             Column(
                                 modifier = Modifier.padding(start = 10.dp)
@@ -567,12 +567,12 @@ internal fun PictureScreen(
                     ) {
                         UserAvatar(
                             url = illust.user.profileImageUrls.medium,
-                            onClick = {
-                                navToUserDetailScreen(illust.user.id)
-                            },
                             modifier = Modifier
                                 .size(30.dp)
                                 .align(Alignment.CenterVertically),
+                            onClick = {
+                                navToUserDetailScreen(illust.user.id)
+                            },
                         )
                         Column(
                             modifier = Modifier
@@ -764,13 +764,13 @@ internal fun PictureScreen(
                     ) {
                         UserAvatar(
                             url = illust.user.profileImageUrls.medium,
-                            onClick = {
-                                navToUserDetailScreen(illust.user.id)
-                            },
                             modifier = Modifier
                                 .padding(start = 20.dp)
                                 .size(20.dp)
                                 .align(Alignment.CenterVertically),
+                            onClick = {
+                                navToUserDetailScreen(illust.user.id)
+                            },
                         )
                         Column(
                             modifier = Modifier.padding(start = 10.dp)

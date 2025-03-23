@@ -1,8 +1,5 @@
 package com.mrl.pixiv.profile.detail
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,13 +9,16 @@ import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -26,6 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.allowRgb565
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.ui.LocalNavigator
@@ -41,12 +44,13 @@ import com.mrl.pixiv.profile.detail.components.IllustWidget
 import com.mrl.pixiv.profile.detail.components.NovelBookmarkWidget
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.math.pow
 
 @Composable
 fun SelfProfileDetailScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
-    profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(Long.MIN_VALUE) },
+    profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(null) },
 ) {
     ProfileDetailScreen(
         modifier = modifier,
@@ -69,7 +73,6 @@ fun OtherProfileDetailScreen(
     ) { navHostController.popBackStack() }
 }
 
-private const val KEY_USER_AVATAR = "user_avatar"
 private const val KEY_USER_INFO = "user_info"
 private const val KEY_USER_ILLUSTS = "user_illusts"
 private const val KEY_USER_BOOKMARKS_ILLUSTS = "user_bookmarks_illusts"
@@ -89,49 +92,87 @@ internal fun ProfileDetailScreen(
 //        Configuration.ORIENTATION_LANDSCAPE -> DisplayUtil.getScreenHeightDp() / 3
 //        else -> DisplayUtil.getScreenWidthDp() / 3
 //    }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val lazyListState = rememberLazyListState()
-
-    val showTopBar by remember {
-        derivedStateOf { lazyListState.firstVisibleItemIndex > 0 }
-    }
+    val avatarSize = 50.dp
+    val expandedHeight = TopAppBarDefaults.MediumAppBarExpandedHeight + avatarSize
+    val backgroundHeight = TopAppBarDefaults.MediumAppBarExpandedHeight +
+            WindowInsets.statusBars.asPaddingValues().calculateTopPadding() +
+            avatarSize * scrollBehavior.state.collapsedFraction.pow(2) +
+            with(LocalDensity.current) {
+                scrollBehavior.state.heightOffset.toDp()
+            }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Row(
-                modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
-                verticalAlignment = CenterVertically
-            ) {
-                IconButton(
-                    onClick = popBack,
-                    modifier = Modifier.padding(vertical = 10.dp)
-                ) {
-                    Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
-                }
-                AnimatedVisibility(
-                    visible = showTopBar,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
+            val backgroundUrl = userInfo.profile.backgroundImageURL.ifEmpty {
+                userInfo.user.profileImageUrls.medium
+            }
+            if (backgroundUrl.isNotEmpty()) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(backgroundUrl)
+                        .allowRgb565(true)
+                        .build(),
+                    contentScale = ContentScale.FillWidth,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(backgroundHeight)
+                        .blur(10.dp)
+                        .drawWithCache {
+                            val color = Color.Black.copy(alpha = 0.5f)
+                            onDrawWithContent {
+                                drawContent()
+                                drawRect(color)
+                            }
+                        }
+                )
+            }
+            MediumTopAppBar(
+                title = {
                     Row(
                         verticalAlignment = CenterVertically
                     ) {
                         UserAvatar(
                             url = userInfo.user.profileImageUrls.medium,
-                            modifier = Modifier.size(50.dp),
+                            modifier = Modifier.size(avatarSize * (2 - scrollBehavior.state.collapsedFraction)),
                             contentScale = ContentScale.FillWidth,
                         )
-                        Text(
-                            modifier = Modifier.padding(start = 10.dp),
-                            text = userInfo.user.name,
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Medium,
-                            ),
-                        )
+                        if (scrollBehavior.state.collapsedFraction == 1f) {
+                            Text(
+                                modifier = Modifier.padding(start = 10.dp),
+                                text = userInfo.user.name,
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Medium,
+                                ),
+                            )
+                        }
                     }
-                }
-            }
+                },
+                modifier = Modifier.statusBarsPadding(),
+                navigationIcon = {
+                    IconButton(
+                        onClick = popBack,
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    ) {
+                        Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
+                    }
+                },
+                expandedHeight = expandedHeight,
+                windowInsets = WindowInsets(0),
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent,
+                    navigationIconContentColor = Color.White,
+                    titleContentColor = Color.White,
+                ),
+                scrollBehavior = scrollBehavior
+            )
         },
     ) {
         LazyColumn(
@@ -141,13 +182,6 @@ internal fun ProfileDetailScreen(
             state = lazyListState,
             contentPadding = PaddingValues(horizontal = 15.dp)
         ) {
-            item(key = KEY_USER_AVATAR) {
-                UserAvatar(
-                    url = userInfo.user.profileImageUrls.medium,
-                    modifier = Modifier.size(100.dp),
-                    contentScale = ContentScale.FillWidth,
-                )
-            }
             item(key = KEY_USER_INFO) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp)

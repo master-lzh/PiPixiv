@@ -31,7 +31,7 @@ sealed class ProfileDetailAction : ViewIntent {
 
 @KoinViewModel
 class ProfileDetailViewModel(
-    private val uid: Long? = null,
+    private val uid: Long?,
 ) : BaseMviViewModel<ProfileDetailState, ProfileDetailAction>(
     initialState = ProfileDetailState(),
 ) {
