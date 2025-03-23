@@ -9,6 +9,12 @@ import com.mrl.pixiv.common.mmkv.mmkvSerializable
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+val requireUserPreferenceValue: UserPreference
+    get() = SettingRepository.userPreferenceFlow.value
+
+val requireUserPreferenceFlow
+    get() = SettingRepository.userPreferenceFlow
+
 object SettingRepository : MMKVUser {
     private val userPreference by mmkvSerializable(UserPreference()).asMutableStateFlow()
     val userPreferenceFlow = userPreference.asStateFlow()

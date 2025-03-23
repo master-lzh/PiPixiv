@@ -41,8 +41,8 @@ import com.mrl.pixiv.search.preview.SearchPreviewScreen
 import com.mrl.pixiv.search.result.OutsideSearchResultsScreen
 import com.mrl.pixiv.search.result.SearchResultScreen
 import com.mrl.pixiv.setting.SettingScreen
+import com.mrl.pixiv.setting.SettingViewModel
 import com.mrl.pixiv.setting.network.NetworkSettingScreen
-import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import com.mrl.pixiv.splash.SplashViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -223,7 +223,6 @@ fun MainGraph(
                                 ) {
                                     composable<Destination.SettingScreen> {
                                         SettingScreen(
-                                            viewModel = settingViewModel,
                                             mainNavHostController = navHostController
                                         )
                                     }

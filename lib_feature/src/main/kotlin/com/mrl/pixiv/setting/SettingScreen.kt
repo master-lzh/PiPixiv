@@ -2,7 +2,6 @@ package com.mrl.pixiv.setting
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatDelegate
@@ -26,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
@@ -37,24 +37,19 @@ import com.mrl.pixiv.common.util.navigateToNetworkSettingScreen
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.feature.R
 import com.mrl.pixiv.setting.components.DropDownSelector
-import com.mrl.pixiv.setting.viewmodel.SettingState
-import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import org.koin.androidx.compose.koinViewModel
 import org.xmlpull.v1.XmlPullParser
 
 
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    viewModel: SettingViewModel = koinViewModel(),
     mainNavHostController: NavHostController,
     settingNavHostController: NavHostController = LocalNavigator.currentOrThrow
 ) {
     SettingScreen_(
         modifier = modifier,
-        state = viewModel.state,
         popBack = { mainNavHostController.popBackStack() },
         navToNetworkScreen = settingNavHostController::navigateToNetworkSettingScreen
     )
@@ -65,12 +60,11 @@ fun SettingScreen(
 @Composable
 internal fun SettingScreen_(
     modifier: Modifier = Modifier,
-    state: SettingState = SettingState.INITIAL,
     popBack: () -> Unit = {},
     navToNetworkScreen: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    val langs = remember { getLangs(context) }
+    val languages = remember { getLangs(context) }
     var currentLanguage by remember {
         mutableStateOf(
             AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag() ?: "Default"
@@ -123,7 +117,7 @@ internal fun SettingScreen_(
                         onDismissRequest = { expanded = false },
                         current = currentLanguage,
                     ) {
-                        langs.forEach {
+                        languages.forEach {
                             DropdownMenuItem(
                                 text = {
                                     Row(
@@ -182,12 +176,12 @@ internal fun SettingScreen_(
                                     action =
                                         Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
                                     addCategory(Intent.CATEGORY_DEFAULT)
-                                    data = Uri.parse("package:${context.packageName}")
+                                    data = "package:${context.packageName}".toUri()
                                     addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
                                     addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                                 }
                                 context.startActivity(intent)
-                            } catch (ignored: Throwable) {
+                            } catch (_: Throwable) {
                             }
                         }
                     }

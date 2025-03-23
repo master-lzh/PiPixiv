@@ -27,9 +27,7 @@ class ProfileViewModel: BaseMviViewModel<ProfileState, ProfileAction>(
     }
 
     private fun changeAppTheme(theme: SettingTheme) {
-        SettingRepository.updateSettings {
-            it.copy(theme = theme.name)
-        }
+        SettingRepository.setSettingTheme(theme)
         setAppCompatDelegateThemeMode(theme)
     }
 

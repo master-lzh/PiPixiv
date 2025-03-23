@@ -6,20 +6,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.SettingItem
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.ToastUtil
+import com.mrl.pixiv.setting.SettingAction
+import com.mrl.pixiv.setting.SettingViewModel
 import com.mrl.pixiv.setting.network.components.PictureSourceWidget
-import com.mrl.pixiv.setting.viewmodel.SettingAction
-import com.mrl.pixiv.setting.viewmodel.SettingState
-import com.mrl.pixiv.setting.viewmodel.SettingViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -30,7 +32,6 @@ fun NetworkSettingScreen(
 ) {
     NetworkSettingScreen_(
         modifier = modifier,
-        state = viewModel.state,
         dispatch = viewModel::dispatch
     ) { navHostController.popBackStack() }
 }
@@ -40,10 +41,10 @@ fun NetworkSettingScreen(
 @Composable
 internal fun NetworkSettingScreen_(
     modifier: Modifier = Modifier,
-    state: SettingState = SettingState.INITIAL,
     dispatch: (SettingAction) -> Unit = {},
     popBack: () -> Unit = {},
 ) {
+    val userPreference by requireUserPreferenceFlow.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -76,12 +77,12 @@ internal fun NetworkSettingScreen_(
                     )
                 }
                 Switch(
-                    checked = state.enableBypassSniffing,
+                    checked = userPreference.enableBypassSniffing,
                     onCheckedChange = { dispatch(SettingAction.SwitchBypassSniffing) }
                 )
             }
             PictureSourceWidget(
-                currentSelected = state.pictureSourceHost,
+                currentSelected = userPreference.imageHost,
                 savePictureSourceHost = {
                     dispatch(SettingAction.SavePictureSourceHost(it))
                     ToastUtil.safeShortToast(RString.restart_app_to_take_effect)
