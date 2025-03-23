@@ -5,7 +5,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
@@ -15,7 +14,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.semantics.Role
 
 
-const val VIEW_CLICK_INTERVAL_TIME = 1000L//点击间隔时间
+const val VIEW_CLICK_INTERVAL_TIME = 200L//点击间隔时间
 
 @SuppressLint("ModifierFactoryUnreferencedReceiver")
 @OptIn(ExperimentalFoundationApi::class)
@@ -45,24 +44,6 @@ inline fun Modifier.throttleClick(
     ) {
         val currentTimeMillis = System.currentTimeMillis()
         if (currentTimeMillis - time >= lastClickTime) {//判断点击间隔,如果在间隔内则不回调
-            onClick()
-            lastClickTime = currentTimeMillis
-        }
-    }
-}
-
-
-@Composable
-inline fun composeClick(
-    time: Long = VIEW_CLICK_INTERVAL_TIME,
-    crossinline onClick: () -> Unit
-): () -> Unit {
-    //使用remember函数记录上次点击的时间
-    var lastClickTime by remember { mutableLongStateOf(value = 0L) }
-    return {
-        val currentTimeMillis = System.currentTimeMillis()
-        //判断点击间隔,如果在间隔内则不回调
-        if (currentTimeMillis - time >= lastClickTime) {
             onClick()
             lastClickTime = currentTimeMillis
         }

@@ -28,12 +28,11 @@ fun IllustWidget(
     endText: String,
     navToPictureScreen: (Illust, String) -> Unit,
     illusts: List<Illust>,
+    modifier: Modifier = Modifier
 ) {
     val horizontalPadding = 16.dp
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = horizontalPadding)
+        modifier = modifier
     ) {
         HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
         Box(

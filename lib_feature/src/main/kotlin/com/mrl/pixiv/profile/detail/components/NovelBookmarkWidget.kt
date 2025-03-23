@@ -1,12 +1,6 @@
 package com.mrl.pixiv.profile.detail.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Favorite
@@ -32,12 +26,14 @@ private const val MAX_SHOW_NOVEL_COUNT = 3
 @Composable
 fun NovelBookmarkWidget(
     novels: List<Novel>,
+    modifier: Modifier = Modifier
 ) {
-    Column {
+    Column(
+        modifier = modifier
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
                 .padding(top = 20.dp)
         ) {
             Text(
@@ -62,26 +58,24 @@ fun NovelBookmarkWidget(
             }
         }
         HorizontalDivider(
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(top = 5.dp)
+            modifier = Modifier.padding(top = 5.dp)
         )
         novels.take(MAX_SHOW_NOVEL_COUNT).forEach {
-            NovelItem(it)
+            NovelItem(
+                novel = it,
+                modifier = Modifier.padding(top = 10.dp)
+            )
         }
     }
 }
 
 @Composable
 private fun NovelItem(
-    novel: Novel
+    novel: Novel,
+    modifier: Modifier = Modifier
 ) {
-    Column {
-        Row(
-            Modifier
-                .padding(horizontal = 16.dp)
-                .padding(top = 10.dp)
-        ) {
+    Column(modifier = modifier) {
+        Row {
             Column(
                 modifier = Modifier.padding(start = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -154,5 +148,4 @@ private fun NovelItem(
                 .padding(horizontal = 15.dp, vertical = 15.dp)
         )
     }
-
 }

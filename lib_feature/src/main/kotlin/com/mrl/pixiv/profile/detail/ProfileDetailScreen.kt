@@ -1,20 +1,24 @@
 package com.mrl.pixiv.profile.detail
 
-import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment.Companion.CenterStart
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -23,22 +27,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.data.Illust
-import com.mrl.pixiv.common.lifecycle.OnLifecycle
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
+import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.copyToClipboard
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.util.throttleClick
+import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.feature.R
 import com.mrl.pixiv.profile.detail.components.IllustWidget
 import com.mrl.pixiv.profile.detail.components.NovelBookmarkWidget
-import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailAction
-import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailState
-import com.mrl.pixiv.profile.detail.viewmodel.ProfileDetailViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -48,14 +48,11 @@ fun SelfProfileDetailScreen(
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(Long.MIN_VALUE) },
 ) {
-    OnLifecycle(onLifecycle = profileDetailViewModel::onStart)
     ProfileDetailScreen(
         modifier = modifier,
-        state = profileDetailViewModel.state,
+        state = profileDetailViewModel.asState(),
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        dispatch = profileDetailViewModel::dispatch,
-        popBack = { navHostController.popBackStack() },
-    )
+    ) { navHostController.popBackStack() }
 }
 
 @Composable
@@ -65,22 +62,25 @@ fun OtherProfileDetailScreen(
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(uid) },
 ) {
-    OnLifecycle(onLifecycle = profileDetailViewModel::onStart)
     ProfileDetailScreen(
         modifier = modifier,
-        state = profileDetailViewModel.state,
+        state = profileDetailViewModel.asState(),
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        dispatch = profileDetailViewModel::dispatch,
-        popBack = { navHostController.popBackStack() },
-    )
+    ) { navHostController.popBackStack() }
 }
+
+private const val KEY_USER_AVATAR = "user_avatar"
+private const val KEY_USER_INFO = "user_info"
+private const val KEY_USER_ILLUSTS = "user_illusts"
+private const val KEY_USER_BOOKMARKS_ILLUSTS = "user_bookmarks_illusts"
+private const val KEY_USER_BOOKMARKS_NOVELS = "user_bookmarks_novels"
+private const val KEY_SPACE = "space"
 
 @Composable
 internal fun ProfileDetailScreen(
     modifier: Modifier = Modifier,
     state: ProfileDetailState,
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
-    dispatch: (ProfileDetailAction) -> Unit,
     popBack: () -> Unit = { },
 ) {
     val userInfo = state.userInfo
@@ -89,187 +89,164 @@ internal fun ProfileDetailScreen(
 //        Configuration.ORIENTATION_LANDSCAPE -> DisplayUtil.getScreenHeightDp() / 3
 //        else -> DisplayUtil.getScreenWidthDp() / 3
 //    }
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val avatarSize = 50.dp
-    val collapseHeight = with(LocalDensity.current) {
-        avatarSize + WindowInsets.statusBars.getTop(this).toDp() + 20.dp
+    val lazyListState = rememberLazyListState()
+
+    val showTopBar by remember {
+        derivedStateOf { lazyListState.firstVisibleItemIndex > 0 }
     }
 
     Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = modifier.fillMaxSize(),
         topBar = {
-            LargeTopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .windowInsetsPadding(WindowInsets.statusBars)
+            Row(
+                modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
+                verticalAlignment = CenterVertically
+            ) {
+                IconButton(
+                    onClick = popBack,
+                    modifier = Modifier.padding(vertical = 10.dp)
+                ) {
+                    Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
+                }
+                AnimatedVisibility(
+                    visible = showTopBar,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Row(
+                        verticalAlignment = CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.align(CenterStart),
-                        ) {
-                            userInfo.user?.profileImageUrls?.medium?.let {
-                                with(LocalSharedTransitionScope.currentOrThrow) {
-                                    UserAvatar(
-                                        url = it,
-                                        modifier = Modifier
-                                            .size(avatarSize * (2 - scrollBehavior.state.collapsedFraction)),
-                                        contentScale = ContentScale.FillWidth,
-                                    )
-                                }
-                            }
-                            userInfo.user?.name?.let { it1 ->
-                                Text(
-                                    modifier = Modifier
-                                        .align(CenterVertically)
-                                        .padding(start = 10.dp),
-                                    text = it1,
-                                    style = TextStyle(
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Medium,
-                                    ),
-                                )
-                            }
-                        }
+                        UserAvatar(
+                            url = userInfo.user.profileImageUrls.medium,
+                            modifier = Modifier.size(50.dp),
+                            contentScale = ContentScale.FillWidth,
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 10.dp),
+                            text = userInfo.user.name,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
                     }
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = popBack,
-                        modifier = Modifier
-                            .windowInsetsPadding(WindowInsets.statusBars)
-                            .padding(vertical = 10.dp)
-                    ) {
-                        Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
-                    }
-                },
-                collapsedHeight = collapseHeight,
-                expandedHeight = 300.dp,
-                windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal),
-                scrollBehavior = scrollBehavior,
-            )
+                }
+            }
         },
     ) {
         LazyColumn(
             modifier = Modifier
                 .padding(it)
                 .fillMaxWidth(),
+            state = lazyListState,
+            contentPadding = PaddingValues(horizontal = 15.dp)
         ) {
-            item(key = "user_info") {
-                with(LocalSharedTransitionScope.currentOrThrow) {
+            item(key = KEY_USER_AVATAR) {
+                UserAvatar(
+                    url = userInfo.user.profileImageUrls.medium,
+                    modifier = Modifier.size(100.dp),
+                    contentScale = ContentScale.FillWidth,
+                )
+            }
+            item(key = KEY_USER_INFO) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     Row(
-                        modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
+                        verticalAlignment = CenterVertically
                     ) {
-                        userInfo.user?.name?.let { it1 ->
-                            Text(
-                                text = it1,
-                                style = TextStyle(
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Medium,
-                                ),
-                                modifier = Modifier
-                                    .sharedElement(
-                                        rememberSharedContentState(key = "user-name-${userInfo.user.id}"),
-                                        LocalAnimatedContentScope.currentOrThrow,
-                                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                    )
-                                    .skipToLookaheadSize()
-                            )
-                        }
-                        if (userInfo.isPremium) {
+                        Text(
+                            text = userInfo.user.name,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
+                        if (userInfo.profile.isPremium) {
                             Image(
                                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_profile_premium),
                                 modifier = Modifier
                                     .padding(start = 5.dp)
-                                    .size(20.dp)
-                                    .align(CenterVertically),
+                                    .size(20.dp),
                                 contentDescription = null
                             )
                         }
                     }
                     //id点击可复制
                     Row(
-                        modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                            .throttleClick {
-                                userInfo.user?.id?.let { it1 -> copyToClipboard(it1.toString()) }
-                            }
+                        horizontalArrangement = 5f.spaceBy,
+                        verticalAlignment = CenterVertically,
                     ) {
                         Text(
-                            text = "ID: ${userInfo.user?.id}",
+                            text = "ID: ${userInfo.user.id}",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                            ),
+                        )
+                        Icon(
+                            imageVector = Icons.Rounded.ContentCopy,
+                            contentDescription = null,
                             modifier = Modifier
-                                .sharedElement(
-                                    rememberSharedContentState(key = "user-id-${userInfo.user?.id}"),
-                                    LocalAnimatedContentScope.currentOrThrow,
-                                    placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                )
-                                .skipToLookaheadSize(),
+                                .size(30.dp)
+                                .throttleClick(indication = ripple(radius = 15.dp)) {
+                                    copyToClipboard(userInfo.user.id.toString())
+                                }
+                                .padding(5.dp)
+                        )
+                    }
+                    // 个人简介
+                    if (userInfo.user.comment.isNotEmpty()) {
+                        Text(
+                            text = userInfo.user.comment,
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
                             ),
                         )
                     }
-                    // 个人简介
-                    userInfo.user?.comment?.let {
-                        Row(
-                            modifier = Modifier
-                                .padding(start = 15.dp, top = 10.dp)
-                        ) {
-                            Text(
-                                text = it,
-                                style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                ),
-                            )
-                        }
-                        Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                        )
-                    }
                 }
             }
-            item(key = "user_illusts") {
-                if (state.userIllusts.isNotEmpty()) {
+            if (state.userIllusts.isNotEmpty()) {
+                item(key = KEY_USER_ILLUSTS) {
                     // 插画、漫画网格组件
                     IllustWidget(
                         title = stringResource(RString.illustration_works),
                         endText = stringResource(
                             RString.illustration_count,
-                            state.userInfo.totalIllusts
+                            userInfo.profile.totalIllusts
                         ),
                         navToPictureScreen = navToPictureScreen,
-                        illusts = state.userIllusts
+                        illusts = state.userIllusts,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
-            item(key = "user_bookmarks_illusts") {
-                if (state.userBookmarksIllusts.isNotEmpty()) {
+            if (state.userBookmarksIllusts.isNotEmpty()) {
+                item(key = KEY_USER_BOOKMARKS_ILLUSTS) {
                     // 插画、漫画收藏网格组件
                     IllustWidget(
                         title = stringResource(RString.illust_and_manga_liked),
                         endText = stringResource(RString.view_all),
                         navToPictureScreen = navToPictureScreen,
-                        illusts = state.userBookmarksIllusts
+                        illusts = state.userBookmarksIllusts,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
-            item(key = "user_bookmarks_novels") {
+            item(key = KEY_USER_BOOKMARKS_NOVELS) {
                 if (state.userBookmarksNovels.isNotEmpty()) {
                     // 小说收藏网格组件
                     NovelBookmarkWidget(
-                        novels = state.userBookmarksNovels
+                        novels = state.userBookmarksNovels,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 20.dp)
                     )
                 }
             }
-            item(key = "space") {
+            item(key = KEY_SPACE) {
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
