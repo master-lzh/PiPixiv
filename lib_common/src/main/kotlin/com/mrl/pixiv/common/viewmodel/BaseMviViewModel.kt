@@ -9,17 +9,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.mrl.pixiv.common.coroutine.CancelException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
@@ -96,14 +87,16 @@ abstract class BaseMviViewModel<State, Intent : ViewIntent>(
     /**
      * 发送副作用（包括错误）
      */
-    protected suspend fun sendEffect(effect: SideEffect) {
-        _sideEffect.emit(effect)
+    protected fun sendEffect(effect: SideEffect) {
+        viewModelScope.launch {
+            _sideEffect.emit(effect)
+        }
     }
 
     /**
      * 统一错误处理
      */
-    protected suspend fun handleError(throwable: Throwable) {
+    protected fun handleError(throwable: Throwable) {
         sendEffect(SideEffect.Error(throwable))
     }
 

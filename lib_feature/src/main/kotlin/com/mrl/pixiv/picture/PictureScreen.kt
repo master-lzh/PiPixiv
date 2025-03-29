@@ -62,7 +62,6 @@ import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.Type
-import com.mrl.pixiv.common.lifecycle.OnLifecycle
 import com.mrl.pixiv.common.ui.*
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.components.UserAvatar
@@ -70,6 +69,8 @@ import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
 import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.util.AppUtil.getString
+import com.mrl.pixiv.common.viewmodel.SideEffect
+import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
@@ -77,7 +78,6 @@ import com.mrl.pixiv.common.viewmodel.follow.requireFollowState
 import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import com.mrl.pixiv.picture.components.UgoiraPlayer
 import com.mrl.pixiv.picture.viewmodel.PictureAction
-import com.mrl.pixiv.picture.viewmodel.PictureDeeplinkViewModel
 import com.mrl.pixiv.picture.viewmodel.PictureState
 import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import kotlinx.coroutines.Dispatchers
@@ -112,15 +112,15 @@ internal fun PictureScreen(
     modifier: Modifier = Modifier,
     illust: Illust,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
-    pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust) },
+    pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust, null) },
 ) {
-    OnLifecycle(onLifecycle = pictureViewModel::onCreate)
-    val exception = pictureViewModel.exception.collectAsStateWithLifecycle(
+    val sideEffect by pictureViewModel.sideEffect.collectAsStateWithLifecycle(
         initialValue = null,
         lifecycle = LocalLifecycleOwner.current.lifecycle,
-    ).value
+    )
+    val exception = (sideEffect as? SideEffect.Error)?.throwable
     PictureScreen(
-        state = pictureViewModel.state,
+        state = pictureViewModel.asState(),
         exception = exception,
         illust = illust,
         modifier = modifier,
@@ -138,16 +138,18 @@ internal fun PictureDeeplinkScreen(
     modifier: Modifier = Modifier,
     illustId: Long,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
-    pictureViewModel: PictureDeeplinkViewModel = koinViewModel { parametersOf(illustId) },
+    pictureViewModel: PictureViewModel = koinViewModel { parametersOf(null, illustId) },
 ) {
-    val illust = pictureViewModel.state.illust
-    val exception = pictureViewModel.exception.collectAsStateWithLifecycle(
+    val state = pictureViewModel.asState()
+    val illust = state.illust
+    val sideEffect by pictureViewModel.sideEffect.collectAsStateWithLifecycle(
         initialValue = null,
         lifecycle = LocalLifecycleOwner.current.lifecycle,
-    ).value
+    )
+    val exception = (sideEffect as? SideEffect.Error)?.throwable
     if (illust != null) {
         PictureScreen(
-            state = pictureViewModel.state,
+            state = state,
             exception = exception,
             illust = illust,
             modifier = modifier,
@@ -656,7 +658,8 @@ internal fun PictureScreen(
                         ) {
                             state.userIllusts.take(minOf(userSpanCount, state.userIllusts.size))
                                 .forEach {
-                                    val innerIsBookmarked = requireBookmarkState[it.id] ?: it.isBookmarked
+                                    val innerIsBookmarked =
+                                        requireBookmarkState[it.id] ?: it.isBookmarked
                                     SquareIllustItem(
                                         illust = it,
                                         isBookmarked = innerIsBookmarked,
