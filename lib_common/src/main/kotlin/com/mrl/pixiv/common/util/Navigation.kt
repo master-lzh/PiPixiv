@@ -6,14 +6,11 @@ import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.viewmodel.illust.IllustState
-import org.koin.core.context.GlobalContext
 import kotlin.time.measureTime
 
 fun NavHostController.navigateToPictureScreen(illust: Illust, prefix: String) {
     measureTime {
-        val koin = GlobalContext.get()
-        val illustState = koin.getOrNull<IllustState>()
-        illustState?.setIllust(illust.id, illust)
+        IllustState.setIllust(illust.id, illust)
         navigate(Destination.PictureScreen(illust.id, prefix)) {
             restoreState = true
         }

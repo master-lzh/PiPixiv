@@ -83,7 +83,6 @@ import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import java.io.File
 import kotlin.uuid.Uuid
@@ -92,9 +91,8 @@ import kotlin.uuid.Uuid
 fun PictureScreen(
     illustId: Long,
     modifier: Modifier = Modifier,
-    illustState: IllustState = koinInject(),
 ) {
-    val illust = illustState.illusts[illustId]
+    val illust = IllustState.illusts[illustId]
     if (illust != null) {
         PictureScreen(
             modifier = modifier,
