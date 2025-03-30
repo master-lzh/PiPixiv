@@ -6,10 +6,6 @@ import coil3.PlatformContext
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import com.mrl.pixiv.common.data.setting.setAppCompatDelegateThemeMode
-import com.mrl.pixiv.common.datasource.local.datastore.UserAuthDataSource.Companion.KEY_ACCESS_TOKEN_EXPIRES_TIME
-import com.mrl.pixiv.common.datasource.local.datastore.UserAuthDataSource.Companion.KEY_USER_ACCESS_TOKEN
-import com.mrl.pixiv.common.datasource.local.datastore.UserAuthDataSource.Companion.KEY_USER_REFRESH_TOKEN
-import com.mrl.pixiv.common.datasource.local.datastore.userAuthDataStore
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.util.AppUtil
 import com.mrl.pixiv.common.util.initializeFirebase
@@ -17,7 +13,6 @@ import com.mrl.pixiv.common.util.isFileExists
 import com.mrl.pixiv.di.allModule
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
 import okio.Path.Companion.toOkioPath
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -54,19 +49,6 @@ class App : Application() {
             if (filesDir.resolve("mmkv").exists()) {
                 return@runBlocking
             }
-            val auth = async {
-                val file = filesDir.resolve("datastore/user_auth.preferences_pb")
-                if (isFileExists(file)) {
-                    val tokens = userAuthDataStore.data.first()
-                    mmkv.encode("userAccessToken", tokens[KEY_USER_ACCESS_TOKEN] ?: "")
-                    mmkv.encode("userRefreshToken", tokens[KEY_USER_REFRESH_TOKEN] ?: "")
-                    mmkv.encode(
-                        "accessTokenExpiresTime",
-                        tokens[KEY_ACCESS_TOKEN_EXPIRES_TIME] ?: 0L
-                    )
-//                    deleteFiles(file)
-                }
-            }
             val search = async {
                 val file = filesDir.resolve("datastore/search.pb")
                 if (isFileExists(file)) {
@@ -91,7 +73,7 @@ class App : Application() {
 //                    deleteFiles(file)
                 }
             }
-            awaitAll(auth, search, userPreference, userInfo)
+            awaitAll(search, userPreference, userInfo)
         }
     }
 }
