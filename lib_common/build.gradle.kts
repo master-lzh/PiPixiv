@@ -23,8 +23,8 @@ dependencies {
     // splash screen
     api(androidx.splashscreen)
     // DataStore
-    api(androidx.datastore)
-    api(androidx.datastore.preferences)
+//    api(androidx.datastore)
+//    api(androidx.datastore.preferences)
     // ProfileInstaller
     api(androidx.profileinstaller)
     // Paging
