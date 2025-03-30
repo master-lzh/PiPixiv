@@ -7,6 +7,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import coil3.SingletonImageLoader
 import coil3.asDrawable
 import coil3.request.ImageRequest
@@ -16,9 +20,11 @@ import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.repository.PixivRepository
 import com.mrl.pixiv.common.repository.SearchRepository
+import com.mrl.pixiv.common.repository.paging.RelatedIllustPaging
 import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.viewmodel.BaseMviViewModel
 import com.mrl.pixiv.common.viewmodel.ViewIntent
+import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import io.ktor.client.HttpClient
 import io.ktor.client.request.request
 import io.ktor.client.statement.bodyAsChannel
@@ -41,7 +47,6 @@ import kotlin.time.Duration.Companion.seconds
 @Stable
 data class PictureState(
     val illust: Illust? = null,
-    val illustRelated: SnapshotStateList<Illust> = mutableStateListOf(),
     val userIllusts: SnapshotStateList<Illust> = mutableStateListOf(),
     val nextUrl: String = "",
     val ugoiraImages: ImmutableList<Pair<Bitmap, Long>> = persistentListOf(),
@@ -52,14 +57,6 @@ sealed class PictureAction : ViewIntent {
     data class AddSearchHistory(val keyword: String) : PictureAction()
     data class GetUserIllustsIntent(
         val userId: Long,
-    ) : PictureAction()
-
-    data class GetIllustRelatedIntent(
-        val illustId: Long,
-    ) : PictureAction()
-
-    data class LoadMoreIllustRelatedIntent(
-        val queryMap: Map<String, String>? = null,
     ) : PictureAction()
 
     data class BookmarkIllust(val illustId: Long) : PictureAction()
@@ -84,17 +81,15 @@ class PictureViewModel(
     initialState = PictureState(),
 ), KoinComponent {
     private val imageOkHttpClient: HttpClient by inject(named(HttpClientEnum.IMAGE))
+    val relatedIllusts = Pager(PagingConfig(pageSize = 20)) {
+        RelatedIllustPaging(illust?.id ?: illustId!!)
+    }.flow.cachedIn(viewModelScope)
 
     override suspend fun handleIntent(intent: PictureAction) {
         when (intent) {
             is PictureAction.GetIllustDetail -> getIllustDetail(intent.illustId)
             is PictureAction.AddSearchHistory -> addSearchHistory(intent.keyword)
             is PictureAction.GetUserIllustsIntent -> getUserIllusts(intent.userId)
-            is PictureAction.GetIllustRelatedIntent -> getIllustRelated(intent.illustId)
-            is PictureAction.LoadMoreIllustRelatedIntent -> loadMoreIllustRelated(
-                intent.queryMap
-            )
-
             is PictureAction.BookmarkIllust -> bookmark(intent.illustId)
 
             is PictureAction.UnBookmarkIllust -> unBookmark(intent.illustId)
@@ -113,7 +108,6 @@ class PictureViewModel(
         when {
             illust != null -> {
                 dispatch(PictureAction.GetUserIllustsIntent(illust.user.id))
-                dispatch(PictureAction.GetIllustRelatedIntent(illust.id))
                 if (illust.type == Type.Ugoira) {
                     dispatch(PictureAction.DownloadUgoira(illust.id))
                 }
@@ -195,7 +189,6 @@ class PictureViewModel(
                 copy(illust = resp.illust)
             }
             getUserIllusts(resp.illust.user.id)
-            getIllustRelated(resp.illust.id)
         }
     }
 
@@ -233,71 +226,12 @@ class PictureViewModel(
     }
 
     private fun unBookmark(illustId: Long) {
-        launchIO {
-            PixivRepository.postIllustBookmarkDelete(illustId)
-            updateState {
-                copy(
-                    userIllusts = userIllusts.apply {
-                        indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
-                            set(it, get(it).copy(isBookmarked = false))
-                        }
-                    },
-                    illustRelated = illustRelated.apply {
-                        indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
-                            set(it, get(it).copy(isBookmarked = false))
-                        }
-                    }
-                )
-            }
-        }
+        BookmarkState.deleteBookmarkIllust(illustId)
     }
 
     private fun bookmark(illustId: Long) {
-        launchIO {
-            PixivRepository.postIllustBookmarkAdd(illustId)
-            updateState {
-                copy(
-                    userIllusts = userIllusts.apply {
-                        indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
-                            set(it, get(it).copy(isBookmarked = true))
-                        }
-                    },
-                    illustRelated = illustRelated.apply {
-                        indexOfFirst { it.id == illustId }.takeIf { it != -1 }?.let {
-                            set(it, get(it).copy(isBookmarked = true))
-                        }
-                    }
-                )
-            }
-        }
+        BookmarkState.bookmarkIllust(illustId)
     }
-
-    private fun loadMoreIllustRelated(queryMap: Map<String, String>?) =
-        launchIO {
-            val resp = PixivRepository.loadMoreIllustRelated(
-                queryMap ?: return@launchIO
-            )
-            updateState {
-                copy(
-                    illustRelated = (illustRelated + resp.illusts).toMutableStateList(),
-                    nextUrl = resp.nextURL
-                )
-            }
-        }
-
-    private fun getIllustRelated(illustId: Long) =
-        launchIO {
-            val resp = PixivRepository.getIllustRelated(
-                illustId = illustId,
-                filter = Filter.ANDROID.value
-            )
-            updateState {
-                copy(
-                    illustRelated = resp.illusts.toMutableStateList(),
-                    nextUrl = resp.nextURL
-                )
-            }
-        }
 
     private fun getUserIllusts(userId: Long) {
         launchIO {

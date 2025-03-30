@@ -43,15 +43,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.SingletonImageLoader
 import coil3.asDrawable
 import coil3.compose.AsyncImage
@@ -65,7 +65,6 @@ import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.ui.*
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.components.UserAvatar
-import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
 import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.util.AppUtil.getString
@@ -120,6 +119,7 @@ internal fun PictureScreen(
     PictureScreen(
         state = pictureViewModel.asState(),
         exception = exception,
+        relatedIllusts = pictureViewModel.relatedIllusts.collectAsLazyPagingItems(),
         illust = illust,
         modifier = modifier,
         navToPictureScreen = navHostController::navigateToPictureScreen,
@@ -149,6 +149,7 @@ internal fun PictureDeeplinkScreen(
         PictureScreen(
             state = state,
             exception = exception,
+            relatedIllusts = pictureViewModel.relatedIllusts.collectAsLazyPagingItems(),
             illust = illust,
             modifier = modifier,
             navToPictureScreen = navHostController::navigateToPictureScreen,
@@ -175,6 +176,7 @@ internal fun PictureDeeplinkScreen(
 internal fun PictureScreen(
     state: PictureState,
     exception: Throwable?,
+    relatedIllusts: LazyPagingItems<Illust>,
     illust: Illust,
     modifier: Modifier = Modifier,
     navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
@@ -215,7 +217,6 @@ internal fun PictureScreen(
         }
     val isBarVisible by remember { derivedStateOf { lazyStaggeredGridState.firstVisibleItemIndex <= illust.pageCount } }
     val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
-    val isScrollToRelatedBottom = rememberSaveable { mutableStateOf(false) }
 
     val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
     val onBookmarkClick = { restrict: String, tags: List<String>? ->
@@ -243,15 +244,6 @@ internal fun PictureScreen(
             launchNetwork {
                 currLongClickPicSize = calculateImageSize(currLongClickPic.second)
             }
-        }
-    }
-
-    var currentLoadingItem by rememberSaveable { mutableIntStateOf(0) }
-    LaunchedEffect(state.illustRelated.size) {
-        currentLoadingItem = if (state.illustRelated.size.isEven()) {
-            4
-        } else {
-            5
         }
     }
 
@@ -692,21 +684,22 @@ internal fun PictureScreen(
                         ),
                     )
                 }
-                itemsIndexed(
-                    state.illustRelated,
-                    key = { _, it -> "${illust.id}_related_${it.id}" },
-                    contentType = { _, _ -> "related_illusts" }
-                ) { index, it ->
-                    val innerIsBookmarked = requireBookmarkState[it.id] ?: it.isBookmarked
+                items(
+                    relatedIllusts.itemCount,
+                    key = { index -> "${illust.id}_related_${index}" },
+                    contentType = { "related_illusts" }
+                ) { index ->
+                    val illust = relatedIllusts[index] ?: return@items
+                    val innerIsBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
                     // 相关作品
                     SquareIllustItem(
-                        illust = it,
+                        illust = illust,
                         isBookmarked = innerIsBookmarked,
                         onBookmarkClick = { restrict: String, tags: List<String>? ->
                             if (innerIsBookmarked) {
-                                BookmarkState.deleteBookmarkIllust(it.id)
+                                BookmarkState.deleteBookmarkIllust(illust.id)
                             } else {
-                                BookmarkState.bookmarkIllust(it.id, restrict, tags)
+                                BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                             }
                         },
                         spanCount = relatedSpanCount,
@@ -716,36 +709,12 @@ internal fun PictureScreen(
                     )
                 }
 
-                items(currentLoadingItem, key = { "loading_$it" }) {
-                    val size =
-                        (LocalConfiguration.current.screenWidthDp.dp - 2 * relatedSpanCount * PaddingValues(
-                            5.dp
-                        ).calculateLeftPadding(
-                            LayoutDirection.Ltr
-                        ) - 1.dp) / relatedSpanCount
-                    Surface(
-                        Modifier
-                            .padding(5.dp)
-                            .size(size),
-                        shape = MaterialTheme.shapes.medium,
-                        shadowElevation = 4.dp,
-                        propagateMinConstraints = false,
-                    ) {
-
-                    }
-                }
-
                 item(key = "spacer") {
                     Spacer(modifier = Modifier.height(70.dp))
                 }
             }
             lazyStaggeredGridState.OnScrollToBottom(isScrollToBottom, illust.pageCount, illust.id)
-            lazyStaggeredGridState.OnScrollToBottom(loadingItemCount = currentLoadingItem) {
-                isScrollToRelatedBottom.value = true
-                state.nextUrl.queryParams.takeIf { it.isNotEmpty() }?.let {
-                    dispatch(PictureAction.LoadMoreIllustRelatedIntent(state.nextUrl.queryParams))
-                }
-            }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
