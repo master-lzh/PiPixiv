@@ -1,7 +1,6 @@
 package com.mrl.pixiv.common.data.auth
 
 import com.mrl.pixiv.common.data.Constants
-import com.mrl.pixiv.common.data.IBaseFieldMap
 
 data class AuthTokenFieldReq(
     val clientId: String = Constants.CLIENT_ID,
@@ -19,7 +18,7 @@ data class AuthTokenFieldReq(
 
     val getSecureUrl: Int = 1,
     val includePolicy: Boolean = true,
-) : IBaseFieldMap
+)
 
 enum class GrantType(val value: String) {
     PASSWORD("password"),

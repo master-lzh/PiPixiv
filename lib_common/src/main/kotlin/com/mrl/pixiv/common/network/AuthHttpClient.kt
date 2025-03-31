@@ -7,11 +7,10 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.accept
 import io.ktor.http.ContentType
-import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
 @Single
-@Named("auth")
+@AuthClient
 fun authHttpClient() = baseHttpClient.apply {
     plugin(HttpSend).intercept { request ->
         addAuthHeader(request)

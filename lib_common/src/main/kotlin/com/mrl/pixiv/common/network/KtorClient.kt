@@ -14,17 +14,9 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 import co.touchlab.kermit.Logger as KermitLogger
 
-
-private val JSON = Json {
-    ignoreUnknownKeys = true
-    coerceInputValues = true
-    isLenient = true
-}
-
-fun <T : HttpClientEngineConfig> httpClient(
+internal fun <T : HttpClientEngineConfig> httpClient(
     engine: HttpClientEngineFactory<T>,
     config: T.() -> Unit
 ): HttpClient {
@@ -64,7 +56,7 @@ fun <T : HttpClientEngineConfig> httpClient(
     }
 }
 
-fun <T : HttpClientEngineConfig> imageHttpClient(
+internal fun <T : HttpClientEngineConfig> imageHttpClient(
     engine: HttpClientEngineFactory<T>,
     config: T.() -> Unit
 ) = HttpClient(engine) {
@@ -83,7 +75,7 @@ fun <T : HttpClientEngineConfig> imageHttpClient(
     }
 }
 
-val baseHttpClient: HttpClient
+internal val baseHttpClient: HttpClient
     get() = httpClient(OkHttp) {
         config {
             retryOnConnectionFailure(true)
@@ -91,7 +83,7 @@ val baseHttpClient: HttpClient
         }
     }
 
-val baseImageHttpClient: HttpClient
+internal val baseImageHttpClient: HttpClient
     get() = imageHttpClient(OkHttp) {
         config {
             retryOnConnectionFailure(true)

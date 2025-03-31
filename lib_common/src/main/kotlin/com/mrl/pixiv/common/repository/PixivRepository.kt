@@ -1,12 +1,13 @@
 package com.mrl.pixiv.common.repository
 
 import com.mrl.pixiv.common.data.Filter
-import com.mrl.pixiv.common.data.HttpClientEnum
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.auth.AuthTokenFieldReq
 import com.mrl.pixiv.common.data.search.SearchIllustQuery
 import com.mrl.pixiv.common.datasource.remote.createAuthApi
 import com.mrl.pixiv.common.datasource.remote.createPixivApi
+import com.mrl.pixiv.common.network.ApiClient
+import com.mrl.pixiv.common.network.AuthClient
 import com.mrl.pixiv.common.util.API_HOST
 import com.mrl.pixiv.common.util.AUTH_HOST
 import com.mrl.pixiv.common.util.NetworkUtil.enableBypassSniffing
@@ -18,8 +19,8 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
 object PixivRepository : KoinComponent {
-    private val authHttpClient by inject<HttpClient>(named(HttpClientEnum.AUTH))
-    private val apiHttpClient by inject<HttpClient>(named(HttpClientEnum.API))
+    private val authHttpClient by inject<HttpClient>(named<AuthClient>())
+    private val apiHttpClient by inject<HttpClient>(named<ApiClient>())
 
     private val authKtorfit = Ktorfit.Builder()
         .baseUrl(

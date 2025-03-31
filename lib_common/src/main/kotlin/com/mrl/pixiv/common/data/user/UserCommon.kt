@@ -104,7 +104,7 @@ data class Workspace(
 )
 
 @Serializable
-data class BookmarkTag (
+data class BookmarkTag(
     val count: Long,
     val name: String,
 )

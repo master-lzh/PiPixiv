@@ -2,7 +2,6 @@ package com.mrl.pixiv.common.data.search
 
 import com.mrl.pixiv.common.data.Filter
 import com.mrl.pixiv.common.data.IBaseEnum
-import com.mrl.pixiv.common.data.IBaseQueryMap
 
 //filter=for_android
 //include_translated_tag_results=true
@@ -43,7 +42,8 @@ data class SearchIllustQuery(
         map["search_ai_type"] = searchAiType.value.toString()
         map["offset"] = offset.toString()
         return map
-    }}
+    }
+}
 
 
 enum class SearchAiType(override val value: Int) : IBaseEnum {
@@ -71,4 +71,4 @@ enum class SearchTarget(override val value: String) : IBaseEnum {
 data class SearchAutoCompleteQuery(
     val word: String,
     val mergePlainKeywordResults: Boolean = true,
-) : IBaseQueryMap
+)

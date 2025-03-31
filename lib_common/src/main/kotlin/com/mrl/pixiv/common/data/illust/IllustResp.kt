@@ -43,13 +43,13 @@ data class IllustDetailResp(
 )
 
 @Serializable
-data class IllustBookmarkDetailResp (
+data class IllustBookmarkDetailResp(
     @SerialName("bookmark_detail")
     val bookmarkDetail: BookmarkDetail
 )
 
 @Serializable
-data class BookmarkDetail (
+data class BookmarkDetail(
     @SerialName("is_bookmarked")
     val isBookmarked: Boolean,
     val restrict: String,
@@ -57,7 +57,7 @@ data class BookmarkDetail (
 )
 
 @Serializable
-data class BookmarkDetailTag (
+data class BookmarkDetailTag(
     @SerialName("is_registered")
     val isRegistered: Boolean,
     val name: String

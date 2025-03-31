@@ -4,13 +4,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UgoiraMetadataResp (
+data class UgoiraMetadataResp(
     @SerialName("ugoira_metadata")
     val ugoiraMetadata: UgoiraMetadata
 )
 
 @Serializable
-data class UgoiraMetadata (
+data class UgoiraMetadata(
     val frames: List<Frame>,
 
     @SerialName("zip_urls")
@@ -18,12 +18,12 @@ data class UgoiraMetadata (
 )
 
 @Serializable
-data class Frame (
+data class Frame(
     val delay: Long,
     val file: String
 )
 
 @Serializable
-data class ZipUrls (
+data class ZipUrls(
     val medium: String
 )

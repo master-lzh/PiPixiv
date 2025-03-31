@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SearchIllustResp (
+data class SearchIllustResp(
     val illusts: List<Illust>,
 
     @SerialName("next_url")
@@ -20,12 +20,12 @@ data class SearchIllustResp (
 )
 
 @Serializable
-data class SearchAutoCompleteResp (
+data class SearchAutoCompleteResp(
     val tags: List<Tag>
 )
 
 @Serializable
-data class TrendingTag (
+data class TrendingTag(
     val illust: Illust,
     val tag: String,
     @SerialName("translated_name")
@@ -33,7 +33,7 @@ data class TrendingTag (
 )
 
 @Serializable
-data class TrendingTagsResp (
+data class TrendingTagsResp(
     @SerialName("trend_tags")
     val trendTags: List<TrendingTag>
 )

@@ -15,9 +15,9 @@ import coil3.SingletonImageLoader
 import coil3.asDrawable
 import coil3.request.ImageRequest
 import com.mrl.pixiv.common.data.Filter
-import com.mrl.pixiv.common.data.HttpClientEnum
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Type
+import com.mrl.pixiv.common.network.ImageClient
 import com.mrl.pixiv.common.repository.PixivRepository
 import com.mrl.pixiv.common.repository.SearchRepository
 import com.mrl.pixiv.common.repository.paging.RelatedIllustPaging
@@ -80,7 +80,7 @@ class PictureViewModel(
 ) : BaseMviViewModel<PictureState, PictureAction>(
     initialState = PictureState(),
 ), KoinComponent {
-    private val imageOkHttpClient: HttpClient by inject(named(HttpClientEnum.IMAGE))
+    private val imageOkHttpClient: HttpClient by inject(named<ImageClient>())
     val relatedIllusts = Pager(PagingConfig(pageSize = 20)) {
         RelatedIllustPaging(illust?.id ?: illustId!!)
     }.flow.cachedIn(viewModelScope)

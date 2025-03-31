@@ -6,23 +6,6 @@ import de.jensklingenberg.ktorfit.http.FormUrlEncoded
 import de.jensklingenberg.ktorfit.http.POST
 
 interface AuthApi {
-    //data class AuthTokenFieldReq(
-    //    val clientId: String = Constants.CLIENT_ID,
-    //    val clientSecret: String = Constants.CLIENT_SECRET,
-    //    val grantType: String,
-    //
-    //    val username: String = "",
-    //    val password: String = "",
-    //
-    //    val code: String = "",
-    //    val redirectUri: String = "",
-    //    val codeVerifier: String = "",
-    //
-    //    val refreshToken: String = "",
-    //
-    //    val getSecureUrl: Int = 1,
-    //    val includePolicy: Boolean = true,
-    //)
     @FormUrlEncoded
     @POST("auth/token")
     suspend fun refreshToken(

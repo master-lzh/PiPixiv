@@ -22,7 +22,7 @@ import coil3.gif.GifDecoder
 import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.allowRgb565
 import com.mrl.pixiv.common.activity.BaseActivity
-import com.mrl.pixiv.common.data.HttpClientEnum
+import com.mrl.pixiv.common.network.ImageClient
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.common.viewmodel.state
 import com.mrl.pixiv.navigation.root.RootNavigationGraph
@@ -38,7 +38,7 @@ import org.koin.core.qualifier.named
 
 class MainActivity : BaseActivity() {
     private val splashViewModel: SplashViewModel by viewModel()
-    private val imageHttpClient: HttpClient by inject(named(HttpClientEnum.IMAGE))
+    private val imageHttpClient: HttpClient by inject(named<ImageClient>())
 
 
     @Composable
