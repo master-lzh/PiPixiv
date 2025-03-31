@@ -46,10 +46,6 @@
 -keep class kotlinx.coroutines.** { *; }
 -dontwarn kotlinx.coroutines.**
 
--keep class com.mrl.pixiv.common.data.Rlt { *; }
-
--keep class com.mrl.pixiv.data.**Req { *; }
--keep class com.mrl.pixiv.data.**Query { *; }
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 -dontwarn org.slf4j.impl.StaticMDCBinder
 -dontwarn org.koin.ksp.generated.*
