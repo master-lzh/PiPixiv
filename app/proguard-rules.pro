@@ -52,3 +52,7 @@
 
 -keep class de.jensklingenberg.ktorfit.** { *; }
 -keepclassmembers class de.jensklingenberg.ktorfit.** { *; }
+
+-keep class com.mrl.pixiv.common.network.ApiClient
+-keep class com.mrl.pixiv.common.network.AuthClient
+-keep class com.mrl.pixiv.common.network.ImageClient
