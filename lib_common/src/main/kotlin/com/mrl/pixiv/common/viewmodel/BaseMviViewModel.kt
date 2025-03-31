@@ -102,7 +102,7 @@ abstract class BaseMviViewModel<State, Intent : ViewIntent>(
 
     protected fun launchIO(
         start: CoroutineStart = CoroutineStart.DEFAULT,
-        onError: (Throwable) -> Unit = {},
+        onError: (Throwable) -> Unit = { it.printStackTrace() },
         block: suspend CoroutineScope.() -> Unit
     ): Job =
         launchCatch(
@@ -115,7 +115,7 @@ abstract class BaseMviViewModel<State, Intent : ViewIntent>(
 
     protected fun launchUI(
         start: CoroutineStart = CoroutineStart.DEFAULT,
-        onError: (Throwable) -> Unit = {},
+        onError: (Throwable) -> Unit = { it.printStackTrace() },
         block: suspend CoroutineScope.() -> Unit
     ): Job =
         launchCatch(
