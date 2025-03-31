@@ -1,18 +1,6 @@
 package com.mrl.pixiv.common.data.user
 
-import com.mrl.pixiv.common.data.Filter
 import com.mrl.pixiv.common.data.Restrict
-
-data class UserDetailQuery(
-    val filter: String = Filter.ANDROID.value,
-    val userId: Long,
-)
-
-data class UserIllustsQuery(
-    val filter: String = Filter.ANDROID.value,
-    val userId: Long,
-    val type: String,
-)
 
 data class UserBookmarksIllustQuery(
     @Restrict
@@ -34,32 +22,3 @@ data class UserBookmarksIllustQuery(
         return map
     }
 }
-
-data class UserBookmarksNovelQuery(
-    @Restrict
-    val restrict: String,
-    val userId: Long,
-    val tag: String = "",
-)
-
-data class UserFollowAddReq(
-    val userId: Long,
-    val restrict: String,
-)
-
-data class UserFollowDeleteReq(
-    val userId: Long,
-)
-
-data class UserBookmarkTagsQuery(
-    val userId: Long,
-    @Restrict
-    val restrict: String,
-)
-
-data class UserFollowingQuery(
-    val filter: Filter = Filter.ANDROID,
-    val userId: Long,
-    val restrict: String = Restrict.PUBLIC,
-    val offset: Int? = null,
-)
