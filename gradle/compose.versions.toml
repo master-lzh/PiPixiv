@@ -1,5 +1,5 @@
 [versions]
-compose-bom = "2025.03.01"
+compose-bom = "2025.04.00"
 accompanist = "0.34.0"
 
 [libraries]
