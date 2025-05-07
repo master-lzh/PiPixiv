@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.getSystemService
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.compose.rememberNavController
 import coil3.ImageLoader
 import coil3.asImage
 import coil3.compose.setSingletonImageLoaderFactory
@@ -25,7 +24,7 @@ import com.mrl.pixiv.common.activity.BaseActivity
 import com.mrl.pixiv.common.network.ImageClient
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.common.viewmodel.state
-import com.mrl.pixiv.navigation.root.RootNavigationGraph
+import com.mrl.pixiv.navigation.MainGraph
 import com.mrl.pixiv.splash.SplashViewModel
 import com.mrl.pixiv.theme.PiPixivTheme
 import io.ktor.client.HttpClient
@@ -82,10 +81,7 @@ class MainActivity : BaseActivity() {
             PiPixivTheme {
                 val state = splashViewModel.asState()
                 state.startDestination?.let {
-                    RootNavigationGraph(
-                        navHostController = rememberNavController(),
-                        startDestination = it
-                    )
+                    MainGraph(startDestination = it)
                 }
             }
         }

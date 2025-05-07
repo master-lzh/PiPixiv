@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.compose.runtime.Stable
 import com.mrl.pixiv.common.datasource.local.mmkv.AuthManager
 import com.mrl.pixiv.common.router.Destination
-import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.viewmodel.BaseMviViewModel
 import com.mrl.pixiv.common.viewmodel.ViewIntent
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,7 +78,7 @@ class SplashViewModel : BaseMviViewModel<SplashState, SplashAction>(
         updateState {
             copy(
                 isLoading = false,
-                startDestination = Graph.Main::class
+                startDestination = Destination.HomeScreen::class
             )
         }
 }
