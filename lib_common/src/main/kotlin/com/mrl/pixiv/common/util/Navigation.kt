@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.router.Destination
-import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import kotlin.time.measureTime
 
@@ -26,20 +25,12 @@ fun NavHostController.navigateToSearchScreen() {
 }
 
 fun NavHostController.navigateToSearchResultScreen(searchWord: String) {
-    navigate(route = Destination.SearchResultsScreen(searchWord)) {
-        launchSingleTop = true
-    }
+    navigate(route = Destination.SearchResultsScreen(searchWord))
 }
 
 fun NavHostController.navigateToOutsideSearchResultScreen(searchWord: String) {
     navigate(route = Destination.SearchResultsScreen(searchWord)) {
 
-    }
-}
-
-fun NavHostController.navigateToMainScreen() {
-    navigate(route = Graph.Main) {
-        launchSingleTop = true
     }
 }
 

@@ -37,10 +37,8 @@ import com.mrl.pixiv.profile.ProfileScreen
 import com.mrl.pixiv.profile.detail.OtherProfileDetailScreen
 import com.mrl.pixiv.profile.detail.SelfProfileDetailScreen
 import com.mrl.pixiv.search.SearchScreen
-import com.mrl.pixiv.search.SearchViewModel
 import com.mrl.pixiv.search.preview.SearchPreviewScreen
 import com.mrl.pixiv.search.result.OutsideSearchResultsScreen
-import com.mrl.pixiv.search.result.SearchResultScreen
 import com.mrl.pixiv.setting.SettingScreen
 import com.mrl.pixiv.setting.SettingViewModel
 import com.mrl.pixiv.setting.network.NetworkSettingScreen
@@ -178,35 +176,10 @@ fun MainGraph(
 
                     // 搜索页
                     composable<Destination.SearchScreen> {
-                        val searchViewModel: SearchViewModel =
-                            koinViewModel(viewModelStoreOwner = it)
-                        val searchNavHostController = rememberNavController()
-                        CompositionLocalProvider(
-                            LocalNavigator provides searchNavHostController,
-                            LocalAnimatedContentScope provides this
-                        ) {
-                            NavHost(
-                                navController = searchNavHostController,
-                                route = Graph.Search::class,
-                                startDestination = Destination.SearchScreen
-                            ) {
-                                composable<Destination.SearchScreen> {
-                                    SearchScreen(
-                                        navHostController = navHostController,
-                                        searchViewModel = searchViewModel
-                                    )
-                                }
-                                composable<Destination.SearchResultsScreen> {
-                                    SearchResultScreen(
-                                        searchWords = it.toRoute<Destination.SearchResultsScreen>().searchWords,
-                                        navHostController = navHostController
-                                    )
-                                }
-                            }
-                        }
+                        SearchScreen()
                     }
 
-                    // 外部搜索结果页
+                    // 搜索结果页
                     composable<Destination.SearchResultsScreen> {
                         val searchWord =
                             it.toRoute<Destination.SearchResultsScreen>().searchWords
@@ -215,7 +188,6 @@ fun MainGraph(
                                 searchWords = searchWord,
                             )
                         }
-
                     }
 
                     // 设置页
