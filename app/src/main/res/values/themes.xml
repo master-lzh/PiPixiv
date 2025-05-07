@@ -7,7 +7,6 @@
 
     <!--== Theme Base ==-->
     <style name="Base.Theme.PiPixiv" parent="Theme.Material3.DayNight.NoActionBar">
-
         <!-- Themes -->
         <item name="android:windowLightStatusBar">@bool/lightStatusBar</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -19,20 +18,5 @@
 
     <!--== Default Theme ==-->
     <style name="Theme.PiPixiv" parent="Base.Theme.PiPixiv" />
-
-    <!--===============-->
-    <!-- Launch Screen -->
-    <!--===============-->
-
-    <!--== Splash Theme ==-->
-    <style name="Theme.PiPixiv.SplashScreen" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#00B4FF</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launch</item>
-        <item name="postSplashScreenTheme">@style/Theme.PiPixiv</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
-    </style>
 
 </resources>
