@@ -24,7 +24,7 @@ private const val INCLUDE_EDGE = true
 @Composable
 fun RecommendGrid(
     recommendImageList: LazyPagingItems<Illust>,
-    navToPictureScreen: (Illust, String) -> Unit,
+    navToPictureScreen: (List<Illust>, Int, String) -> Unit,
     lazyStaggeredGridState: LazyStaggeredGridState,
 ) {
     val spanCount = when (LocalConfiguration.current.orientation) {
@@ -49,7 +49,9 @@ fun RecommendGrid(
                 val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
                 RecommendImageItem(
                     width = width,
-                    navToPictureScreen = navToPictureScreen,
+                    navToPictureScreen = { _, prefix ->
+                        navToPictureScreen(recommendImageList.itemSnapshotList.items, it, prefix)
+                    },
                     illust = illust,
                     isBookmarked = isBookmarked,
                     onBookmarkClick = { restrict, tags ->

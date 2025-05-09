@@ -2,6 +2,7 @@ plugins {
     id("pixiv.android.library.compose")
     alias(kotlinx.plugins.serialization)
     alias(kotlinx.plugins.ktorfit)
+    alias(kotlinx.plugins.parcelize)
 }
 
 android {

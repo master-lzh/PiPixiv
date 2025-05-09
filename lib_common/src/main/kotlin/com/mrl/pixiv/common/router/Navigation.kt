@@ -97,4 +97,11 @@ sealed class Destination(
     data class FollowingScreen(
         val userId: Long,
     ) : Destination()
+
+    @Serializable
+    data class HorizontalPictureScreen(
+        val illusts: String,
+        val index: Int,
+        val prefix: String,
+    )
 }
