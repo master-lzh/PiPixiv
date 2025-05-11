@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Environment
-import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -21,7 +20,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.staggeredgrid.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -193,6 +194,11 @@ internal fun PictureScreen(
         Configuration.ORIENTATION_LANDSCAPE -> Pair(4, 6)
         else -> Pair(2, 3)
     }
+    val relatedRowCount = if (relatedIllusts.itemCount % relatedSpanCount == 0) {
+        relatedIllusts.itemCount / relatedSpanCount
+    } else {
+        relatedIllusts.itemCount / relatedSpanCount + 1
+    }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val shareLauncher =
@@ -206,18 +212,18 @@ internal fun PictureScreen(
                 // 分享失败或取消
             }
         }
-    val lazyStaggeredGridState = rememberLazyStaggeredGridState()
+    val lazyListState = rememberLazyListState()
     val currPage =
         remember {
             derivedStateOf {
                 minOf(
-                    lazyStaggeredGridState.firstVisibleItemIndex,
+                    lazyListState.firstVisibleItemIndex,
                     illust.pageCount - 1
                 )
             }
         }
-    val isBarVisible by remember { derivedStateOf { lazyStaggeredGridState.firstVisibleItemIndex <= illust.pageCount } }
-    val isScrollToBottom = rememberSaveable { mutableStateOf(false) }
+    val isBarVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex <= illust.pageCount } }
+    val isScrollToBottom = lazyListState.onScrollToBottom(illust.pageCount, illust.id)
 
     val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
     val onBookmarkClick = { restrict: String, tags: List<String>? ->
@@ -359,15 +365,13 @@ internal fun PictureScreen(
                 }
             },
         ) {
-            LazyVerticalStaggeredGrid(
-                state = lazyStaggeredGridState,
-                columns = StaggeredGridCells.Fixed(relatedSpanCount),
-                modifier = Modifier
-                    .fillMaxSize()
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier.fillMaxSize()
             ) {
                 with(sharedTransitionScope) {
                     if (illust.type == Type.Ugoira) {
-                        item(span = StaggeredGridItemSpan.FullLine, key = "ugoira") {
+                        item(key = "ugoira") {
                             UgoiraPlayer(
                                 images = state.ugoiraImages,
                                 placeholder = placeholder
@@ -377,7 +381,6 @@ internal fun PictureScreen(
                         items(
                             illust.pageCount,
                             key = { "${illust.id}_$it" },
-                            span = { StaggeredGridItemSpan.FullLine }
                         ) { index ->
                             val firstImageKey = "image-${illust.id}-0"
                             if (illust.pageCount > 1) {
@@ -442,8 +445,8 @@ internal fun PictureScreen(
                         }
                     }
                 }
-                item(span = StaggeredGridItemSpan.FullLine, key = "illust_title") {
-                    if (isScrollToBottom.value) {
+                item(key = "illust_title") {
+                    if (isScrollToBottom) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -496,7 +499,7 @@ internal fun PictureScreen(
                         )
                     }
                 }
-                item(span = StaggeredGridItemSpan.FullLine, key = "illust_data") {
+                item(key = "illust_data") {
                     Row(
                         Modifier.padding(top = 10.dp)
                     ) {
@@ -518,7 +521,7 @@ internal fun PictureScreen(
                     }
                 }
                 // tag
-                item(span = StaggeredGridItemSpan.FullLine, key = "illust_tags") {
+                item(key = "illust_tags") {
                     FlowRow(
                         Modifier.padding(start = 20.dp, top = 10.dp)
                     ) {
@@ -544,14 +547,14 @@ internal fun PictureScreen(
                         }
                     }
                 }
-                item(span = StaggeredGridItemSpan.FullLine, key = "illust_divider_1") {
+                item(key = "illust_divider_1") {
                     HorizontalDivider(
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
                             .padding(top = 50.dp)
                     )
                 }
-                item(span = StaggeredGridItemSpan.FullLine, key = "illust_author") {
+                item(key = "illust_author") {
                     //作者头像、名字、关注按钮
                     Row(
                         modifier = Modifier
@@ -637,7 +640,7 @@ internal fun PictureScreen(
                         }
                     }
                 }
-                item(span = StaggeredGridItemSpan.FullLine, key = "illust_author_other_works") {
+                item(key = "illust_author_other_works") {
                     Row(
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
@@ -672,7 +675,7 @@ internal fun PictureScreen(
                         }
                     }
                 }
-                item(span = StaggeredGridItemSpan.FullLine, key = "illust_related_title") {
+                item(key = "illust_related_title") {
                     //相关作品文字，显示在中间
                     Text(
                         text = stringResource(RString.related_artworks),
@@ -687,43 +690,62 @@ internal fun PictureScreen(
                     )
                 }
                 items(
-                    relatedIllusts.itemCount,
+                    relatedRowCount,
                     key = { index -> "${illust.id}_related_${index}" },
                     contentType = { "related_illusts" }
-                ) { index ->
-                    val illust = relatedIllusts[index] ?: return@items
-                    val innerIsBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
+                ) { rowIndex ->
+                    val illustsPair = (0..relatedSpanCount - 1).mapNotNull { it ->
+                        val index = rowIndex * relatedSpanCount + it
+                        val illust = relatedIllusts[index] ?: return@mapNotNull null
+                        Triple(
+                            illust,
+                            requireBookmarkState[illust.id] ?: illust.isBookmarked,
+                            index
+                        )
+                    }
+                    if (illustsPair.isEmpty()) return@items
                     // 相关作品
-                    SquareIllustItem(
-                        illust = illust,
-                        isBookmarked = innerIsBookmarked,
-                        onBookmarkClick = { restrict: String, tags: List<String>? ->
-                            if (innerIsBookmarked) {
-                                BookmarkState.deleteBookmarkIllust(illust.id)
-                            } else {
-                                BookmarkState.bookmarkIllust(illust.id, restrict, tags)
-                            }
-                        },
-                        navToPictureScreen = { prefix ->
-                            navToPictureScreen(relatedIllusts.itemSnapshotList.items, index, prefix)
-                        },
-                        modifier = Modifier.padding(),
-                        shouldShowTip = index == 0
-                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, bottom = 5.dp),
+                        horizontalArrangement = 5f.spaceBy
+                    ) {
+                        illustsPair.forEach { (illust, isBookmarked, index) ->
+                            SquareIllustItem(
+                                illust = illust,
+                                isBookmarked = isBookmarked,
+                                onBookmarkClick = { restrict: String, tags: List<String>? ->
+                                    if (isBookmarked) {
+                                        BookmarkState.deleteBookmarkIllust(illust.id)
+                                    } else {
+                                        BookmarkState.bookmarkIllust(illust.id, restrict, tags)
+                                    }
+                                },
+                                navToPictureScreen = { prefix ->
+                                    navToPictureScreen(
+                                        relatedIllusts.itemSnapshotList.items,
+                                        index,
+                                        prefix
+                                    )
+                                },
+                                modifier = Modifier.weight(1f),
+                                shouldShowTip = index == 0
+                            )
+                        }
+                    }
                 }
 
                 item(key = "spacer") {
                     Spacer(modifier = Modifier.height(70.dp))
                 }
             }
-            lazyStaggeredGridState.OnScrollToBottom(isScrollToBottom, illust.pageCount, illust.id)
 
             Box(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
                 AnimatedVisibility(
-                    visible = !isScrollToBottom.value,
+                    visible = !isScrollToBottom,
                     enter = fadeIn(),
                     exit = fadeOut(),
                     modifier = Modifier
@@ -902,36 +924,22 @@ private fun createShareIntent(text: String): Intent {
 }
 
 @Composable
-private fun LazyStaggeredGridState.OnScrollToBottom(
-    isScrollToBottom: MutableState<Boolean>,
+private fun LazyListState.onScrollToBottom(
     pageCount: Int,
     id: Long
-) {
+): Boolean {
     val isToBottom by remember {
         derivedStateOf {
             val lastVisibleItem =
                 layoutInfo.visibleItemsInfo.find { it.key == "${id}_${pageCount - 1}" }
-//            layoutInfo.visibleItemsInfo.forEachIndexed { i, it ->
-//                Log.d(
-//                    "TAG",
-//                    "OnScrollToBottom: ${it.index} ${
-//                        it.let { "${it.offset} ${it.size} ${layoutInfo.viewportStartOffset} ${layoutInfo.viewportEndOffset}" }
-//                    }"
-//                )
-//            }
-
 
             if (lastVisibleItem != null) {
                 return@derivedStateOf lastVisibleItem.index == pageCount - 1
-                        && lastVisibleItem.let { it.offset.y + it.size.height } <= layoutInfo.let { it.viewportEndOffset - it.viewportStartOffset }
+                        && lastVisibleItem.let { it.offset + it.size } <= layoutInfo.let { it.viewportEndOffset - it.viewportStartOffset }
             } else {
                 return@derivedStateOf false
             }
         }
     }
-    LaunchedEffect(isToBottom) {
-        Log.d("TAG", "OnScrollToBottom: $isToBottom")
-        isScrollToBottom.value = isToBottom
-        Log.d("TAG", "OnScrollToBottom: $isScrollToBottom")
-    }
+    return isToBottom
 }

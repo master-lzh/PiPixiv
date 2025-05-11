@@ -3,6 +3,7 @@ package com.mrl.pixiv.common.data
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonElement
 
 
@@ -58,6 +59,7 @@ data class Illust(
     @SerialName("x_restrict")
     val xRestrict: Int = 0,
 
+    @Transient
     val series: JsonElement? = null,
 
     @SerialName("meta_single_page")
