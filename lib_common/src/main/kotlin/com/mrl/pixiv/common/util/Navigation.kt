@@ -3,10 +3,10 @@ package com.mrl.pixiv.common.util
 import android.util.Log
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.data.Illust
-import com.mrl.pixiv.common.network.JSON
 import com.mrl.pixiv.common.router.Destination
+import com.mrl.pixiv.common.serialize.NavigationProtoBuf
 import com.mrl.pixiv.common.viewmodel.illust.IllustState
-import io.ktor.util.encodeBase64
+import kotlinx.serialization.encodeToHexString
 import kotlin.time.measureTime
 
 fun NavHostController.navigateToPictureScreen(illust: Illust, prefix: String) {
@@ -25,7 +25,7 @@ fun NavHostController.navigateToHorizontalPictureScreen(
     index: Int,
     prefix: String
 ) {
-    val encoded = JSON.encodeToString(illusts).encodeBase64()
+    val encoded = NavigationProtoBuf.encodeToHexString(illusts)
     navigate(Destination.HorizontalPictureScreen(encoded, index, prefix))
 }
 

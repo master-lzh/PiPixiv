@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -45,14 +44,12 @@ import kotlin.uuid.Uuid
 
 @Composable
 fun RecommendImageItem(
-    width: Dp,
-    navToPictureScreen: (Illust, String) -> Unit,
+    navToPictureScreen: (String) -> Unit,
     illust: Illust,
     isBookmarked: Boolean,
     onBookmarkClick: (String, List<String>?) -> Unit,
 ) {
-    val scale = illust.height * 1.0f / illust.width
-    val height = width * scale
+    val scale = illust.width * 1.0f / illust.height
     val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
     val prefix = rememberSaveable { Uuid.random().toHexString() }
@@ -73,7 +70,7 @@ fun RecommendImageItem(
                 .padding(horizontal = 5.dp)
                 .padding(bottom = 5.dp)
                 .throttleClick {
-                    navToPictureScreen(illust, prefix)
+                    navToPictureScreen(prefix)
                 },
             shape = RoundedCornerShape(10.dp),
             shadowElevation = 4.dp,
@@ -92,8 +89,7 @@ fun RecommendImageItem(
                     },
                     contentDescription = null,
                     modifier = Modifier
-                        .width(width)
-                        .height(height)
+                        .aspectRatio(scale)
                         .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
                         .sharedElement(
                             sharedTransitionScope.rememberSharedContentState(key = "${prefix}-$imageKey"),

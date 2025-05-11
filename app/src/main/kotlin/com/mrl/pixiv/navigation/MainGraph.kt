@@ -21,10 +21,10 @@ import androidx.navigation.toRoute
 import com.mrl.pixiv.collection.SelfCollectionScreen
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
-import com.mrl.pixiv.common.network.JSON
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
+import com.mrl.pixiv.common.serialize.NavigationProtoBuf
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
@@ -46,8 +46,8 @@ import com.mrl.pixiv.setting.SettingScreen
 import com.mrl.pixiv.setting.SettingViewModel
 import com.mrl.pixiv.setting.network.NetworkSettingScreen
 import com.mrl.pixiv.splash.SplashViewModel
-import io.ktor.util.decodeBase64String
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.serialization.decodeFromHexString
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
 
@@ -243,7 +243,7 @@ fun MainGraph(
                     composable<Destination.HorizontalPictureScreen> {
                         val params = it.toRoute<Destination.HorizontalPictureScreen>()
                         val illusts =
-                            JSON.decodeFromString<List<Illust>>(params.illusts.decodeBase64String())
+                            NavigationProtoBuf.decodeFromHexString<List<Illust>>(params.illusts)
                         CompositionLocalProvider(
                             LocalAnimatedContentScope provides this,
                             LocalSharedKeyPrefix provides params.prefix

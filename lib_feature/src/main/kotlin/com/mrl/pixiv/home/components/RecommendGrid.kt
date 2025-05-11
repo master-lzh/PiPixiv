@@ -14,12 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.mrl.pixiv.common.data.Illust
-import com.mrl.pixiv.common.util.DisplayUtil
+import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 
-private const val LOADING_ITEM_COUNT = 4
-private const val INCLUDE_EDGE = true
+private const val LOADING_ITEM_COUNT_PORTRAIT = 2
+private const val LOADING_ITEM_COUNT_LANDSCAPE = 4
 
 @Composable
 fun RecommendGrid(
@@ -28,19 +28,17 @@ fun RecommendGrid(
     lazyStaggeredGridState: LazyStaggeredGridState,
 ) {
     val spanCount = when (LocalConfiguration.current.orientation) {
-        ORIENTATION_PORTRAIT -> 2
-        ORIENTATION_LANDSCAPE -> 4
-        else -> 2
+        ORIENTATION_PORTRAIT -> LOADING_ITEM_COUNT_PORTRAIT
+        ORIENTATION_LANDSCAPE -> LOADING_ITEM_COUNT_LANDSCAPE
+        else -> LOADING_ITEM_COUNT_PORTRAIT
     }
-    val paddingValues = 5.dp
-    val width =
-        (DisplayUtil.getScreenWidthDp() - paddingValues * (spanCount + if (INCLUDE_EDGE) 1 else -1)) / spanCount
 
     LazyVerticalStaggeredGrid(
         state = lazyStaggeredGridState,
-        contentPadding = PaddingValues(paddingValues),
+        contentPadding = PaddingValues(5.dp),
         columns = StaggeredGridCells.Fixed(spanCount),
         verticalItemSpacing = 3.dp,
+        horizontalArrangement = 5f.spaceBy,
         modifier = Modifier.fillMaxSize()
     ) {
         items(recommendImageList.itemCount, key = recommendImageList.itemKey { it.id }) {
@@ -48,33 +46,19 @@ fun RecommendGrid(
             if (illust != null) {
                 val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
                 RecommendImageItem(
-                    width = width,
-                    navToPictureScreen = { _, prefix ->
+                    navToPictureScreen = { prefix ->
                         navToPictureScreen(recommendImageList.itemSnapshotList.items, it, prefix)
                     },
                     illust = illust,
-                    isBookmarked = isBookmarked,
-                    onBookmarkClick = { restrict, tags ->
-                        if (isBookmarked) {
-                            BookmarkState.deleteBookmarkIllust(illust.id)
-                        } else {
-                            BookmarkState.bookmarkIllust(illust.id, restrict, tags)
-                        }
+                    isBookmarked = isBookmarked
+                ) { restrict, tags ->
+                    if (isBookmarked) {
+                        BookmarkState.deleteBookmarkIllust(illust.id)
+                    } else {
+                        BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                     }
-                )
+                }
             }
         }
-
-//        when (recommendImageList.loadState.append) {
-//            is LoadState.Loading -> { // Pagination Loading UI
-//                itemsIndexed(
-//                    List(LOADING_ITEM_COUNT) { 0 },
-//                    key = { index, _ -> "loading-$index" }) { _, _ ->
-//                    RecommendSkeleton(size = width)
-//                }
-//            }
-//
-//            else -> {}
-//        }
     }
 }

@@ -1,6 +1,5 @@
 package com.mrl.pixiv.common.util
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.combinedClickable
@@ -14,9 +13,8 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.semantics.Role
 
 
-const val VIEW_CLICK_INTERVAL_TIME = 200L//点击间隔时间
+const val VIEW_CLICK_INTERVAL_TIME = 1000L//点击间隔时间
 
-@SuppressLint("ModifierFactoryUnreferencedReceiver")
 @OptIn(ExperimentalFoundationApi::class)
 inline fun Modifier.throttleClick(
     time: Long = VIEW_CLICK_INTERVAL_TIME,
