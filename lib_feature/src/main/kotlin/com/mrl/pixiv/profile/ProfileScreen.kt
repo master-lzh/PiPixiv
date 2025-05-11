@@ -52,7 +52,7 @@ fun ProfileScreen(
         modifier = modifier,
         state = viewModel.asState(),
         dispatch = viewModel::dispatch,
-        navToProfileDetail = navHostController::navigateToSelfProfileDetailScreen,
+        navToProfileDetail = navHostController::navigateToProfileDetailScreen,
         navToSetting = navHostController::navigateToSettingScreen,
         navToHistory = navHostController::navigateToHistoryScreen,
         navToCollection = navHostController::navigateToSelfCollectionScreen,
@@ -66,7 +66,7 @@ internal fun ProfileScreen_(
     modifier: Modifier = Modifier,
     state: ProfileState = ProfileState,
     dispatch: (ProfileAction) -> Unit = {},
-    navToProfileDetail: () -> Unit = {},
+    navToProfileDetail: (Long) -> Unit = {},
     navToSetting: () -> Unit = {},
     navToHistory: () -> Unit = {},
     navToCollection: () -> Unit = {},
@@ -134,7 +134,9 @@ internal fun ProfileScreen_(
                         UserAvatar(
                             url = userInfo.user.profileImageUrls.medium,
                             modifier = Modifier.size(80.dp),
-                            onClick = navToProfileDetail
+                            onClick = {
+                                navToProfileDetail(userInfo.user.id)
+                            }
                         )
                         Column {
                             // 昵称

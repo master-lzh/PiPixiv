@@ -28,6 +28,7 @@ import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.IllustGrid
+import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState
@@ -58,7 +59,7 @@ internal fun HistoryScreen_(
     state: HistoryState = HistoryState(),
     dispatch: (HistoryAction) -> Unit = {},
     popBack: () -> Unit = {},
-    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
+    navToPictureScreen: NavigateToHorizontalPictureScreen = { _, _, _ -> },
 ) {
     var searchValue by remember { mutableStateOf(TextFieldValue(state.currentSearch)) }
     val focusManager = LocalFocusManager.current

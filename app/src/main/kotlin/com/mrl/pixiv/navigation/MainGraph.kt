@@ -37,11 +37,10 @@ import com.mrl.pixiv.login.LoginScreen
 import com.mrl.pixiv.picture.HorizontalSwipePictureScreen
 import com.mrl.pixiv.picture.PictureScreen
 import com.mrl.pixiv.profile.ProfileScreen
-import com.mrl.pixiv.profile.detail.OtherProfileDetailScreen
-import com.mrl.pixiv.profile.detail.SelfProfileDetailScreen
+import com.mrl.pixiv.profile.detail.ProfileDetailScreen
 import com.mrl.pixiv.search.SearchScreen
 import com.mrl.pixiv.search.preview.SearchPreviewScreen
-import com.mrl.pixiv.search.result.OutsideSearchResultsScreen
+import com.mrl.pixiv.search.result.SearchResultsScreen
 import com.mrl.pixiv.setting.SettingScreen
 import com.mrl.pixiv.setting.SettingViewModel
 import com.mrl.pixiv.setting.network.NetworkSettingScreen
@@ -116,47 +115,23 @@ fun MainGraph(
                         }
                     }
 
-                    // 个人详情页
-                    composable<Destination.SelfProfileDetailScreen> {
-                        CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
-                            SelfProfileDetailScreen()
-                        }
-                    }
-
-                    // 他人详情页
-                    composable<Destination.OtherProfileDetailScreen>(
+                    // 详情页
+                    composable<Destination.ProfileDetailScreen>(
                         deepLinks = DestinationsDeepLink.ProfileDetailPattern.map {
-                            navDeepLink<Destination.OtherProfileDetailScreen>(
+                            navDeepLink<Destination.ProfileDetailScreen>(
                                 basePath = it
                             )
                         },
                     ) {
                         CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
-                            val args = it.toRoute<Destination.OtherProfileDetailScreen>()
-                            OtherProfileDetailScreen(
+                            val args = it.toRoute<Destination.ProfileDetailScreen>()
+                            ProfileDetailScreen(
                                 uid = args.userId
                             )
                         }
                     }
 
-                    // 作品详情页
-                    composable<Destination.PictureScreen>(
-                        enterTransition = { scaleIn(initialScale = 0.9f) + fadeIn() },
-                        exitTransition = { scaleOut(targetScale = 1.1f) + fadeOut() },
-                        popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
-                        popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
-                    ) {
-                        val args = it.toRoute<Destination.PictureScreen>()
-                        CompositionLocalProvider(
-                            LocalAnimatedContentScope provides this,
-                            LocalSharedKeyPrefix provides args.prefix
-                        ) {
-                            PictureScreen(
-                                illustId = args.illustId,
-                            )
-                        }
-                    }
-
+                    // 作品详情页（深度链接）
                     composable<Destination.PictureDeeplinkScreen>(
                         deepLinks = DestinationsDeepLink.PicturePattern.map {
                             navDeepLink<Destination.PictureDeeplinkScreen>(
@@ -176,7 +151,6 @@ fun MainGraph(
                                 illustId = illustId,
                             )
                         }
-
                     }
 
                     // 搜索页
@@ -189,7 +163,7 @@ fun MainGraph(
                         val searchWord =
                             it.toRoute<Destination.SearchResultsScreen>().searchWords
                         CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                            OutsideSearchResultsScreen(
+                            SearchResultsScreen(
                                 searchWords = searchWord,
                             )
                         }
@@ -240,8 +214,14 @@ fun MainGraph(
                         }
                     }
 
-                    composable<Destination.HorizontalPictureScreen> {
-                        val params = it.toRoute<Destination.HorizontalPictureScreen>()
+                    // 横向滑动作品详情页
+                    composable<Destination.PictureScreen>(
+                        enterTransition = { scaleIn(initialScale = 0.9f) + fadeIn() },
+                        exitTransition = { scaleOut(targetScale = 1.1f) + fadeOut() },
+                        popEnterTransition = { scaleIn(initialScale = 1.1f) + fadeIn() },
+                        popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
+                    ) {
+                        val params = it.toRoute<Destination.PictureScreen>()
                         val illusts =
                             NavigationProtoBuf.decodeFromHexString<List<Illust>>(params.illusts)
                         CompositionLocalProvider(
@@ -281,7 +261,7 @@ private fun HandleDeeplink(
 
                 DestinationsDeepLink.userRegex.matches(data.toString()) -> {
                     navHostController.navigate(
-                        Destination.OtherProfileDetailScreen(
+                        Destination.ProfileDetailScreen(
                             data.lastPathSegment?.toLong() ?: 0
                         )
                     )

@@ -27,6 +27,7 @@ import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.IllustGrid
 import com.mrl.pixiv.common.ui.lightBlue
+import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState
@@ -58,7 +59,7 @@ fun CollectionScreen_(
     state: CollectionState = CollectionState(),
     dispatch: (CollectionAction) -> Unit = {},
     popBack: () -> Unit = {},
-    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> }
+    navToPictureScreen: NavigateToHorizontalPictureScreen = { _, _, _ -> }
 ) {
     Scaffold(
         modifier = modifier,
@@ -96,13 +97,12 @@ fun CollectionScreen_(
                     .fillMaxSize()
                     .padding(horizontal = 8.dp),
                 lazyGridState = lazyGridState,
-                navToPictureScreen = navToPictureScreen,
-                leadingContent = {
-                    item(key = "leading", span = { GridItemSpan(2) }) {
-                        Spacer(modifier = Modifier.height(50.dp))
-                    }
+                navToPictureScreen = navToPictureScreen
+            ) {
+                item(key = "leading", span = { GridItemSpan(2) }) {
+                    Spacer(modifier = Modifier.height(50.dp))
                 }
-            )
+            }
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {

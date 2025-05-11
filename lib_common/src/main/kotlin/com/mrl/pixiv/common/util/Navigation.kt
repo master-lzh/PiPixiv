@@ -1,32 +1,20 @@
 package com.mrl.pixiv.common.util
 
-import android.util.Log
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.serialize.NavigationProtoBuf
-import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import kotlinx.serialization.encodeToHexString
-import kotlin.time.measureTime
 
-fun NavHostController.navigateToPictureScreen(illust: Illust, prefix: String) {
-    measureTime {
-        IllustState.setIllust(illust.id, illust)
-        navigate(Destination.PictureScreen(illust.id, prefix)) {
-            restoreState = true
-        }
-    }.also {
-        Log.i("TAG", "navigateToPictureScreen: $it")
-    }
-}
+typealias NavigateToHorizontalPictureScreen = (illusts: List<Illust>, index: Int, prefix: String) -> Unit
 
-fun NavHostController.navigateToHorizontalPictureScreen(
+fun NavHostController.navigateToPictureScreen(
     illusts: List<Illust>,
     index: Int,
     prefix: String
 ) {
     val encoded = NavigationProtoBuf.encodeToHexString(illusts)
-    navigate(Destination.HorizontalPictureScreen(encoded, index, prefix))
+    navigate(Destination.PictureScreen(encoded, index, prefix))
 }
 
 fun NavHostController.navigateToSearchScreen() {
@@ -49,12 +37,8 @@ fun NavHostController.popBackToMainScreen() {
     popBackStack(route = Destination.HomeScreen, inclusive = false)
 }
 
-fun NavHostController.navigateToSelfProfileDetailScreen() {
-    navigate(route = Destination.SelfProfileDetailScreen)
-}
-
-fun NavHostController.navigateToOtherProfileDetailScreen(userId: Long) {
-    navigate(route = Destination.OtherProfileDetailScreen(userId))
+fun NavHostController.navigateToProfileDetailScreen(userId: Long) {
+    navigate(route = Destination.ProfileDetailScreen(userId))
 }
 
 fun NavHostController.navigateToSettingScreen() {

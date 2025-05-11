@@ -3,22 +3,21 @@ package com.mrl.pixiv.common.ui.illust
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.mrl.pixiv.common.data.Illust
-import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
-import com.mrl.pixiv.common.util.isEven
+import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
+
+private const val KEY_LOADING = "loading"
+private const val KEY_SPACER = "spacer"
 
 @Composable
 fun IllustGrid(
@@ -26,19 +25,9 @@ fun IllustGrid(
     spanCount: Int,
     modifier: Modifier = Modifier,
     lazyGridState: LazyGridState = rememberLazyGridState(),
-    horizontalPadding: Dp = 0.dp,
-    paddingValues: PaddingValues = PaddingValues(1.dp),
-    navToPictureScreen: (Illust, String) -> Unit,
+    navToPictureScreen: NavigateToHorizontalPictureScreen,
     leadingContent: (LazyGridScope.() -> Unit)? = null,
 ) {
-    var currentLoadingItem by rememberSaveable { mutableIntStateOf(0) }
-    LaunchedEffect(illusts.itemCount) {
-        currentLoadingItem = if (illusts.itemCount.isEven()) {
-            4
-        } else {
-            5
-        }
-    }
     LazyVerticalGrid(
         state = lazyGridState,
         modifier = modifier,
@@ -49,7 +38,7 @@ fun IllustGrid(
         leadingContent?.invoke(this)
 
         if (illusts.loadState.refresh is LoadState.Loading && illusts.itemCount == 0) {
-            item(key = "loading", span = { GridItemSpan(spanCount) }) {
+            item(key = KEY_LOADING, span = { GridItemSpan(spanCount) }) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -76,30 +65,14 @@ fun IllustGrid(
                         BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                     }
                 },
-                spanCount = spanCount,
-                horizontalPadding = horizontalPadding,
-                paddingValues = paddingValues,
+                navToPictureScreen = { prefix ->
+                    navToPictureScreen(illusts.itemSnapshotList.items, index, prefix)
+                },
                 shouldShowTip = index == 0,
-                navToPictureScreen = navToPictureScreen,
             )
         }
 
-        if (illusts.loadState.refresh !is LoadState.Loading && !illusts.loadState.append.endOfPaginationReached) {
-            items(currentLoadingItem, key = { "loading_$it" }) {
-                Surface(
-                    Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
-                    shape = MaterialTheme.shapes.medium,
-                    shadowElevation = 4.dp,
-                    propagateMinConstraints = false,
-                ) {
-
-                }
-            }
-        }
-
-        item(key = "spacer") {
+        item(key = KEY_SPACER) {
             Spacer(modifier = Modifier.height(8.dp))
         }
     }

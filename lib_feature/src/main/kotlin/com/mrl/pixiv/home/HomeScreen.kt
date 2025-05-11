@@ -27,10 +27,7 @@ import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common.util.AppUtil
-import com.mrl.pixiv.common.util.RString
-import com.mrl.pixiv.common.util.navigateToHorizontalPictureScreen
-import com.mrl.pixiv.common.util.throttleClick
+import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.home.components.HomeTopBar
 import com.mrl.pixiv.home.components.RecommendGrid
@@ -51,7 +48,7 @@ fun HomeScreen(
     val recommendImageList = homeViewModel.recommendImageList.collectAsLazyPagingItems()
     HomeScreen(
         modifier = modifier,
-        navToPictureScreen = navHostController::navigateToHorizontalPictureScreen,
+        navToPictureScreen = navHostController::navigateToPictureScreen,
         onRefresh = recommendImageList::refresh,
         recommendImageList = recommendImageList,
         dispatch = homeViewModel::dispatch,
@@ -62,7 +59,7 @@ fun HomeScreen(
 @Composable
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
-    navToPictureScreen: (List<Illust>, Int, String) -> Unit,
+    navToPictureScreen: NavigateToHorizontalPictureScreen,
     onRefresh: () -> Unit,
     recommendImageList: LazyPagingItems<Illust>,
     dispatch: (HomeAction) -> Unit = {},

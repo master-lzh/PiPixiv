@@ -62,6 +62,7 @@ import com.mrl.pixiv.common.coroutine.launchNetwork
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.Type
+import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.ui.*
 import com.mrl.pixiv.common.ui.components.TextSnackbar
 import com.mrl.pixiv.common.ui.components.UserAvatar
@@ -127,7 +128,7 @@ internal fun PictureScreen(
         dispatch = pictureViewModel::dispatch,
         navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
         popBackToHomeScreen = navHostController::popBackToMainScreen,
-        navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
+        navToUserDetailScreen = navHostController::navigateToProfileDetailScreen,
     )
 }
 
@@ -157,7 +158,7 @@ internal fun PictureDeeplinkScreen(
             dispatch = pictureViewModel::dispatch,
             navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
             popBackToHomeScreen = navHostController::popBackToMainScreen,
-            navToUserDetailScreen = navHostController::navigateToOtherProfileDetailScreen,
+            navToUserDetailScreen = navHostController::navigateToProfileDetailScreen,
         )
     } else {
         Box(
@@ -179,7 +180,7 @@ internal fun PictureScreen(
     relatedIllusts: LazyPagingItems<Illust>,
     illust: Illust,
     modifier: Modifier = Modifier,
-    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
+    navToPictureScreen: NavigateToHorizontalPictureScreen = { _, _, _ -> },
     popBackStack: () -> Unit = {},
     dispatch: (PictureAction) -> Unit = {},
     navToSearchResultScreen: (String) -> Unit = {},
@@ -640,33 +641,34 @@ internal fun PictureScreen(
                     Row(
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
-                            .padding(top = 10.dp)
+                            .padding(top = 10.dp),
+                        horizontalArrangement = 5f.spaceBy
                     ) {
                         val otherPrefix = rememberSaveable { Uuid.random().toHexString() }
                         CompositionLocalProvider(
                             LocalSharedKeyPrefix provides otherPrefix
                         ) {
-                            state.userIllusts.take(minOf(userSpanCount, state.userIllusts.size))
-                                .forEach {
-                                    val innerIsBookmarked =
-                                        requireBookmarkState[it.id] ?: it.isBookmarked
-                                    SquareIllustItem(
-                                        illust = it,
-                                        isBookmarked = innerIsBookmarked,
-                                        onBookmarkClick = { restrict: String, tags: List<String>? ->
-                                            if (innerIsBookmarked) {
-                                                BookmarkState.deleteBookmarkIllust(it.id)
-                                            } else {
-                                                BookmarkState.bookmarkIllust(it.id, restrict, tags)
-                                            }
-                                        },
-                                        spanCount = minOf(userSpanCount, state.userIllusts.size),
-                                        horizontalPadding = 15.dp,
-                                        paddingValues = PaddingValues(2.dp),
-                                        elevation = 5.dp,
-                                        navToPictureScreen = navToPictureScreen
-                                    )
-                                }
+                            val illusts =
+                                state.userIllusts.take(minOf(userSpanCount, state.userIllusts.size))
+                            illusts.forEachIndexed { index, it ->
+                                val innerIsBookmarked =
+                                    requireBookmarkState[it.id] ?: it.isBookmarked
+                                SquareIllustItem(
+                                    illust = it,
+                                    isBookmarked = innerIsBookmarked,
+                                    onBookmarkClick = { restrict: String, tags: List<String>? ->
+                                        if (innerIsBookmarked) {
+                                            BookmarkState.deleteBookmarkIllust(it.id)
+                                        } else {
+                                            BookmarkState.bookmarkIllust(it.id, restrict, tags)
+                                        }
+                                    },
+                                    navToPictureScreen = { prefix ->
+                                        navToPictureScreen(illusts, index, prefix)
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                )
+                            }
                         }
                     }
                 }
@@ -702,10 +704,11 @@ internal fun PictureScreen(
                                 BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                             }
                         },
-                        spanCount = relatedSpanCount,
-                        paddingValues = PaddingValues(5.dp),
-                        shouldShowTip = index == 0,
-                        navToPictureScreen = navToPictureScreen
+                        navToPictureScreen = { prefix ->
+                            navToPictureScreen(relatedIllusts.itemSnapshotList.items, index, prefix)
+                        },
+                        modifier = Modifier.padding(),
+                        shouldShowTip = index == 0
                     )
                 }
 
@@ -770,7 +773,7 @@ internal fun PictureScreen(
                         openBottomSheet = false
                     },
                     modifier = Modifier
-                        .heightIn(LocalConfiguration.current.screenHeightDp.dp / 2),
+                        .heightIn(getScreenHeight() / 2),
                     sheetState = bottomSheetState,
                     containerColor = MaterialTheme.colorScheme.background,
                 ) {

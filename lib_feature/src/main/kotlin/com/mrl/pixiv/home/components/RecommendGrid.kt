@@ -15,6 +15,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.kts.spaceBy
+import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 
@@ -24,7 +25,7 @@ private const val LOADING_ITEM_COUNT_LANDSCAPE = 4
 @Composable
 fun RecommendGrid(
     recommendImageList: LazyPagingItems<Illust>,
-    navToPictureScreen: (List<Illust>, Int, String) -> Unit,
+    navToPictureScreen: NavigateToHorizontalPictureScreen,
     lazyStaggeredGridState: LazyStaggeredGridState,
 ) {
     val spanCount = when (LocalConfiguration.current.orientation) {

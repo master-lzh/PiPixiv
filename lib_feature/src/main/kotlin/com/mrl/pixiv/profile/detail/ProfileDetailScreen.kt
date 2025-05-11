@@ -29,15 +29,11 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowRgb565
-import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common.util.RString
-import com.mrl.pixiv.common.util.copyToClipboard
-import com.mrl.pixiv.common.util.navigateToPictureScreen
-import com.mrl.pixiv.common.util.throttleClick
+import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.feature.R
 import com.mrl.pixiv.profile.detail.components.IllustWidget
@@ -47,20 +43,7 @@ import org.koin.core.parameter.parametersOf
 import kotlin.math.pow
 
 @Composable
-fun SelfProfileDetailScreen(
-    modifier: Modifier = Modifier,
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
-    profileDetailViewModel: ProfileDetailViewModel = koinViewModel { parametersOf(null) },
-) {
-    ProfileDetailScreen(
-        modifier = modifier,
-        state = profileDetailViewModel.asState(),
-        navToPictureScreen = navHostController::navigateToPictureScreen,
-    ) { navHostController.popBackStack() }
-}
-
-@Composable
-fun OtherProfileDetailScreen(
+fun ProfileDetailScreen(
     uid: Long,
     modifier: Modifier = Modifier,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
@@ -83,7 +66,7 @@ private const val KEY_SPACE = "space"
 internal fun ProfileDetailScreen(
     modifier: Modifier = Modifier,
     state: ProfileDetailState,
-    navToPictureScreen: (Illust, String) -> Unit = { _, _ -> },
+    navToPictureScreen: NavigateToHorizontalPictureScreen = { _, _, _ -> },
     popBack: () -> Unit = { },
 ) {
     val userInfo = state.userInfo

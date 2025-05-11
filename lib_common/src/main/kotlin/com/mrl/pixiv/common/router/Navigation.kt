@@ -55,18 +55,16 @@ sealed class Destination(
     )
 
     @Serializable
-    data object SelfProfileDetailScreen : Destination()
-
-    @Serializable
-    data class OtherProfileDetailScreen(
+    data class ProfileDetailScreen(
         val userId: Long,
     ) : Destination()
 
     @Serializable
     data class PictureScreen(
-        val illustId: Long,
+        val illusts: String,
+        val index: Int,
         val prefix: String,
-    ) : Destination()
+    )
 
     @Serializable
     data class PictureDeeplinkScreen(
@@ -97,11 +95,4 @@ sealed class Destination(
     data class FollowingScreen(
         val userId: Long,
     ) : Destination()
-
-    @Serializable
-    data class HorizontalPictureScreen(
-        val illusts: String,
-        val index: Int,
-        val prefix: String,
-    )
 }

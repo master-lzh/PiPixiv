@@ -26,6 +26,7 @@ import com.mrl.pixiv.common.data.search.SearchTarget
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.IllustGrid
+import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.util.throttleClick
@@ -37,26 +38,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun SearchResultScreen(
-    searchWords: String,
-    modifier: Modifier = Modifier,
-    searchNavHostController: NavHostController = LocalNavigator.currentOrThrow,
-    searchResultViewModel: SearchResultViewModel = koinViewModel { parametersOf(searchWords) },
-    navHostController: NavHostController,
-) {
-    val state = searchResultViewModel.asState()
-    SearchResultScreen_(
-        modifier = modifier,
-        state = state,
-        searchResults = searchResultViewModel.searchResults.collectAsLazyPagingItems(),
-        popBack = searchNavHostController::popBackStack,
-        naviToPic = navHostController::navigateToPictureScreen,
-        dispatch = searchResultViewModel::dispatch,
-    )
-}
-
-@Composable
-fun OutsideSearchResultsScreen(
+fun SearchResultsScreen(
     searchWords: String,
     modifier: Modifier = Modifier,
     searchResultViewModel: SearchResultViewModel = koinViewModel { parametersOf(searchWords) },
@@ -80,7 +62,7 @@ internal fun SearchResultScreen_(
     state: SearchResultState = SearchResultState(),
     searchResults: LazyPagingItems<Illust>,
     popBack: () -> Unit = {},
-    naviToPic: (Illust, String) -> Unit = { _, _ -> },
+    naviToPic: NavigateToHorizontalPictureScreen = { _, _, _ -> },
     dispatch: (SearchResultAction) -> Unit = {},
 ) {
     val showBottomSheet = remember { mutableStateOf(false) }

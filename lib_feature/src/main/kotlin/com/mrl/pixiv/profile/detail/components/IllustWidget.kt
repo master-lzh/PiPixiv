@@ -14,7 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrl.pixiv.common.data.Illust
+import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.ui.item.SquareIllustItem
+import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 
@@ -26,11 +28,10 @@ private const val MAX_SHOW_ILLUST_COUNT = 6
 fun IllustWidget(
     title: String,
     endText: String,
-    navToPictureScreen: (Illust, String) -> Unit,
+    navToPictureScreen: NavigateToHorizontalPictureScreen,
     illusts: List<Illust>,
     modifier: Modifier = Modifier
 ) {
-    val horizontalPadding = 16.dp
     Column(
         modifier = modifier
     ) {
@@ -61,11 +62,13 @@ fun IllustWidget(
 
         }
         FlowRow(
-            Modifier.padding(top = 10.dp),
+            modifier = Modifier.padding(top = 10.dp),
+            horizontalArrangement = 5f.spaceBy,
+            verticalArrangement = 5f.spaceBy,
             maxItemsInEachRow = SPAN_COUNT,
         ) {
-            illusts.take(MAX_SHOW_ILLUST_COUNT).forEach {
-                val illust = it
+            val takenIllusts = illusts.take(MAX_SHOW_ILLUST_COUNT)
+            takenIllusts.forEachIndexed { index, illust ->
                 val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
                 SquareIllustItem(
                     illust = illust,
@@ -77,9 +80,10 @@ fun IllustWidget(
                             BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                         }
                     },
-                    spanCount = SPAN_COUNT,
-                    horizontalPadding = horizontalPadding,
-                    navToPictureScreen = navToPictureScreen,
+                    navToPictureScreen = { prefix ->
+                        navToPictureScreen(takenIllusts, index, prefix)
+                    },
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

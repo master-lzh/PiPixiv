@@ -21,11 +21,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -54,19 +56,17 @@ fun SquareIllustItem(
     illust: Illust,
     isBookmarked: Boolean,
     onBookmarkClick: (String, List<String>?) -> Unit,
-    spanCount: Int,
-    horizontalPadding: Dp = 0.dp,
-    paddingValues: PaddingValues = PaddingValues(1.dp),
+    navToPictureScreen: (String) -> Unit,
+    modifier: Modifier = Modifier,
     elevation: Dp = 5.dp,
     shouldShowTip: Boolean = false,
-    navToPictureScreen: (Illust, String) -> Unit,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
     var showPopupTip by remember { mutableStateOf(false) }
     val prefix = rememberSaveable { Uuid.random().toHexString() }
     val onClick = {
-        navToPictureScreen(illust.copy(isBookmarked = isBookmarked), prefix)
+        navToPictureScreen(prefix)
     }
     LaunchedEffect(Unit) {
         showPopupTip =
@@ -75,34 +75,21 @@ fun SquareIllustItem(
     val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
     with(LocalSharedTransitionScope.currentOrThrow) {
         Box(
-            modifier = Modifier
-                .padding(paddingValues)
+            modifier = modifier
+                .aspectRatio(1f)
                 .sharedBounds(
                     rememberSharedContentState(key = "${prefix}-card-${illust.id}"),
                     animatedContentScope,
                     clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(10.dp))
                 )
-//                .graphicsLayer(
-//                    shadowElevation = with(LocalDensity.current) {
-//                        elevation.toPx()
-//                    },
-//                    shape = MaterialTheme.shapes.medium,
-//                    clip = false
-//                )
                 .shadow(elevation, MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.background)
                 .throttleClick { onClick() }
         ) {
-            val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-            val size =
-                (screenWidth - horizontalPadding * 2 - 2 * spanCount * paddingValues.calculateLeftPadding(
-                    LayoutDirection.Ltr
-                ) - 1.dp) / spanCount
-
             val imageKey = "image-${illust.id}-0"
             AsyncImage(
                 modifier = Modifier
-                    .size(size)
+                    .matchParentSize()
                     .sharedElement(
                         rememberSharedContentState(key = "${prefix}-$imageKey"),
                         animatedVisibilityScope = LocalAnimatedContentScope.currentOrThrow,
@@ -117,11 +104,7 @@ fun SquareIllustItem(
                     .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                onError = {
-                    it.result.throwable
-                }
             )
-
             Row(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
