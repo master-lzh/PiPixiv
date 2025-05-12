@@ -61,7 +61,6 @@ sealed class Destination(
 
     @Serializable
     data class PictureScreen(
-        val illusts: String,
         val index: Int,
         val prefix: String,
     )

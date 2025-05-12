@@ -19,12 +19,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mrl.pixiv.collection.SelfCollectionScreen
-import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
+import com.mrl.pixiv.common.repository.IllustCacheRepo
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.Graph
-import com.mrl.pixiv.common.serialize.NavigationProtoBuf
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedKeyPrefix
@@ -46,7 +45,6 @@ import com.mrl.pixiv.setting.SettingViewModel
 import com.mrl.pixiv.setting.network.NetworkSettingScreen
 import com.mrl.pixiv.splash.SplashViewModel
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.serialization.decodeFromHexString
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
 
@@ -222,8 +220,7 @@ fun MainGraph(
                         popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
                     ) {
                         val params = it.toRoute<Destination.PictureScreen>()
-                        val illusts =
-                            NavigationProtoBuf.decodeFromHexString<List<Illust>>(params.illusts)
+                        val illusts = IllustCacheRepo[params.prefix]
                         CompositionLocalProvider(
                             LocalAnimatedContentScope provides this,
                             LocalSharedKeyPrefix provides params.prefix
@@ -231,6 +228,7 @@ fun MainGraph(
                             HorizontalSwipePictureScreen(
                                 illusts = illusts.toImmutableList(),
                                 index = params.index,
+                                prefix = params.prefix,
                             )
                         }
                     }

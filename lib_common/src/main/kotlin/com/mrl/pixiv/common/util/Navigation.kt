@@ -1,10 +1,11 @@
 package com.mrl.pixiv.common.util
 
 import androidx.navigation.NavHostController
+import co.touchlab.kermit.Logger
 import com.mrl.pixiv.common.data.Illust
+import com.mrl.pixiv.common.repository.IllustCacheRepo
 import com.mrl.pixiv.common.router.Destination
-import com.mrl.pixiv.common.serialize.NavigationProtoBuf
-import kotlinx.serialization.encodeToHexString
+import kotlin.time.measureTime
 
 typealias NavigateToHorizontalPictureScreen = (illusts: List<Illust>, index: Int, prefix: String) -> Unit
 
@@ -13,8 +14,12 @@ fun NavHostController.navigateToPictureScreen(
     index: Int,
     prefix: String
 ) {
-    val encoded = NavigationProtoBuf.encodeToHexString(illusts)
-    navigate(Destination.PictureScreen(encoded, index, prefix))
+    measureTime {
+        IllustCacheRepo[prefix] = illusts
+        navigate(Destination.PictureScreen(index, prefix))
+    }.let {
+        Logger.i("Navigation") { "navigateToPictureScreen cost: $it" }
+    }
 }
 
 fun NavHostController.navigateToSearchScreen() {

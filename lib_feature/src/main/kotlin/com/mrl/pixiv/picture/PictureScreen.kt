@@ -78,9 +78,6 @@ import com.mrl.pixiv.common.viewmodel.follow.FollowState
 import com.mrl.pixiv.common.viewmodel.follow.requireFollowState
 import com.mrl.pixiv.common.viewmodel.illust.IllustState
 import com.mrl.pixiv.picture.components.UgoiraPlayer
-import com.mrl.pixiv.picture.viewmodel.PictureAction
-import com.mrl.pixiv.picture.viewmodel.PictureState
-import com.mrl.pixiv.picture.viewmodel.PictureViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -172,8 +169,8 @@ internal fun PictureDeeplinkScreen(
 }
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 internal fun PictureScreen(
     state: PictureState,

@@ -1,4 +1,4 @@
-package com.mrl.pixiv.picture.viewmodel
+package com.mrl.pixiv.picture
 
 import android.graphics.Bitmap
 import android.util.Log
