@@ -1,11 +1,11 @@
 package com.mrl.pixiv.picture
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -25,9 +25,13 @@ import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.viewmodel.BaseMviViewModel
 import com.mrl.pixiv.common.viewmodel.ViewIntent
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
+import com.mrl.pixiv.common.viewmodel.state
 import io.ktor.client.HttpClient
 import io.ktor.client.request.request
+import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.HttpMethod
+import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
 import io.ktor.http.takeFrom
 import io.ktor.utils.io.jvm.javaio.toInputStream
@@ -47,9 +51,18 @@ import kotlin.time.Duration.Companion.seconds
 @Stable
 data class PictureState(
     val illust: Illust? = null,
-    val userIllusts: SnapshotStateList<Illust> = mutableStateListOf(),
+    val userIllusts: ImmutableList<Illust> = persistentListOf(),
     val nextUrl: String = "",
     val ugoiraImages: ImmutableList<Pair<Bitmap, Long>> = persistentListOf(),
+    val bottomSheetState: BottomSheetState? = null,
+    val loading: Boolean = false,
+)
+
+@Stable
+data class BottomSheetState(
+    val index: Int = 0,
+    val downloadUrl: String = "",
+    val downloadSize: Float = 0f,
 )
 
 sealed class PictureAction : ViewIntent {
@@ -69,8 +82,9 @@ sealed class PictureAction : ViewIntent {
         val illustId: Long,
         val index: Int,
         val originalUrl: String,
-        val downloadCallback: (result: Boolean) -> Unit
     ) : PictureAction()
+
+    data class GetPictureInfo(val index: Int) : PictureAction()
 }
 
 @KoinViewModel
@@ -85,6 +99,8 @@ class PictureViewModel(
         RelatedIllustPaging(illust?.id ?: illustId!!)
     }.flow.cachedIn(viewModelScope)
 
+    private val cachedDownloadSize = mutableMapOf<Int, Float>()
+
     override suspend fun handleIntent(intent: PictureAction) {
         when (intent) {
             is PictureAction.GetIllustDetail -> getIllustDetail(intent.illustId)
@@ -97,10 +113,10 @@ class PictureViewModel(
                 intent.illustId,
                 intent.index,
                 intent.originalUrl,
-                intent.downloadCallback
             )
 
             is PictureAction.DownloadUgoira -> downloadUgoira(intent.illustId)
+            is PictureAction.GetPictureInfo -> getPictureInfo(intent.index)
         }
     }
 
@@ -111,6 +127,7 @@ class PictureViewModel(
                 if (illust.type == Type.Ugoira) {
                     dispatch(PictureAction.DownloadUgoira(illust.id))
                 }
+                updateState { copy(illust = illust) }
             }
 
             illustId != null -> {
@@ -200,9 +217,9 @@ class PictureViewModel(
         illustId: Long,
         index: Int,
         originalUrl: String,
-        downloadCallback: (result: Boolean) -> Unit
     ) {
         launchIO {
+            showLoading(true)
             // 使用coil下载图片
             val imageLoader = SingletonImageLoader.get(AppUtil.appContext)
             val request = ImageRequest.Builder(AppUtil.appContext)
@@ -212,16 +229,18 @@ class PictureViewModel(
                 imageLoader.execute(request)
             }
             result ?: run {
-                downloadCallback(false)
+                closeBottomSheet()
                 return@launchIO
             }
             result.image?.asDrawable(AppUtil.appContext.resources)?.toBitmap()
                 ?.saveToAlbum("${illustId}_$index", PictureType.PNG) {
                     with(AppUtil.appContext) {
-                        downloadCallback(it)
+                        closeBottomSheet()
                         handleError(Exception(getString(if (it) RString.download_success else RString.download_failed)))
                     }
                 }
+            closeBottomSheet()
+            showLoading(false)
         }
     }
 
@@ -240,8 +259,74 @@ class PictureViewModel(
                 type = Type.Illust.value
             )
             updateState {
-                copy(userIllusts = resp.illusts.toMutableStateList())
+                copy(userIllusts = resp.illusts.toImmutableList())
             }
         }
+    }
+
+    private fun getPictureInfo(index: Int) {
+        val illust = state.illust ?: return
+        val url = if (illust.pageCount > 1) {
+            illust.metaPages?.get(index)?.imageUrls?.original
+        } else {
+            illust.metaSinglePage.originalImageURL
+        } ?: return
+        val cachedSize = cachedDownloadSize[index]
+        updateState {
+            copy(bottomSheetState = BottomSheetState(index, url, cachedSize ?: 0f))
+        }
+        if (cachedSize == null) {
+            launchIO {
+                val downloadSize = calculateImageSize(url)
+                updateState {
+                    cachedDownloadSize[index] = downloadSize
+                    copy(bottomSheetState = bottomSheetState?.copy(downloadSize = downloadSize))
+                }
+            }
+        }
+    }
+
+    private suspend fun calculateImageSize(url: String): Float {
+        return try {
+            val response = imageOkHttpClient.request {
+                method = HttpMethod.Head
+                url(url)
+            }
+            val contentLength = response.contentLength()?.toFloat() ?: 0f
+            return contentLength / 1024 / 1024
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0f
+        }
+    }
+
+    fun closeBottomSheet() {
+        updateState {
+            copy(bottomSheetState = null)
+        }
+    }
+
+    private fun showLoading(show: Boolean) {
+        updateState {
+            copy(loading = show)
+        }
+    }
+
+    fun shareImage(
+        index: Int,
+        downloadUrl: String,
+        illust: Illust,
+        shareLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+    ) {
+        launchIO {
+            showLoading(true)
+            ShareUtil.createShareImage(index, downloadUrl, illust, shareLauncher)
+            showLoading(false)
+            closeBottomSheet()
+        }
+    }
+
+    override fun onCleared() {
+        cachedDownloadSize.clear()
     }
 }

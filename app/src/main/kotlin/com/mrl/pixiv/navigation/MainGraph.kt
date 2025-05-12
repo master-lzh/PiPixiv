@@ -34,7 +34,7 @@ import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.HomeViewModel
 import com.mrl.pixiv.login.LoginScreen
 import com.mrl.pixiv.picture.HorizontalSwipePictureScreen
-import com.mrl.pixiv.picture.PictureScreen
+import com.mrl.pixiv.picture.PictureDeeplinkScreen
 import com.mrl.pixiv.profile.ProfileScreen
 import com.mrl.pixiv.profile.detail.ProfileDetailScreen
 import com.mrl.pixiv.search.SearchScreen
@@ -145,7 +145,7 @@ fun MainGraph(
                         CompositionLocalProvider(
                             LocalAnimatedContentScope provides this,
                         ) {
-                            PictureScreen(
+                            PictureDeeplinkScreen(
                                 illustId = illustId,
                             )
                         }

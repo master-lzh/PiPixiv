@@ -17,7 +17,7 @@ import kotlin.coroutines.cancellation.CancellationException
 
 
 // 定义副作用（包括错误）
-sealed interface SideEffect {
+interface SideEffect {
     data class Error(val throwable: Throwable) : SideEffect
     // 可扩展其他副作用如导航事件等
 }
