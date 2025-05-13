@@ -1,13 +1,13 @@
 package com.mrl.pixiv.login.oauth
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.kts.spaceBy
@@ -26,6 +26,7 @@ fun OAuthLoginScreen(
     val navigator = LocalNavigator.currentOrThrow
     var token by remember { mutableStateOf("") }
     val state = viewModel.asState()
+    val focusManager = LocalFocusManager.current
     LaunchedEffect(state.isLogin) {
         if (state.isLogin) {
             navigator.loginToMainScreen()
@@ -47,29 +48,40 @@ fun OAuthLoginScreen(
             )
         }
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .padding(it)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = 10f.spaceBy
+                .imePadding()
         ) {
-            TextField(
-                value = token,
-                onValueChange = { token = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = {
-                    Text(text = stringResource(RString.token))
-                }
-            )
-            Button(
-                onClick = {
-                    viewModel.dispatch(OAuthLoginAction.Login(token))
-                },
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxSize(),
+                verticalArrangement = 10f.spaceBy
             ) {
-                Text(
-                    text = stringResource(RString.sign_in)
+                TextField(
+                    value = token,
+                    onValueChange = { token = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(text = stringResource(RString.token))
+                    }
                 )
+                Button(
+                    onClick = click@{
+                        if (state.loading || token.isEmpty()) return@click
+                        focusManager.clearFocus()
+                        viewModel.dispatch(OAuthLoginAction.Login(token))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(RString.sign_in)
+                    )
+                }
+            }
+            if (state.loading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
     }

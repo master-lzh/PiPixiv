@@ -9,6 +9,7 @@ import org.koin.android.annotation.KoinViewModel
 @Stable
 data class OAuthLoginState(
     val isLogin: Boolean = false,
+    val loading: Boolean = false,
 )
 
 sealed class OAuthLoginAction : ViewIntent {
@@ -27,8 +28,9 @@ class OAuthLoginViewModel : BaseMviViewModel<OAuthLoginState, OAuthLoginAction>(
 
     private fun login(refreshToken: String) {
         launchIO {
+            updateState { copy(loading = true) }
             AuthManager.login(refreshToken)
-            updateState { copy(isLogin = true) }
+            updateState { copy(isLogin = true, loading = false) }
         }
     }
 }
