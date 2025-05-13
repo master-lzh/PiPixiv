@@ -61,8 +61,6 @@ dependencies {
     // Firebase
     "defaultApi"(platform(libs.firebase.bom))
     "defaultApi"(libs.bundles.firebase)
-    // Guava
-    api(libs.guava)
     // MMKV
     api(libs.mmkv)
     api(libs.mmkv.kotlin)
