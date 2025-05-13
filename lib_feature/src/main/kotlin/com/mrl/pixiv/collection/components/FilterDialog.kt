@@ -35,6 +35,7 @@ fun FilterDialog(
     switchTab: (Int) -> Unit,
     pagerState: PagerState,
     userBookmarkTagsIllust: ImmutableList<RestrictBookmarkTag>,
+    privateBookmarkTagsIllust: ImmutableList<RestrictBookmarkTag>,
     @Restrict restrict: String,
     filterTag: String?,
     dispatch: (CollectionAction) -> Unit,
@@ -122,7 +123,10 @@ fun FilterDialog(
                             .padding(horizontal = 8.dp)
                             .height(300.dp)
                     ) {
-                        items(userBookmarkTagsIllust, key = { it.name.toString() }) {
+                        items(
+                            if (currentPage == 0) userBookmarkTagsIllust else privateBookmarkTagsIllust,
+                            key = { it.name.toString() }
+                        ) {
                             Row(
                                 modifier = Modifier.itemModifier(
                                     ((restrict == Restrict.PUBLIC && it.isPublic) || (restrict == Restrict.PRIVATE && !it.isPublic)) && filterTag == it.name,

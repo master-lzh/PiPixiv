@@ -92,6 +92,7 @@ fun SelfCollectionScreen(
                 switchTab = { selectedTab = it },
                 pagerState = pagerState,
                 userBookmarkTagsIllust = state.userBookmarkTagsIllust,
+                privateBookmarkTagsIllust = state.privateBookmarkTagsIllust,
                 restrict = state.restrict,
                 filterTag = state.filterTag,
                 dispatch = dispatch,

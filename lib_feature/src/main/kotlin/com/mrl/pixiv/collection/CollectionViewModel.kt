@@ -26,6 +26,7 @@ data class CollectionState(
     val filterTag: String? = null,
     val userBookmarksNovels: ImmutableList<Novel> = persistentListOf(),
     val userBookmarkTagsIllust: ImmutableList<RestrictBookmarkTag> = persistentListOf(),
+    val privateBookmarkTagsIllust: ImmutableList<RestrictBookmarkTag> = persistentListOf(),
 )
 
 @Stable
@@ -81,18 +82,33 @@ class CollectionViewModel(
                 userId = uid,
                 restrict = restrict
             )
+            val isPublic = restrict == Restrict.PUBLIC
             updateState {
-                copy(
-                    userBookmarkTagsIllust = (generateInitialTags(restrict == Restrict.PUBLIC) +
-                            resp.bookmarkTags.map {
-                                RestrictBookmarkTag(
-                                    isPublic = restrict == Restrict.PUBLIC,
-                                    count = it.count,
-                                    displayName = it.name,
-                                    name = it.name
-                                )
-                            }).toImmutableList()
-                )
+                if (isPublic) {
+                    copy(
+                        userBookmarkTagsIllust = (generateInitialTags(true) +
+                                resp.bookmarkTags.map {
+                                    RestrictBookmarkTag(
+                                        isPublic = true,
+                                        count = it.count,
+                                        displayName = it.name,
+                                        name = it.name
+                                    )
+                                }).toImmutableList()
+                    )
+                } else {
+                    copy(
+                        privateBookmarkTagsIllust = (generateInitialTags(false) +
+                                resp.bookmarkTags.map {
+                                    RestrictBookmarkTag(
+                                        isPublic = false,
+                                        count = it.count,
+                                        displayName = it.name,
+                                        name = it.name
+                                    )
+                                }).toImmutableList()
+                    )
+                }
             }
         }
     }
