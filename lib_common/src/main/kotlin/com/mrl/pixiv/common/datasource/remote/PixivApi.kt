@@ -115,7 +115,7 @@ interface PixivApi {
     suspend fun getUserBookmarksIllust(
         @Query("restrict") restrict: String,
         @Query("user_id") userId: Long,
-        @Query("tag") tag: String = "",
+        @Query("tag") tag: String? = null,
         @Query("max_bookmark_id") maxBookmarkId: Long? = null,
     ): UserBookmarksIllustResp
 

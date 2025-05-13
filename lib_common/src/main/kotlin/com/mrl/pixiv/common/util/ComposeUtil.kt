@@ -47,3 +47,12 @@ inline fun Modifier.throttleClick(
         }
     }
 }
+
+inline fun Modifier.conditionally(
+    condition: Boolean,
+    block: Modifier.() -> Modifier
+): Modifier = if (condition) {
+    this then block()
+} else {
+    this
+}

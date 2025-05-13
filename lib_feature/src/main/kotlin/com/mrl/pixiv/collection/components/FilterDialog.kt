@@ -23,6 +23,7 @@ import com.mrl.pixiv.common.data.user.BookmarkTag
 import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.common.util.AppUtil
 import com.mrl.pixiv.common.util.RString
+import com.mrl.pixiv.common.util.conditionally
 import com.mrl.pixiv.common.util.throttleClick
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
@@ -36,9 +37,9 @@ fun FilterDialog(
     pagerState: PagerState,
     userBookmarkTagsIllust: ImmutableList<BookmarkTag>,
     @Restrict restrict: String,
-    filterTag: String,
+    filterTag: String?,
     dispatch: (CollectionAction) -> Unit,
-    onSelected: (String) -> Unit
+    onSelected: (String?) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     Dialog(onDismissRequest = onDismissRequest) {
@@ -125,12 +126,11 @@ fun FilterDialog(
                         item(key = "all") {
                             Text(
                                 text = stringResource(RString.all),
-                                modifier = Modifier.itemModifier(
-                                    ((restrict == Restrict.PUBLIC && currentPage == 0) || (restrict == Restrict.PRIVATE && currentPage == 1)) && filterTag.isEmpty(),
-                                ) {
-                                    onSelected("")
-                                    onDismissRequest()
-                                },
+                                modifier = Modifier
+                                    .itemModifier(((restrict == Restrict.PUBLIC && currentPage == 0) || (restrict == Restrict.PRIVATE && currentPage == 1)) && filterTag.isNullOrEmpty()) {
+                                        onSelected(null)
+                                        onDismissRequest()
+                                    },
                             )
                         }
                         item(key = "uncategorized") {
@@ -176,12 +176,8 @@ private fun Modifier.itemModifier(
             .throttleClick(indication = ripple()) {
                 onClick()
             }
-            .then(
-                if (condition) Modifier.background(
-                    lightBlue,
-                    MaterialTheme.shapes.small
-                ) else Modifier
-            )
+            .conditionally(condition) {
+                Modifier.background(lightBlue, MaterialTheme.shapes.small)
+            }
             .padding(8.dp)
-
     }

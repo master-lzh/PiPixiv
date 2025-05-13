@@ -23,9 +23,10 @@ private const val KEY_SPACER = "spacer"
 fun IllustGrid(
     illusts: LazyPagingItems<Illust>,
     spanCount: Int,
+    navToPictureScreen: NavigateToHorizontalPictureScreen,
     modifier: Modifier = Modifier,
     lazyGridState: LazyGridState = rememberLazyGridState(),
-    navToPictureScreen: NavigateToHorizontalPictureScreen,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     leadingContent: (LazyGridScope.() -> Unit)? = null,
 ) {
     LazyVerticalGrid(
@@ -34,6 +35,7 @@ fun IllustGrid(
         columns = GridCells.Fixed(spanCount),
         verticalArrangement = Arrangement.spacedBy(3.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp),
+        contentPadding = contentPadding,
     ) {
         leadingContent?.invoke(this)
 

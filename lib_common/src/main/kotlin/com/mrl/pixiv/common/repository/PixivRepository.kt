@@ -130,7 +130,7 @@ object PixivRepository : KoinComponent {
     suspend fun getUserBookmarksIllust(
         restrict: String,
         userId: Long,
-        tag: String = "",
+        tag: String? = null,
         maxBookmarkId: Long? = null
     ) = apiApi.getUserBookmarksIllust(restrict, userId, tag, maxBookmarkId)
 

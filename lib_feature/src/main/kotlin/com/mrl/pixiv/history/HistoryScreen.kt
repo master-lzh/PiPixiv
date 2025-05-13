@@ -117,12 +117,12 @@ internal fun HistoryScreen_(
                 }
             }.collectAsLazyPagingItems(),
             spanCount = 2,
+            navToPictureScreen = navToPictureScreen,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
                 .padding(horizontal = 8.dp),
             lazyGridState = lazyGridState,
-            navToPictureScreen = navToPictureScreen,
         )
     }
 }

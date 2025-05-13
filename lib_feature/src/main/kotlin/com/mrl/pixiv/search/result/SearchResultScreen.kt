@@ -118,10 +118,10 @@ internal fun SearchResultScreen_(
             IllustGrid(
                 illusts = searchResults,
                 spanCount = spanCount,
+                navToPictureScreen = naviToPic,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 8.dp),
-                navToPictureScreen = naviToPic
+                    .padding(horizontal = 8.dp)
             )
         }
 

@@ -22,7 +22,7 @@ import org.koin.android.annotation.KoinViewModel
 @Stable
 data class CollectionState(
     @Restrict val restrict: String = Restrict.PUBLIC,
-    val filterTag: String = "",
+    val filterTag: String? = null,
     val userBookmarksNovels: ImmutableList<Novel> = persistentListOf(),
     val userBookmarkTagsIllust: ImmutableList<BookmarkTag> = persistentListOf(),
 )
@@ -30,18 +30,9 @@ data class CollectionState(
 sealed class CollectionAction : ViewIntent {
     data class LoadUserBookmarksTagsIllust(@Restrict val restrict: String) : CollectionAction()
 
-    data class UpdateRestrict(@Restrict val restrict: String) : CollectionAction()
     data class UpdateFilterTag(
         @Restrict val restrict: String,
-        val filterTag: String
-    ) : CollectionAction()
-
-    data class UpdateUserBookmarksNovels(
-        val userBookmarksNovels: ImmutableList<Novel>
-    ) : CollectionAction()
-
-    data class UpdateUserBookmarkTagsIllust(
-        val userBookmarkTagsIllust: ImmutableList<BookmarkTag>
+        val filterTag: String?
     ) : CollectionAction()
 }
 
@@ -65,28 +56,12 @@ class CollectionViewModel(
         when (intent) {
             is CollectionAction.LoadUserBookmarksTagsIllust -> loadUserBookmarkTagsIllust(intent.restrict)
 
-            is CollectionAction.UpdateRestrict ->
-                updateState {
-                    copy(
-                        restrict = intent.restrict,
-                        filterTag = ""
-                    )
-                }
-
             is CollectionAction.UpdateFilterTag ->
                 updateState {
                     copy(
                         restrict = intent.restrict,
                         filterTag = intent.filterTag
                     )
-                }
-
-            is CollectionAction.UpdateUserBookmarksNovels ->
-                updateState { copy(userBookmarksNovels = intent.userBookmarksNovels) }
-
-            is CollectionAction.UpdateUserBookmarkTagsIllust ->
-                updateState {
-                    copy(userBookmarkTagsIllust = intent.userBookmarkTagsIllust)
                 }
         }
     }
