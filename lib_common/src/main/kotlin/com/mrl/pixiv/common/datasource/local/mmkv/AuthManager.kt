@@ -47,6 +47,16 @@ object AuthManager : MMKVUser {
         updateUserInfo(resp)
     }
 
+    suspend fun login(refreshToken: String) {
+        val resp = PixivRepository.refreshToken(
+            AuthTokenFieldReq(
+                grantType = GrantType.REFRESH_TOKEN.value,
+                refreshToken = refreshToken
+            )
+        )
+        updateUserInfo(resp)
+    }
+
     private fun updateUserInfo(resp: AuthTokenResp) {
         userAccessToken = resp.accessToken
         userRefreshToken = resp.refreshToken

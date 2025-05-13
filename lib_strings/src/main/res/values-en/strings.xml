@@ -15,6 +15,7 @@
     <string name="edit_favorite">Edit favorite</string>
     <string name="save">Save</string>
     <string name="long_click_to_edit_favorite">Long click to edit favorite</string>
+    <string name="non_translate_uncategorized">Uncategorized</string>
     <string name="all">All</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="search_by_title_author">Search by title or author name</string>
@@ -24,6 +25,7 @@
     <string name="refresh_token_success">Refresh token successfully</string>
     <string name="sign_up">Sign up</string>
     <string name="sign_in">Sign in</string>
+    <string name="sign_with_token">Sign in with Token</string>
     <string name="download_with_size">Download (%1$.2fMB)</string>
     <string name="followed">Followed</string>
     <string name="follow">Follow</string>

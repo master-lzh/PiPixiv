@@ -38,6 +38,12 @@ fun NavHostController.navigateToOutsideSearchResultScreen(searchWord: String) {
     }
 }
 
+fun NavHostController.loginToMainScreen() {
+    navigate(Destination.HomeScreen) {
+        popUpTo(Destination.LoginOptionScreen) { inclusive = true }
+    }
+}
+
 fun NavHostController.popBackToMainScreen() {
     popBackStack(route = Destination.HomeScreen, inclusive = false)
 }

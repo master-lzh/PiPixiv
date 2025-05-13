@@ -6,7 +6,6 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -32,7 +31,9 @@ import com.mrl.pixiv.common.ui.components.HomeBottomBar
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.home.HomeViewModel
+import com.mrl.pixiv.login.LoginOptionScreen
 import com.mrl.pixiv.login.LoginScreen
+import com.mrl.pixiv.login.oauth.OAuthLoginScreen
 import com.mrl.pixiv.picture.HorizontalSwipePictureScreen
 import com.mrl.pixiv.picture.PictureDeeplinkScreen
 import com.mrl.pixiv.profile.ProfileScreen
@@ -77,9 +78,17 @@ fun MainGraph(
                     route = Graph.Main::class,
                     startDestination = startDestination,
                 ) {
+                    composable<Destination.LoginOptionScreen> {
+                        LoginOptionScreen()
+                    }
                     // 登陆
                     composable<Destination.LoginScreen> {
-                        LoginScreen(navHostController = navHostController)
+                        val startUrl = it.toRoute<Destination.LoginScreen>().startUrl
+                        LoginScreen(startUrl = startUrl)
+                    }
+                    // OAuth token登陆
+                    composable<Destination.OAuthLoginScreen> {
+                        OAuthLoginScreen()
                     }
                     // 首页
                     composable<Destination.HomeScreen>(
@@ -273,11 +282,13 @@ private fun HandleDeeplink(
 private fun bottomBarVisibility(
     navController: NavController,
 ): Boolean {
-    var bottomBarState by rememberSaveable { mutableStateOf(false) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     navController.currentDestination?.hasRoute(Destination.HomeScreen::class)
-    bottomBarState = navBackStackEntry?.destination?.hasRoute<Destination.HomeScreen>() == true ||
-            navBackStackEntry?.destination?.hasRoute<Destination.SearchPreviewScreen>() == true ||
-            navBackStackEntry?.destination?.hasRoute<Destination.ProfileScreen>() == true
-    return bottomBarState
+    return listOf(
+        Destination.HomeScreen::class,
+        Destination.SearchPreviewScreen::class,
+        Destination.ProfileScreen::class
+    ).any { route ->
+        navBackStackEntry?.destination?.hasRoute(route) == true
+    }
 }

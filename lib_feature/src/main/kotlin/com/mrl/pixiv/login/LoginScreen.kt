@@ -9,37 +9,38 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
-import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common.util.RString
+import com.mrl.pixiv.common.util.loginToMainScreen
 import com.mrl.pixiv.common.viewmodel.asState
 import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun LoginScreen(
+    startUrl: String,
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
     LoginScreen(
+        startUrl = startUrl,
         modifier = modifier,
         state = loginViewModel.asState(),
+        navBack = { navHostController.popBackStack() },
         navToHome = {
-            navHostController.navigate(Destination.HomeScreen) {
-                popUpTo(Destination.LoginScreen) { inclusive = true }
-            }
+            navHostController.loginToMainScreen()
         },
         dispatch = loginViewModel::dispatch,
     )
@@ -48,16 +49,27 @@ fun LoginScreen(
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 internal fun LoginScreen(
-    modifier: Modifier = Modifier,
+    startUrl: String,
     state: LoginState,
+    modifier: Modifier = Modifier,
+    navBack: () -> Unit = {},
     navToHome: () -> Unit = {},
     dispatch: (LoginAction) -> Unit,
 ) {
-    var currUrl by rememberSaveable { mutableStateOf(generateWebViewUrl(true)) }
     LaunchedEffect(state.isLogin) {
         if (state.isLogin) {
             navToHome()
         }
+    }
+    val webViewState = rememberWebViewState(url = startUrl)
+    when (webViewState.loadingState) {
+        LoadingState.Finished -> {}
+
+        LoadingState.Initializing -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        is LoadingState.Loading -> LinearProgressIndicator(
+            modifier = Modifier.fillMaxWidth(),
+            progress = (webViewState.loadingState as LoadingState.Loading).progress
+        )
     }
     Scaffold(
         modifier = modifier
@@ -65,35 +77,19 @@ internal fun LoginScreen(
         topBar = {
             TopAppBar(
                 title = {},
-                actions = {
-                    Button(
-                        onClick = {
-                            currUrl = generateWebViewUrl(false)
-                        }
+                navigationIcon = {
+                    IconButton(
+                        onClick = navBack
                     ) {
-                        Text(text = stringResource(RString.sign_in))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = null,
+                        )
                     }
-                    Button(
-                        onClick = {
-                            currUrl = generateWebViewUrl(true)
-                        }
-                    ) {
-                        Text(text = stringResource(RString.sign_up))
-                    }
-                }
+                },
             )
         }
     ) {
-        val webViewState = rememberWebViewState(url = currUrl)
-        when (webViewState.loadingState) {
-            LoadingState.Finished -> {}
-
-            LoadingState.Initializing -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            is LoadingState.Loading -> LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth(),
-                progress = (webViewState.loadingState as LoadingState.Loading).progress
-            )
-        }
         WebView(
             modifier = Modifier
                 .padding(it)

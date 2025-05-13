@@ -19,7 +19,15 @@ sealed class Destination(
     val icon: @Composable() (() -> Unit)? = {},
 ) {
     @Serializable
-    data object LoginScreen : Destination()
+    data object LoginOptionScreen : Destination()
+
+    @Serializable
+    data class LoginScreen(
+        val startUrl: String,
+    ) : Destination()
+
+    @Serializable
+    data object OAuthLoginScreen : Destination()
 
     @Serializable
     data object HomeScreen : Destination(

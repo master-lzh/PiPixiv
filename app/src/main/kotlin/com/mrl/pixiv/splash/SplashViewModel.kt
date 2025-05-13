@@ -69,7 +69,7 @@ class SplashViewModel : BaseMviViewModel<SplashState, SplashAction>(
         updateState {
             copy(
                 isLoading = false,
-                startDestination = Destination.LoginScreen::class
+                startDestination = Destination.LoginOptionScreen::class
             )
         }
 
