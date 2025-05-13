@@ -7,24 +7,10 @@ import com.mrl.pixiv.common.data.illust.IllustBookmarkDetailResp
 import com.mrl.pixiv.common.data.illust.IllustDetailResp
 import com.mrl.pixiv.common.data.illust.IllustRecommendedResp
 import com.mrl.pixiv.common.data.illust.IllustRelatedResp
-import com.mrl.pixiv.common.data.search.SearchAiType
-import com.mrl.pixiv.common.data.search.SearchAutoCompleteResp
-import com.mrl.pixiv.common.data.search.SearchIllustResp
-import com.mrl.pixiv.common.data.search.SearchSort
-import com.mrl.pixiv.common.data.search.SearchTarget
-import com.mrl.pixiv.common.data.search.TrendingTagsResp
+import com.mrl.pixiv.common.data.search.*
 import com.mrl.pixiv.common.data.ugoira.UgoiraMetadataResp
-import com.mrl.pixiv.common.data.user.UserBookmarkTagsResp
-import com.mrl.pixiv.common.data.user.UserBookmarksIllustResp
-import com.mrl.pixiv.common.data.user.UserDetailResp
-import com.mrl.pixiv.common.data.user.UserFollowingResp
-import com.mrl.pixiv.common.data.user.UserHistoryIllustsResp
-import com.mrl.pixiv.common.data.user.UserIllustsResp
-import com.mrl.pixiv.common.data.user.UserNovelsResp
-import de.jensklingenberg.ktorfit.http.GET
-import de.jensklingenberg.ktorfit.http.POST
-import de.jensklingenberg.ktorfit.http.Query
-import de.jensklingenberg.ktorfit.http.QueryMap
+import com.mrl.pixiv.common.data.user.*
+import de.jensklingenberg.ktorfit.http.*
 
 interface PixivApi {
     @GET("v1/illust/recommended")
@@ -39,16 +25,16 @@ interface PixivApi {
         @QueryMap queryMap: Map<String, String>,
     ): IllustRecommendedResp
 
-    @GET("v2/illust/bookmark/add")
+    @POST("v2/illust/bookmark/add")
     suspend fun postIllustBookmarkAdd(
-        @Query("illust_id") illustId: Long,
-        @Query("restrict") restrict: String = Restrict.PUBLIC,
-        @Query("tags") tags: List<String>? = null,
+        @Field("illust_id") illustId: Long,
+        @Field("restrict") restrict: String = Restrict.PUBLIC,
+        @Field("tags") tags: List<String>? = null,
     ): EmptyResp
 
-    @GET("v1/illust/bookmark/delete")
+    @POST("v1/illust/bookmark/delete")
     suspend fun postIllustBookmarkDelete(
-        @Query("illust_id") illustId: Long,
+        @Field("illust_id") illustId: Long,
     ): EmptyResp
 
     @GET("v2/illust/related")
@@ -145,13 +131,13 @@ interface PixivApi {
 
     @POST("v1/user/follow/add")
     suspend fun followUser(
-        @Query("user_id") userId: Long,
-        @Query("restrict") restrict: String,
+        @Field("user_id") userId: Long,
+        @Field("restrict") restrict: String,
     ): EmptyResp
 
     @POST("v1/user/follow/delete")
     suspend fun unFollowUser(
-        @Query("user_id") userId: Long,
+        @Field("user_id") userId: Long,
     ): EmptyResp
 
     @GET("v1/user/browsing-history/illusts")
