@@ -229,7 +229,7 @@ fun MainGraph(
                         popExitTransition = { scaleOut(targetScale = 0.9f) + fadeOut() },
                     ) {
                         val params = it.toRoute<Destination.PictureScreen>()
-                        val illusts = IllustCacheRepo[params.prefix]
+                        val illusts = remember { IllustCacheRepo[params.prefix] }
                         CompositionLocalProvider(
                             LocalAnimatedContentScope provides this,
                             LocalSharedKeyPrefix provides params.prefix

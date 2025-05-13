@@ -112,8 +112,9 @@ fun PictureDeeplinkScreen(
 
 @Composable
 internal fun PictureScreen(
-    modifier: Modifier = Modifier,
     illust: Illust,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
     pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust, null) },
 ) {
@@ -128,7 +129,7 @@ internal fun PictureScreen(
         illust = illust,
         modifier = modifier,
         navToPictureScreen = navHostController::navigateToPictureScreen,
-        popBackStack = navHostController::popBackStack,
+        popBackStack = onBack,
         dispatch = pictureViewModel::dispatch,
         navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
         popBackToHomeScreen = navHostController::popBackToMainScreen,
