@@ -15,7 +15,7 @@
     <string name="edit_favorite">编辑喜欢！</string>
     <string name="save">保存</string>
     <string name="long_click_to_edit_favorite">长按编辑收藏</string>
-    <string name="non_translate_uncategorized">未分类</string>
+    <string name="non_translate_uncategorized" translatable="false">未分類</string>
     <string name="all">全部</string>
     <string name="uncategorized">未分类</string>
     <string name="search_by_title_author">搜索标题或画师名称</string>

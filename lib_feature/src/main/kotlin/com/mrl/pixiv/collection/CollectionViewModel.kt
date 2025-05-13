@@ -7,10 +7,11 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.mrl.pixiv.common.data.Novel
 import com.mrl.pixiv.common.data.Restrict
-import com.mrl.pixiv.common.data.user.BookmarkTag
 import com.mrl.pixiv.common.data.user.UserBookmarksIllustQuery
 import com.mrl.pixiv.common.repository.PixivRepository
 import com.mrl.pixiv.common.repository.paging.CollectionIllustPagingSource
+import com.mrl.pixiv.common.util.AppUtil
+import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.viewmodel.BaseMviViewModel
 import com.mrl.pixiv.common.viewmodel.ViewIntent
 import com.mrl.pixiv.common.viewmodel.state
@@ -24,7 +25,15 @@ data class CollectionState(
     @Restrict val restrict: String = Restrict.PUBLIC,
     val filterTag: String? = null,
     val userBookmarksNovels: ImmutableList<Novel> = persistentListOf(),
-    val userBookmarkTagsIllust: ImmutableList<BookmarkTag> = persistentListOf(),
+    val userBookmarkTagsIllust: ImmutableList<RestrictBookmarkTag> = persistentListOf(),
+)
+
+@Stable
+data class RestrictBookmarkTag(
+    val isPublic: Boolean,
+    val count: Long? = null,
+    val displayName: String,
+    val name: String? = null,
 )
 
 sealed class CollectionAction : ViewIntent {
@@ -74,10 +83,34 @@ class CollectionViewModel(
             )
             updateState {
                 copy(
-                    restrict = restrict,
-                    userBookmarkTagsIllust = resp.bookmarkTags.toImmutableList()
+                    userBookmarkTagsIllust = (generateInitialTags(restrict == Restrict.PUBLIC) +
+                            resp.bookmarkTags.map {
+                                RestrictBookmarkTag(
+                                    isPublic = restrict == Restrict.PUBLIC,
+                                    count = it.count,
+                                    displayName = it.name,
+                                    name = it.name
+                                )
+                            }).toImmutableList()
                 )
             }
         }
+    }
+
+    private fun generateInitialTags(isPublic: Boolean): List<RestrictBookmarkTag> {
+        return listOf(
+            RestrictBookmarkTag(
+                isPublic = isPublic,
+                count = null,
+                displayName = AppUtil.getString(RString.all),
+                name = null,
+            ),
+            RestrictBookmarkTag(
+                isPublic = isPublic,
+                count = null,
+                displayName = AppUtil.getString(RString.uncategorized),
+                name = AppUtil.getString(RString.non_translate_uncategorized)
+            )
+        )
     }
 }

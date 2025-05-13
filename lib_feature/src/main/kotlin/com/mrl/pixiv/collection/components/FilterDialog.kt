@@ -18,10 +18,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.mrl.pixiv.collection.CollectionAction
+import com.mrl.pixiv.collection.RestrictBookmarkTag
 import com.mrl.pixiv.common.data.Restrict
-import com.mrl.pixiv.common.data.user.BookmarkTag
 import com.mrl.pixiv.common.ui.lightBlue
-import com.mrl.pixiv.common.util.AppUtil
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.conditionally
 import com.mrl.pixiv.common.util.throttleClick
@@ -35,7 +34,7 @@ fun FilterDialog(
     selectedTab: Int,
     switchTab: (Int) -> Unit,
     pagerState: PagerState,
-    userBookmarkTagsIllust: ImmutableList<BookmarkTag>,
+    userBookmarkTagsIllust: ImmutableList<RestrictBookmarkTag>,
     @Restrict restrict: String,
     filterTag: String?,
     dispatch: (CollectionAction) -> Unit,
@@ -123,41 +122,20 @@ fun FilterDialog(
                             .padding(horizontal = 8.dp)
                             .height(300.dp)
                     ) {
-                        item(key = "all") {
-                            Text(
-                                text = stringResource(RString.all),
-                                modifier = Modifier
-                                    .itemModifier(((restrict == Restrict.PUBLIC && currentPage == 0) || (restrict == Restrict.PRIVATE && currentPage == 1)) && filterTag.isNullOrEmpty()) {
-                                        onSelected(null)
-                                        onDismissRequest()
-                                    },
-                            )
-                        }
-                        item(key = "uncategorized") {
-                            Text(
-                                text = stringResource(RString.uncategorized),
-                                modifier = Modifier.itemModifier(
-                                    ((restrict == Restrict.PUBLIC && currentPage == 0) || (restrict == Restrict.PRIVATE && currentPage == 1)) && filterTag == stringResource(
-                                        RString.non_translate_uncategorized
-                                    ),
-                                ) {
-                                    onSelected(AppUtil.getString(RString.non_translate_uncategorized))
-                                    onDismissRequest()
-                                },
-                            )
-                        }
-                        items(userBookmarkTagsIllust, key = { it.name }) {
+                        items(userBookmarkTagsIllust, key = { it.name.toString() }) {
                             Row(
                                 modifier = Modifier.itemModifier(
-                                    ((restrict == Restrict.PUBLIC && currentPage == 0) || (restrict == Restrict.PRIVATE && currentPage == 1)) && filterTag == it.name,
+                                    ((restrict == Restrict.PUBLIC && it.isPublic) || (restrict == Restrict.PRIVATE && !it.isPublic)) && filterTag == it.name,
                                 ) {
                                     onSelected(it.name)
                                     onDismissRequest()
                                 },
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Text(text = it.name)
-                                Text(text = "${it.count}")
+                                Text(text = it.displayName)
+                                if (it.count != null) {
+                                    Text(text = it.count.toString())
+                                }
                             }
                         }
                     }
