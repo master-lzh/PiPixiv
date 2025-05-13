@@ -123,7 +123,6 @@ internal fun ProfileDetailScreen(
                         UserAvatar(
                             url = userInfo.user.profileImageUrls.medium,
                             modifier = Modifier.size(avatarSize * (2 - scrollBehavior.state.collapsedFraction)),
-                            contentScale = ContentScale.FillWidth,
                         )
                         if (scrollBehavior.state.collapsedFraction == 1f) {
                             Text(

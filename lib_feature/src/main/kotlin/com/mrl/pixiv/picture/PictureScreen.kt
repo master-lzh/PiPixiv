@@ -405,58 +405,10 @@ internal fun PictureScreen(
                     }
                 }
                 item(key = KEY_ILLUST_TITLE) {
-                    if (isScrollToBottom) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.background)
-                                .padding(vertical = 10.dp)
-                        ) {
-                            UserAvatar(
-                                url = illust.user.profileImageUrls.medium,
-                                modifier = Modifier
-                                    .padding(start = 20.dp)
-                                    .size(30.dp)
-                                    .align(Alignment.CenterVertically),
-                                onClick = {
-                                    navToUserDetailScreen(illust.user.id)
-                                },
-                            )
-                            Column(
-                                modifier = Modifier.padding(start = 10.dp)
-                            ) {
-                                Text(
-                                    text = illust.title,
-                                    modifier = Modifier
-                                        .sharedElement(
-                                            rememberSharedContentState(key = "${prefix}-title-${illust.id}"),
-                                            animatedContentScope,
-                                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                                        )
-                                        .skipToLookaheadSize(),
-                                    style = TextStyle(
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold
-                                    ),
-                                    maxLines = 1,
-                                )
-                                Text(
-                                    text = illust.user.name,
-                                    modifier = Modifier,
-                                    style = TextStyle(
-                                        fontSize = 12.sp,
-                                    ),
-                                    maxLines = 1,
-                                )
-                            }
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                        )
-                    }
+                    UserInfo(
+                        illust = illust,
+                        navToUserDetailScreen = navToUserDetailScreen
+                    )
                 }
                 item(key = KEY_ILLUST_DATA) {
                     Row(
@@ -709,42 +661,10 @@ internal fun PictureScreen(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(vertical = 10.dp)
-                    ) {
-                        UserAvatar(
-                            url = illust.user.profileImageUrls.medium,
-                            modifier = Modifier
-                                .padding(start = 20.dp)
-                                .size(20.dp)
-                                .align(Alignment.CenterVertically),
-                            onClick = {
-                                navToUserDetailScreen(illust.user.id)
-                            },
-                        )
-                        Column(
-                            modifier = Modifier.padding(start = 10.dp)
-                        ) {
-                            Text(
-                                text = illust.title,
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                maxLines = 1,
-                            )
-                            Text(
-                                text = illust.user.name,
-                                style = TextStyle(
-                                    fontSize = 12.sp,
-                                ),
-                                maxLines = 1,
-                            )
-                        }
-                    }
+                    UserInfo(
+                        illust = illust,
+                        navToUserDetailScreen = navToUserDetailScreen,
+                    )
                 }
             }
             if (state.bottomSheetState != null) {
@@ -827,6 +747,49 @@ internal fun PictureScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun UserInfo(
+    illust: Illust,
+    navToUserDetailScreen: (Long) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(start = 20.dp, top = 10.dp, bottom = 10.dp),
+    ) {
+        UserAvatar(
+            url = illust.user.profileImageUrls.medium,
+            modifier = Modifier
+                .size(30.dp)
+                .align(Alignment.CenterVertically),
+            onClick = {
+                navToUserDetailScreen(illust.user.id)
+            },
+        )
+        Column(
+            modifier = Modifier.padding(start = 10.dp)
+        ) {
+            Text(
+                text = illust.title,
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                maxLines = 1,
+            )
+            Text(
+                text = illust.user.name,
+                modifier = Modifier,
+                style = TextStyle(
+                    fontSize = 12.sp,
+                ),
+                maxLines = 1,
+            )
         }
     }
 }

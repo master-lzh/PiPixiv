@@ -17,7 +17,7 @@ fun UserAvatar(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     contentDescription: String = "",
-    contentScale: ContentScale = ContentScale.Fit,
+    contentScale: ContentScale = ContentScale.Crop,
 ) {
     if (url.isEmpty()) {
         CircularProgressIndicator(modifier)
