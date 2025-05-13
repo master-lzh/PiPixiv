@@ -21,6 +21,10 @@ val requireUserInfoValue
 val requireUserInfoFlow
     get() = UserManager.userInfoFlow
 
+@Suppress("KotlinConstantConditions")
+val Long.isSelf: Boolean
+    get() = requireUserInfoValue.user.id == this
+
 object UserManager : MMKVUser {
     private val userInfo by mmkvSerializable(UserDetailResp()).asMutableStateFlow()
     internal val userInfoFlow = userInfo.asStateFlow()

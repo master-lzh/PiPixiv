@@ -211,7 +211,7 @@ fun MainGraph(
                     composable<Destination.SelfCollectionScreen> {
                         CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                             val userInfo by requireUserInfoFlow.collectAsStateWithLifecycle()
-                            SelfCollectionScreen(userInfo.user.id)
+                            SelfCollectionScreen(uid = userInfo.user.id)
                         }
                     }
 

@@ -9,7 +9,6 @@ import com.mrl.pixiv.common.data.Novel
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.user.BookmarkTag
 import com.mrl.pixiv.common.data.user.UserBookmarksIllustQuery
-import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoValue
 import com.mrl.pixiv.common.repository.PixivRepository
 import com.mrl.pixiv.common.repository.paging.CollectionIllustPagingSource
 import com.mrl.pixiv.common.viewmodel.BaseMviViewModel
@@ -22,7 +21,6 @@ import org.koin.android.annotation.KoinViewModel
 
 @Stable
 data class CollectionState(
-    val userId: Long = Long.MIN_VALUE,
     @Restrict val restrict: String = Restrict.PUBLIC,
     val filterTag: String = "",
     val userBookmarksNovels: ImmutableList<Novel> = persistentListOf(),
@@ -49,9 +47,9 @@ sealed class CollectionAction : ViewIntent {
 
 @KoinViewModel
 class CollectionViewModel(
-    uid: Long,
+    private val uid: Long,
 ) : BaseMviViewModel<CollectionState, CollectionAction>(
-    initialState = CollectionState(userId = uid),
+    initialState = CollectionState(),
 ) {
     val userBookmarksIllusts = Pager(PagingConfig(pageSize = 20)) {
         CollectionIllustPagingSource(
@@ -65,10 +63,7 @@ class CollectionViewModel(
 
     override suspend fun handleIntent(intent: CollectionAction) {
         when (intent) {
-            is CollectionAction.LoadUserBookmarksTagsIllust -> loadUserBookmarkTagsIllust(
-                intent.restrict,
-                state.userId
-            )
+            is CollectionAction.LoadUserBookmarksTagsIllust -> loadUserBookmarkTagsIllust(intent.restrict)
 
             is CollectionAction.UpdateRestrict ->
                 updateState {
@@ -96,10 +91,10 @@ class CollectionViewModel(
         }
     }
 
-    private fun loadUserBookmarkTagsIllust(@Restrict restrict: String, userId: Long) {
+    private fun loadUserBookmarkTagsIllust(@Restrict restrict: String) {
         launchIO {
             val resp = PixivRepository.getUserBookmarkTagsIllust(
-                userId = if (userId == Long.MIN_VALUE) requireUserInfoValue.user.id else userId,
+                userId = uid,
                 restrict = restrict
             )
             updateState {
