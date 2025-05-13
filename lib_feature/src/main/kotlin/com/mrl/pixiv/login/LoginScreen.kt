@@ -26,7 +26,7 @@ import com.mrl.pixiv.common.util.loginToMainScreen
 import com.mrl.pixiv.common.viewmodel.asState
 import org.koin.androidx.compose.koinViewModel
 
-
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun LoginScreen(
     startUrl: String,
@@ -34,31 +34,10 @@ fun LoginScreen(
     loginViewModel: LoginViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
-    LoginScreen(
-        startUrl = startUrl,
-        modifier = modifier,
-        state = loginViewModel.asState(),
-        navBack = { navHostController.popBackStack() },
-        navToHome = {
-            navHostController.loginToMainScreen()
-        },
-        dispatch = loginViewModel::dispatch,
-    )
-}
-
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-internal fun LoginScreen(
-    startUrl: String,
-    state: LoginState,
-    modifier: Modifier = Modifier,
-    navBack: () -> Unit = {},
-    navToHome: () -> Unit = {},
-    dispatch: (LoginAction) -> Unit,
-) {
+    val state = loginViewModel.asState()
     LaunchedEffect(state.isLogin) {
         if (state.isLogin) {
-            navToHome()
+            navHostController.loginToMainScreen()
         }
     }
     val webViewState = rememberWebViewState(url = startUrl)
@@ -79,7 +58,9 @@ internal fun LoginScreen(
                 title = {},
                 navigationIcon = {
                     IconButton(
-                        onClick = navBack
+                        onClick = {
+                            navHostController.popBackStack()
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -108,7 +89,9 @@ internal fun LoginScreen(
                     request: WebResourceRequest?
                 ): Boolean {
                     Log.d("LoginScreen", "shouldOverrideUrlLoading: ${request?.url}")
-                    if (checkUri(dispatch, request?.url!!)) {
+                    val codePair = checkUri(request?.url!!)
+                    if (codePair != null) {
+                        loginViewModel.dispatch(LoginAction.Login(codePair.first, codePair.second))
                         return true
                     }
                     return super.shouldOverrideUrlLoading(view, request)
