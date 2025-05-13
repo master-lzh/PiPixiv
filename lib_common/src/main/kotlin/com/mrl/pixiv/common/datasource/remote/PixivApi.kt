@@ -25,6 +25,7 @@ interface PixivApi {
         @QueryMap queryMap: Map<String, String>,
     ): IllustRecommendedResp
 
+    @FormUrlEncoded
     @POST("v2/illust/bookmark/add")
     suspend fun postIllustBookmarkAdd(
         @Field("illust_id") illustId: Long,
@@ -32,6 +33,7 @@ interface PixivApi {
         @Field("tags") tags: List<String>? = null,
     ): EmptyResp
 
+    @FormUrlEncoded
     @POST("v1/illust/bookmark/delete")
     suspend fun postIllustBookmarkDelete(
         @Field("illust_id") illustId: Long,
@@ -129,12 +131,14 @@ interface PixivApi {
         @Query("tag") tag: String = "",
     ): UserNovelsResp
 
+    @FormUrlEncoded
     @POST("v1/user/follow/add")
     suspend fun followUser(
         @Field("user_id") userId: Long,
         @Field("restrict") restrict: String,
     ): EmptyResp
 
+    @FormUrlEncoded
     @POST("v1/user/follow/delete")
     suspend fun unFollowUser(
         @Field("user_id") userId: Long,
