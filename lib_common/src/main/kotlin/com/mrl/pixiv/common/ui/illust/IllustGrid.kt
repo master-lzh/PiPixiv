@@ -1,9 +1,9 @@
 package com.mrl.pixiv.common.ui.illust
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,38 +19,24 @@ import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 private const val KEY_LOADING = "loading"
 private const val KEY_SPACER = "spacer"
 
-@Composable
-fun IllustGrid(
+fun LazyGridScope.illustGrid(
     illusts: LazyPagingItems<Illust>,
-    spanCount: Int,
     navToPictureScreen: NavigateToHorizontalPictureScreen,
-    modifier: Modifier = Modifier,
-    lazyGridState: LazyGridState = rememberLazyGridState(),
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    leadingContent: (LazyGridScope.() -> Unit)? = null,
+    enableLoading: Boolean = false,
 ) {
-    LazyVerticalGrid(
-        state = lazyGridState,
-        modifier = modifier,
-        columns = GridCells.Fixed(spanCount),
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-        horizontalArrangement = Arrangement.spacedBy(3.dp),
-        contentPadding = contentPadding,
-    ) {
-        leadingContent?.invoke(this)
-
-        if (illusts.loadState.refresh is LoadState.Loading && illusts.itemCount == 0) {
-            item(key = KEY_LOADING, span = { GridItemSpan(spanCount) }) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+    if (enableLoading && illusts.loadState.refresh is LoadState.Loading && illusts.itemCount == 0) {
+        item(key = KEY_LOADING, span = { GridItemSpan(maxLineSpan) }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 200.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
         }
+    }
+    if (illusts.itemCount > 0) {
         items(
             illusts.itemCount,
             key = illusts.itemKey { it.id }
@@ -73,7 +59,6 @@ fun IllustGrid(
                 shouldShowTip = index == 0,
             )
         }
-
         item(key = KEY_SPACER) {
             Spacer(modifier = Modifier.height(8.dp))
         }

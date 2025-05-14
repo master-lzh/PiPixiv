@@ -1,8 +1,8 @@
 package com.mrl.pixiv.collection
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -24,7 +24,7 @@ import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.datasource.local.mmkv.isSelf
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common.ui.illust.IllustGrid
+import com.mrl.pixiv.common.ui.illust.illustGrid
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState
@@ -63,7 +63,8 @@ fun SelfCollectionScreen(
                     }
                 }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.statusBars
     ) {
         val lazyGridState = rememberLazyGridState()
         var selectedTab by remember(state.restrict) { mutableIntStateOf(if (state.restrict == Restrict.PUBLIC) 0 else 1) }
@@ -76,14 +77,24 @@ fun SelfCollectionScreen(
             modifier = Modifier.padding(it),
             state = pullRefreshState
         ) {
-            IllustGrid(
-                illusts = userBookmarksIllusts,
-                spanCount = 2,
-                navToPictureScreen = navHostController::navigateToPictureScreen,
+            LazyVerticalGrid(
+                state = lazyGridState,
                 modifier = Modifier.fillMaxSize(),
-                lazyGridState = lazyGridState,
-                contentPadding = PaddingValues(start = 8.dp, top = 10.dp, end = 8.dp)
-            )
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                contentPadding = PaddingValues(
+                    start = 8.dp,
+                    top = 10.dp,
+                    end = 8.dp,
+                    bottom = 20.dp
+                ),
+            ) {
+                illustGrid(
+                    illusts = userBookmarksIllusts,
+                    navToPictureScreen = navHostController::navigateToPictureScreen,
+                )
+            }
         }
         if (showFilterDialog) {
             FilterDialog(

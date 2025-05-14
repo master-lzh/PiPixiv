@@ -1,8 +1,8 @@
 package com.mrl.pixiv.history
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,22 +19,19 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.filter
-import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common.ui.illust.IllustGrid
-import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
+import com.mrl.pixiv.common.ui.illust.illustGrid
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun HistoryScreen(
@@ -42,87 +39,90 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
-    HistoryScreen_(
-        illusts = viewModel.illusts,
-        modifier = modifier,
-        state = viewModel.asState(),
-        dispatch = viewModel::dispatch,
-        popBack = { navHostController.popBackStack() },
-        navToPictureScreen = navHostController::navigateToPictureScreen
-    )
-}
-
-@Composable
-internal fun HistoryScreen_(
-    illusts: Flow<PagingData<Illust>>,
-    modifier: Modifier = Modifier,
-    state: HistoryState = HistoryState(),
-    dispatch: (HistoryAction) -> Unit = {},
-    popBack: () -> Unit = {},
-    navToPictureScreen: NavigateToHorizontalPictureScreen = { _, _, _ -> },
-) {
+    val state = viewModel.asState()
     var searchValue by remember { mutableStateOf(TextFieldValue(state.currentSearch)) }
-    val focusManager = LocalFocusManager.current
+    val illusts = viewModel.illusts.map {
+        it.filter {
+            it.title.contains(searchValue.text, ignoreCase = true) ||
+                    it.user.name.contains(searchValue.text, ignoreCase = true)
+        }
+    }.collectAsLazyPagingItems()
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    TextField(
-                        value = searchValue,
-                        onValueChange = {
-                            searchValue = it
-                            dispatch(HistoryAction.UpdateSearch(it.text))
-                        },
-                        colors = transparentIndicatorColors.copy(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent
-                        ),
-                        placeholder = {
-                            Text(text = stringResource(RString.search_by_title_author))
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        trailingIcon = {
-                            IconButton(onClick = { searchValue = TextFieldValue() }) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Clear,
-                                    contentDescription = "Clear"
-                                )
-                            }
-                        },
-                        singleLine = true,
-                        keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    )
+            HistoryAppBar(
+                searchValue = searchValue,
+                onValueChange = {
+                    searchValue = it
+                    viewModel.dispatch(HistoryAction.UpdateSearch(it.text))
                 },
-                navigationIcon = {
-                    IconButton(onClick = popBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
+                onBack = { navHostController.popBackStack() }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.statusBars
     ) {
         val lazyGridState = rememberLazyGridState()
-        IllustGrid(
-            illusts = illusts.map {
-                it.filter {
-                    it.title.contains(
-                        searchValue.text,
-                        ignoreCase = true
-                    ) || it.user.name.contains(searchValue.text, ignoreCase = true)
-                }
-            }.collectAsLazyPagingItems(),
-            spanCount = 2,
-            navToPictureScreen = navToPictureScreen,
+        LazyVerticalGrid(
+            state = lazyGridState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
-                .padding(horizontal = 8.dp),
-            lazyGridState = lazyGridState,
-        )
+                .padding(it),
+            columns = GridCells.Fixed(2),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 20.dp),
+        ) {
+            illustGrid(
+                illusts = illusts,
+                navToPictureScreen = navHostController::navigateToPictureScreen,
+                enableLoading = true
+            )
+        }
     }
+}
+
+@Composable
+private fun HistoryAppBar(
+    searchValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    onBack: () -> Unit = {},
+) {
+    val focusManager = LocalFocusManager.current
+    TopAppBar(
+        title = {
+            TextField(
+                value = searchValue,
+                onValueChange = onValueChange,
+                colors = transparentIndicatorColors.copy(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                ),
+                placeholder = {
+                    Text(text = stringResource(RString.search_by_title_author))
+                },
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = { onValueChange(TextFieldValue()) }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Clear,
+                            contentDescription = "Clear"
+                        )
+                    }
+                },
+                singleLine = true,
+                keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            )
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = onBack
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        }
+    )
 }

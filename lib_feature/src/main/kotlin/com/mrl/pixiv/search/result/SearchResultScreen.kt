@@ -2,6 +2,8 @@ package com.mrl.pixiv.search.result
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterAlt
@@ -25,7 +27,7 @@ import com.mrl.pixiv.common.data.search.SearchSort
 import com.mrl.pixiv.common.data.search.SearchTarget
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common.ui.illust.IllustGrid
+import com.mrl.pixiv.common.ui.illust.illustGrid
 import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
@@ -115,14 +117,18 @@ internal fun SearchResultScreen_(
             onRefresh = { searchResults.refresh() },
             modifier = modifier.padding(it),
         ) {
-            IllustGrid(
-                illusts = searchResults,
-                spanCount = spanCount,
-                navToPictureScreen = naviToPic,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp)
-            )
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxSize(),
+                columns = GridCells.Fixed(spanCount),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+            ) {
+                illustGrid(
+                    illusts = searchResults,
+                    navToPictureScreen = naviToPic,
+                )
+            }
         }
 
         if (showBottomSheet.value) {
