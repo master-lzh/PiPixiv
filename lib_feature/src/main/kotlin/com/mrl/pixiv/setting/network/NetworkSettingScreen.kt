@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -33,20 +32,6 @@ fun NetworkSettingScreen(
     viewModel: SettingViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow
 ) {
-    NetworkSettingScreen_(
-        modifier = modifier,
-        dispatch = viewModel::dispatch
-    ) { navHostController.popBackStack() }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-internal fun NetworkSettingScreen_(
-    modifier: Modifier = Modifier,
-    dispatch: (SettingAction) -> Unit = {},
-    popBack: () -> Unit = {},
-) {
     val userPreference by requireUserPreferenceFlow.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier,
@@ -56,7 +41,7 @@ internal fun NetworkSettingScreen_(
                     Text(text = stringResource(RString.network_setting))
                 },
                 navigationIcon = {
-                    IconButton(onClick = popBack) {
+                    IconButton(onClick = navHostController::popBackStack) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
                     }
                 }
@@ -83,13 +68,13 @@ internal fun NetworkSettingScreen_(
                 }
                 Switch(
                     checked = userPreference.enableBypassSniffing,
-                    onCheckedChange = { dispatch(SettingAction.SwitchBypassSniffing) }
+                    onCheckedChange = { viewModel.dispatch(SettingAction.SwitchBypassSniffing) }
                 )
             }
             PictureSourceWidget(
                 currentSelected = userPreference.imageHost,
                 savePictureSourceHost = {
-                    dispatch(SettingAction.SavePictureSourceHost(it))
+                    viewModel.dispatch(SettingAction.SavePictureSourceHost(it))
                     ToastUtil.safeShortToast(RString.restart_app_to_take_effect)
                 }
             )
