@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package com.mrl.pixiv.picture
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
@@ -44,24 +46,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.mrl.pixiv.common.compose.LocalAnimatedContentScope
-import com.mrl.pixiv.common.compose.LocalNavigator
-import com.mrl.pixiv.common.compose.LocalSharedKeyPrefix
-import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
+import com.mrl.pixiv.common.compose.*
+import com.mrl.pixiv.common.compose.ui.bar.TextSnackbar
+import com.mrl.pixiv.common.compose.ui.illust.SquareIllustItem
+import com.mrl.pixiv.common.compose.ui.image.UserAvatar
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.kts.spaceBy
-import com.mrl.pixiv.common.compose.ui.bar.TextSnackbar
-import com.mrl.pixiv.common.compose.ui.image.UserAvatar
-import com.mrl.pixiv.common.compose.deepBlue
-import com.mrl.pixiv.common.compose.ui.illust.SquareIllustItem
 import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.util.AppUtil.getString
 import com.mrl.pixiv.common.viewmodel.SideEffect
@@ -86,23 +83,11 @@ fun PictureDeeplinkScreen(
 ) {
     val state = pictureViewModel.asState()
     val illust = state.illust
-    val sideEffect by pictureViewModel.sideEffect
-        .filterIsInstance<SideEffect.Error>()
-        .collectAsStateWithLifecycle(null)
-    val exception = sideEffect?.throwable
     if (illust != null) {
         PictureScreen(
-            pictureViewModel = pictureViewModel,
-            exception = exception,
-            relatedIllusts = pictureViewModel.relatedIllusts.collectAsLazyPagingItems(),
             illust = illust,
+            onBack = navHostController::popBackStack,
             modifier = modifier,
-            navToPictureScreen = navHostController::navigateToPictureScreen,
-            popBackStack = navHostController::popBackStack,
-            dispatch = pictureViewModel::dispatch,
-            navToSearchResultScreen = navHostController::navigateToSearchResultScreen,
-            popBackToHomeScreen = navHostController::popBackToMainScreen,
-            navToUserDetailScreen = navHostController::navigateToProfileDetailScreen,
         )
     } else {
         Box(
@@ -112,33 +97,6 @@ fun PictureDeeplinkScreen(
             CircularProgressIndicator()
         }
     }
-}
-
-@Composable
-internal fun PictureScreen(
-    illust: Illust,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier,
-    navHostController: NavHostController = LocalNavigator.current,
-    pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust, null) },
-) {
-    val sideEffect by pictureViewModel.sideEffect
-        .filterIsInstance<SideEffect.Error>()
-        .collectAsStateWithLifecycle(null)
-    val exception = sideEffect?.throwable
-    PictureScreen(
-        pictureViewModel = pictureViewModel,
-        exception = exception,
-        relatedIllusts = pictureViewModel.relatedIllusts.collectAsLazyPagingItems(),
-        illust = illust,
-        modifier = modifier,
-        navToPictureScreen = navHostController::navigateToPictureScreen,
-        popBackStack = onBack,
-        dispatch = pictureViewModel::dispatch,
-        navToSearchResultScreen = navHostController::navigateToSearchResultScreen,
-        popBackToHomeScreen = navHostController::popBackToMainScreen,
-        navToUserDetailScreen = navHostController::navigateToProfileDetailScreen,
-    )
 }
 
 private const val KEY_UGOIRA = "ugoira"
@@ -152,21 +110,23 @@ private const val KEY_ILLUST_RELATED_TITLE = "illust_related_title"
 private const val KEY_SPACER = "spacer"
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun PictureScreen(
-    pictureViewModel: PictureViewModel,
-    exception: Throwable?,
-    relatedIllusts: LazyPagingItems<Illust>,
     illust: Illust,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    navToPictureScreen: NavigateToHorizontalPictureScreen = { _, _, _ -> },
-    popBackStack: () -> Unit = {},
-    dispatch: (PictureAction) -> Unit = {},
-    navToSearchResultScreen: (String) -> Unit = {},
-    popBackToHomeScreen: () -> Unit = {},
-    navToUserDetailScreen: (Long) -> Unit = {},
+    navHostController: NavHostController = LocalNavigator.current,
+    pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust, null) },
 ) {
+    val sideEffect by pictureViewModel.sideEffect.filterIsInstance<SideEffect.Error>()
+        .collectAsStateWithLifecycle(null)
+    val exception = sideEffect?.throwable
+    val relatedIllusts = pictureViewModel.relatedIllusts.collectAsLazyPagingItems()
+    val navToPictureScreen = navHostController::navigateToPictureScreen
+    val dispatch = pictureViewModel::dispatch
+    val navToSearchResultScreen = navHostController::navigateToSearchResultScreen
+    val popBackToHomeScreen = navHostController::popBackToMainScreen
+    val navToUserDetailScreen = navHostController::navigateToProfileDetailScreen
     val state = pictureViewModel.asState()
     val context = LocalContext.current
     val (relatedSpanCount, userSpanCount) = when (LocalConfiguration.current.orientation) {
@@ -259,7 +219,7 @@ internal fun PictureScreen(
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                                     contentDescription = null,
-                                    modifier = Modifier.throttleClick { popBackStack() },
+                                    modifier = Modifier.throttleClick { onBack() },
                                 )
                                 Icon(
                                     imageVector = Icons.Rounded.Home,
