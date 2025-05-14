@@ -18,7 +18,6 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.illustGrid
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState
@@ -33,7 +32,7 @@ fun SearchResultsScreen(
     searchWords: String,
     modifier: Modifier = Modifier,
     viewModel: SearchResultViewModel = koinViewModel { parametersOf(searchWords) },
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
 ) {
     val state = viewModel.asState()
     val searchResults = viewModel.searchResults.collectAsLazyPagingItems()

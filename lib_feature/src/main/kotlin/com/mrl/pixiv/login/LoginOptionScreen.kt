@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.RDrawable
 import com.mrl.pixiv.common.util.RString
 
@@ -28,7 +27,7 @@ import com.mrl.pixiv.common.util.RString
 fun LoginOptionScreen(
     modifier: Modifier = Modifier
 ) {
-    val navHostController = LocalNavigator.currentOrThrow
+    val navHostController = LocalNavigator.current
     Scaffold(modifier = modifier) {
         Column(
             modifier = Modifier

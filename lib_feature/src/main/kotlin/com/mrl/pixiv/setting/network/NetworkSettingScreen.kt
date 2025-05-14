@@ -17,7 +17,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.SettingItem
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.ToastUtil
@@ -30,7 +29,7 @@ import org.koin.androidx.compose.koinViewModel
 fun NetworkSettingScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = koinViewModel(),
-    navHostController: NavHostController = LocalNavigator.currentOrThrow
+    navHostController: NavHostController = LocalNavigator.current
 ) {
     val userPreference by requireUserPreferenceFlow.collectAsStateWithLifecycle()
     Scaffold(

@@ -22,7 +22,6 @@ import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.UserAvatar
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.SettingItem
 import com.mrl.pixiv.common.util.*
 import org.koin.androidx.compose.koinViewModel
@@ -44,7 +43,7 @@ private val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel(),
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
 ) {
     val userInfo by requireUserInfoFlow.collectAsStateWithLifecycle()
     LifecycleResumeEffect(Unit) {
@@ -74,7 +73,7 @@ fun ProfileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    with(LocalSharedTransitionScope.currentOrThrow) {
+                    with(LocalSharedTransitionScope.current) {
                         UserAvatar(
                             url = userInfo.user.profileImageUrls.medium,
                             modifier = Modifier.size(80.dp),
@@ -89,7 +88,7 @@ fun ProfileScreen(
                                 modifier = Modifier
                                     .sharedElement(
                                         rememberSharedContentState(key = "user-name-${userInfo.user.id}"),
-                                        LocalAnimatedContentScope.currentOrThrow,
+                                        LocalAnimatedContentScope.current,
                                         placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
                                     )
                                     .skipToLookaheadSize()
@@ -100,7 +99,7 @@ fun ProfileScreen(
                                 modifier = Modifier
                                     .sharedElement(
                                         rememberSharedContentState(key = "user-id-${userInfo.user.id}"),
-                                        LocalAnimatedContentScope.currentOrThrow,
+                                        LocalAnimatedContentScope.current,
                                         placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
                                     )
                                     .skipToLookaheadSize()

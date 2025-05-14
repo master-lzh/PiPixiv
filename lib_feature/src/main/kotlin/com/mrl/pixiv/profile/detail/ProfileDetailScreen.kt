@@ -33,7 +33,6 @@ import com.mrl.pixiv.common.data.user.UserDetailResp
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.UserAvatar
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.copyToClipboard
 import com.mrl.pixiv.common.util.navigateToPictureScreen
@@ -56,7 +55,7 @@ private const val KEY_SPACE = "space"
 fun ProfileDetailScreen(
     uid: Long,
     modifier: Modifier = Modifier,
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
     viewModel: ProfileDetailViewModel = koinViewModel { parametersOf(uid) },
 ) {
     val state = viewModel.asState()

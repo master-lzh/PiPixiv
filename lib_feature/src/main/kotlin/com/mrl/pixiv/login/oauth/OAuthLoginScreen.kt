@@ -12,7 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.loginToMainScreen
 import com.mrl.pixiv.common.viewmodel.asState
@@ -23,7 +22,7 @@ fun OAuthLoginScreen(
     modifier: Modifier = Modifier,
     viewModel: OAuthLoginViewModel = koinViewModel()
 ) {
-    val navigator = LocalNavigator.currentOrThrow
+    val navigator = LocalNavigator.current
     var token by remember { mutableStateOf("") }
     val state = viewModel.asState()
     val focusManager = LocalFocusManager.current

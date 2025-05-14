@@ -20,7 +20,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToSearchResultScreen
 import com.mrl.pixiv.common.util.navigateToSearchScreen
@@ -33,7 +32,7 @@ import org.koin.androidx.compose.koinViewModel
 fun SearchPreviewScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchPreviewViewModel = koinViewModel(),
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
 ) {
     val state = viewModel.asState()
     val textState by remember { mutableStateOf(TextFieldValue()) }

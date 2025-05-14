@@ -77,7 +77,7 @@ import kotlin.uuid.Uuid
 fun PictureDeeplinkScreen(
     modifier: Modifier = Modifier,
     illustId: Long,
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
     pictureViewModel: PictureViewModel = koinViewModel { parametersOf(null, illustId) },
 ) {
     val state = pictureViewModel.asState()
@@ -115,7 +115,7 @@ internal fun PictureScreen(
     illust: Illust,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
     pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust, null) },
 ) {
     val sideEffect by pictureViewModel.sideEffect
@@ -229,8 +229,8 @@ internal fun PictureScreen(
     }
 
     val prefix = LocalSharedKeyPrefix.current
-    val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
-    val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val animatedContentScope = LocalAnimatedContentScope.current
     with(sharedTransitionScope) {
         Scaffold(
             modifier = modifier.sharedBounds(

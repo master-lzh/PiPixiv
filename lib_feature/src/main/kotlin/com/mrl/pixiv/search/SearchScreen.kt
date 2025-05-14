@@ -31,7 +31,6 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.repository.SearchRepository
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.DebounceUtil
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToSearchResultScreen
@@ -43,7 +42,7 @@ import org.koin.androidx.compose.koinViewModel
 fun SearchScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = koinViewModel(),
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
 ) {
     val dispatch = viewModel::dispatch
     val state = viewModel.asState()

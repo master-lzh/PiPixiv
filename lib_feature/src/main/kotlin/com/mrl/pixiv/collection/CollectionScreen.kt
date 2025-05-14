@@ -21,7 +21,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.collection.components.FilterDialog
 import com.mrl.pixiv.common.datasource.local.mmkv.isSelf
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.illustGrid
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
@@ -34,7 +33,7 @@ fun SelfCollectionScreen(
     uid: Long,
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(uid) },
-    navHostController: NavHostController = LocalNavigator.currentOrThrow
+    navHostController: NavHostController = LocalNavigator.current
 ) {
     val state = viewModel.asState()
     val userBookmarksIllusts = viewModel.userBookmarksIllusts.collectAsLazyPagingItems()

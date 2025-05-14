@@ -2,29 +2,26 @@ package com.mrl.pixiv.common.ui
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavHostController
 
-val <reified T> ProvidableCompositionLocal<T?>.currentOrThrow: T
-    @Composable
-    inline get() = this.current ?: error("No ${T::class.java.name} provided")
-
-val LocalNavigator = staticCompositionLocalOf<NavHostController?> {
-    null
+val LocalNavigator = staticCompositionLocalOf<NavHostController> {
+    noLocalProvidedFor("LocalNavigator")
 }
 
-
-val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope?> {
-    null
+val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
+    noLocalProvidedFor("LocalSharedTransitionScope")
 }
 
-val LocalAnimatedContentScope = compositionLocalOf<AnimatedContentScope?> {
-    null
+val LocalAnimatedContentScope = compositionLocalOf<AnimatedContentScope> {
+    noLocalProvidedFor("LocalAnimatedContentScope")
 }
 
 val LocalSharedKeyPrefix = compositionLocalOf {
     ""
+}
+
+private fun noLocalProvidedFor(name: String): Nothing {
+    error("CompositionLocal $name not present")
 }

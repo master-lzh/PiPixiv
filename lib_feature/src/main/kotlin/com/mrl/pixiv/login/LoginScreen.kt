@@ -21,7 +21,6 @@ import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.loginToMainScreen
 import com.mrl.pixiv.common.viewmodel.asState
 import org.koin.androidx.compose.koinViewModel
@@ -32,7 +31,7 @@ fun LoginScreen(
     startUrl: String,
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = koinViewModel(),
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
 ) {
     val state = loginViewModel.asState()
     LaunchedEffect(state.isLogin) {

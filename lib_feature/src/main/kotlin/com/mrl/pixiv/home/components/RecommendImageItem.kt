@@ -32,7 +32,6 @@ import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.kts.round
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.BottomBookmarkSheet
 import com.mrl.pixiv.common.ui.lightBlue
 import com.mrl.pixiv.common.util.throttleClick
@@ -48,8 +47,8 @@ fun RecommendImageItem(
     onBookmarkClick: (String, List<String>?) -> Unit,
 ) {
     val scale = illust.width * 1.0f / illust.height
-    val sharedTransitionScope = LocalSharedTransitionScope.currentOrThrow
-    val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val animatedContentScope = LocalAnimatedContentScope.current
     val prefix = rememberSaveable { Uuid.random().toHexString() }
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()

@@ -27,7 +27,6 @@ import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.SettingItem
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToNetworkSettingScreen
@@ -38,7 +37,7 @@ import com.mrl.pixiv.setting.components.DropDownSelector
 fun SettingScreen(
     modifier: Modifier = Modifier,
     mainNavHostController: NavHostController,
-    settingNavHostController: NavHostController = LocalNavigator.currentOrThrow
+    settingNavHostController: NavHostController = LocalNavigator.current
 ) {
     val context = LocalContext.current
     val languages = remember { getLangs(context) }

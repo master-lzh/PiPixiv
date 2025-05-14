@@ -40,7 +40,10 @@ import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.data.illust.BookmarkDetailTag
 import com.mrl.pixiv.common.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.common.repository.SettingRepository
-import com.mrl.pixiv.common.ui.*
+import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
+import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
+import com.mrl.pixiv.common.ui.lightBlue
+import com.mrl.pixiv.common.ui.transparentIndicatorColors
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.throttleClick
 import kotlinx.coroutines.delay
@@ -67,8 +70,8 @@ fun SquareIllustItem(
         showPopupTip =
             shouldShowTip && !SettingRepository.userPreferenceFlow.value.hasShowBookmarkTip
     }
-    val animatedContentScope = LocalAnimatedContentScope.currentOrThrow
-    with(LocalSharedTransitionScope.currentOrThrow) {
+    val animatedContentScope = LocalAnimatedContentScope.current
+    with(LocalSharedTransitionScope.current) {
         Box(
             modifier = modifier
                 .aspectRatio(1f)
@@ -87,7 +90,7 @@ fun SquareIllustItem(
                     .matchParentSize()
                     .sharedElement(
                         rememberSharedContentState(key = "${prefix}-$imageKey"),
-                        animatedVisibilityScope = LocalAnimatedContentScope.currentOrThrow,
+                        animatedVisibilityScope = LocalAnimatedContentScope.current,
                         placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
                     )
                     .clip(MaterialTheme.shapes.medium),

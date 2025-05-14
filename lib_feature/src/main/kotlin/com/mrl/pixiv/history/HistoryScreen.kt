@@ -22,7 +22,6 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.filter
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.illustGrid
 import com.mrl.pixiv.common.ui.transparentIndicatorColors
 import com.mrl.pixiv.common.util.RString
@@ -36,7 +35,7 @@ import org.koin.androidx.compose.koinViewModel
 fun HistoryScreen(
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = koinViewModel(),
-    navHostController: NavHostController = LocalNavigator.currentOrThrow,
+    navHostController: NavHostController = LocalNavigator.current,
 ) {
     val state = viewModel.asState()
     var searchValue by remember { mutableStateOf(TextFieldValue(state.currentSearch)) }
