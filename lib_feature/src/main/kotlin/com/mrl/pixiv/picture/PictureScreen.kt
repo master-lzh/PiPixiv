@@ -42,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,6 +59,7 @@ import com.mrl.pixiv.common.compose.ui.image.UserAvatar
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.Type
+import com.mrl.pixiv.common.kts.round
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.util.AppUtil.getString
@@ -399,27 +401,38 @@ internal fun PictureScreen(
                 // tag
                 item(key = KEY_ILLUST_TAGS) {
                     FlowRow(
-                        Modifier.padding(start = 20.dp, top = 10.dp)
+                        modifier = Modifier.padding(start = 20.dp, top = 10.dp, end = 20.dp),
+                        horizontalArrangement = 5f.spaceBy,
+                        verticalArrangement = 5f.spaceBy,
                     ) {
                         illust.tags?.forEach {
-                            Text(
-                                text = "#" + it.name,
+                            Row(
                                 modifier = Modifier
-                                    .padding(vertical = 2.5.dp)
-                                    .padding(end = 5.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.primaryContainer,
+                                        10f.round
+                                    )
                                     .throttleClick {
                                         navToSearchResultScreen(it.name)
                                         dispatch(PictureAction.AddSearchHistory(it.name))
-                                    },
-                                style = TextStyle(fontSize = 12.sp, color = deepBlue),
-                            )
-                            Text(
-                                text = it.translatedName,
-                                modifier = Modifier
-                                    .padding(vertical = 2.5.dp)
-                                    .padding(end = 10.dp),
-                                style = TextStyle(fontSize = 12.sp)
-                            )
+                                    }
+                                    .padding(horizontal = 10.dp, vertical = 2.5.dp),
+                                horizontalArrangement = 5f.spaceBy,
+                            ) {
+                                Text(
+                                    text = "#" + it.name,
+                                    modifier = Modifier,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = TextStyle(fontSize = 13.sp, color = deepBlue),
+                                )
+                                Text(
+                                    text = it.translatedName,
+                                    modifier = Modifier,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = TextStyle(fontSize = 13.sp)
+                                )
+                            }
                         }
                     }
                 }
