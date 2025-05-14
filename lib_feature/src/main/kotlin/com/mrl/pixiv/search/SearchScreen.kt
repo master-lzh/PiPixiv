@@ -70,74 +70,25 @@ fun SearchScreen(
             softwareKeyboardController?.hide()
         },
         topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    Row(
-                        modifier = Modifier
-                            .height(56.dp)
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = {
-                                navHostController.popBackStack()
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                                contentDescription = "Back"
-                            )
+            SearchScreenAppBar(
+                textState = textState,
+                focusRequester = focusRequester,
+                onValueChange = {
+                    textState = it
+                    dispatch(SearchAction.UpdateSearchWords(it.text))
+                    if (it.text.isNotBlank() && it.text != state.searchWords) {
+                        DebounceUtil.debounce {
+                            dispatch(SearchAction.SearchAutoComplete(it.text))
                         }
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(vertical = 4.dp, horizontal = 8.dp),
-                            shape = MaterialTheme.shapes.extraLarge
-                        ) {
-                            TextField(
-                                value = textState,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .focusRequester(focusRequester)
-                                    .throttleClick {
-                                        focusRequester.requestFocus()
-                                    },
-                                onValueChange = {
-                                    textState = it
-                                    dispatch(SearchAction.UpdateSearchWords(it.text))
-                                    if (it.text.isNotBlank() && it.text != state.searchWords) {
-                                        DebounceUtil.debounce {
-                                            dispatch(SearchAction.SearchAutoComplete(it.text))
-                                        }
-                                    } else {
-                                        dispatch(SearchAction.ClearAutoCompleteSearchWords)
-                                    }
-                                },
-                                placeholder = { Text(stringResource(RString.enter_keywords)) },
-                                minHeight = 40.dp,
-                                contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
-                                    top = 2.dp,
-                                    bottom = 2.dp,
-                                ),
-                                colors = TextFieldDefaults.colors(
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                ),
-                                singleLine = true,
-                                shape = MaterialTheme.shapes.extraLarge,
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                                keyboardActions = KeyboardActions(
-                                    onSearch = {
-                                        dispatch(SearchAction.AddSearchHistory(textState.text))
-                                        focusRequester.freeFocus()
-                                        navHostController.navigateToSearchResultScreen(textState.text)
-                                    }
-                                )
-                            )
-                        }
+                    } else {
+                        dispatch(SearchAction.ClearAutoCompleteSearchWords)
                     }
+                },
+                onBack = { navHostController.popBackStack() },
+                onSearch = {
+                    dispatch(SearchAction.AddSearchHistory(textState.text))
+                    focusRequester.freeFocus()
+                    navHostController.navigateToSearchResultScreen(textState.text)
                 }
             )
         }
@@ -227,4 +178,70 @@ fun SearchScreen(
             }
         }
     }
+}
+
+@Composable
+private fun SearchScreenAppBar(
+    textState: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    focusRequester: FocusRequester,
+    onBack: () -> Unit,
+    onSearch: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        title = {},
+        modifier = modifier,
+        actions = {
+            Row(
+                modifier = Modifier
+                    .height(56.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = onBack
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                    shape = MaterialTheme.shapes.extraLarge
+                ) {
+                    TextField(
+                        value = textState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester)
+                            .throttleClick {
+                                focusRequester.requestFocus()
+                            },
+                        onValueChange = onValueChange,
+                        placeholder = { Text(stringResource(RString.enter_keywords)) },
+                        minHeight = 40.dp,
+                        contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
+                            top = 2.dp,
+                            bottom = 2.dp,
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                        ),
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.extraLarge,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(
+                            onSearch = { onSearch() }
+                        )
+                    )
+                }
+            }
+        }
+    )
 }
