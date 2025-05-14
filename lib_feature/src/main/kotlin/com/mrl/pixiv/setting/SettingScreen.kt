@@ -1,6 +1,5 @@
 package com.mrl.pixiv.setting
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
@@ -23,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
@@ -31,37 +29,16 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.SettingItem
-import com.mrl.pixiv.common.util.LocaleHelper
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToNetworkSettingScreen
 import com.mrl.pixiv.common.util.throttleClick
-import com.mrl.pixiv.feature.R
 import com.mrl.pixiv.setting.components.DropDownSelector
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import org.xmlpull.v1.XmlPullParser
-
 
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
     mainNavHostController: NavHostController,
     settingNavHostController: NavHostController = LocalNavigator.currentOrThrow
-) {
-    SettingScreen_(
-        modifier = modifier,
-        popBack = { mainNavHostController.popBackStack() },
-        navToNetworkScreen = settingNavHostController::navigateToNetworkSettingScreen
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-internal fun SettingScreen_(
-    modifier: Modifier = Modifier,
-    popBack: () -> Unit = {},
-    navToNetworkScreen: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val languages = remember { getLangs(context) }
@@ -77,7 +54,7 @@ internal fun SettingScreen_(
                     Text(text = stringResource(RString.setting))
                 },
                 navigationIcon = {
-                    IconButton(onClick = popBack) {
+                    IconButton(onClick = mainNavHostController::popBackStack) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
                     }
                 },
@@ -151,7 +128,7 @@ internal fun SettingScreen_(
                     icon = {
                         Icon(imageVector = Icons.Rounded.NetworkWifi, contentDescription = null)
                     },
-                    onClick = navToNetworkScreen
+                    onClick = settingNavHostController::navigateToNetworkSettingScreen
                 ) {
                     Text(
                         text = stringResource(RString.network_setting),
@@ -202,39 +179,3 @@ internal fun SettingScreen_(
     }
 }
 
-private fun getLangs(context: Context): ImmutableList<Language> {
-    val langs = mutableListOf<Language>()
-    val parser = context.resources.getXml(R.xml.locales_config)
-    var eventType = parser.eventType
-    while (eventType != XmlPullParser.END_DOCUMENT) {
-        if (eventType == XmlPullParser.START_TAG && parser.name == "locale") {
-            for (i in 0..<parser.attributeCount) {
-                if (parser.getAttributeName(i) == "name") {
-                    val langTag = parser.getAttributeValue(i)
-                    val displayName = LocaleHelper.getLocalizedDisplayName(langTag)
-                    if (displayName.isNotEmpty()) {
-                        langs.add(
-                            Language(
-                                langTag,
-                                displayName,
-                                LocaleHelper.getDisplayName(langTag)
-                            )
-                        )
-                    }
-                }
-            }
-        }
-        eventType = parser.next()
-    }
-
-    langs.sortBy { it.displayName }
-    langs.add(0, Language("Default", context.getString(RString.label_default), null))
-
-    return langs.toImmutableList()
-}
-
-private data class Language(
-    val langTag: String,
-    val displayName: String,
-    val localizedDisplayName: String?,
-)
