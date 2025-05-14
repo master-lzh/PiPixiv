@@ -96,7 +96,7 @@ fun PictureDeeplinkScreen(
             navToPictureScreen = navHostController::navigateToPictureScreen,
             popBackStack = navHostController::popBackStack,
             dispatch = pictureViewModel::dispatch,
-            navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
+            navToSearchResultScreen = navHostController::navigateToSearchResultScreen,
             popBackToHomeScreen = navHostController::popBackToMainScreen,
             navToUserDetailScreen = navHostController::navigateToProfileDetailScreen,
         )
@@ -131,7 +131,7 @@ internal fun PictureScreen(
         navToPictureScreen = navHostController::navigateToPictureScreen,
         popBackStack = onBack,
         dispatch = pictureViewModel::dispatch,
-        navToSearchResultScreen = navHostController::navigateToOutsideSearchResultScreen,
+        navToSearchResultScreen = navHostController::navigateToSearchResultScreen,
         popBackToHomeScreen = navHostController::popBackToMainScreen,
         navToUserDetailScreen = navHostController::navigateToProfileDetailScreen,
     )

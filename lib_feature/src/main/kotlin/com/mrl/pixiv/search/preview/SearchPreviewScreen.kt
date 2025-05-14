@@ -17,13 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.RString
-import com.mrl.pixiv.common.util.navigateToOutsideSearchResultScreen
+import com.mrl.pixiv.common.util.navigateToSearchResultScreen
 import com.mrl.pixiv.common.util.navigateToSearchScreen
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
@@ -36,25 +35,7 @@ fun SearchPreviewScreen(
     viewModel: SearchPreviewViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
-    SearchPreviewScreen_(
-        modifier = modifier,
-        state = viewModel.asState(),
-        dispatch = viewModel::dispatch,
-        navToSearchScreen = navHostController::navigateToSearchScreen,
-        navToSearchResultsScreen = navHostController::navigateToOutsideSearchResultScreen
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-internal fun SearchPreviewScreen_(
-    modifier: Modifier = Modifier,
-    state: SearchPreviewState = SearchPreviewState(),
-    dispatch: (SearchPreviewAction) -> Unit = {},
-    navToSearchScreen: () -> Unit = {},
-    navToSearchResultsScreen: (String) -> Unit = {},
-) {
+    val state = viewModel.asState()
     val textState by remember { mutableStateOf(TextFieldValue()) }
     Scaffold(
         modifier = modifier,
@@ -65,11 +46,12 @@ internal fun SearchPreviewScreen_(
                     TextField(
                         value = textState,
                         onValueChange = {},
-                        modifier = Modifier.height(56.dp)
+                        modifier = Modifier
+                            .height(56.dp)
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
                             .throttleClick {
-                                navToSearchScreen()
+                                navHostController.navigateToSearchScreen()
                             },
                         placeholder = { Text(stringResource(RString.enter_keywords)) },
                         colors = TextFieldDefaults.colors(
@@ -91,7 +73,7 @@ internal fun SearchPreviewScreen_(
     ) {
         PullToRefreshBox(
             isRefreshing = state.refreshing,
-            onRefresh = { dispatch(SearchPreviewAction.LoadTrendingTags) },
+            onRefresh = { viewModel.dispatch(SearchPreviewAction.LoadTrendingTags) },
             modifier = Modifier.padding(it),
         ) {
             LazyVerticalGrid(
@@ -114,8 +96,8 @@ internal fun SearchPreviewScreen_(
                     TrendingItem(
                         trendingTag = tag,
                         onSearch = {
-                            navToSearchResultsScreen(it)
-                            dispatch(SearchPreviewAction.AddSearchHistory(it))
+                            navHostController.navigateToSearchResultScreen(it)
+                            viewModel.dispatch(SearchPreviewAction.AddSearchHistory(it))
                         }
                     )
                 }

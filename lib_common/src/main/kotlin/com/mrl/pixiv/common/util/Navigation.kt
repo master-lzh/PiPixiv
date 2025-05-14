@@ -32,12 +32,6 @@ fun NavHostController.navigateToSearchResultScreen(searchWord: String) {
     navigate(route = Destination.SearchResultsScreen(searchWord))
 }
 
-fun NavHostController.navigateToOutsideSearchResultScreen(searchWord: String) {
-    navigate(route = Destination.SearchResultsScreen(searchWord)) {
-
-    }
-}
-
 fun NavHostController.loginToMainScreen() {
     navigate(Destination.HomeScreen) {
         popUpTo(Destination.LoginOptionScreen) { inclusive = true }
