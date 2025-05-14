@@ -31,7 +31,6 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.repository.SearchRepository
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.DebounceUtil
 import com.mrl.pixiv.common.util.RString
@@ -211,7 +210,7 @@ private fun SearchScreenAppBar(
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                        .padding(horizontal = 8.dp),
                     shape = MaterialTheme.shapes.extraLarge
                 ) {
                     TextField(
@@ -224,11 +223,6 @@ private fun SearchScreenAppBar(
                             },
                         onValueChange = onValueChange,
                         placeholder = { Text(stringResource(RString.enter_keywords)) },
-                        minHeight = 40.dp,
-                        contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
-                            top = 2.dp,
-                            bottom = 2.dp,
-                        ),
                         colors = TextFieldDefaults.colors(
                             unfocusedIndicatorColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,

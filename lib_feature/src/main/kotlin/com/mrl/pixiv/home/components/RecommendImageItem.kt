@@ -8,17 +8,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.FileCopy
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,10 +29,9 @@ import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.IllustAiType
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.Type
+import com.mrl.pixiv.common.kts.round
 import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
 import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
-import com.mrl.pixiv.common.ui.components.m3.IconButton
-import com.mrl.pixiv.common.ui.components.m3.Surface
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.BottomBookmarkSheet
 import com.mrl.pixiv.common.ui.lightBlue
@@ -60,7 +58,8 @@ fun RecommendImageItem(
     }
     val context = LocalContext.current
     with(sharedTransitionScope) {
-        Surface(
+        val shape = 10f.round
+        Box(
             modifier = Modifier
                 .sharedBounds(
                     rememberSharedContentState(key = "${prefix}-card-${illust.id}"),
@@ -71,10 +70,10 @@ fun RecommendImageItem(
                 .padding(bottom = 5.dp)
                 .throttleClick {
                     navToPictureScreen(prefix)
-                },
-            shape = RoundedCornerShape(10.dp),
-            shadowElevation = 4.dp,
-            propagateMinConstraints = false,
+                }
+                .shadow(4.dp, shape, clip = false)
+                .background(color = MaterialTheme.colorScheme.surface, shape = shape)
+                .clip(shape),
         ) {
             Column {
                 val imageKey = "image-${illust.id}-0"
@@ -136,16 +135,21 @@ fun RecommendImageItem(
                         )
                     }
 
-                    IconButton(
-                        onClick = {
-                            onBookmarkClick(Restrict.PUBLIC, null)
-                        },
-                        modifier = Modifier.sharedElement(
-                            rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
-                            animatedContentScope,
-                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                        ),
-                        onLongClick = onBookmarkLongClick
+                    Box(
+                        modifier = Modifier
+                            .sharedElement(
+                                rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
+                                animatedContentScope,
+                                placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                            )
+                            .minimumInteractiveComponentSize()
+                            .throttleClick(
+                                role = Role.Button,
+                                indication = ripple(bounded = false, radius = 20.dp),
+                                onLongClick = onBookmarkLongClick
+                            ) {
+                                onBookmarkClick(Restrict.PUBLIC, null)
+                            },
                     ) {
                         Icon(
                             imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,

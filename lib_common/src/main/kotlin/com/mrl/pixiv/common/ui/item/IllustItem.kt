@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -39,13 +40,7 @@ import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.data.illust.BookmarkDetailTag
 import com.mrl.pixiv.common.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.common.repository.SettingRepository
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
-import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
-import com.mrl.pixiv.common.ui.components.m3.IconButton
-import com.mrl.pixiv.common.ui.components.m3.TextField
-import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
-import com.mrl.pixiv.common.ui.currentOrThrow
-import com.mrl.pixiv.common.ui.lightBlue
+import com.mrl.pixiv.common.ui.*
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.throttleClick
 import kotlinx.coroutines.delay
@@ -155,14 +150,21 @@ fun SquareIllustItem(
             Box(
                 modifier = Modifier.align(Alignment.BottomEnd)
             ) {
-                IconButton(
-                    onClick = { onBookmarkClick(Restrict.PUBLIC, null) },
-                    modifier = Modifier.sharedElement(
-                        rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
-                        animatedContentScope,
-                        placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                    ),
-                    onLongClick = { showBottomSheet = true },
+                Box(
+                    modifier = Modifier
+                        .sharedElement(
+                            rememberSharedContentState(key = "${prefix}-favorite-${illust.id}"),
+                            animatedContentScope,
+                            placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
+                        )
+                        .minimumInteractiveComponentSize()
+                        .throttleClick(
+                            role = Role.Button,
+                            indication = ripple(bounded = false, radius = 20.dp),
+                            onLongClick = { showBottomSheet = true }
+                        ) {
+                            onBookmarkClick(Restrict.PUBLIC, null)
+                        },
                 ) {
                     Icon(
                         imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
@@ -243,15 +245,20 @@ fun BottomBookmarkSheet(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
-                        onClick = {
-                            onBookmarkClick(
-                                if (publicSwitch) Restrict.PUBLIC else Restrict.PRIVATE,
-                                selectedTagsIndex.map { allTags[it].first }
-                            )
-                            hideBottomSheet()
-                        },
-                        modifier = Modifier.weight(1f)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .minimumInteractiveComponentSize()
+                            .throttleClick(
+                                role = Role.Button,
+                                indication = ripple(bounded = false, radius = 20.dp),
+                            ) {
+                                onBookmarkClick(
+                                    if (publicSwitch) Restrict.PUBLIC else Restrict.PRIVATE,
+                                    selectedTagsIndex.map { allTags[it].first }
+                                )
+                                hideBottomSheet()
+                            }
                     ) {
                         Icon(
                             imageVector = if (isBookmarked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
@@ -330,12 +337,16 @@ fun BottomBookmarkSheet(
                     shape = MaterialTheme.shapes.small,
                     colors = transparentIndicatorColors
                 )
-                IconButton(
-                    onClick = {
-                        handleInputTag(inputTag, allTags)
-                        inputTag = inputTag.copy(text = "")
-                    },
+                Box(
                     modifier = Modifier
+                        .minimumInteractiveComponentSize()
+                        .throttleClick(
+                            role = Role.Button,
+                            indication = ripple(bounded = false, radius = 20.dp),
+                        ) {
+                            handleInputTag(inputTag, allTags)
+                            inputTag = inputTag.copy(text = "")
+                        }
                 ) {
                     Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
                 }

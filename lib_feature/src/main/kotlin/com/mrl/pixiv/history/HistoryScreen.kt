@@ -22,10 +22,9 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.filter
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.components.m3.TextField
-import com.mrl.pixiv.common.ui.components.m3.transparentIndicatorColors
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.illust.illustGrid
+import com.mrl.pixiv.common.ui.transparentIndicatorColors
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState

@@ -1,32 +1,18 @@
 package com.mrl.pixiv.search.preview
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -35,11 +21,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.components.m3.TextField
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToOutsideSearchResultScreen
 import com.mrl.pixiv.common.util.navigateToSearchScreen
+import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.search.preview.components.TrendingItem
 import org.koin.androidx.compose.koinViewModel
@@ -76,45 +62,29 @@ internal fun SearchPreviewScreen_(
             TopAppBar(
                 title = {},
                 actions = {
-                    Row(
-                        modifier = Modifier
-                            .height(56.dp)
+                    TextField(
+                        value = textState,
+                        onValueChange = {},
+                        modifier = Modifier.height(56.dp)
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(vertical = 4.dp, horizontal = 8.dp),
-                            onClick = navToSearchScreen
-                        ) {
-                            TextField(
-                                value = textState,
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                onValueChange = {},
-                                placeholder = { Text(stringResource(RString.enter_keywords)) },
-                                minHeight = 40.dp,
-                                contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
-                                    top = 2.dp,
-                                    bottom = 2.dp,
-                                ),
-                                colors = TextFieldDefaults.colors(
-                                    disabledIndicatorColor = Color.Transparent,
-                                ),
-                                singleLine = true,
-                                shape = MaterialTheme.shapes.extraLarge,
-                                enabled = false,
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Search,
-                                        contentDescription = null
-                                    )
-                                }
+                            .padding(horizontal = 16.dp)
+                            .throttleClick {
+                                navToSearchScreen()
+                            },
+                        placeholder = { Text(stringResource(RString.enter_keywords)) },
+                        colors = TextFieldDefaults.colors(
+                            disabledIndicatorColor = Color.Transparent,
+                        ),
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.extraLarge,
+                        enabled = false,
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Rounded.Search,
+                                contentDescription = null
                             )
                         }
-                    }
+                    )
                 }
             )
         }

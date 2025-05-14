@@ -1,7 +1,10 @@
 package com.mrl.pixiv.setting.network
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
@@ -62,8 +65,10 @@ internal fun NetworkSettingScreen_(
     ) {
         Column(
             modifier = Modifier
+                .verticalScroll(rememberScrollState())
                 .padding(it)
                 .padding(horizontal = 16.dp)
+                .imePadding()
         ) {
             SettingItem {
                 Column {
