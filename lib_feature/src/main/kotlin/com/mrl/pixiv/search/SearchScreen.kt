@@ -1,6 +1,6 @@
 package com.mrl.pixiv.search
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -24,12 +24,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.mrl.pixiv.common.lifecycle.OnLifecycle
+import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.repository.SearchRepository
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.components.m3.TextField
@@ -41,42 +40,24 @@ import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
 import org.koin.androidx.compose.koinViewModel
 
-
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    searchViewModel: SearchViewModel = koinViewModel(),
+    viewModel: SearchViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
-
-    SearchScreen_(
-        modifier = modifier,
-        searchViewModel = searchViewModel,
-        navigateToResult = navHostController::navigateToSearchResultScreen,
-        popBack = { navHostController.popBackStack() },
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@Preview
-@Composable
-internal fun SearchScreen_(
-    modifier: Modifier = Modifier,
-    searchViewModel: SearchViewModel = koinViewModel(),
-    navigateToResult: (String) -> Unit = {},
-    popBack: () -> Unit = {},
-) {
-    val dispatch = searchViewModel::dispatch
-    val state = searchViewModel.asState()
+    val dispatch = viewModel::dispatch
+    val state = viewModel.asState()
     val searchHistory by SearchRepository.searchHistoryFlow.collectAsStateWithLifecycle()
     var textState by remember { mutableStateOf(TextFieldValue(state.searchWords)) }
     val focusRequester = remember { FocusRequester() }
-    OnLifecycle(Lifecycle.Event.ON_RESUME) {
+    LifecycleResumeEffect(Unit) {
         try {
             focusRequester.requestFocus()
         } catch (_: Exception) {
         }
         textState = textState.copy(selection = TextRange(textState.text.length))
+        onPauseOrDispose { }
     }
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -99,9 +80,11 @@ internal fun SearchScreen_(
                             .padding(horizontal = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = {
-                            popBack()
-                        }) {
+                        IconButton(
+                            onClick = {
+                                navHostController.popBackStack()
+                            }
+                        ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                                 contentDescription = "Back"
@@ -149,7 +132,7 @@ internal fun SearchScreen_(
                                     onSearch = {
                                         dispatch(SearchAction.AddSearchHistory(textState.text))
                                         focusRequester.freeFocus()
-                                        navigateToResult(textState.text)
+                                        navHostController.navigateToSearchResultScreen(textState.text)
                                     }
                                 )
                             )
@@ -163,14 +146,17 @@ internal fun SearchScreen_(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(it)
                 .padding(top = 8.dp)
-                .padding(WindowInsets.ime.asPaddingValues()),
-            contentPadding = it,
+                .imePadding(),
+            contentPadding = PaddingValues(horizontal = 8.dp),
+            verticalArrangement = 16f.spaceBy
         ) {
             stickyHeader {
                 Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background),
                 ) {
                     Text(
                         text = if (state.searchWords.isEmpty())
@@ -178,25 +164,21 @@ internal fun SearchScreen_(
                         else
                             stringResource(RString.find_for),
                         style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                     )
-
                 }
-
             }
             if (state.searchWords.isEmpty()) {
                 items(searchHistory.searchHistoryList) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp)
-                            .padding(vertical = 4.dp)
-                            .throttleClick {
-                                dispatch(SearchAction.UpdateSearchWords(it.keyword))
+                            .throttleClick(indication = ripple()) {
                                 dispatch(SearchAction.AddSearchHistory(it.keyword))
                                 focusRequester.freeFocus()
-                                navigateToResult(it.keyword)
+                                navHostController.navigateToSearchResultScreen(it.keyword)
                             }
+                            .padding(8.dp)
                             .animateItem(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -205,13 +187,15 @@ internal fun SearchScreen_(
                             text = it.keyword,
                             style = MaterialTheme.typography.bodyLarge,
                         )
-                        IconButton(onClick = { dispatch(SearchAction.DeleteSearchHistory(it.keyword)) }) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Rounded.Close,
-                                contentDescription = "delete"
-                            )
-                        }
+                        Icon(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .throttleClick(indication = ripple()) {
+                                    dispatch(SearchAction.DeleteSearchHistory(it.keyword))
+                                },
+                            imageVector = Icons.Rounded.Close,
+                            contentDescription = "delete"
+                        )
                     }
                 }
             }
@@ -219,14 +203,12 @@ internal fun SearchScreen_(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp)
-                        .padding(vertical = 4.dp)
-                        .throttleClick {
-                            dispatch(SearchAction.UpdateSearchWords(word.name))
+                        .throttleClick(indication = ripple()) {
                             dispatch(SearchAction.AddSearchHistory(word.name))
                             focusRequester.freeFocus()
-                            navigateToResult(word.name)
-                        },
+                            navHostController.navigateToSearchResultScreen(word.name)
+                        }
+                        .padding(8.dp),
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
@@ -234,11 +216,13 @@ internal fun SearchScreen_(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 4.dp),
                     )
-                    Text(
-                        text = word.translatedName,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                    )
+                    if (word.translatedName.isNotBlank()) {
+                        Text(
+                            text = word.translatedName,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(bottom = 8.dp),
+                        )
+                    }
                 }
             }
         }

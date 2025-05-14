@@ -63,6 +63,9 @@ class SearchViewModel : BaseMviViewModel<SearchState, SearchAction>(
     }
 
     private fun addSearchHistory(action: SearchAction.AddSearchHistory) {
+        updateState {
+            copy(searchWords = action.searchWords)
+        }
         SearchRepository.addSearchHistory(action.searchWords)
     }
 
