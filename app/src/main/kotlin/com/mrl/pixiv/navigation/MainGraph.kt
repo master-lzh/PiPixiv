@@ -30,7 +30,6 @@ import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
 import com.mrl.pixiv.common.ui.components.HomeBottomBar
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
-import com.mrl.pixiv.home.HomeViewModel
 import com.mrl.pixiv.login.LoginOptionScreen
 import com.mrl.pixiv.login.LoginScreen
 import com.mrl.pixiv.login.oauth.OAuthLoginScreen
@@ -54,8 +53,6 @@ fun MainGraph(
     startDestination: KClass<*>,
     navHostController: NavHostController = rememberNavController()
 ) {
-    val homeViewModel: HomeViewModel = koinViewModel()
-
     HandleDeeplink(navHostController)
     SharedTransitionLayout {
         CompositionLocalProvider(
@@ -101,7 +98,6 @@ fun MainGraph(
                         CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
                             HomeScreen(
                                 modifier = Modifier.padding(bottom = bottomPadding),
-                                viewModel = homeViewModel,
                             )
                         }
                     }

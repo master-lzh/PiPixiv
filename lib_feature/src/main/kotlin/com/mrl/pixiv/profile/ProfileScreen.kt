@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,7 +25,6 @@ import com.mrl.pixiv.common.ui.components.UserAvatar
 import com.mrl.pixiv.common.ui.currentOrThrow
 import com.mrl.pixiv.common.ui.item.SettingItem
 import com.mrl.pixiv.common.util.*
-import com.mrl.pixiv.common.viewmodel.asState
 import org.koin.androidx.compose.koinViewModel
 
 private val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -48,70 +46,16 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.currentOrThrow,
 ) {
-    ProfileScreen_(
-        modifier = modifier,
-        state = viewModel.asState(),
-        dispatch = viewModel::dispatch,
-        navToProfileDetail = navHostController::navigateToProfileDetailScreen,
-        navToSetting = navHostController::navigateToSettingScreen,
-        navToHistory = navHostController::navigateToHistoryScreen,
-        navToCollection = navHostController::navigateToSelfCollectionScreen,
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-internal fun ProfileScreen_(
-    modifier: Modifier = Modifier,
-    state: ProfileState = ProfileState,
-    dispatch: (ProfileAction) -> Unit = {},
-    navToProfileDetail: (Long) -> Unit = {},
-    navToSetting: () -> Unit = {},
-    navToHistory: () -> Unit = {},
-    navToCollection: () -> Unit = {},
-) {
     val userInfo by requireUserInfoFlow.collectAsStateWithLifecycle()
     LifecycleResumeEffect(Unit) {
-        dispatch(ProfileAction.GetUserInfo)
+        viewModel.dispatch(ProfileAction.GetUserInfo)
         onPauseOrDispose {}
     }
     Scaffold(
         topBar = {
-            var expanded by remember { mutableStateOf(false) }
-            TopAppBar(
-                title = {},
-                actions = {
-                    IconButton(onClick = { expanded = true }) {
-                        Icon(imageVector = Icons.Rounded.Palette, contentDescription = null)
-                    }
-                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        options.forEach { (theme, resId) ->
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Text(
-                                            text = stringResource(resId),
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
-                                        if (getAppCompatDelegateThemeMode() == theme) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.Check,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    }
-                                },
-                                onClick = {
-                                    dispatch(ProfileAction.ChangeAppTheme(theme = theme))
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
+            ProfileAppBar(
+                onChangeAppTheme = { theme ->
+                    viewModel.dispatch(ProfileAction.ChangeAppTheme(theme = theme))
                 }
             )
         }
@@ -135,7 +79,7 @@ internal fun ProfileScreen_(
                             url = userInfo.user.profileImageUrls.medium,
                             modifier = Modifier.size(80.dp),
                             onClick = {
-                                navToProfileDetail(userInfo.user.id)
+                                navHostController.navigateToProfileDetailScreen(userInfo.user.id)
                             }
                         )
                         Column {
@@ -177,7 +121,7 @@ internal fun ProfileScreen_(
                             .throttleClick(
                                 indication = ripple()
                             ) {
-                                navToSetting()
+                                navHostController.navigateToSettingScreen()
                             }
                     ) {
                         Row(
@@ -203,7 +147,7 @@ internal fun ProfileScreen_(
                                 contentDescription = null
                             )
                         },
-                        onClick = navToHistory
+                        onClick = navHostController::navigateToHistoryScreen
                     ) {
                         Text(
                             text = stringResource(RString.history),
@@ -219,7 +163,7 @@ internal fun ProfileScreen_(
                                 contentDescription = null
                             )
                         },
-                        onClick = navToCollection
+                        onClick = navHostController::navigateToSelfCollectionScreen
                     ) {
                         Text(
                             text = stringResource(RString.collection),
@@ -230,4 +174,46 @@ internal fun ProfileScreen_(
             }
         }
     }
+}
+
+@Composable
+private fun ProfileAppBar(
+    onChangeAppTheme: (SettingTheme) -> Unit = {},
+) {
+    var expanded by remember { mutableStateOf(false) }
+    TopAppBar(
+        title = {},
+        actions = {
+            IconButton(onClick = { expanded = true }) {
+                Icon(imageVector = Icons.Rounded.Palette, contentDescription = null)
+            }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                options.forEach { (theme, resId) ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(resId),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                if (getAppCompatDelegateThemeMode() == theme) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Check,
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        },
+                        onClick = {
+                            onChangeAppTheme(theme)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    )
 }
