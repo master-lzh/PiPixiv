@@ -6,9 +6,7 @@ import com.mrl.pixiv.common.data.Filter
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.repository.PixivRepository
 import com.mrl.pixiv.common.util.queryParams
-import org.koin.core.annotation.Factory
 
-@Factory
 class IllustRecommendedPagingSource : PagingSource<String, Illust>() {
     override suspend fun load(params: LoadParams<String>): LoadResult<String, Illust> {
         return try {

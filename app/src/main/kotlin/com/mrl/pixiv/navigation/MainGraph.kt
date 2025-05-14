@@ -101,7 +101,7 @@ fun MainGraph(
                         CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
                             HomeScreen(
                                 modifier = Modifier.padding(bottom = bottomPadding),
-                                homeViewModel = homeViewModel,
+                                viewModel = homeViewModel,
                             )
                         }
                     }
