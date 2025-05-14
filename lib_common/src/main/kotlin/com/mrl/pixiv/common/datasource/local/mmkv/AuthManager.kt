@@ -9,6 +9,8 @@ import com.mrl.pixiv.common.mmkv.MMKVUser
 import com.mrl.pixiv.common.mmkv.mmkvLong
 import com.mrl.pixiv.common.mmkv.mmkvString
 import com.mrl.pixiv.common.repository.PixivRepository
+import com.mrl.pixiv.common.util.RString
+import com.mrl.pixiv.common.util.ToastUtil
 import com.mrl.pixiv.common.util.currentTimeMillis
 
 object AuthManager : MMKVUser {
@@ -32,6 +34,8 @@ object AuthManager : MMKVUser {
                     updateUserInfo(resp)
                 }
                 userAccessToken
+            }.onFailure {
+                ToastUtil.safeShortToast(RString.unknown_error)
             }.getOrNull().orEmpty()
         }
 

@@ -15,7 +15,6 @@
     <string name="edit_favorite">Edit favorite</string>
     <string name="save">Save</string>
     <string name="long_click_to_edit_favorite">Long click to edit favorite</string>
-    <string name="non_translate_uncategorized">Uncategorized</string>
     <string name="all">All</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="search_by_title_author">Search by title or author name</string>
@@ -71,4 +70,5 @@
     <string name="self_defined_source">Self-defined Image Source</string>
     <string name="default_open">Default Open Link</string>
     <string name="allow_open_link">Allow the application to open the corresponding link</string>
+    <string name="network_error">Network error, please check the network</string>
 </resources>
