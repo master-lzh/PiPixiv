@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -128,12 +127,16 @@ fun FilterDialog(
                             key = { it.name.toString() }
                         ) {
                             Row(
-                                modifier = Modifier.itemModifier(
-                                    ((restrict == Restrict.PUBLIC && it.isPublic) || (restrict == Restrict.PRIVATE && !it.isPublic)) && filterTag == it.name,
-                                ) {
-                                    onSelected(it.name)
-                                    onDismissRequest()
-                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .throttleClick(indication = ripple()) {
+                                        onSelected(it.name)
+                                        onDismissRequest()
+                                    }
+                                    .conditionally(((restrict == Restrict.PUBLIC && it.isPublic) || (restrict == Restrict.PRIVATE && !it.isPublic)) && filterTag == it.name) {
+                                        Modifier.background(lightBlue, MaterialTheme.shapes.small)
+                                    }
+                                    .padding(8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
                                 Text(text = it.displayName)
@@ -148,18 +151,3 @@ fun FilterDialog(
         }
     }
 }
-
-private fun Modifier.itemModifier(
-    condition: Boolean,
-    onClick: () -> Unit
-): Modifier =
-    composed {
-        fillMaxWidth()
-            .throttleClick(indication = ripple()) {
-                onClick()
-            }
-            .conditionally(condition) {
-                Modifier.background(lightBlue, MaterialTheme.shapes.small)
-            }
-            .padding(8.dp)
-    }

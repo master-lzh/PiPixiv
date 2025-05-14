@@ -98,8 +98,8 @@ fun SelfCollectionScreen(
                 dispatch = dispatch,
                 onSelected = { tag: String? ->
                     when (selectedTab) {
-                        0 -> dispatch(CollectionAction.UpdateFilterTag(Restrict.PUBLIC, tag))
-                        1 -> dispatch(CollectionAction.UpdateFilterTag(Restrict.PRIVATE, tag))
+                        0 -> viewModel.updateFilterTag(Restrict.PUBLIC, tag)
+                        1 -> viewModel.updateFilterTag(Restrict.PRIVATE, tag)
                     }
                     userBookmarksIllusts.refresh()
                 }

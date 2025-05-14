@@ -39,11 +39,6 @@ data class RestrictBookmarkTag(
 
 sealed class CollectionAction : ViewIntent {
     data class LoadUserBookmarksTagsIllust(@Restrict val restrict: String) : CollectionAction()
-
-    data class UpdateFilterTag(
-        @Restrict val restrict: String,
-        val filterTag: String?
-    ) : CollectionAction()
 }
 
 @KoinViewModel
@@ -65,14 +60,15 @@ class CollectionViewModel(
     override suspend fun handleIntent(intent: CollectionAction) {
         when (intent) {
             is CollectionAction.LoadUserBookmarksTagsIllust -> loadUserBookmarkTagsIllust(intent.restrict)
+        }
+    }
 
-            is CollectionAction.UpdateFilterTag ->
-                updateState {
-                    copy(
-                        restrict = intent.restrict,
-                        filterTag = intent.filterTag
-                    )
-                }
+    fun updateFilterTag(@Restrict restrict: String, filterTag: String?) {
+        updateState {
+            copy(
+                restrict = restrict,
+                filterTag = filterTag
+            )
         }
     }
 
