@@ -20,7 +20,7 @@ import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
-import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.util.loginToMainScreen
 import com.mrl.pixiv.common.viewmodel.asState
 import org.koin.androidx.compose.koinViewModel

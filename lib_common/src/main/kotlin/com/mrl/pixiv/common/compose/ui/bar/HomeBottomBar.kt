@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.ui.components
+package com.mrl.pixiv.common.compose.ui.bar
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically

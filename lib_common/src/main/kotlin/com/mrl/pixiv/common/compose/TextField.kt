@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.ui
+package com.mrl.pixiv.common.compose
 
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable

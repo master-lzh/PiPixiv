@@ -20,8 +20,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.collection.components.FilterDialog
 import com.mrl.pixiv.common.datasource.local.mmkv.isSelf
-import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.illust.illustGrid
+import com.mrl.pixiv.common.compose.LocalNavigator
+import com.mrl.pixiv.common.compose.ui.illust.illustGrid
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState

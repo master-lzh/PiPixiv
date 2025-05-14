@@ -18,11 +18,11 @@ import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.data.setting.SettingTheme
 import com.mrl.pixiv.common.data.setting.getAppCompatDelegateThemeMode
 import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
-import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
-import com.mrl.pixiv.common.ui.components.UserAvatar
-import com.mrl.pixiv.common.ui.item.SettingItem
+import com.mrl.pixiv.common.compose.LocalAnimatedContentScope
+import com.mrl.pixiv.common.compose.LocalNavigator
+import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
+import com.mrl.pixiv.common.compose.ui.image.UserAvatar
+import com.mrl.pixiv.common.compose.ui.SettingItem
 import com.mrl.pixiv.common.util.*
 import org.koin.androidx.compose.koinViewModel
 

@@ -15,9 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.mrl.pixiv.common.compose.LocalNavigator
+import com.mrl.pixiv.common.compose.ui.SettingItem
 import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
-import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.item.SettingItem
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.ToastUtil
 import com.mrl.pixiv.setting.SettingAction

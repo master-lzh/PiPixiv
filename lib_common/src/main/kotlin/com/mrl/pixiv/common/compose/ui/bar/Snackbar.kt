@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.ui.components
+package com.mrl.pixiv.common.compose.ui.bar
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Snackbar

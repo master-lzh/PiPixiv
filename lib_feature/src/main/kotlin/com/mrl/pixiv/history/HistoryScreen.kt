@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.filter
-import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.illust.illustGrid
-import com.mrl.pixiv.common.ui.transparentIndicatorColors
+import com.mrl.pixiv.common.compose.LocalNavigator
+import com.mrl.pixiv.common.compose.ui.illust.illustGrid
+import com.mrl.pixiv.common.compose.transparentIndicatorColors
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState

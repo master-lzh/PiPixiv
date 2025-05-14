@@ -30,10 +30,10 @@ import com.mrl.pixiv.common.data.IllustAiType
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.kts.round
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
-import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
-import com.mrl.pixiv.common.ui.item.BottomBookmarkSheet
-import com.mrl.pixiv.common.ui.lightBlue
+import com.mrl.pixiv.common.compose.LocalAnimatedContentScope
+import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
+import com.mrl.pixiv.common.compose.ui.illust.BottomBookmarkSheet
+import com.mrl.pixiv.common.compose.lightBlue
 import com.mrl.pixiv.common.util.throttleClick
 import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.Uuid

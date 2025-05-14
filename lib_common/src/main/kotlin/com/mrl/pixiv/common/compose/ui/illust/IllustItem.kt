@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.ui.item
+package com.mrl.pixiv.common.compose.ui.illust
 
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
@@ -33,6 +33,10 @@ import androidx.compose.ui.window.Popup
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowRgb565
+import com.mrl.pixiv.common.compose.LocalAnimatedContentScope
+import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
+import com.mrl.pixiv.common.compose.lightBlue
+import com.mrl.pixiv.common.compose.transparentIndicatorColors
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.IllustAiType
 import com.mrl.pixiv.common.data.Restrict
@@ -40,10 +44,6 @@ import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.data.illust.BookmarkDetailTag
 import com.mrl.pixiv.common.domain.illust.GetIllustBookmarkDetailUseCase
 import com.mrl.pixiv.common.repository.SettingRepository
-import com.mrl.pixiv.common.ui.LocalAnimatedContentScope
-import com.mrl.pixiv.common.ui.LocalSharedTransitionScope
-import com.mrl.pixiv.common.ui.lightBlue
-import com.mrl.pixiv.common.ui.transparentIndicatorColors
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.throttleClick
 import kotlinx.coroutines.delay

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.repository.IllustCacheRepo
-import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.compose.LocalNavigator
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable

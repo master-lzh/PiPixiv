@@ -31,8 +31,8 @@ import coil3.request.ImageRequest
 import coil3.request.allowRgb565
 import com.mrl.pixiv.common.data.user.UserDetailResp
 import com.mrl.pixiv.common.kts.spaceBy
-import com.mrl.pixiv.common.ui.LocalNavigator
-import com.mrl.pixiv.common.ui.components.UserAvatar
+import com.mrl.pixiv.common.compose.LocalNavigator
+import com.mrl.pixiv.common.compose.ui.image.UserAvatar
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.copyToClipboard
 import com.mrl.pixiv.common.util.navigateToPictureScreen

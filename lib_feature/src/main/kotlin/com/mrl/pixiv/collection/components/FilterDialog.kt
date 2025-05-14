@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.mrl.pixiv.collection.RestrictBookmarkTag
 import com.mrl.pixiv.common.data.Restrict
-import com.mrl.pixiv.common.ui.lightBlue
+import com.mrl.pixiv.common.compose.lightBlue
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.conditionally
 import com.mrl.pixiv.common.util.throttleClick

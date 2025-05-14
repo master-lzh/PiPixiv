@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.router.Destination
-import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.util.RDrawable
 import com.mrl.pixiv.common.util.RString
 

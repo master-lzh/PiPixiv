@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.ui.components
+package com.mrl.pixiv.common.compose.ui.image
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator

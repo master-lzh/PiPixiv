@@ -1,4 +1,4 @@
-package com.mrl.pixiv.common.ui
+package com.mrl.pixiv.common.compose
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope

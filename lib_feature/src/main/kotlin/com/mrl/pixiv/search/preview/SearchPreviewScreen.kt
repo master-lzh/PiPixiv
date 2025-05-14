@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToSearchResultScreen
 import com.mrl.pixiv.common.util.navigateToSearchScreen

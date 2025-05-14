@@ -30,7 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.repository.SearchRepository
-import com.mrl.pixiv.common.ui.LocalNavigator
+import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.util.DebounceUtil
 import com.mrl.pixiv.common.util.RString
 import com.mrl.pixiv.common.util.navigateToSearchResultScreen
