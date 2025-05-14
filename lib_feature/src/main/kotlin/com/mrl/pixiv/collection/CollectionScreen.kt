@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterList
@@ -20,7 +19,6 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.collection.components.FilterDialog
-import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.datasource.local.mmkv.isSelf
 import com.mrl.pixiv.common.ui.LocalNavigator
 import com.mrl.pixiv.common.ui.currentOrThrow
@@ -45,30 +43,15 @@ fun SelfCollectionScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                modifier = Modifier.shadow(4.dp),
-                title = {
-                    Text(text = stringResource(RString.collection))
-                },
-                navigationIcon = {
-                    IconButton(onClick = navHostController::popBackStack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
-                    }
-                },
-                actions = {
-                    if (uid.isSelf) {
-                        IconButton(onClick = { showFilterDialog = true }) {
-                            Icon(Icons.Rounded.FilterList, contentDescription = null)
-                        }
-                    }
-                }
+            CollectionTopAppBar(
+                uid = uid,
+                showFilterDialog = { showFilterDialog = true },
+                onBack = { navHostController.popBackStack() }
             )
         },
         contentWindowInsets = WindowInsets.statusBars
     ) {
         val lazyGridState = rememberLazyGridState()
-        var selectedTab by remember(state.restrict) { mutableIntStateOf(if (state.restrict == Restrict.PUBLIC) 0 else 1) }
-        val pagerState = rememberPagerState(initialPage = selectedTab, pageCount = { 2 })
         val pullRefreshState = rememberPullToRefreshState()
 
         PullToRefreshBox(
@@ -99,22 +82,44 @@ fun SelfCollectionScreen(
         if (showFilterDialog) {
             FilterDialog(
                 onDismissRequest = { showFilterDialog = false },
-                selectedTab = selectedTab,
-                switchTab = { selectedTab = it },
-                pagerState = pagerState,
                 userBookmarkTagsIllust = state.userBookmarkTagsIllust,
                 privateBookmarkTagsIllust = state.privateBookmarkTagsIllust,
                 restrict = state.restrict,
                 filterTag = state.filterTag,
-                dispatch = dispatch,
-                onSelected = { tag: String? ->
-                    when (selectedTab) {
-                        0 -> viewModel.updateFilterTag(Restrict.PUBLIC, tag)
-                        1 -> viewModel.updateFilterTag(Restrict.PRIVATE, tag)
-                    }
+                onLoadUserBookmarksTags = {
+                    dispatch(CollectionAction.LoadUserBookmarksTagsIllust(it))
+                },
+                onSelected = { restrict: String, tag: String? ->
+                    viewModel.updateFilterTag(restrict, tag)
                     userBookmarksIllusts.refresh()
                 }
             )
         }
     }
+}
+
+@Composable
+private fun CollectionTopAppBar(
+    uid: Long,
+    showFilterDialog: () -> Unit = {},
+    onBack: () -> Unit = {},
+) {
+    TopAppBar(
+        modifier = Modifier.shadow(4.dp),
+        title = {
+            Text(text = stringResource(RString.collection))
+        },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
+            }
+        },
+        actions = {
+            if (uid.isSelf) {
+                IconButton(onClick = showFilterDialog) {
+                    Icon(Icons.Rounded.FilterList, contentDescription = null)
+                }
+            }
+        }
+    )
 }

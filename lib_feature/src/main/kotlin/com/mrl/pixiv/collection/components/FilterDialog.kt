@@ -5,18 +5,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.mrl.pixiv.collection.CollectionAction
 import com.mrl.pixiv.collection.RestrictBookmarkTag
 import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.ui.lightBlue
@@ -28,19 +25,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FilterDialog(
-    modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
-    selectedTab: Int,
-    switchTab: (Int) -> Unit,
-    pagerState: PagerState,
     userBookmarkTagsIllust: ImmutableList<RestrictBookmarkTag>,
     privateBookmarkTagsIllust: ImmutableList<RestrictBookmarkTag>,
     @Restrict restrict: String,
     filterTag: String?,
-    dispatch: (CollectionAction) -> Unit,
-    onSelected: (String?) -> Unit
+    onLoadUserBookmarksTags: (String) -> Unit,
+    onSelected: (restrict: String, tag: String?) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
+    var selectedTab by remember(restrict) { mutableIntStateOf(if (restrict == Restrict.PUBLIC) 0 else 1) }
+    val pagerState = rememberPagerState(initialPage = selectedTab, pageCount = { 2 })
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
             modifier = modifier.fillMaxWidth(),
@@ -53,10 +49,7 @@ fun FilterDialog(
                         .clip(MaterialTheme.shapes.small)
                 ) {
                     LaunchedEffect(pagerState.currentPage) {
-                        when (pagerState.currentPage) {
-                            0 -> switchTab(0)
-                            1 -> switchTab(1)
-                        }
+                        selectedTab = pagerState.currentPage
                     }
                     TabRow(
                         selectedTabIndex = selectedTab,
@@ -114,7 +107,7 @@ fun FilterDialog(
                 )
                 HorizontalPager(state = pagerState) { currentPage ->
                     LaunchedEffect(Unit) {
-                        dispatch(CollectionAction.LoadUserBookmarksTagsIllust(if (currentPage == 0) Restrict.PUBLIC else Restrict.PRIVATE))
+                        onLoadUserBookmarksTags(if (currentPage == 0) Restrict.PUBLIC else Restrict.PRIVATE)
                     }
                     LazyColumn(
                         modifier = Modifier
@@ -130,7 +123,10 @@ fun FilterDialog(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .throttleClick(indication = ripple()) {
-                                        onSelected(it.name)
+                                        onSelected(
+                                            if (selectedTab == 0) Restrict.PUBLIC else Restrict.PRIVATE,
+                                            it.name
+                                        )
                                         onDismissRequest()
                                     }
                                     .conditionally(((restrict == Restrict.PUBLIC && it.isPublic) || (restrict == Restrict.PRIVATE && !it.isPublic)) && filterTag == it.name) {
