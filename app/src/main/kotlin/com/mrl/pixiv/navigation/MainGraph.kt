@@ -18,16 +18,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mrl.pixiv.collection.SelfCollectionScreen
-import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
-import com.mrl.pixiv.common.repository.IllustCacheRepo
-import com.mrl.pixiv.common.router.Destination
-import com.mrl.pixiv.common.router.DestinationsDeepLink
-import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.common.compose.LocalAnimatedContentScope
 import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.compose.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
 import com.mrl.pixiv.common.compose.ui.bar.HomeBottomBar
+import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
+import com.mrl.pixiv.common.repository.IllustCacheRepo
+import com.mrl.pixiv.common.router.Destination
+import com.mrl.pixiv.common.router.DestinationsDeepLink
+import com.mrl.pixiv.common.router.Graph
+import com.mrl.pixiv.follow.FollowingScreen
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.login.LoginOptionScreen
@@ -213,7 +214,8 @@ fun MainGraph(
 
                     composable<Destination.FollowingScreen> {
                         CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-
+                            val uid = it.toRoute<Destination.FollowingScreen>().userId
+                            FollowingScreen(uid = uid)
                         }
                     }
 

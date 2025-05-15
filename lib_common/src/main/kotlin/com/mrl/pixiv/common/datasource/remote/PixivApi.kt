@@ -171,4 +171,9 @@ interface PixivApi {
         @Query("restrict") restrict: String = Restrict.PUBLIC,
         @Query("offset") offset: Int? = null,
     ): UserFollowingResp
+
+    @GET("v1/user/following")
+    suspend fun loadMoreUserFollowing(
+        @QueryMap queryMap: Map<String, String>,
+    ): UserFollowingResp
 }
