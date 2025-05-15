@@ -1,5 +1,6 @@
 package com.mrl.pixiv.common.data.user
 
+import androidx.compose.runtime.Stable
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.data.Novel
 import com.mrl.pixiv.common.data.User
@@ -69,6 +70,7 @@ data class UserFollowingResp(
 )
 
 @Serializable
+@Stable
 data class UserPreview(
     val user: User,
     val illusts: List<Illust>,
