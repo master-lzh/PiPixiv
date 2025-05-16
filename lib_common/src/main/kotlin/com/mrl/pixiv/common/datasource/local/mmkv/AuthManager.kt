@@ -35,7 +35,7 @@ object AuthManager : MMKVUser {
                 }
                 userAccessToken
             }.onFailure {
-                ToastUtil.safeShortToast(RString.unknown_error)
+                ToastUtil.safeShortToast(RString.network_error)
             }.getOrNull().orEmpty()
         }
 
