@@ -14,7 +14,7 @@ data class UserIllustsResp(
     val illusts: List<Illust>,
 
     @SerialName("next_url")
-    val nextURL: String = ""
+    val nextURL: String? = null
 )
 
 @Serializable
@@ -63,6 +63,7 @@ data class UserBookmarkTagsResp(
 
 @Serializable
 data class UserFollowingResp(
+    @SerialName("user_previews")
     val userPreviews: List<UserPreview>,
 
     @SerialName("next_url")

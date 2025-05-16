@@ -17,9 +17,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -58,6 +58,7 @@ fun SquareIllustItem(
     modifier: Modifier = Modifier,
     elevation: Dp = 5.dp,
     shouldShowTip: Boolean = false,
+    shape: Shape = MaterialTheme.shapes.medium,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
@@ -80,7 +81,7 @@ fun SquareIllustItem(
                     animatedContentScope,
                     clipInOverlayDuringTransition = OverlayClip(RoundedCornerShape(10.dp))
                 )
-                .shadow(elevation, MaterialTheme.shapes.medium)
+                .shadow(elevation, shape)
                 .background(MaterialTheme.colorScheme.background)
                 .throttleClick { onClick() }
         ) {
@@ -92,8 +93,7 @@ fun SquareIllustItem(
                         rememberSharedContentState(key = "${prefix}-$imageKey"),
                         animatedVisibilityScope = LocalAnimatedContentScope.current,
                         placeHolderSize = SharedTransitionScope.PlaceHolderSize.animatedSize
-                    )
-                    .clip(MaterialTheme.shapes.medium),
+                    ),
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(illust.imageUrls.squareMedium)
                     .allowRgb565(true)

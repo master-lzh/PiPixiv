@@ -52,7 +52,6 @@ import kotlin.time.Duration.Companion.seconds
 data class PictureState(
     val illust: Illust? = null,
     val userIllusts: ImmutableList<Illust> = persistentListOf(),
-    val nextUrl: String = "",
     val ugoiraImages: ImmutableList<Pair<Bitmap, Long>> = persistentListOf(),
     val bottomSheetState: BottomSheetState? = null,
     val loading: Boolean = false,
