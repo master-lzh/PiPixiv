@@ -2,20 +2,22 @@ package com.mrl.pixiv.follow
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,9 +33,9 @@ import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.compose.ui.illust.SquareIllustItem
 import com.mrl.pixiv.common.compose.ui.image.UserAvatar
 import com.mrl.pixiv.common.data.Illust
+import com.mrl.pixiv.common.datasource.local.mmkv.isSelf
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.util.*
-import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
@@ -41,8 +43,14 @@ import com.mrl.pixiv.common.viewmodel.follow.FollowState.isFollowing
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+private enum class FollowingPage {
+    PUBLIC,
+    PRIVATE,
+}
 
 @Composable
 fun FollowingScreen(
@@ -50,10 +58,14 @@ fun FollowingScreen(
     modifier: Modifier = Modifier,
     viewModel: FollowingViewModel = koinViewModel { parametersOf(uid) }
 ) {
-    val state = viewModel.asState()
-    val followingUsers = viewModel.followingPageSource.collectAsLazyPagingItems()
+    val scope = rememberCoroutineScope()
     val navigator = LocalNavigator.current
     val pullRefreshState = rememberPullToRefreshState()
+    val pages = remember {
+        if (uid.isSelf) listOf(FollowingPage.PUBLIC, FollowingPage.PRIVATE)
+        else listOf(FollowingPage.PUBLIC)
+    }
+    val pagerState = rememberPagerState { pages.size }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -74,33 +86,75 @@ fun FollowingScreen(
                     }
                 }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.statusBars,
     ) {
-        PullToRefreshBox(
-            isRefreshing = followingUsers.loadState.refresh is LoadState.Loading,
-            onRefresh = { followingUsers.refresh() },
-            modifier = Modifier.padding(it),
-            state = pullRefreshState
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(
-                    followingUsers.itemCount,
-                    key = followingUsers.itemKey { it.user.id }
+            if (pages.size > 1) {
+                TabRow(
+                    selectedTabIndex = pagerState.currentPage,
                 ) {
-                    val userPreview = followingUsers[it] ?: return@items
-                    FollowingUserCard(
-                        illusts = userPreview.illusts.toImmutableList(),
-                        userName = userPreview.user.name,
-                        userId = userPreview.user.id,
-                        userAvatar = userPreview.user.profileImageUrls.medium,
-                        isFollowed = userPreview.user.isFollowing,
-                        navToPictureScreen = navigator::navigateToPictureScreen,
-                        navToUserProfile = {
-                            navigator.navigateToProfileDetailScreen(userPreview.user.id)
+                    pages.forEachIndexed { index, page ->
+                        Tab(
+                            text = { Text(text = stringResource(if (page == FollowingPage.PUBLIC) RString.word_public else RString.word_private)) },
+                            selected = pagerState.currentPage == index,
+                            onClick = {
+                                scope.launch {
+                                    if (pagerState.currentPage == index) return@launch
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                        )
+                    }
+                }
+            }
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.weight(1f),
+            ) {
+                val page = pages[it]
+                val followingUsers = if (page == FollowingPage.PUBLIC) {
+                    viewModel.publicFollowingPageSource.collectAsLazyPagingItems()
+                } else {
+                    viewModel.privateFollowingPageSource.collectAsLazyPagingItems()
+                }
+                PullToRefreshBox(
+                    isRefreshing = followingUsers.loadState.refresh is LoadState.Loading,
+                    onRefresh = { followingUsers.refresh() },
+                    state = pullRefreshState
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            top = 10.dp,
+                            end = 16.dp,
+                            bottom = 20.dp
+                        ),
+                        verticalArrangement = 10f.spaceBy,
+                    ) {
+                        items(
+                            followingUsers.itemCount,
+                            key = followingUsers.itemKey { it.user.id }
+                        ) {
+                            val userPreview = followingUsers[it] ?: return@items
+                            FollowingUserCard(
+                                illusts = userPreview.illusts.toImmutableList(),
+                                userName = userPreview.user.name,
+                                userId = userPreview.user.id,
+                                userAvatar = userPreview.user.profileImageUrls.medium,
+                                isFollowed = userPreview.user.isFollowing,
+                                navToPictureScreen = navigator::navigateToPictureScreen,
+                                navToUserProfile = {
+                                    navigator.navigateToProfileDetailScreen(userPreview.user.id)
+                                }
+                            )
                         }
-                    )
+                    }
                 }
             }
         }
@@ -135,7 +189,9 @@ private fun FollowingUserCard(
                     navToPictureScreen = { prefix ->
                         navToPictureScreen(illusts, index, prefix)
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    elevation = 0.dp,
+                    shape = RectangleShape
                 )
             }
         }
@@ -172,9 +228,9 @@ private fun FollowingUserCard(
                     .padding(horizontal = 10.dp, vertical = 8.dp)
                     .throttleClick {
                         if (isFollowed) {
-                            FollowState.followUser(userId)
-                        } else {
                             FollowState.unFollowUser(userId)
+                        } else {
+                            FollowState.followUser(userId)
                         }
                     },
                 text = stringResource(if (isFollowed) RString.followed else RString.follow),
