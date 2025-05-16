@@ -8,8 +8,9 @@ import com.mrl.pixiv.common.datasource.local.mmkv.isSelf
 import com.mrl.pixiv.common.repository.paging.FollowingPagingSource
 import com.mrl.pixiv.common.viewmodel.BaseMviViewModel
 import com.mrl.pixiv.common.viewmodel.state
+import org.koin.android.annotation.KoinViewModel
 
-
+@KoinViewModel
 class FollowingViewModel(
     private val uid: Long,
 ) : BaseMviViewModel<FollowingState, FollowingAction>(

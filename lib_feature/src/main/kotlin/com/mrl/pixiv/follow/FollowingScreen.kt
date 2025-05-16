@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.compose.deepBlue
 import com.mrl.pixiv.common.compose.rememberThrottleClick
@@ -31,15 +32,15 @@ import com.mrl.pixiv.common.compose.ui.illust.SquareIllustItem
 import com.mrl.pixiv.common.compose.ui.image.UserAvatar
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.kts.spaceBy
-import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
-import com.mrl.pixiv.common.util.RString
-import com.mrl.pixiv.common.util.throttleClick
+import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
+import com.mrl.pixiv.common.viewmodel.follow.FollowState.isFollowing
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -84,7 +85,23 @@ fun FollowingScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-
+                items(
+                    followingUsers.itemCount,
+                    key = followingUsers.itemKey { it.user.id }
+                ) {
+                    val userPreview = followingUsers[it] ?: return@items
+                    FollowingUserCard(
+                        illusts = userPreview.illusts.toImmutableList(),
+                        userName = userPreview.user.name,
+                        userId = userPreview.user.id,
+                        userAvatar = userPreview.user.profileImageUrls.medium,
+                        isFollowed = userPreview.user.isFollowing,
+                        navToPictureScreen = navigator::navigateToPictureScreen,
+                        navToUserProfile = {
+                            navigator.navigateToProfileDetailScreen(userPreview.user.id)
+                        }
+                    )
+                }
             }
         }
     }
@@ -98,6 +115,7 @@ private fun FollowingUserCard(
     userAvatar: String,
     isFollowed: Boolean,
     navToPictureScreen: NavigateToHorizontalPictureScreen,
+    navToUserProfile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier) {
@@ -128,7 +146,7 @@ private fun FollowingUserCard(
         ) {
             UserAvatar(
                 url = userAvatar,
-                onClick = { navToPictureScreen(illusts, 0, "user") },
+                onClick = navToUserProfile,
                 modifier = Modifier.size(40.dp)
             )
             Text(
@@ -181,5 +199,6 @@ private fun FollowingUserCardPreview() {
         userAvatar = "http://iph.href.lu/200x200",
         isFollowed = false,
         navToPictureScreen = { _, _, _ -> },
+        navToUserProfile = { },
     )
 }

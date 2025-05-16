@@ -29,14 +29,11 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowRgb565
-import com.mrl.pixiv.common.data.user.UserDetailResp
-import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.compose.ui.image.UserAvatar
-import com.mrl.pixiv.common.util.RString
-import com.mrl.pixiv.common.util.copyToClipboard
-import com.mrl.pixiv.common.util.navigateToPictureScreen
-import com.mrl.pixiv.common.util.throttleClick
+import com.mrl.pixiv.common.data.user.UserDetailResp
+import com.mrl.pixiv.common.kts.spaceBy
+import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.feature.R
 import com.mrl.pixiv.profile.detail.components.IllustWidget
@@ -106,6 +103,20 @@ fun ProfileDetailScreen(
                             )
                         }
                     }
+                    Text(
+                        text = buildString {
+                            append(userInfo.profile.totalFollowUsers.toString())
+                            append(" ")
+                            append(stringResource(RString.followed))
+                        },
+                        modifier = Modifier.throttleClick {
+                            navHostController.navigateToFollowingScreen(userInfo.user.id)
+                        },
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    )
                     //id点击可复制
                     Row(
                         horizontalArrangement = 5f.spaceBy,

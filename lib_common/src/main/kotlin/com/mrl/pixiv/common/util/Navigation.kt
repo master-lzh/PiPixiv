@@ -61,3 +61,7 @@ fun NavHostController.navigateToHistoryScreen() {
 fun NavHostController.navigateToSelfCollectionScreen() {
     navigate(route = Destination.SelfCollectionScreen)
 }
+
+fun NavHostController.navigateToFollowingScreen(userId: Long) {
+    navigate(route = Destination.FollowingScreen(userId))
+}
