@@ -18,8 +18,8 @@ android {
 
     defaultConfig {
         applicationId = "com.mrl.pixiv"
-        versionCode = 10013
-        versionName = "1.0.13"
+        versionCode = 10100
+        versionName = "1.1.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -89,42 +89,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":common-ui"))
-    implementation(project(":util"))
-    implementation(project(":repository"))
-    implementation(project(":datasource"))
-    implementation(project(":network"))
-    implementation(project(":data"))
-    implementation(project(":domain"))
-
-    file("../feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
-        // 使用目录名称构建模块路径
-        val moduleName = ":feature:${moduleDir.name}"
-        println("module name: $moduleName")
-        implementation(project(moduleName))
-    }
-
-
-    implementation(compose.bundles.accompanist)
-    implementation(compose.ui.text)
-    implementation(androidx.activity.compose)
-    implementation(androidx.splashscreen)
-    implementation(androidx.datastore)
-    implementation(androidx.datastore.preferences)
-    implementation(androidx.profileinstaller)
-    implementation(kotlinx.bundles.serialization)
-    implementation(kotlinx.bundles.coroutines)
-    implementation(kotlinx.bundles.ktor)
-    implementation(kotlinx.datetime)
-
-    implementation(platform(libs.coil3.bom))
-    implementation(libs.bundles.coil3)
-    implementation(libs.google.material)
-    implementation(libs.koin)
-
-    "defaultImplementation"(platform(libs.firebase.bom))
-    "defaultImplementation"(libs.bundles.firebase)
+    implementation(project(":lib_common"))
+    implementation(project(":lib_feature"))
 
     baselineProfile(project(":baselineprofile"))
     ksp(libs.koin.ksp.compiler)

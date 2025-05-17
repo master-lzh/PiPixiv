@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="bookmark_add_failed">collection failed</string>
-    <string name="bookmark_add_success">collection successfully</string>
-    <string name="bookmark_delete_success">cancel collection successfully</string>
-    <string name="bookmark_delete_failed">cancel collection failed</string>
-</resources>

@@ -1,26 +1,28 @@
 [versions]
-junit = "4.13.2"
-okio = "3.9.1"
-coil3 = "3.0.4"
+material = "1.12.0"
+okio = "3.11.0"
+coil3 = "3.2.0"
 richtext = "0.20.0"
-koin = "4.0.2"
-koinAnnotation = "1.4.0-RC3"
+koin = "4.0.4"
+koinAnnotation = "2.0.0"
 androidx-test-ext-junit = "1.2.1"
 androidx-test-espresso-espresso-core = "3.6.1"
-com-google-android-material-material = "1.12.0"
-lottie = "6.5.2"
+lottie = "6.6.6"
 google-services = "4.4.2"
-firebase-bom = "33.8.0"
-firebase-crashlytics-gradle = "3.0.2"
+firebase-bom = "33.13.0"
+firebase-crashlytics-gradle = "3.0.3"
 uiautomator = "2.3.0"
-benchmark-macro-junit4 = "1.3.3"
+benchmark-macro-junit4 = "1.3.4"
 kermit = "2.0.5"
+mmkv = "2.2.2-32bit-support"
+mmkv-kotlin = "1.2.17"
+desugar = "2.1.5"
 
 [libraries]
-desugar = "com.android.tools:desugar_jdk_libs:2.1.4"
+desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 
-junit-junit = { module = "junit:junit", version.ref = "junit" }
 
+material = { module = "com.google.android.material:material", version.ref = "material" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 coil3-bom = { module = "io.coil-kt.coil3:coil-bom", version.ref = "coil3" }
@@ -32,8 +34,6 @@ coil3-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3" }
 richtext-commonmark = { module = "com.halilibo.compose-richtext:richtext-commonmark", version.ref = "richtext" }
 richtext-m3 = { module = "com.halilibo.compose-richtext:richtext-ui-material3", version.ref = "richtext" }
 
-
-
 koin = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-annotations = { group = "io.insert-koin", name = "koin-annotations", version.ref = "koinAnnotation" }
@@ -42,17 +42,12 @@ koin-ksp-compiler = { group = "io.insert-koin", name = "koin-ksp-compiler", vers
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 
-guava = "com.google.guava:guava:33.3.1-jre"
-
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-test-espresso-espresso-core" }
-google-material = { group = "com.google.android.material", name = "material", version.ref = "com-google-android-material-material" }
-
-collapsing-toolbar = "me.onebone:toolbar-compose:2.3.5"
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
-firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
-firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 
 uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmark-macro-junit4" }
@@ -61,11 +56,15 @@ benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 
+mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
+mmkv-kotlin = { module = "com.ctrip.flight.mmkv:mmkv-kotlin", version.ref = "mmkv-kotlin" }
+
 [bundles]
+koin = ["koin", "koin-compose", "koin-annotations"]
 coil3 = ["coil3-core", "coil3-gif", "coil3-compose", "coil3-network-ktor3"]
 richtext = ["richtext-commonmark", "richtext-m3"]
 lottie = ["lottie", "lottie-compose"]
-firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
+firebase = ["firebase-analytics", "firebase-crashlytics"]
 
 [plugins]
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

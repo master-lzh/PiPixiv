@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="collection">Collection</string>
-    <string name="word_private">Private</string>
-    <string name="word_public">Public</string>
-    <string name="bookmark_tags">Bookmark tags</string>
-    <string name="all">All</string>
-    <string name="uncategorized">Uncategorized</string>
-</resources>

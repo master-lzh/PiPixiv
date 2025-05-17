@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.PiPixiv" parent="Theme.Material3.Light.NoActionBar">
+<resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!--============-->
+    <!-- Base Theme -->
+    <!--============-->
+
+    <!--== Theme Base ==-->
+    <style name="Base.Theme.PiPixiv" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Themes -->
+        <item name="android:windowLightStatusBar">@bool/lightStatusBar</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">@null</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="Q">false</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="Q">false</item>
     </style>
+
+    <!--== Default Theme ==-->
+    <style name="Theme.PiPixiv" parent="Base.Theme.PiPixiv" />
+
 </resources>

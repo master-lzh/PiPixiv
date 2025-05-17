@@ -1,6 +1,17 @@
 @file:Suppress("UnstableApiUsage")
 
+import java.io.FileInputStream
+import java.util.Properties
+
+
+val localProperties = Properties()
+val localFile = file("local.properties")
+if (localFile.exists()) {
+    localProperties.load(FileInputStream(localFile))
+}
+
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -25,25 +36,21 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven(url = "https://www.jitpack.io")
-        maven (url ="https://androidx.dev/storage/compose-compiler/repository/")
+        maven(url = "https://androidx.dev/storage/compose-compiler/repository/")
+        maven {
+            url = uri("https://maven.pkg.github.com/master-lzh/MMKV")
+            credentials {
+                username =
+                    localProperties.getProperty("github.user") ?: System.getenv("GH_USERNAME")
+                password = localProperties.getProperty("github.package.token")
+                    ?: System.getenv("GH_PACKAGE_TOKEN")
+            }
+        }
     }
 }
 rootProject.name = "PiPixiv"
 include(":app")
-include(":common")
-include(":util")
-include(":repository")
-include(":datasource")
-include(":data")
-include(":network")
-include(":domain")
-include(":common-ui")
-
-// include modules in feature folder
-file("./feature").listFiles()?.filter { it.isDirectory }?.forEach { moduleDir ->
-    // 使用目录名称构建模块路径
-    val moduleName = ":feature:${moduleDir.name}"
-    println("module name: $moduleName")
-    include(moduleName)
-}
+include(":lib_common")
+include(":lib_feature")
+include(":lib_strings")
 include(":baselineprofile")
