@@ -50,4 +50,12 @@ object SearchRepository : MMKVUser {
             }
         }
     }
+
+    fun clear() {
+        searchHistory.update {
+            it.copy(
+                searchHistoryList = emptyList()
+            )
+        }
+    }
 }

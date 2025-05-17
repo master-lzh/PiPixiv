@@ -45,4 +45,8 @@ object SettingRepository : MMKVUser {
     fun updateSettings(block: (UserPreference) -> UserPreference) {
         userPreference.update(block)
     }
+
+    fun clear() {
+        userPreference.value = UserPreference()
+    }
 }

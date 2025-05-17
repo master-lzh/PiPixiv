@@ -65,3 +65,11 @@ fun NavHostController.navigateToSelfCollectionScreen() {
 fun NavHostController.navigateToFollowingScreen(userId: Long) {
     navigate(route = Destination.FollowingScreen(userId))
 }
+
+fun NavHostController.navigateToLoginOptionScreen() {
+    graph.setStartDestination(Destination.HomeScreen)
+    navigate(route = Destination.LoginOptionScreen) {
+        popUpTo(graph.startDestinationId) { inclusive = true }
+        launchSingleTop = true
+    }
+}

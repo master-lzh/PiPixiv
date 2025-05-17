@@ -5,6 +5,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,14 +16,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.mrl.pixiv.common.data.setting.SettingTheme
-import com.mrl.pixiv.common.data.setting.getAppCompatDelegateThemeMode
-import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
 import com.mrl.pixiv.common.compose.LocalAnimatedContentScope
 import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
-import com.mrl.pixiv.common.compose.ui.image.UserAvatar
 import com.mrl.pixiv.common.compose.ui.SettingItem
+import com.mrl.pixiv.common.compose.ui.image.UserAvatar
+import com.mrl.pixiv.common.data.setting.SettingTheme
+import com.mrl.pixiv.common.data.setting.getAppCompatDelegateThemeMode
+import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
 import com.mrl.pixiv.common.util.*
 import org.koin.androidx.compose.koinViewModel
 
@@ -38,6 +39,10 @@ private val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         SettingTheme.DARK to RString.theme_dark,
     )
 }
+
+private const val KEY_USER_INFO = "user_info"
+private const val KEY_DIVIDER = "divider"
+private const val KEY_SETTINGS = "settings"
 
 @Composable
 fun ProfileScreen(
@@ -61,13 +66,12 @@ fun ProfileScreen(
     ) {
         LazyColumn(
             modifier = modifier
-                .fillMaxSize()
                 .padding(it)
-                .padding(top = 16.dp)
-                .padding(horizontal = 16.dp),
+                .fillMaxSize()
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
+            item(key = KEY_USER_INFO) {
                 // 头像和昵称
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -108,64 +112,86 @@ fun ProfileScreen(
                     }
                 }
             }
-            item {
+            item(key = KEY_DIVIDER) {
                 HorizontalDivider()
             }
-            item {
+            item(key = KEY_SETTINGS) {
                 Column {
                     // 偏好设置
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .throttleClick(
-                                indication = ripple()
-                            ) {
-                                navHostController.navigateToSettingScreen()
-                            }
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(start = 8.dp)
-                                .padding(vertical = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
+                    SettingItem(
+                        onClick = navHostController::navigateToSettingScreen,
+                        icon = {
                             Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
-                            Text(
-                                text = stringResource(RString.preference),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(RString.preference),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
-
                     // 历史记录
                     SettingItem(
+                        onClick = navHostController::navigateToHistoryScreen,
                         icon = {
                             Icon(
                                 imageVector = Icons.Rounded.History,
                                 contentDescription = null
                             )
                         },
-                        onClick = navHostController::navigateToHistoryScreen
                     ) {
                         Text(
                             text = stringResource(RString.history),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
-
                     // 收藏
                     SettingItem(
+                        onClick = navHostController::navigateToSelfCollectionScreen,
                         icon = {
                             Icon(
                                 imageVector = Icons.Rounded.Bookmarks,
                                 contentDescription = null
                             )
                         },
-                        onClick = navHostController::navigateToSelfCollectionScreen
                     ) {
                         Text(
                             text = stringResource(RString.collection),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    // 导出Token
+                    SettingItem(
+                        onClick = {
+                            viewModel.dispatch(ProfileAction.ExportToken)
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Rounded.ImportExport,
+                                contentDescription = null
+                            )
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(RString.export_token),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    // 退出登录
+                    SettingItem(
+                        onClick = {
+                            viewModel.logout()
+                            navHostController.navigateToLoginOptionScreen()
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.Logout,
+                                contentDescription = null
+                            )
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(RString.sign_out),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

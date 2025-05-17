@@ -11,30 +11,26 @@ import com.mrl.pixiv.common.util.throttleClick
 @Composable
 fun SettingItem(
     modifier: Modifier = Modifier,
-    icon: @Composable (() -> Unit)? = null,
     onClick: () -> Unit = {},
+    icon: @Composable (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
     content: @Composable RowScope.() -> Unit = {},
 ) {
-    Box(
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .throttleClick(indication = ripple()) { onClick() }) {
+            .throttleClick(indication = ripple()) { onClick() }
+            .padding(contentPadding),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        icon?.invoke()
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(contentPadding),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            icon?.invoke()
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                content()
-            }
+            content()
         }
     }
 }

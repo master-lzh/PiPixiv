@@ -59,4 +59,8 @@ object UserManager : MMKVUser {
             userInfo.update { resp }
         }
     }
+
+    fun logout() {
+        userInfo.value = UserDetailResp()
+    }
 }

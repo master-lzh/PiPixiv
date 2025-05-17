@@ -14,9 +14,19 @@ import com.mrl.pixiv.common.util.ToastUtil
 import com.mrl.pixiv.common.util.currentTimeMillis
 
 object AuthManager : MMKVUser {
-    private var userRefreshToken by mmkvString()
+    var userRefreshToken by mmkvString()
+        private set
     private var userAccessToken by mmkvString()
     private var accessTokenExpiresTime: Long by mmkvLong()
+    val hasTokens: Boolean
+        get() = userRefreshToken.isNotEmpty() && userAccessToken.isNotEmpty()
+
+    val isNeedRefreshToken: Boolean
+        get() = accessTokenExpiresTime != 0L && accessTokenExpiresTime <= currentTimeMillis()
+
+    val isLogin: Boolean
+        get() = hasTokens && accessTokenExpiresTime > currentTimeMillis()
+
 
     suspend fun requireUserAccessToken(force: Boolean = false): String =
         withIOContext {
@@ -74,12 +84,9 @@ object AuthManager : MMKVUser {
         }
     }
 
-    val hasTokens: Boolean
-        get() = userRefreshToken.isNotEmpty() && userAccessToken.isNotEmpty()
-
-    val isNeedRefreshToken: Boolean
-        get() = accessTokenExpiresTime != 0L && accessTokenExpiresTime <= currentTimeMillis()
-
-    val isLogin: Boolean
-        get() = hasTokens && accessTokenExpiresTime > currentTimeMillis()
+    fun logout() {
+        userAccessToken = ""
+        userRefreshToken = ""
+        accessTokenExpiresTime = 0L
+    }
 }

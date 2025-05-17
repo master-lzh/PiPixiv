@@ -41,7 +41,7 @@ fun PictureSourceWidget(
         shadowElevation = 4.dp
     ) {
         Column {
-            SettingItem {
+            SettingItem(content = {
                 Text(text = stringResource(RString.image_source))
                 IconButton(
                     onClick = {
@@ -52,7 +52,7 @@ fun PictureSourceWidget(
                 ) {
                     Icon(imageVector = Icons.Rounded.Refresh, contentDescription = null)
                 }
-            }
+            })
             map.forEach { (key, value) ->
                 SettingItem(
                     modifier = Modifier.then(
@@ -65,18 +65,19 @@ fun PictureSourceWidget(
                         savePictureSourceHost(key)
                         imageHost = imageHost.copy(text = key)
                     },
-                ) {
-                    Text(text = value)
-                    if (key == currentSelected) {
-                        Icon(
-                            imageVector = Icons.Rounded.Check,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
-                }
+                    content = {
+                        Text(text = value)
+                        if (key == currentSelected) {
+                            Icon(
+                                imageVector = Icons.Rounded.Check,
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                        }
+                    },
+                )
             }
-            SettingItem {
+            SettingItem(content = {
                 val imeVisible = WindowInsets.isImeVisible
                 LaunchedEffect(WindowInsets.isImeVisible) {
                     if (!imeVisible) {
@@ -101,7 +102,7 @@ fun PictureSourceWidget(
                         unfocusedContainerColor = Color.Transparent
                     ),
                 )
-            }
+            })
         }
     }
 }

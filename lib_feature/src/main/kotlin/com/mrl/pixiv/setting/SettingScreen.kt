@@ -70,81 +70,80 @@ fun SettingScreen(
                 SettingItem(
                     icon = {
                         Icon(Icons.Rounded.Translate, contentDescription = null)
-                    }
-                ) {
-                    LaunchedEffect(currentLanguage) {
-                        val locale = if (currentLanguage == "Default") {
-                            LocaleListCompat.getEmptyLocaleList()
-                        } else {
-                            LocaleListCompat.forLanguageTags(currentLanguage)
+                    },
+                    content = {
+                        LaunchedEffect(currentLanguage) {
+                            val locale = if (currentLanguage == "Default") {
+                                LocaleListCompat.getEmptyLocaleList()
+                            } else {
+                                LocaleListCompat.forLanguageTags(currentLanguage)
+                            }
+                            AppCompatDelegate.setApplicationLocales(locale)
                         }
-                        AppCompatDelegate.setApplicationLocales(locale)
-                    }
 
-                    Text(
-                        text = stringResource(RString.app_language),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    DropDownSelector(
-                        modifier = Modifier.throttleClick {
-                            expanded = !expanded
-                        },
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        current = currentLanguage,
-                    ) {
-                        languages.forEach {
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = it.displayName,
-                                            modifier = Modifier.padding(16.dp),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                        )
-                                        if (currentLanguage == it.langTag) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.Check,
-                                                contentDescription = null
+                        Text(
+                            text = stringResource(RString.app_language),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        DropDownSelector(
+                            modifier = Modifier.throttleClick {
+                                expanded = !expanded
+                            },
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            current = currentLanguage,
+                        ) {
+                            languages.forEach {
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = it.displayName,
+                                                modifier = Modifier.padding(16.dp),
+                                                style = MaterialTheme.typography.bodyMedium,
                                             )
+                                            if (currentLanguage == it.langTag) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.Check,
+                                                    contentDescription = null
+                                                )
+                                            }
                                         }
-                                    }
 
-                                }, onClick = {
-                                    currentLanguage = it.langTag
-                                    expanded = false
-                                }
-                            )
+                                    }, onClick = {
+                                        currentLanguage = it.langTag
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
                     }
-                }
+                )
             }
 
             item {
                 SettingItem(
+                    onClick = settingNavHostController::navigateToNetworkSettingScreen,
                     icon = {
                         Icon(imageVector = Icons.Rounded.NetworkWifi, contentDescription = null)
                     },
-                    onClick = settingNavHostController::navigateToNetworkSettingScreen
-                ) {
-                    Text(
-                        text = stringResource(RString.network_setting),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
-                        contentDescription = null
-                    )
-                }
+                    content = {
+                        Text(
+                            text = stringResource(RString.network_setting),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowForwardIos,
+                            contentDescription = null
+                        )
+                    }
+                )
             }
 
             item {
                 SettingItem(
-                    icon = {
-                        Icon(imageVector = Icons.Rounded.AddLink, contentDescription = null)
-                    },
                     onClick = {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             try {
@@ -160,19 +159,23 @@ fun SettingScreen(
                             } catch (_: Throwable) {
                             }
                         }
+                    },
+                    icon = {
+                        Icon(imageVector = Icons.Rounded.AddLink, contentDescription = null)
+                    },
+                    content = {
+                        Column {
+                            Text(
+                                text = stringResource(RString.default_open),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = stringResource(RString.allow_open_link),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
-                ) {
-                    Column {
-                        Text(
-                            text = stringResource(RString.default_open),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Text(
-                            text = stringResource(RString.allow_open_link),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
+                )
             }
         }
     }

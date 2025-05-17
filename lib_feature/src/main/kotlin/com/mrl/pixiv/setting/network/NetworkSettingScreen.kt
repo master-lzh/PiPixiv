@@ -54,7 +54,7 @@ fun NetworkSettingScreen(
                 .padding(horizontal = 16.dp)
                 .imePadding()
         ) {
-            SettingItem {
+            SettingItem(content = {
                 Column {
                     Text(
                         text = stringResource(RString.enable_bypass_sniffing),
@@ -69,7 +69,7 @@ fun NetworkSettingScreen(
                     checked = userPreference.enableBypassSniffing,
                     onCheckedChange = { viewModel.dispatch(SettingAction.SwitchBypassSniffing) }
                 )
-            }
+            })
             PictureSourceWidget(
                 currentSelected = userPreference.imageHost,
                 savePictureSourceHost = {
