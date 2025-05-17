@@ -584,6 +584,7 @@ internal fun PictureScreen(
                 ) { rowIndex ->
                     val illustsPair = (0..relatedSpanCount - 1).mapNotNull { it ->
                         val index = rowIndex * relatedSpanCount + it
+                        if (index >= relatedIllusts.itemCount) return@mapNotNull null
                         val illust = relatedIllusts[index] ?: return@mapNotNull null
                         Triple(
                             illust,
@@ -619,6 +620,9 @@ internal fun PictureScreen(
                                 modifier = Modifier.weight(1f),
                                 shouldShowTip = index == 0
                             )
+                        }
+                        if (illustsPair.size.isOdd()) {
+                            Spacer(modifier = Modifier.weight(1f))
                         }
                     }
                 }
