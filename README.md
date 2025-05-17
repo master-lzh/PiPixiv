@@ -12,7 +12,7 @@
 
 一个完全由 [Jetpack Compose](https://developer.android.com/develop/ui/compose) 编写的第三方 Pixiv 应用
 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.1.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/master-lzh/PiPixiv/release.yml)](https://github.com/master-lzh/PiPixiv/actions/workflows/release.yml)
 [![License: Apache-2.0](https://img.shields.io/github/license/master-lzh/PiPixiv?labelColor=27303D&color=0877d2)](/LICENSE)
 
@@ -22,7 +22,7 @@
 [![GitHub downloads](https://img.shields.io/github/downloads/master-lzh/PiPixiv/total?label=下载量&labelColor=27303D&color=0D1117&logo=github&logoColor=FFFFFF&style=flat)](https://github.com/master-lzh/PiPixiv/releases)
 [![F-Droid Version](https://img.shields.io/f-droid/v/com.mrl.pixiv)](https://f-droid.org/packages/com.mrl.pixiv/)
 
-### 支持 **[Android 5.0]()** 或更高版本
+### 支持 **[Android 6.0]()** 或更高版本
 
 ## 功能
 
@@ -43,12 +43,12 @@
 
 ### v1.1.0
 - [x] 重构网络层，将OkHttp换成Ktor
-- [x] 优化datastore
+- [x] 重构datastore为MMKV
 - [x] 将一些全局状态重构成单例模式，简化代码，便于依赖注入
 - [x] 适配新的导航
 - [x] 设置页面
 - [x] 收藏页面
-- [ ] 关注页面
+- [x] 关注页面
 - [x] 历史页面
 
 </div>

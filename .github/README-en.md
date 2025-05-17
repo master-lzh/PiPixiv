@@ -10,7 +10,7 @@
 
 A third-party Pixiv App entirely written by [Jetpack Compose](https://developer.android.com/develop/ui/compose)
 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.1.20-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/master-lzh/PiPixiv/release.yml)](https://github.com/master-lzh/PiPixiv/actions/workflows/release.yml)
 [![License: Apache-2.0](https://img.shields.io/github/license/master-lzh/PiPixiv?labelColor=27303D&color=0877d2)](/LICENSE)
 
@@ -20,7 +20,7 @@ A third-party Pixiv App entirely written by [Jetpack Compose](https://developer.
 [![GitHub downloads](https://img.shields.io/github/downloads/master-lzh/PiPixiv/total?label=downloads&labelColor=27303D&color=0D1117&logo=github&logoColor=FFFFFF&style=flat)](https://github.com/master-lzh/PiPixiv/releases)
 [![F-Droid Version](https://img.shields.io/f-droid/v/com.mrl.pixiv)](https://f-droid.org/packages/com.mrl.pixiv/)
 
-### Supports **[Android 5.0]()** or higher
+### Supports **[Android 6.0]()** or higher
 
 ## Features
 
@@ -41,12 +41,12 @@ A third-party Pixiv App entirely written by [Jetpack Compose](https://developer.
 
 ### v1.1.0
 - [x] Refactor the network layer, replacing OkHttp with Ktor
-- [x] Optimize datastore
+- [x] Refactor datastore to MMKV
 - [x] Refactor some global states into a singleton pattern for code simplification and easier dependency injection
 - [x] Adapt new navigation
 - [x] Settings page
 - [x] Favourites page
-- [ ] Followed page
+- [x] Followed page
 - [x] History page
 
 </div>
