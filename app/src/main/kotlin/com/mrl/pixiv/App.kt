@@ -54,7 +54,7 @@ class App : Application() {
                 if (isFileExists(file)) {
                     val bytes = file.readBytes()
                     mmkv.encode("searchHistory", bytes)
-//                    deleteFiles(file)
+                    deleteFiles(file)
                 }
             }
             val userPreference = async {
@@ -62,7 +62,7 @@ class App : Application() {
                 if (isFileExists(file)) {
                     val bytes = file.readBytes()
                     mmkv.encode("userPreference", bytes)
-//                    deleteFiles(file)
+                    deleteFiles(file)
                 }
             }
             val userInfo = async {
@@ -70,7 +70,7 @@ class App : Application() {
                 if (isFileExists(file)) {
                     val bytes = file.readBytes()
                     mmkv.encode("userInfo", bytes)
-//                    deleteFiles(file)
+                    deleteFiles(file)
                 }
             }
             awaitAll(search, userPreference, userInfo)
