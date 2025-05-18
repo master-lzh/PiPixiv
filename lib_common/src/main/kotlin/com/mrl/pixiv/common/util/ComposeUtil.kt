@@ -24,11 +24,12 @@ inline fun Modifier.throttleClick(
     onClickLabel: String? = null,
     role: Role? = null,
     onLongClickLabel: String? = null,
-    noinline onLongClick: (() -> Unit) = {},
-    noinline onDoubleClick: (() -> Unit) = {},
+    noinline onLongClick: (() -> Unit)? = null,
+    noinline onDoubleClick: (() -> Unit)? = null,
     crossinline onClick: () -> Unit = {},
 ): Modifier = composed {
-    var lastClickTime by remember { mutableLongStateOf(value = 0L) }//使用remember函数记录上次点击的时间
+    // 使用remember函数记录上次点击的时间
+    var lastClickTime by remember { mutableLongStateOf(value = 0L) }
     val innerInteractionSource = remember { interactionSource ?: MutableInteractionSource() }
     combinedClickable(
         innerInteractionSource,

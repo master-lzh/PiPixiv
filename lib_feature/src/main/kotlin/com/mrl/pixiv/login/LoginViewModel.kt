@@ -8,7 +8,9 @@ import com.mrl.pixiv.common.viewmodel.ViewIntent
 import org.koin.android.annotation.KoinViewModel
 
 @Stable
-data object LoginState
+data class LoginState(
+    val loading: Boolean = false,
+)
 
 sealed class LoginAction : ViewIntent {
     data class Login(val code: String, val codeVerifier: String) : LoginAction()
@@ -20,7 +22,7 @@ sealed class LoginEvent : SideEffect {
 
 @KoinViewModel
 class LoginViewModel : BaseMviViewModel<LoginState, LoginAction>(
-    initialState = LoginState,
+    initialState = LoginState(),
 ) {
     override suspend fun handleIntent(intent: LoginAction) {
         when (intent) {
@@ -30,6 +32,7 @@ class LoginViewModel : BaseMviViewModel<LoginState, LoginAction>(
 
     private fun login(code: String, codeVerifier: String) =
         launchIO {
+            updateState { copy(loading = true) }
             AuthManager.login(code, codeVerifier)
             sendEffect(LoginEvent.NavigateToMain)
         }

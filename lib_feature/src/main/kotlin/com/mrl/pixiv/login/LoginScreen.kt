@@ -5,16 +5,20 @@ import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.util.loginToMainScreen
+import com.mrl.pixiv.common.util.throttleClick
+import com.mrl.pixiv.common.viewmodel.asState
 import com.multiplatform.webview.web.*
 import org.koin.androidx.compose.koinViewModel
 
@@ -26,6 +30,10 @@ fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(),
     navHostController: NavHostController = LocalNavigator.current,
 ) {
+    val state = viewModel.asState()
+    val webViewState = rememberWebViewState(url = startUrl)
+    val loadingState = webViewState.loadingState
+
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect {
             when (it) {
@@ -35,8 +43,6 @@ fun LoginScreen(
             }
         }
     }
-    val webViewState = rememberWebViewState(url = startUrl)
-    val loadingState = webViewState.loadingState
 
     Scaffold(
         modifier = modifier
@@ -103,6 +109,15 @@ fun LoginScreen(
                 )
             )
         }
-
+    }
+    if (state.loading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
+                .throttleClick()
+        ) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
     }
 }
