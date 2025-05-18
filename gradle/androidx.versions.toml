@@ -29,7 +29,7 @@ lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-com
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
-guava = "com.google.guava:guava:33.3.1-jre"
+guava = "com.google.guava:guava:33.4.8-jre"
 
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 
