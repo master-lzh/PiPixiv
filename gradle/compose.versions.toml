@@ -1,6 +1,6 @@
 [versions]
 compose-bom = "2025.05.00"
-accompanist = "0.34.0"
+accompanist = "0.36.0"
 
 [libraries]
 bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
