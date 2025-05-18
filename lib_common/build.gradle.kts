@@ -35,6 +35,7 @@ dependencies {
     api(compose.bundles.baselibs)
     api(androidx.activity.compose)
     api(compose.bundles.accompanist)
+    api(libs.compose.webview.multiplatform)
     // Navigation
     api(androidx.navigation.compose)
     // Koin

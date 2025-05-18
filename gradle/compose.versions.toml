@@ -13,9 +13,8 @@ material3-core = { module = "androidx.compose.material3:material3" }
 material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 material-icons = { module = "androidx.compose.material:material-icons-extended" }
 
-accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
 [bundles]
-accompanist = ["accompanist-webview", "accompanist-permissions"]
+accompanist = ["accompanist-permissions"]
 baselibs = ["foundation", "animation", "ui", "ui-tooling", "material-icons", "material3-core", "material-icons-core"]
