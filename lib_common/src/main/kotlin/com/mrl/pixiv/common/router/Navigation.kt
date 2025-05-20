@@ -2,6 +2,7 @@ package com.mrl.pixiv.common.router
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
@@ -35,6 +36,17 @@ sealed class Destination(
         icon = {
             Icon(
                 imageVector = Icons.Rounded.Home,
+                contentDescription = null,
+            )
+        }
+    )
+
+    @Serializable
+    data object LatestScreen : Destination(
+        title = { stringResource(RString.new_artworks) },
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.Favorite,
                 contentDescription = null,
             )
         }

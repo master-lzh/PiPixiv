@@ -3,6 +3,9 @@ package com.mrl.pixiv.navigation
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.*
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -30,6 +33,7 @@ import com.mrl.pixiv.common.router.Graph
 import com.mrl.pixiv.follow.FollowingScreen
 import com.mrl.pixiv.history.HistoryScreen
 import com.mrl.pixiv.home.HomeScreen
+import com.mrl.pixiv.latest.LatestScreen
 import com.mrl.pixiv.login.LoginOptionScreen
 import com.mrl.pixiv.login.LoginScreen
 import com.mrl.pixiv.login.oauth.OAuthLoginScreen
@@ -63,13 +67,12 @@ fun MainGraph(
                 bottomBar = {
                     HomeBottomBar(
                         navController = navHostController,
-                        bottomBarState = bottomBarVisibility(navHostController)
+                        bottomBarState = bottomBarVisibility(navHostController),
+                        modifier = Modifier.navigationBarsPadding()
                     )
                 },
+                contentWindowInsets = WindowInsets.navigationBars
             ) { innerPadding ->
-                val bottomPadding by remember(innerPadding) {
-                    mutableStateOf(innerPadding.calculateBottomPadding())
-                }
                 NavHost(
                     navController = navHostController,
                     route = Graph.Main::class,
@@ -97,15 +100,22 @@ fun MainGraph(
                     ) {
                         CompositionLocalProvider(LocalAnimatedContentScope provides this@composable) {
                             HomeScreen(
-                                modifier = Modifier.padding(bottom = bottomPadding),
+                                modifier = Modifier.padding(innerPadding),
                             )
+                        }
+                    }
+
+                    // 新作页面
+                    composable<Destination.LatestScreen> {
+                        CompositionLocalProvider(LocalAnimatedContentScope provides this) {
+                            LatestScreen(modifier = Modifier.padding(innerPadding))
                         }
                     }
 
                     // 搜索预览页
                     composable<Destination.SearchPreviewScreen> {
                         SearchPreviewScreen(
-                            modifier = Modifier.padding(bottom = bottomPadding),
+                            modifier = Modifier.padding(innerPadding),
                         )
                     }
 
@@ -113,7 +123,7 @@ fun MainGraph(
                     composable<Destination.ProfileScreen> {
                         CompositionLocalProvider(LocalAnimatedContentScope provides this) {
                             ProfileScreen(
-                                modifier = Modifier.padding(bottom = bottomPadding),
+                                modifier = Modifier.padding(innerPadding),
                             )
                         }
                     }
@@ -283,6 +293,7 @@ private fun bottomBarVisibility(
     navController.currentDestination?.hasRoute(Destination.HomeScreen::class)
     return listOf(
         Destination.HomeScreen::class,
+        Destination.LatestScreen::class,
         Destination.SearchPreviewScreen::class,
         Destination.ProfileScreen::class
     ).any { route ->

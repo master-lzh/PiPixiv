@@ -3,13 +3,14 @@ package com.mrl.pixiv.common.compose.ui.bar
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -23,6 +24,7 @@ fun HomeBottomBar(
 ) {
     val screens = listOf(
         Destination.HomeScreen,
+        Destination.LatestScreen,
         Destination.SearchPreviewScreen,
         Destination.ProfileScreen,
     )
@@ -31,9 +33,8 @@ fun HomeBottomBar(
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
     ) {
-        NavigationBar(
+        Row(
             modifier = modifier,
-            containerColor = MaterialTheme.colorScheme.background,
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination
@@ -55,7 +56,8 @@ fun HomeBottomBar(
                                 restoreState = true
                             }
                         }
-                    }
+                    },
+                    modifier = Modifier.requiredHeightIn(max = 56.dp)
                 )
             }
         }

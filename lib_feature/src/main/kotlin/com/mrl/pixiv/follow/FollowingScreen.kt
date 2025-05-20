@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -47,7 +48,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-private enum class FollowingPage {
+enum class FollowingPage {
     PUBLIC,
     PRIVATE,
 }
@@ -60,12 +61,13 @@ fun FollowingScreen(
 ) {
     val scope = rememberCoroutineScope()
     val navigator = LocalNavigator.current
-    val pullRefreshState = rememberPullToRefreshState()
     val pages = remember {
         if (uid.isSelf) listOf(FollowingPage.PUBLIC, FollowingPage.PRIVATE)
         else listOf(FollowingPage.PUBLIC)
     }
     val pagerState = rememberPagerState { pages.size }
+
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -112,49 +114,73 @@ fun FollowingScreen(
                     }
                 }
             }
-            HorizontalPager(
-                state = pagerState,
+            FollowingScreenBody(
+                uid = uid,
+                navToPictureScreen = navigator::navigateToPictureScreen,
+                navToUserProfile = navigator::navigateToProfileDetailScreen,
+                pages = pages.toImmutableList(),
+                pagerState = pagerState,
                 modifier = Modifier.weight(1f),
+                viewModel = viewModel,
+            )
+        }
+    }
+}
+
+@Composable
+fun FollowingScreenBody(
+    uid: Long,
+    navToPictureScreen: NavigateToHorizontalPictureScreen,
+    navToUserProfile: (Long) -> Unit,
+    pages: ImmutableList<FollowingPage>,
+    pagerState: PagerState,
+    modifier: Modifier = Modifier,
+    viewModel: FollowingViewModel = koinViewModel { parametersOf(uid) },
+    userScrollEnabled: Boolean = true,
+) {
+    val pullRefreshState = rememberPullToRefreshState()
+    HorizontalPager(
+        state = pagerState,
+        modifier = modifier,
+        userScrollEnabled = userScrollEnabled
+    ) {
+        val page = pages[it]
+        val followingUsers = if (page == FollowingPage.PUBLIC) {
+            viewModel.publicFollowingPageSource.collectAsLazyPagingItems()
+        } else {
+            viewModel.privateFollowingPageSource.collectAsLazyPagingItems()
+        }
+        PullToRefreshBox(
+            isRefreshing = followingUsers.loadState.refresh is LoadState.Loading,
+            onRefresh = { followingUsers.refresh() },
+            state = pullRefreshState
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    top = 10.dp,
+                    end = 16.dp,
+                    bottom = 20.dp
+                ),
+                verticalArrangement = 10f.spaceBy,
             ) {
-                val page = pages[it]
-                val followingUsers = if (page == FollowingPage.PUBLIC) {
-                    viewModel.publicFollowingPageSource.collectAsLazyPagingItems()
-                } else {
-                    viewModel.privateFollowingPageSource.collectAsLazyPagingItems()
-                }
-                PullToRefreshBox(
-                    isRefreshing = followingUsers.loadState.refresh is LoadState.Loading,
-                    onRefresh = { followingUsers.refresh() },
-                    state = pullRefreshState
+                items(
+                    followingUsers.itemCount,
+                    key = followingUsers.itemKey { it.user.id }
                 ) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            start = 16.dp,
-                            top = 10.dp,
-                            end = 16.dp,
-                            bottom = 20.dp
-                        ),
-                        verticalArrangement = 10f.spaceBy,
-                    ) {
-                        items(
-                            followingUsers.itemCount,
-                            key = followingUsers.itemKey { it.user.id }
-                        ) {
-                            val userPreview = followingUsers[it] ?: return@items
-                            FollowingUserCard(
-                                illusts = userPreview.illusts.toImmutableList(),
-                                userName = userPreview.user.name,
-                                userId = userPreview.user.id,
-                                userAvatar = userPreview.user.profileImageUrls.medium,
-                                isFollowed = userPreview.user.isFollowing,
-                                navToPictureScreen = navigator::navigateToPictureScreen,
-                                navToUserProfile = {
-                                    navigator.navigateToProfileDetailScreen(userPreview.user.id)
-                                }
-                            )
+                    val userPreview = followingUsers[it] ?: return@items
+                    FollowingUserCard(
+                        illusts = userPreview.illusts.toImmutableList(),
+                        userName = userPreview.user.name,
+                        userId = userPreview.user.id,
+                        userAvatar = userPreview.user.profileImageUrls.medium,
+                        isFollowed = userPreview.user.isFollowing,
+                        navToPictureScreen = navToPictureScreen,
+                        navToUserProfile = {
+                            navToUserProfile(userPreview.user.id)
                         }
-                    }
+                    )
                 }
             }
         }

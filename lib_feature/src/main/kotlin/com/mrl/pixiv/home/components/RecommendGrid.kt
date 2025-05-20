@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
+import com.mrl.pixiv.common.compose.ui.illust.RectangleIllustItem
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
@@ -43,23 +44,22 @@ fun RecommendGrid(
         modifier = Modifier.fillMaxSize()
     ) {
         items(recommendImageList.itemCount, key = recommendImageList.itemKey { it.id }) {
-            val illust = recommendImageList[it]
-            if (illust != null) {
-                val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
-                RecommendImageItem(
-                    navToPictureScreen = { prefix ->
-                        navToPictureScreen(recommendImageList.itemSnapshotList.items, it, prefix)
-                    },
-                    illust = illust,
-                    isBookmarked = isBookmarked
-                ) { restrict, tags ->
+            val illust = recommendImageList[it] ?: return@items
+            val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
+            RectangleIllustItem(
+                navToPictureScreen = { prefix ->
+                    navToPictureScreen(recommendImageList.itemSnapshotList.items, it, prefix)
+                },
+                illust = illust,
+                isBookmarked = isBookmarked,
+                onBookmarkClick = { restrict, tags ->
                     if (isBookmarked) {
                         BookmarkState.deleteBookmarkIllust(illust.id)
                     } else {
                         BookmarkState.bookmarkIllust(illust.id, restrict, tags)
                     }
                 }
-            }
+            )
         }
     }
 }
