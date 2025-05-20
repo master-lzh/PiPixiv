@@ -176,7 +176,10 @@ fun ProfileDetailScreen(
                         endText = stringResource(RString.view_all),
                         navToPictureScreen = navHostController::navigateToPictureScreen,
                         illusts = state.userBookmarksIllusts,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        onAllClick = {
+                            navHostController.navigateToCollectionScreen(uid)
+                        }
                     )
                 }
             }

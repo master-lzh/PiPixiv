@@ -96,7 +96,9 @@ sealed class Destination(
     data object HistoryScreen : Destination()
 
     @Serializable
-    data object SelfCollectionScreen : Destination()
+    data class CollectionScreen(
+        val userId: Long,
+    ) : Destination()
 
     @Serializable
     data class FollowingScreen(

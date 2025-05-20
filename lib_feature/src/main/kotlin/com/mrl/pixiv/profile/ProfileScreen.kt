@@ -24,6 +24,7 @@ import com.mrl.pixiv.common.compose.ui.image.UserAvatar
 import com.mrl.pixiv.common.data.setting.SettingTheme
 import com.mrl.pixiv.common.data.setting.getAppCompatDelegateThemeMode
 import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
+import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoValue
 import com.mrl.pixiv.common.util.*
 import org.koin.androidx.compose.koinViewModel
 
@@ -146,7 +147,9 @@ fun ProfileScreen(
                     }
                     // 收藏
                     SettingItem(
-                        onClick = navHostController::navigateToSelfCollectionScreen,
+                        onClick = {
+                            navHostController.navigateToCollectionScreen(requireUserInfoValue.user.id)
+                        },
                         icon = {
                             Icon(
                                 imageVector = Icons.Rounded.Bookmarks,

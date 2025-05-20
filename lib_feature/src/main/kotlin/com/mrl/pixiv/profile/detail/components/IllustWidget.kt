@@ -13,10 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mrl.pixiv.common.compose.ui.illust.SquareIllustItem
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.kts.spaceBy
-import com.mrl.pixiv.common.compose.ui.illust.SquareIllustItem
 import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
+import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
 
@@ -30,7 +31,8 @@ fun IllustWidget(
     endText: String,
     navToPictureScreen: NavigateToHorizontalPictureScreen,
     illusts: List<Illust>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAllClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -45,7 +47,13 @@ fun IllustWidget(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
-            Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .throttleClick {
+                        onAllClick()
+                    }
+            ) {
                 Text(
                     text = endText,
                     fontSize = 12.sp,

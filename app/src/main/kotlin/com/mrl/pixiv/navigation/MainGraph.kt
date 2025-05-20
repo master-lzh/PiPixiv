@@ -17,13 +17,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import com.mrl.pixiv.collection.SelfCollectionScreen
+import com.mrl.pixiv.collection.CollectionScreen
 import com.mrl.pixiv.common.compose.LocalAnimatedContentScope
 import com.mrl.pixiv.common.compose.LocalNavigator
 import com.mrl.pixiv.common.compose.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
 import com.mrl.pixiv.common.compose.ui.bar.HomeBottomBar
-import com.mrl.pixiv.common.datasource.local.mmkv.requireUserInfoFlow
 import com.mrl.pixiv.common.repository.IllustCacheRepo
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.DestinationsDeepLink
@@ -205,10 +204,10 @@ fun MainGraph(
                     }
 
                     // 本人收藏页
-                    composable<Destination.SelfCollectionScreen> {
+                    composable<Destination.CollectionScreen> {
                         CompositionLocalProvider(LocalAnimatedContentScope provides this) {
-                            val userInfo by requireUserInfoFlow.collectAsStateWithLifecycle()
-                            SelfCollectionScreen(uid = userInfo.user.id)
+                            val userId = it.toRoute<Destination.CollectionScreen>().userId
+                            CollectionScreen(uid = userId)
                         }
                     }
 
