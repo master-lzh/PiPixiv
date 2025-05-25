@@ -2,9 +2,12 @@ package com.mrl.pixiv.latest
 
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.mrl.pixiv.collection.CollectionViewModel
@@ -26,34 +29,43 @@ fun CollectionPage(
 ) {
     val state = viewModel.asState()
     val userBookmarksIllusts = viewModel.userBookmarksIllusts.collectAsLazyPagingItems()
-    LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Fixed(2),
+    val pullRefreshState = rememberPullToRefreshState()
+
+    PullToRefreshBox(
+        isRefreshing = userBookmarksIllusts.loadState.refresh is LoadState.Loading,
+        onRefresh = { userBookmarksIllusts.refresh() },
         modifier = modifier,
+        state = pullRefreshState
     ) {
-        items(
-            count = userBookmarksIllusts.itemCount,
-            key = userBookmarksIllusts.itemKey { it.id }
-        ) { index ->
-            val illust = userBookmarksIllusts[index] ?: return@items
-            val isBookmarked = illust.isBookmark
-            RectangleIllustItem(
-                illust = illust,
-                isBookmarked = isBookmarked,
-                navToPictureScreen = { prefix ->
-                    navHostController.navigateToPictureScreen(
-                        userBookmarksIllusts.itemSnapshotList.items,
-                        index,
-                        prefix
-                    )
-                },
-                onBookmarkClick = { restrict: String, tags: List<String>? ->
-                    if (isBookmarked) {
-                        BookmarkState.deleteBookmarkIllust(illust.id)
-                    } else {
-                        BookmarkState.bookmarkIllust(illust.id, restrict, tags)
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            modifier = Modifier,
+        ) {
+            items(
+                count = userBookmarksIllusts.itemCount,
+                key = userBookmarksIllusts.itemKey { it.id }
+            ) { index ->
+                val illust = userBookmarksIllusts[index] ?: return@items
+                val isBookmarked = illust.isBookmark
+                RectangleIllustItem(
+                    illust = illust,
+                    isBookmarked = isBookmarked,
+                    navToPictureScreen = { prefix ->
+                        navHostController.navigateToPictureScreen(
+                            userBookmarksIllusts.itemSnapshotList.items,
+                            index,
+                            prefix
+                        )
+                    },
+                    onBookmarkClick = { restrict: String, tags: List<String>? ->
+                        if (isBookmarked) {
+                            BookmarkState.deleteBookmarkIllust(illust.id)
+                        } else {
+                            BookmarkState.bookmarkIllust(illust.id, restrict, tags)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
