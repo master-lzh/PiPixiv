@@ -10,6 +10,11 @@ ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 
 material3-core = { module = "androidx.compose.material3:material3" }
+material3-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
+material3-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout" }
+material3-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation" }
+material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite" }
+material3-window-size = { module = "androidx.compose.material3:material3-window-size-class" }
 material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 material-icons = { module = "androidx.compose.material:material-icons-extended" }
 
@@ -17,4 +22,4 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 
 [bundles]
 accompanist = ["accompanist-permissions"]
-baselibs = ["foundation", "animation", "ui", "ui-tooling", "material-icons", "material3-core", "material-icons-core"]
+baselibs = ["foundation", "animation", "ui", "ui-tooling", "material-icons", "material3-core", "material3-adaptive", "material3-adaptive-layout", "material3-adaptive-navigation", "material3-adaptive-navigation-suite", "material3-window-size", "material-icons-core"]
