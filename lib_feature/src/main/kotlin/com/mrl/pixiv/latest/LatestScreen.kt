@@ -71,7 +71,9 @@ fun LatestScreen(
             ) {
                 val page = pages[it]
                 when (page) {
-                    LatestPage.TREND -> {}
+                    LatestPage.TREND -> {
+                        TrendingPage()
+                    }
                     LatestPage.COLLECTION -> {
                         CollectionPage(
                             uid = userInfo.user.id,
