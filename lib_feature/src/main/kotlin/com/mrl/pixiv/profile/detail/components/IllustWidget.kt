@@ -19,7 +19,7 @@ import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
+import com.mrl.pixiv.common.viewmodel.bookmark.isBookmark
 
 private const val SPAN_COUNT = 3
 private const val MAX_SHOW_ILLUST_COUNT = 6
@@ -77,7 +77,7 @@ fun IllustWidget(
         ) {
             val takenIllusts = illusts.take(MAX_SHOW_ILLUST_COUNT)
             takenIllusts.forEachIndexed { index, illust ->
-                val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
+                val isBookmarked = illust.isBookmark
                 SquareIllustItem(
                     illust = illust,
                     isBookmarked = isBookmarked,

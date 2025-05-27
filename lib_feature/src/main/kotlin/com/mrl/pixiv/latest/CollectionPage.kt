@@ -18,7 +18,7 @@ import com.mrl.pixiv.common.compose.ui.illust.RectangleIllustItem
 import com.mrl.pixiv.common.util.navigateToPictureScreen
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState.isBookmark
+import com.mrl.pixiv.common.viewmodel.bookmark.isBookmark
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 

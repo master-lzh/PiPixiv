@@ -18,7 +18,7 @@ import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.util.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
+import com.mrl.pixiv.common.viewmodel.bookmark.isBookmark
 
 private const val LOADING_ITEM_COUNT_PORTRAIT = 2
 private const val LOADING_ITEM_COUNT_LANDSCAPE = 4
@@ -45,7 +45,7 @@ fun RecommendGrid(
     ) {
         items(recommendImageList.itemCount, key = recommendImageList.itemKey { it.id }) {
             val illust = recommendImageList[it] ?: return@items
-            val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
+            val isBookmarked = illust.isBookmark
             RectangleIllustItem(
                 navToPictureScreen = { prefix ->
                     navToPictureScreen(recommendImageList.itemSnapshotList.items, it, prefix)

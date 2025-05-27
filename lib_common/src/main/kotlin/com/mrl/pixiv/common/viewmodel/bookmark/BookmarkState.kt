@@ -7,14 +7,11 @@ import com.mrl.pixiv.common.data.Restrict
 import com.mrl.pixiv.common.repository.PixivRepository
 import kotlinx.coroutines.Dispatchers
 
-val requireBookmarkState
-    get() = BookmarkState.state
+val Illust.isBookmark: Boolean
+    get() = BookmarkState.state[id] ?: isBookmarked
 
 object BookmarkState {
     internal val state = mutableStateMapOf<Long, Boolean>()
-
-    val Illust.isBookmark: Boolean
-        get() = state[id] ?: isBookmarked
 
     fun bookmarkIllust(
         illustId: Long,

@@ -38,9 +38,9 @@ import com.mrl.pixiv.common.datasource.local.mmkv.isSelf
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.util.*
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
+import com.mrl.pixiv.common.viewmodel.bookmark.isBookmark
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
-import com.mrl.pixiv.common.viewmodel.follow.FollowState.isFollowing
+import com.mrl.pixiv.common.viewmodel.follow.isFollowing
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -201,7 +201,7 @@ private fun FollowingUserCard(
     Card(modifier = modifier) {
         Row {
             illusts.take(3).forEachIndexed { index, it ->
-                val isBookmarked = requireBookmarkState[it.id] ?: it.isBookmarked
+                val isBookmarked = it.isBookmark
                 SquareIllustItem(
                     illust = it,
                     isBookmarked = isBookmarked,

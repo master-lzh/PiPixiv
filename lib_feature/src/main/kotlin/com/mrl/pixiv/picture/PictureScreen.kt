@@ -66,9 +66,9 @@ import com.mrl.pixiv.common.util.AppUtil.getString
 import com.mrl.pixiv.common.viewmodel.SideEffect
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.common.viewmodel.bookmark.BookmarkState
-import com.mrl.pixiv.common.viewmodel.bookmark.requireBookmarkState
+import com.mrl.pixiv.common.viewmodel.bookmark.isBookmark
 import com.mrl.pixiv.common.viewmodel.follow.FollowState
-import com.mrl.pixiv.common.viewmodel.follow.requireFollowState
+import com.mrl.pixiv.common.viewmodel.follow.isFollowing
 import com.mrl.pixiv.picture.components.UgoiraPlayer
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
@@ -167,7 +167,7 @@ internal fun PictureScreen(
     val isBarVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex <= illust.pageCount } }
     val isScrollToBottom = lazyListState.onScrollToBottom(illust.pageCount, illust.id)
 
-    val isBookmarked = requireBookmarkState[illust.id] ?: illust.isBookmarked
+    val isBookmarked = illust.isBookmark
     val onBookmarkClick = { restrict: String, tags: List<String>? ->
         if (isBookmarked) {
             BookmarkState.deleteBookmarkIllust(illust.id)
@@ -175,7 +175,7 @@ internal fun PictureScreen(
             BookmarkState.bookmarkIllust(illust.id, restrict, tags)
         }
     }
-    val isFollowed = requireFollowState[illust.user.id] == true
+    val isFollowed = illust.user.isFollowing
     val placeholder = rememberVectorPainter(Icons.Rounded.Refresh)
     val bottomSheetState = rememberModalBottomSheetState()
     val readMediaImagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -542,8 +542,7 @@ internal fun PictureScreen(
                         ) {
                             val illusts = state.userIllusts.take(userSpanCount)
                             illusts.forEachIndexed { index, it ->
-                                val innerIsBookmarked =
-                                    requireBookmarkState[it.id] ?: it.isBookmarked
+                                val innerIsBookmarked = illust.isBookmark
                                 SquareIllustItem(
                                     illust = it,
                                     isBookmarked = innerIsBookmarked,
@@ -588,7 +587,7 @@ internal fun PictureScreen(
                         val illust = relatedIllusts[index] ?: return@mapNotNull null
                         Triple(
                             illust,
-                            requireBookmarkState[illust.id] ?: illust.isBookmarked,
+                            illust.isBookmark,
                             index
                         )
                     }
