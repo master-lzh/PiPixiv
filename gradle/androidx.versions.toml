@@ -12,6 +12,7 @@ navigation = "2.9.0"
 datastore = "1.1.7"
 paging = "3.3.6"
 work = "2.10.1"
+window = "1.4.0"
 
 [libraries]
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -38,6 +39,8 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 
 paging = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
+
+window = { module = "androidx.window:window", version.ref = "window" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

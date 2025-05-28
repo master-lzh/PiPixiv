@@ -30,6 +30,7 @@ dependencies {
     api(androidx.profileinstaller)
     // Paging
     api(androidx.bundles.paging)
+    api(androidx.window)
     // Compose
     api(platform(compose.bom))
     api(compose.bundles.baselibs)
