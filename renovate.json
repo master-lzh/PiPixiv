@@ -8,14 +8,9 @@
   ],
   "packageRules": [
     {
-      "groupName": "所有依赖统一升级",
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "major"
-      ],
-      "matchPackagePatterns": [
-        ".*"
+      "groupName": "all-dependencies",
+      "matchPackageNames": [
+        "*"
       ]
     }
   ]
