@@ -1,5 +1,5 @@
 [versions]
-composeWebviewMultiplatform = "1.9.40"
+composeWebviewMultiplatform = "2.0.0"
 material = "1.12.0"
 okio = "3.13.0"
 coil3 = "3.2.0"
