@@ -285,10 +285,13 @@ jobs:
 
   ios:
     if: ${{ inputs.windowsArtifactRunId == '' }}
-    runs-on: macos-26
+    runs-on: xcode-27
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+
+      - name: Show Xcode version
+        run: xcodebuild -version
 
       - name: Setup Java
         uses: actions/setup-java@v5
