@@ -35,6 +35,7 @@ import org.koin.core.qualifier.named
 import java.util.Locale
 
 fun main(args: Array<String>) {
+    if (runDesktopAotTrainingIfRequested()) return
     if ("--sentry-mapping-smoke-test" in args) {
         runDesktopSentryMappingSmokeTest()
         return

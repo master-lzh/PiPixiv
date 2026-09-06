@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
-    [string]$MsiPath = 'composeApp/build/compose/binaries/main-release/msi/*.msi',
-    [string]$OutputDirectory = 'composeApp/build/reports/windows-startup',
+    [string]$MsiPath = 'desktopApp/build/compose/binaries/main-release/msi/*.msi',
+    [string]$OutputDirectory = 'desktopApp/build/reports/windows-startup',
     [ValidateSet('Tao', 'Awt', 'Auto')]
     [string]$ExpectedWindowBackend = 'Tao'
 )

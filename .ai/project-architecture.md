@@ -93,7 +93,8 @@ Coil 3 (coil3)
 ```
 PiPixiv/
 ├── app/                          # Android 入口模块（MainActivity、Navigation、Application）
-├── composeApp/                   # 多平台入口模块（iOS/Desktop）
+├── composeApp/                   # 共享 Compose UI、导航和平台实现
+├── desktopApp/                   # 桌面 JVM 入口、Nucleus 窗口及安装包
 ├── iosApp/                       # iOS 原生入口
 ├── lib_strings/                  # 字符串资源模块（所有平台共享）
 ├── baselineprofile/              # Baseline Profile 生成

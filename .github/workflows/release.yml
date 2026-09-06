@@ -138,28 +138,28 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           SENTRY_ORG: pipixiv
           SENTRY_PROJECT: pipixiv
-        run: ./gradlew :composeApp:createReleaseDistributable :composeApp:uploadDesktopSentryMapping -Pdebug=false
+        run: ./gradlew :desktopApp:createReleaseDistributable :desktopApp:uploadDesktopSentryMapping -Pdebug=false
 
       - name: Save desktop Sentry mapping
-        if: ${{ always() && hashFiles('composeApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
+        if: ${{ always() && hashFiles('desktopApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
         uses: actions/upload-artifact@v7
         with:
           name: desktop-linux-sentry-mapping
           if-no-files-found: error
           path: |
-            composeApp/build/compose/binaries/main-release/proguard/mapping.txt
-            composeApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
+            desktopApp/build/compose/binaries/main-release/proguard/mapping.txt
+            desktopApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
 
       - name: Package Linux Distribution
         run: |
-          cd composeApp/build/compose/binaries/main-release
+          cd desktopApp/build/compose/binaries/main-release
           tar -czf PiPixiv-linux-x86_64.tar.gz -C app .
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v7
         with:
           name: linux-artifacts
-          path: composeApp/build/compose/binaries/main-release/PiPixiv-linux-x86_64.tar.gz
+          path: desktopApp/build/compose/binaries/main-release/PiPixiv-linux-x86_64.tar.gz
 
   desktop-windows:
     runs-on: windows-latest
@@ -186,23 +186,23 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           SENTRY_ORG: pipixiv
           SENTRY_PROJECT: pipixiv
-        run: ./gradlew packageReleaseMsi :composeApp:uploadDesktopSentryMapping -Pdebug=false
+        run: ./gradlew :desktopApp:packageReleaseMsi :desktopApp:uploadDesktopSentryMapping -Pdebug=false
 
       - name: Save desktop Sentry mapping
-        if: ${{ always() && hashFiles('composeApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
+        if: ${{ always() && hashFiles('desktopApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
         uses: actions/upload-artifact@v7
         with:
           name: desktop-windows-sentry-mapping
           if-no-files-found: error
           path: |
-            composeApp/build/compose/binaries/main-release/proguard/mapping.txt
-            composeApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
+            desktopApp/build/compose/binaries/main-release/proguard/mapping.txt
+            desktopApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
 
       - name: Verify Windows installation and startup
         timeout-minutes: 8
         shell: pwsh
         run: |
-          $installers = @(Get-ChildItem 'composeApp/build/compose/binaries/main-release/msi/*.msi')
+          $installers = @(Get-ChildItem 'desktopApp/build/compose/binaries/main-release/msi/*.msi')
           if ($installers.Count -ne 1) { throw "Expected exactly one Windows MSI" }
           ./.github/scripts/test-windows-startup.ps1 -MsiPath $installers[0].FullName -OutputDirectory "$env:RUNNER_TEMP/windows-startup" -ExpectedWindowBackend Tao
 
@@ -219,7 +219,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: windows-artifacts
-          path: composeApp/build/compose/binaries/main-release/msi/*.msi
+          path: desktopApp/build/compose/binaries/main-release/msi/*.msi
           if-no-files-found: ignore
 
   desktop-macos:
@@ -247,23 +247,23 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           SENTRY_ORG: pipixiv
           SENTRY_PROJECT: pipixiv
-        run: ./gradlew packageReleaseDmg :composeApp:uploadDesktopSentryMapping -Pdebug=false
+        run: ./gradlew :desktopApp:packageReleaseDmg :desktopApp:uploadDesktopSentryMapping -Pdebug=false
 
       - name: Save desktop Sentry mapping
-        if: ${{ always() && hashFiles('composeApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
+        if: ${{ always() && hashFiles('desktopApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
         uses: actions/upload-artifact@v7
         with:
           name: desktop-macos-sentry-mapping
           if-no-files-found: error
           path: |
-            composeApp/build/compose/binaries/main-release/proguard/mapping.txt
-            composeApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
+            desktopApp/build/compose/binaries/main-release/proguard/mapping.txt
+            desktopApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
 
       - name: Upload MacOS Artifacts
         uses: actions/upload-artifact@v7
         with:
           name: macos-artifacts
-          path: composeApp/build/compose/binaries/main-release/dmg/*.dmg
+          path: desktopApp/build/compose/binaries/main-release/dmg/*.dmg
 
   ios:
     runs-on: xcode-27
