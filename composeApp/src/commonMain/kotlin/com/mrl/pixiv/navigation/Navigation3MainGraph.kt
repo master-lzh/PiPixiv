@@ -197,53 +197,37 @@ fun Navigation3MainGraph(
                     }
 
                     // 设置页
-                    entry<Destination.Setting>(
-                        metadata = ListDetailSceneStrategy.listPane()
-                    ) {
+                    entry<Destination.Setting> {
                         SettingScreen()
                     }
 
                     // 网络设置页
-                    entry<Destination.NetworkSetting>(
-                        metadata = ListDetailSceneStrategy.detailPane()
-                    ) {
+                    entry<Destination.NetworkSetting> {
                         NetworkSettingScreen()
                     }
 
-                    entry<Destination.BrowsingSetting>(
-                        metadata = ListDetailSceneStrategy.detailPane()
-                    ) {
+                    entry<Destination.BrowsingSetting> {
                         BrowsingSettingScreen()
                     }
 
-                    entry<Destination.SearchSetting>(
-                        metadata = ListDetailSceneStrategy.detailPane()
-                    ) {
+                    entry<Destination.SearchSetting> {
                         SearchSettingScreen()
                     }
 
-                    entry<Destination.HistorySetting>(
-                        metadata = ListDetailSceneStrategy.detailPane()
-                    ) {
+                    entry<Destination.HistorySetting> {
                         HistorySettingScreen()
                     }
 
-                    entry<Destination.PrivacySetting>(
-                        metadata = ListDetailSceneStrategy.detailPane()
-                    ) {
+                    entry<Destination.PrivacySetting> {
                         PrivacySettingScreen()
                     }
 
                     // 保存格式设置
-                    entry<Destination.FileNameFormat>(
-                        metadata = ListDetailSceneStrategy.detailPane()
-                    ) {
+                    entry<Destination.FileNameFormat> {
                         FileNameFormatScreen()
                     }
 
-                    entry<Destination.AiTranslationSetting>(
-                        metadata = ListDetailSceneStrategy.detailPane()
-                    ) {
+                    entry<Destination.AiTranslationSetting> {
                         AiTranslationSettingScreen()
                     }
 
@@ -261,9 +245,7 @@ fun Navigation3MainGraph(
                     }
 
                     // 本人收藏页
-                    entry<Destination.Collection>(
-                        metadata = ListDetailSceneStrategy.listPane()
-                    ) {
+                    entry<Destination.Collection> {
                         CollectionScreen(uid = it.userId, isNovel = it.isNovel)
                     }
 

@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.compose.rememberThrottleClick
+import com.mrl.pixiv.common.compose.ui.ViewModeToggleButton
 import com.mrl.pixiv.common.data.AppViewMode
 import com.mrl.pixiv.common.kts.VSpacer
 import com.mrl.pixiv.common.kts.spaceBy
@@ -75,7 +76,6 @@ import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.readTextFromClipboard
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
-import com.mrl.pixiv.main.components.ViewModeToggleButton
 import com.mrl.pixiv.strings.cancel
 import com.mrl.pixiv.strings.clear
 import com.mrl.pixiv.strings.enter_keywords

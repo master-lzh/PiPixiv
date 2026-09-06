@@ -28,13 +28,13 @@ import com.mrl.pixiv.common.analytics.logEvent
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
 import com.mrl.pixiv.common.compose.layout.isWidthCompact
 import com.mrl.pixiv.common.compose.ui.BackToTopButton
+import com.mrl.pixiv.common.compose.ui.ViewModeToggleButton
 import com.mrl.pixiv.common.data.AppViewMode
 import com.mrl.pixiv.common.kts.VSpacer
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.repository.SettingRepository.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.repository.requireUserInfoFlow
 import com.mrl.pixiv.common.util.RStrings
-import com.mrl.pixiv.main.components.ViewModeToggleButton
 import com.mrl.pixiv.strings.collection
 import com.mrl.pixiv.strings.latest_tab_following
 import com.mrl.pixiv.strings.latest_tab_trend

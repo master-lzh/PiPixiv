@@ -1,4 +1,4 @@
-package com.mrl.pixiv.main.components
+package com.mrl.pixiv.common.compose.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Book

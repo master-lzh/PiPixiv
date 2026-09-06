@@ -26,6 +26,7 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -44,12 +45,16 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.collection.components.FilterDialog
 import com.mrl.pixiv.common.compose.IllustGridDefaults
+import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
 import com.mrl.pixiv.common.compose.listener.KeyEventListener
 import com.mrl.pixiv.common.compose.listener.keyboardScrollerController
 import com.mrl.pixiv.common.compose.ui.BackToTopButton
 import com.mrl.pixiv.common.compose.ui.VerticalScrollbar
+import com.mrl.pixiv.common.compose.ui.ViewModeToggleButton
 import com.mrl.pixiv.common.compose.ui.illust.illustGrid
 import com.mrl.pixiv.common.compose.ui.novel.NovelItem
+import com.mrl.pixiv.common.data.AppViewMode
+import com.mrl.pixiv.common.kts.VSpacer
 import com.mrl.pixiv.common.kts.itemIndexKey
 import com.mrl.pixiv.common.repository.isSelf
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
@@ -83,6 +88,7 @@ fun CollectionScreen(
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(if (isNovel) 1 else 0) { 2 }
     val isIllustPage = pagerState.currentPage == 0
+    val useViewModeFab = currentWindowAdaptiveInfoV2().isWidthAtLeastMedium
 
     val illustController = remember {
         keyboardScrollerController(lazyGridState) {
@@ -106,17 +112,19 @@ fun CollectionScreen(
                     showFilterDialog = { showFilterDialog = true },
                     onBack = { navigationManager.popBackStack() }
                 )
-                PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
-                    Tab(
-                        selected = isIllustPage,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
-                        text = { Text(text = stringResource(RStrings.illusts)) }
-                    )
-                    Tab(
-                        selected = !isIllustPage,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
-                        text = { Text(text = stringResource(RStrings.novels)) }
-                    )
+                if (!useViewModeFab) {
+                    PrimaryTabRow(selectedTabIndex = pagerState.currentPage) {
+                        Tab(
+                            selected = isIllustPage,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
+                            text = { Text(text = stringResource(RStrings.illusts)) }
+                        )
+                        Tab(
+                            selected = !isIllustPage,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
+                            text = { Text(text = stringResource(RStrings.novels)) }
+                        )
+                    }
                 }
             }
         },
@@ -125,20 +133,33 @@ fun CollectionScreen(
                 lazyGridState.canScrollBackward
             else
                 lazyListState.canScrollBackward
-            BackToTopButton(
-                visibility = canScrollBackward,
-                modifier = Modifier,
-                onBackToTop = {
-                    scope.launch {
-                        if (isIllustPage) lazyGridState.scrollToItem(0)
-                        else lazyListState.scrollToItem(0)
+            Column {
+                BackToTopButton(
+                    visibility = canScrollBackward,
+                    modifier = Modifier,
+                    onBackToTop = {
+                        scope.launch {
+                            if (isIllustPage) lazyGridState.scrollToItem(0)
+                            else lazyListState.scrollToItem(0)
+                        }
+                    },
+                    onRefresh = {
+                        if (isIllustPage) userBookmarksIllusts.refresh()
+                        else userBookmarksNovels.refresh()
                     }
-                },
-                onRefresh = {
-                    if (isIllustPage) userBookmarksIllusts.refresh()
-                    else userBookmarksNovels.refresh()
+                )
+                if (useViewModeFab) {
+                    8.VSpacer
+                    ViewModeToggleButton(
+                        currentMode = if (isIllustPage) AppViewMode.ILLUST else AppViewMode.NOVEL,
+                        onModeChange = { mode ->
+                            scope.launch {
+                                pagerState.scrollToPage(if (mode == AppViewMode.ILLUST) 0 else 1)
+                            }
+                        }
+                    )
                 }
-            )
+            }
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.navigationBars),
     ) { paddingValues ->
