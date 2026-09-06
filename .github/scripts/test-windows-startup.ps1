@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [string]$MsiPath = 'composeApp/build/compose/binaries/main-release/msi/*.msi',
-    [string]$OutputDirectory = 'composeApp/build/reports/windows-startup'
+    [string]$OutputDirectory = 'composeApp/build/reports/windows-startup',
+    [ValidateSet('Tao', 'Awt', 'Auto')]
+    [string]$ExpectedWindowBackend = 'Tao'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -28,6 +30,8 @@ $result = [ordered]@{
     startedAt = [DateTime]::UtcNow.ToString('o')
     msiPath = $MsiPath
     msiSha256 = $null
+    msiProductCode = $null
+    msiLauncherComponentCode = $null
     installDirectory = $null
     installerExitCode = $null
     nativeLibrary = $null
@@ -39,6 +43,8 @@ $result = [ordered]@{
     stableSeconds = 30
     observedStableSeconds = $null
     window = $null
+    expectedWindowBackend = $ExpectedWindowBackend
+    expectedWindowClasses = @()
     screenshot = $null
     screenshotError = $null
     desktopScreenshot = $null
@@ -56,6 +62,82 @@ $trackedApplications = [System.Collections.Generic.Dictionary[int, System.Diagno
 $installer = $null
 $windowHandle = [IntPtr]::Zero
 $checks = [System.Collections.Generic.List[object]]::new()
+# Nucleus 2.5.14 uses Tao's default Windows class. Auto is only for the
+# workflow's explicit reuse of an older MSI, which can still contain AWT.
+$expectedWindowClasses = @(switch ($ExpectedWindowBackend) {
+    'Tao' { 'Window Class' }
+    'Awt' { 'SunAwtFrame' }
+    'Auto' { 'Window Class'; 'SunAwtFrame' }
+})
+$result.expectedWindowClasses = $expectedWindowClasses
+
+function Get-MsiLauncherMetadata {
+    param([string]$PackagePath)
+
+    $comInstaller = $null
+    $database = $null
+    $view = $null
+    $record = $null
+    try {
+        $comInstaller = New-Object -ComObject WindowsInstaller.Installer
+        $database = $comInstaller.OpenDatabase($PackagePath, 0)
+        $view = $database.OpenView('SELECT `Value` FROM `Property` WHERE `Property` = ''ProductCode''')
+        $view.Execute()
+        $record = $view.Fetch()
+        if ($null -eq $record) { throw 'The MSI does not declare a ProductCode.' }
+        $productCode = [string]$record.GetType().InvokeMember('StringData', 'GetProperty', $null, $record, @(1))
+        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($record) | Out-Null
+        $record = $null
+        $view.Close()
+        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($view) | Out-Null
+        $view = $null
+
+        # Resolve the launcher's registered component, regardless of whether
+        # jpackage or electron-builder authored the MSI directory tree.
+        $view = $database.OpenView('SELECT `File`.`File`, `File`.`FileName`, `Component`.`ComponentId`, `Component`.`KeyPath` FROM `File`, `Component` WHERE `File`.`Component_` = `Component`.`Component`')
+        $view.Execute()
+        $launchers = [System.Collections.Generic.List[object]]::new()
+        while ($null -ne ($record = $view.Fetch())) {
+            $columns = @(foreach ($column in 1..4) {
+                [string]$record.GetType().InvokeMember('StringData', 'GetProperty', $null, $record, @($column))
+            })
+            $longName = ($columns[1] -split '\|')[-1]
+            if ($longName -ieq 'PiPixiv.exe') {
+                if (-not $columns[2] -or $columns[3] -cne $columns[0]) {
+                    throw 'The MSI launcher must be the key file of a registered component.'
+                }
+                $launchers.Add([pscustomobject]@{ productCode = $productCode; componentCode = $columns[2] })
+            }
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($record) | Out-Null
+            $record = $null
+        }
+        if ($launchers.Count -ne 1) { throw 'The MSI must contain exactly one PiPixiv.exe launcher.' }
+        return $launchers[0]
+    }
+    finally {
+        if ($null -ne $view) { $view.Close() }
+        foreach ($comObject in @($record, $view, $database, $comInstaller)) {
+            if ($null -ne $comObject) {
+                [System.Runtime.InteropServices.Marshal]::ReleaseComObject($comObject) | Out-Null
+            }
+        }
+    }
+}
+
+function Get-MsiRegistration {
+    param([string]$ProductCode, [string]$ComponentCode)
+
+    $comInstaller = New-Object -ComObject WindowsInstaller.Installer
+    try {
+        $state = [int]$comInstaller.GetType().InvokeMember('ProductState', 'GetProperty', $null, $comInstaller, @($ProductCode))
+        $path = $null
+        if ($state -ne -1) {
+            $path = [string]$comInstaller.GetType().InvokeMember('ComponentPath', 'GetProperty', $null, $comInstaller, @($ProductCode, $ComponentCode))
+        }
+        return [pscustomobject]@{ state = $state; path = $path }
+    }
+    finally { [System.Runtime.InteropServices.Marshal]::ReleaseComObject($comInstaller) | Out-Null }
+}
 
 function Get-ApplicationProcessTree {
     param([int]$RootProcessId, [DateTime]$RootStartedAt, [string]$FamilyExecutable, [switch]$IncludeJvmModules)
@@ -177,10 +259,20 @@ try {
     $package = $packages[0].FullName
     $result.msiPath = $package
     $result.msiSha256 = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash
-    $installDirectory = Join-Path $env:LOCALAPPDATA 'PiPixiv'
-    $result.installDirectory = $installDirectory
-    if (Test-Path -LiteralPath $installDirectory) {
-        throw "Refusing to replace an existing installation at $installDirectory."
+    foreach ($existingDirectory in @(
+        (Join-Path $env:LOCALAPPDATA 'PiPixiv'),
+        (Join-Path $env:LOCALAPPDATA 'Programs/PiPixiv')
+    )) {
+        if (Test-Path -LiteralPath $existingDirectory) {
+            throw "Refusing to replace an existing installation at $existingDirectory."
+        }
+    }
+    $msiLauncher = Get-MsiLauncherMetadata -PackagePath $package
+    $result.msiProductCode = $msiLauncher.productCode
+    $result.msiLauncherComponentCode = $msiLauncher.componentCode
+    $registration = Get-MsiRegistration -ProductCode $msiLauncher.productCode -ComponentCode $msiLauncher.componentCode
+    if ($registration.state -ne -1) {
+        throw "Refusing to replace an already registered MSI product: $($msiLauncher.productCode)."
     }
 
     Add-Type -TypeDefinition @'
@@ -217,7 +309,18 @@ public static class PiPixivStartupWindow {
         throw "MSI installation failed with exit code $($installer.ExitCode)."
     }
 
-    $executable = Join-Path $installDirectory 'PiPixiv.exe'
+    $registration = Get-MsiRegistration -ProductCode $msiLauncher.productCode -ComponentCode $msiLauncher.componentCode
+    if ($registration.state -ne 5 -or -not $registration.path) {
+        throw 'The MSI did not register an installed launcher component for the current user.'
+    }
+    $executable = [System.IO.Path]::GetFullPath($registration.path)
+    $installDirectory = Split-Path -Parent $executable
+    $result.installDirectory = $installDirectory
+    $userDirectory = [System.IO.Path]::GetFullPath($env:LOCALAPPDATA).TrimEnd('\') + '\'
+    if (-not $executable.StartsWith($userDirectory, [System.StringComparison]::OrdinalIgnoreCase) -or
+        [System.IO.Path]::GetFileName($executable) -ine 'PiPixiv.exe') {
+        throw "The MSI launcher is not installed in the expected per-user location: $executable"
+    }
     $library = Join-Path $installDirectory 'app/resources/composeResources/files/mmkv/mmkvc.dll'
     if (-not (Test-Path -LiteralPath $executable -PathType Leaf)) {
         throw "Installed executable does not exist: $executable"
@@ -248,7 +351,7 @@ public static class PiPixivStartupWindow {
             throw "PiPixiv launcher exited before its main window appeared (exit code $($launcher.ExitCode))."
         }
         # JDK 25's Windows launcher can restart the same EXE as a child and
-        # wait in a parent without an AWT window. Follow only this EXE's chain.
+        # wait in a parent without a main window. Follow only this EXE's chain.
         $family = @(Get-ApplicationProcessTree -RootProcessId $launcher.Id `
             -RootStartedAt $launcherStartedAt -FamilyExecutable $executable)
         foreach ($member in $family) {
@@ -271,7 +374,7 @@ public static class PiPixivStartupWindow {
             }
             $checks.Add($check)
             if ($null -ne $check.handle -and $check.handle -ne 0) { $windowHandle = [IntPtr]$check.handle }
-            if ($check.title -ceq 'PiPixiv' -and $check.class -ceq 'SunAwtFrame' -and
+            if ($check.title -ceq 'PiPixiv' -and $expectedWindowClasses -ccontains $check.class -and
                 $check.responding -and $check.visible) {
                 $application = $trackedApplications[$member.processId]
                 $result.processId = $application.Id
@@ -286,11 +389,11 @@ public static class PiPixivStartupWindow {
         Start-Sleep -Seconds 1
     }
     if ($null -eq $result.window) {
-        throw 'No responding PiPixiv SunAwtFrame main window appeared within 60 seconds.'
+        throw "No responding PiPixiv $ExpectedWindowBackend main window appeared within 60 seconds."
     }
 
-    # MMKV initializes synchronously before application()/Window in main.kt.
-    # A launcher error dialog cannot satisfy the title and AWT class checks.
+    # MMKV initializes synchronously before the main window in main.kt.
+    # A launcher error dialog cannot satisfy the title and backend class checks.
     $stability = [System.Diagnostics.Stopwatch]::StartNew()
     do {
         $application.Refresh()
@@ -298,10 +401,13 @@ public static class PiPixivStartupWindow {
             $result.processExitCode = $application.ExitCode
             throw "PiPixiv exited during the stability check (exit code $($application.ExitCode))."
         }
+        $stableClass = [System.Text.StringBuilder]::new(256)
+        [PiPixivStartupWindow]::GetClassName($windowHandle, $stableClass, $stableClass.Capacity) | Out-Null
         if ($application.MainWindowHandle -ne $windowHandle -or
             -not [PiPixivStartupWindow]::IsWindow($windowHandle) -or
             -not [PiPixivStartupWindow]::IsWindowVisible($windowHandle) -or
-            $application.MainWindowTitle -cne 'PiPixiv' -or -not $application.Responding) {
+            $application.MainWindowTitle -cne 'PiPixiv' -or
+            $stableClass.ToString() -cne $result.window.class -or -not $application.Responding) {
             throw 'The PiPixiv main window disappeared, changed, or stopped responding.'
         }
         if ($stability.Elapsed.TotalSeconds -ge $result.stableSeconds) { break }

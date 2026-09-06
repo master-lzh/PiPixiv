@@ -1,13 +1,14 @@
 
 import com.mrl.pixiv.buildsrc.configureDesktopSentryMapping
 import com.mrl.pixiv.buildsrc.configureRemoveKoinMeta
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
-import org.jetbrains.compose.desktop.application.tasks.AbstractProguardTask
+import dev.nucleusframework.desktop.application.dsl.TargetFormat
+import dev.nucleusframework.desktop.application.tasks.AbstractJPackageTask
+import dev.nucleusframework.desktop.application.tasks.AbstractProguardTask
 
 plugins {
     id("pixiv.multiplatform.compose")
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.nucleus)
 }
 
 val desktopOsName = System.getProperty("os.name").toString()
@@ -113,32 +114,36 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation(compose.desktop.currentOs)
+                implementation(libs.nucleus.application)
+                implementation(libs.nucleus.window.tao)
             }
+        }
+        jvmTest.dependencies {
+            implementation(kotlin("test"))
         }
     }
 
     configureRemoveKoinMeta()
 }
 
-compose.desktop {
+nucleus {
     application {
         mainClass = "com.mrl.pixiv.MainKt"
 
         nativeDistributions {
             includeAllModules = true
-            targetFormats(
-                *listOfNotNull(
-                    TargetFormat.Dmg,
-                    TargetFormat.Msi,
-                    if ("Mac" !in System.getProperty("os.name")) TargetFormat.AppImage else null
-                ).toTypedArray()
-            )
+            cleanupNativeLibs = true
+            enableAotCache = false
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.RawAppImage)
             packageName = rootProject.name
             packageVersion = findProperty("versionName")?.toString()
             windows {
                 iconFile.set(file("icons/pipixiv.ico"))
                 shortcut = true
-                perUserInstall = true
+                msi {
+                    perMachine = false
+                    oneClick = false
+                }
                 msiPackageVersion = findProperty("versionName")?.toString()
                 upgradeUuid = "650ae9c7-32ad-400e-93f3-6b0874eccc1c"
                 menuGroup = rootProject.name
@@ -147,14 +152,22 @@ compose.desktop {
                 iconFile.set(file("icons/pipixiv.png"))
                 shortcut = true
             }
-            macOS { iconFile.set(file("icons/pipixiv.icns")) }
+            macOS {
+                iconFile.set(file("icons/pipixiv.icns"))
+                bundleID = "com.mrl.pixiv"
+                // The bundled MMKV native library targets macOS 12.0.
+                minimumSystemVersion = "12.0"
+            }
         }
 
         buildTypes.release.proguard {
-            version = "7.9.1"
+            version.set("7.9.1")
         }
 
         jvmArgs("--enable-native-access", "ALL-UNNAMED")
+        if (desktopOsName == "Mac OS X") {
+            jvmArgs("-XstartOnFirstThread")
+        }
     }
 }
 
@@ -224,7 +237,7 @@ if (findProperty("debug") != "true") {
             proguardTask = proguardReleaseJars,
             mappingFile = layout.buildDirectory.file("compose/binaries/main-release/proguard/mapping.txt"),
             outputJar = proguardReleaseJars.flatMap { task ->
-                task.mainJar.flatMap { jar -> task.destinationDir.file(jar.asFile.name) }
+                task.destinationDir.file(task.mainJarBaseName)
             },
             organization = "pipixiv",
             sentryProject = "pipixiv",
@@ -235,12 +248,12 @@ if (findProperty("debug") != "true") {
         val proguardFile = File.createTempFile("tmp", ".pro", temporaryDir)
         proguardFile.deleteOnExit()
 
-        compose.desktop.application.buildTypes.release.proguard {
+        nucleus.application.buildTypes.release.proguard {
             configurationFiles.from(proguardFile, file("compose-desktop.pro"))
-            optimize = false // fixme(tarsin): proguard internal error
+            optimize.set(false) // fixme(tarsin): proguard internal error
             // Sentry restores these names using the mapping UUID embedded before packaging.
-            obfuscate = true
-            joinOutputJars = true
+            obfuscate.set(true)
+            joinOutputJars.set(true)
         }
 
         doFirst {
@@ -264,8 +277,8 @@ if (findProperty("debug") != "true") {
         }
     }
 } else {
-    compose.desktop.application.buildTypes.release.proguard {
-        isEnabled = false
+    nucleus.application.buildTypes.release.proguard {
+        isEnabled.set(false)
     }
 }
 

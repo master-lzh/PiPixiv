@@ -27,7 +27,8 @@ sentry-bom = "8.55.0"
 sentry-plugin = "6.21.0"
 sentry-kmp = "0.27.0"
 hotswan = "2.0.0-beta04"
-webview = "1.0.0-beta-02"
+webview = "1.0.3"
+nucleus = "2.5.14"
 zoomimage = "1.6.0"
 
 # AndroidX
@@ -75,7 +76,9 @@ collections-immutable = "0.5.2"
 
 [libraries]
 # General
-compose-webview-multiplatform = { module = "io.github.kdroidfilter:composewebview", version.ref = "webview" }
+compose-webview-multiplatform = { module = "dev.nucleusframework:composewebview", version.ref = "webview" }
+nucleus-application = { module = "dev.nucleusframework:nucleus.nucleus-application", version.ref = "nucleus" }
+nucleus-window-tao = { module = "dev.nucleusframework:nucleus.decorated-window-tao", version.ref = "nucleus" }
 
 material = { module = "com.google.android.material:material", version.ref = "material" }
 mp_stools = { module = "io.github.darriousliu:mp_stools", version.ref = "mp_stools" }
@@ -302,6 +305,7 @@ android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.
 # Compose
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
+nucleus = { id = "dev.nucleusframework", version.ref = "nucleus" }
 
 # Kotlin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

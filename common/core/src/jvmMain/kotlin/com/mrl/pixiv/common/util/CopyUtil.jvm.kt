@@ -1,10 +1,14 @@
+@file:Suppress("DEPRECATION")
+@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
+
 package com.mrl.pixiv.common.util
 
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.text.AnnotatedString
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
-import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.ByteArrayInputStream
@@ -14,14 +18,16 @@ import java.nio.file.Paths
 import javax.imageio.ImageIO
 
 actual fun copyToClipboard(text: String) {
-    val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-    val selection = StringSelection(text)
-    clipboard.setContents(selection, null)
+    val clipboard = desktopWindowServices().clipboardManager
+    // Tao's synchronous Linux clipboard must be used on its GTK main thread.
+    runBlocking(Dispatchers.Main.immediate) {
+        clipboard.setText(AnnotatedString(text))
+    }
 }
 
 actual fun readTextFromClipboard(): String? = runCatching {
-    Toolkit.getDefaultToolkit().systemClipboard
-        .getData(DataFlavor.stringFlavor) as? String
+    val clipboard = desktopWindowServices().clipboardManager
+    runBlocking(Dispatchers.Main.immediate) { clipboard.getText()?.text }
 }.getOrNull()
 
 suspend fun copyImageToClipboard(imageUri: String) {
@@ -47,10 +53,7 @@ suspend fun copyImageToClipboard(imageUri: String) {
         }
 
         else -> {
-            Toolkit.getDefaultToolkit().systemClipboard.setContents(
-                TransferableImage(bitmap),
-                null,
-            )
+            desktopWindowServices().clipboard.setClipEntry(ClipEntry(TransferableImage(bitmap)))
         }
     }
 }

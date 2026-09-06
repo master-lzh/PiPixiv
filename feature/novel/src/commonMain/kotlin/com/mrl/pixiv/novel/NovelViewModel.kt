@@ -42,11 +42,11 @@ import com.mrl.pixiv.strings.ai_translation_deleted
 import com.mrl.pixiv.strings.ai_translation_failed
 import com.mrl.pixiv.strings.ai_translation_success
 import com.mrl.pixiv.strings.load_failed
+import com.mrl.pixiv.strings.export_failed
 import com.mrl.pixiv.strings.novel_marker_add_success
 import com.mrl.pixiv.strings.novel_marker_delete_success
 import com.mrl.pixiv.strings.novel_marker_update_failed
-import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.dialogs.openFileSaver
+import com.mrl.pixiv.common.util.selectSaveFile
 import io.github.vinceglb.filekit.writeString
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -418,11 +418,11 @@ class NovelViewModel(
         val novel = uiState.value.novel ?: return
         val text = uiState.value.novelText
 
-        // 这需要使用FileKit或平台特定API
         launchUI {
-            val file = FileKit.openFileSaver(
+            val file = selectSaveFile(
                 suggestedName = novel.title,
                 defaultExtension = "txt",
+                failureMessage = RStrings.export_failed,
             )
             if (file != null) {
                 withIOContext {

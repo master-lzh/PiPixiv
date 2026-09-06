@@ -2,7 +2,7 @@ package com.mrl.pixiv.login
 
 import android.annotation.SuppressLint
 import android.webkit.WebSettings
-import io.github.kdroidfilter.webview.web.NativeWebView
+import dev.nucleusframework.webview.web.NativeWebView
 
 @SuppressLint("SetJavaScriptEnabled")
 internal actual fun NativeWebView.setUp() {

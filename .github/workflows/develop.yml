@@ -137,7 +137,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           SENTRY_ORG: pipixiv
           SENTRY_PROJECT: pipixiv
-        run: ./gradlew packageReleaseAppImage :composeApp:uploadDesktopSentryMapping -Pdebug=false
+        run: ./gradlew :composeApp:createReleaseDistributable :composeApp:uploadDesktopSentryMapping -Pdebug=false
 
       - name: Save desktop Sentry mapping
         if: ${{ always() && hashFiles('composeApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
@@ -215,10 +215,13 @@ jobs:
       - name: Verify Windows installation and startup
         timeout-minutes: 8
         shell: pwsh
+        env:
+          WINDOWS_ARTIFACT_RUN_ID: ${{ inputs.windowsArtifactRunId }}
         run: |
           $installers = @(Get-ChildItem 'composeApp/build/compose/binaries/main-release/msi/*.msi')
           if ($installers.Count -ne 1) { throw "Expected exactly one Windows MSI" }
-          ./.github/scripts/test-windows-startup.ps1 -MsiPath $installers[0].FullName -OutputDirectory "$env:RUNNER_TEMP/windows-startup"
+          $backend = if ($env:WINDOWS_ARTIFACT_RUN_ID) { 'Auto' } else { 'Tao' }
+          ./.github/scripts/test-windows-startup.ps1 -MsiPath $installers[0].FullName -OutputDirectory "$env:RUNNER_TEMP/windows-startup" -ExpectedWindowBackend $backend
 
       - name: Upload Windows startup diagnostics
         if: always()

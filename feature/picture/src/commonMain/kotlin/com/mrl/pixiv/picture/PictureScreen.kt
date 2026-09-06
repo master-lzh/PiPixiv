@@ -67,6 +67,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -139,6 +140,7 @@ import com.mrl.pixiv.strings.cancel_user_blocked
 import com.mrl.pixiv.strings.copy_link
 import com.mrl.pixiv.strings.download
 import com.mrl.pixiv.strings.download_with_size
+import com.mrl.pixiv.strings.export_failed
 import com.mrl.pixiv.strings.follow
 import com.mrl.pixiv.strings.followed
 import com.mrl.pixiv.strings.hide_illust
@@ -152,9 +154,12 @@ import com.mrl.pixiv.strings.user_blocked
 import com.mrl.pixiv.strings.view_comments
 import com.mrl.pixiv.strings.view_comments_count
 import com.mrl.pixiv.strings.viewed
+import com.mrl.pixiv.common.util.selectSaveFile
+import com.mrl.pixiv.common.util.Platform
 import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
 import io.github.vinceglb.filekit.dialogs.compose.rememberFileSaverLauncher
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -288,7 +293,6 @@ internal fun PictureScreen(
     val bottomSheetState = rememberModalBottomSheetState(true)
     var contextMenuImageIndex by remember { mutableStateOf<Int?>(null) }
     var contextMenuOffset by remember { mutableStateOf(Offset.Zero) }
-    var pendingSaveAsUrl by remember { mutableStateOf<String?>(null) }
     val showPreviewControls = !browsingSettings.autoHidePreviewControls ||
             !isBarVisible ||
             arePreviewControlsVisible
@@ -370,13 +374,29 @@ internal fun PictureScreen(
             )
         }
     }
-    val saveAsLauncher = rememberFileSaverLauncher(
-        dialogSettings = FileKitDialogSettings.createDefault()
-    ) { file ->
-        val url = pendingSaveAsUrl
-        pendingSaveAsUrl = null
-        if (file != null && url != null) {
-            pictureViewModel.saveAsImage(url, file)
+    // Mobile keeps FileKit's Compose ActivityResult integration; desktop borrows
+    // a native Tao parent for the lifetime of each file dialog.
+    var pendingMobileSaveAsUrl by remember { mutableStateOf<String?>(null) }
+    val mobileSaveAsLauncher = if (platform !is Platform.Desktop) {
+        rememberFileSaverLauncher(dialogSettings = FileKitDialogSettings.createDefault()) { file ->
+            val url = pendingMobileSaveAsUrl
+            pendingMobileSaveAsUrl = null
+            if (file != null && url != null) pictureViewModel.saveAsImage(url, file)
+        }
+    } else {
+        null
+    }
+    val saveAsScope = rememberCoroutineScope()
+    fun saveAsImage(url: String) {
+        val (fileName, extension) = extractFileNameAndExtension(url)
+        if (mobileSaveAsLauncher != null) {
+            pendingMobileSaveAsUrl = url
+            mobileSaveAsLauncher.launch(suggestedName = fileName, defaultExtension = extension)
+            return
+        }
+        saveAsScope.launch {
+            val file = selectSaveFile(fileName, extension, RStrings.export_failed)
+            if (file != null) pictureViewModel.saveAsImage(url, file)
         }
     }
 
@@ -457,16 +477,7 @@ internal fun PictureScreen(
                                         onDownload = { url ->
                                             pictureViewModel.downloadIllust(illust.id, index, url)
                                         },
-                                        onSaveAs = { url ->
-                                            pendingSaveAsUrl = url
-                                            val (fileName, extension) = extractFileNameAndExtension(
-                                                url
-                                            )
-                                            saveAsLauncher.launch(
-                                                suggestedName = fileName,
-                                                defaultExtension = extension
-                                            )
-                                        },
+                                        onSaveAs = ::saveAsImage,
                                         onCopyLink = { url -> copyToClipboard(url) }
                                     )
                                 }
@@ -521,14 +532,7 @@ internal fun PictureScreen(
                                     onDownload = { url ->
                                         pictureViewModel.downloadIllust(illust.id, 0, url)
                                     },
-                                    onSaveAs = { url ->
-                                        pendingSaveAsUrl = url
-                                        val (fileName, extension) = extractFileNameAndExtension(url)
-                                        saveAsLauncher.launch(
-                                            suggestedName = fileName,
-                                            defaultExtension = extension
-                                        )
-                                    },
+                                    onSaveAs = ::saveAsImage,
                                     onCopyLink = { url -> copyToClipboard(url) }
                                 )
                             }

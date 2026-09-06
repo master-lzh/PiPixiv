@@ -62,6 +62,9 @@ kotlin {
             implementation(libs.coil3.gif)
             implementation(libs.mmkv)
         }
+        jvmMain.dependencies {
+            implementation(libs.nucleus.window.tao)
+        }
     }
 }
 

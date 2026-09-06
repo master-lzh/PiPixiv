@@ -17,6 +17,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.build.konfig) apply false
     alias(libs.plugins.composeHotReload) apply false
+    alias(libs.plugins.nucleus) apply false
     alias(libs.plugins.sentry.android) apply false
     alias(libs.plugins.sentry.kmp) apply false
     alias(libs.plugins.hotswan.compiler) apply false

@@ -23,17 +23,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import co.touchlab.kermit.Logger
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.util.Platform
+import com.mrl.pixiv.common.util.platform
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
-import io.github.kdroidfilter.webview.request.RequestInterceptor
-import io.github.kdroidfilter.webview.request.WebRequest
-import io.github.kdroidfilter.webview.request.WebRequestInterceptResult
-import io.github.kdroidfilter.webview.web.LoadingState
-import io.github.kdroidfilter.webview.web.NativeWebView
-import io.github.kdroidfilter.webview.web.WebView
-import io.github.kdroidfilter.webview.web.WebViewNavigator
-import io.github.kdroidfilter.webview.web.rememberWebViewNavigator
-import io.github.kdroidfilter.webview.web.rememberWebViewState
+import dev.nucleusframework.webview.request.RequestInterceptor
+import dev.nucleusframework.webview.request.WebRequest
+import dev.nucleusframework.webview.request.WebRequestInterceptResult
+import dev.nucleusframework.webview.web.LoadingState
+import dev.nucleusframework.webview.web.NativeWebView
+import dev.nucleusframework.webview.web.WebView
+import dev.nucleusframework.webview.web.WebViewNavigator
+import dev.nucleusframework.webview.web.rememberWebViewNavigator
+import dev.nucleusframework.webview.web.rememberWebViewState
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -45,6 +47,7 @@ fun LoginScreen(
     navigationManager: NavigationManager = koinInject(),
 ) {
     val state = viewModel.asState()
+    val nativeDesktopOverlay = platform is Platform.Desktop
     val webViewState = rememberWebViewState(url = startUrl)
     val webViewNavigator = rememberWebViewNavigator(
         requestInterceptor = object : RequestInterceptor {
@@ -78,22 +81,26 @@ fun LoginScreen(
         modifier = modifier
             .imePadding(),
         topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navigationManager.popBackStack()
-                        },
-                        shapes = IconButtonDefaults.shapes(),
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = null,
-                        )
-                    }
-                },
-            )
+            Box {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { navigationManager.popBackStack() },
+                            enabled = !state.loading,
+                            shapes = IconButtonDefaults.shapes(),
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = null,
+                            )
+                        }
+                    },
+                )
+                if (nativeDesktopOverlay && state.loading) {
+                    LoginLoadingOverlay(Modifier.matchParentSize(), showIndicator = false)
+                }
+            }
         }
     ) {
         Column(
@@ -117,16 +124,29 @@ fun LoginScreen(
                 onCreated = { webview ->
                     webview.setUp()
                 },
+                content = {
+                    // Native desktop WebViews need their own Compose overlay surface.
+                    if (nativeDesktopOverlay && state.loading) LoginLoadingOverlay()
+                },
             )
         }
     }
-    if (state.loading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
-                .throttleClick()
-        ) {
+    if (!nativeDesktopOverlay && state.loading) {
+        LoginLoadingOverlay()
+    }
+}
+
+@Composable
+private fun LoginLoadingOverlay(
+    modifier: Modifier = Modifier.fillMaxSize(),
+    showIndicator: Boolean = true,
+) {
+    Box(
+        modifier = modifier
+            .background(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
+            .throttleClick(),
+    ) {
+        if (showIndicator) {
             CircularWavyProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }

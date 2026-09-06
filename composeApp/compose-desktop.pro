@@ -26,6 +26,21 @@
 -keep class * extends com.sun.jna.* { *; }
 -keepclassmembers class * extends com.sun.jna.* { public *; }
 
+# FileKit's XDG portal uses D-Bus proxy interfaces. Their methods are wire
+# protocol names, and dbus-java rejects interfaces repackaged into the root.
+-keep interface * extends org.freedesktop.dbus.interfaces.DBusInterface {
+    public <methods>;
+}
+-keep interface org.freedesktop.dbus.interfaces.DBusInterface {
+    public <methods>;
+}
+# FileKit locates these public signal handlers by name, including inherited ones.
+-keepclassmembers class org.freedesktop.dbus.connections.** {
+    java.lang.AutoCloseable addGenericSigHandler(org.freedesktop.dbus.matchrules.DBusMatchRule, org.freedesktop.dbus.interfaces.DBusSigHandler);
+    java.lang.AutoCloseable addSigHandler(org.freedesktop.dbus.matchrules.DBusMatchRule, org.freedesktop.dbus.interfaces.DBusSigHandler);
+}
+-keepattributes RuntimeVisibleAnnotations,AnnotationDefault,Signature
+
 -assumevalues public class androidx.compose.runtime.ComposeRuntimeFlags {
     static boolean isLinkBufferComposerEnabled return true;
 }
