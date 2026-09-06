@@ -40,7 +40,8 @@ private fun resolveMMKVNativeLibrary(): String {
             else -> error("Unsupported desktop OS: $osName")
         }
     }
-    val libraryPath = Path.of(resourcesDirectory, "mmkv", libraryName)
+    // Gradle includes this file in the installer. Startup only resolves the installed file.
+    val libraryPath = Path.of(resourcesDirectory, "composeResources", "files", "mmkv", libraryName)
         .toAbsolutePath()
         .normalize()
     check(Files.isRegularFile(libraryPath)) {

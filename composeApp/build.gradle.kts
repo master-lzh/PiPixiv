@@ -1,6 +1,7 @@
 
 import com.mrl.pixiv.buildsrc.configureRemoveKoinMeta
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.compose.desktop.application.tasks.AbstractProguardTask
 
 plugins {
@@ -9,15 +10,15 @@ plugins {
 }
 
 val desktopOsName = System.getProperty("os.name").toString()
-val (desktopOsResourceDirectory, mmkvNativeLibraryName, mmkvNativeLibraryDependency) = when {
+val (mmkvNativeLibraryName, mmkvNativeLibraryDependency) = when {
     desktopOsName == "Mac OS X" ->
-        Triple("macos", "libmmkvc.dylib", libs.mmkv.kotlin.nativelib.macos)
+        "libmmkvc.dylib" to libs.mmkv.kotlin.nativelib.macos
 
     desktopOsName.startsWith("Windows") ->
-        Triple("windows", "mmkvc.dll", libs.mmkv.kotlin.nativelib.windows)
+        "mmkvc.dll" to libs.mmkv.kotlin.nativelib.windows
 
     desktopOsName.startsWith("Linux") ->
-        Triple("linux", "libmmkvc.so", libs.mmkv.kotlin.nativelib.linux)
+        "libmmkvc.so" to libs.mmkv.kotlin.nativelib.linux
 
     else -> error("Unsupported desktop OS: $desktopOsName")
 }
@@ -34,8 +35,9 @@ dependencies {
 }
 
 val composeResourcesDirectory =
-    layout.projectDirectory.dir("src/commonMain/composeResources/files")
-val mmkvComposeResourcesDirectory = composeResourcesDirectory.dir("mmkv")
+    layout.projectDirectory.dir("src/commonMain/composeResources")
+val mmkvComposeResourcesDirectory = composeResourcesDirectory.dir("files/mmkv")
+val packagedMMKVLibraryPath = "composeResources/files/mmkv/$mmkvNativeLibraryName"
 
 val copyMMKVNativeLibraryToComposeResources =
     tasks.register("copyMMKVNativeLibraryToComposeResources", Copy::class) {
@@ -155,6 +157,38 @@ compose.desktop {
     }
 }
 
+val prepareDesktopAppResources = tasks.withType<Sync>().matching { it.name == "prepareAppResources" }
+prepareDesktopAppResources.configureEach {
+    dependsOn(copyMMKVNativeLibraryToComposeResources)
+    // Include a real file in the installer; loading MMKV must never extract resources at startup.
+    from(composeResourcesDirectory) {
+        include("files/mmkv/$mmkvNativeLibraryName")
+        into("composeResources")
+    }
+}
+
+val verifyMMKVNativeLibraryPackaging = tasks.register("verifyMMKVNativeLibraryPackaging") {
+    group = "verification"
+    description = "Checks that MMKV is available as a native distribution resource"
+    dependsOn(prepareDesktopAppResources)
+
+    val libraryFile = providers.provider {
+        prepareDesktopAppResources.single().destinationDir.resolve(packagedMMKVLibraryPath)
+    }
+    inputs.file(libraryFile)
+
+    doLast {
+        val library = libraryFile.get()
+        check(library.isFile && library.length() > 0) {
+            "MMKV native library is missing from the desktop distribution resources: $library"
+        }
+    }
+}
+
+tasks.withType<AbstractJPackageTask>().configureEach {
+    dependsOn(verifyMMKVNativeLibraryPackaging)
+}
+
 tasks.matching { it.name == "copyNonXmlValueResourcesForCommonMain" }.configureEach {
     dependsOn(copyMMKVNativeLibraryToComposeResources)
 }
@@ -165,7 +199,7 @@ tasks.withType(JavaExec::class.java).configureEach {
         dependsOn(copyMMKVNativeLibraryToComposeResources)
         systemProperty(
             "compose.application.resources.dir",
-            composeResourcesDirectory.asFile.absolutePath,
+            composeResourcesDirectory.asFile.parentFile.absolutePath,
         )
     }
 }
