@@ -168,11 +168,29 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: ./gradlew packageReleaseMsi -Pdebug=false
 
+      - name: Verify Windows installation and startup
+        timeout-minutes: 8
+        shell: pwsh
+        run: |
+          $installers = @(Get-ChildItem 'composeApp/build/compose/binaries/main-release/msi/*.msi')
+          if ($installers.Count -ne 1) { throw "Expected exactly one Windows MSI" }
+          ./.github/scripts/test-windows-startup.ps1 -MsiPath $installers[0].FullName -OutputDirectory "$env:RUNNER_TEMP/windows-startup"
+
+      - name: Upload Windows startup diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-startup-diagnostics
+          path: ${{ runner.temp }}/windows-startup
+          if-no-files-found: ignore
+
       - name: Upload Windows Artifacts
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: windows-artifacts
           path: composeApp/build/compose/binaries/main-release/msi/*.msi
+          if-no-files-found: ignore
 
   desktop-macos:
     runs-on: macos-latest
