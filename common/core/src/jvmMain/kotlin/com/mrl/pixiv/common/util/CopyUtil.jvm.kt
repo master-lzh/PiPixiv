@@ -1,14 +1,15 @@
-@file:Suppress("DEPRECATION")
 @file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
 
 package com.mrl.pixiv.common.util
 
 import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.Clipboard
+import androidx.compose.ui.platform.asAwtTransferable
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.ByteArrayInputStream
@@ -17,18 +18,35 @@ import java.net.URI
 import java.nio.file.Paths
 import javax.imageio.ImageIO
 
-actual fun copyToClipboard(text: String) {
-    val clipboard = desktopWindowServices().clipboardManager
-    // Tao's synchronous Linux clipboard must be used on its GTK main thread.
-    runBlocking(Dispatchers.Main.immediate) {
-        clipboard.setText(AnnotatedString(text))
+actual suspend fun copyToClipboard(text: String) {
+    val clipboard = desktopWindowServices().clipboard
+    // Keep GTK clipboard access on Main without blocking its asynchronous callbacks.
+    withContext(Dispatchers.Main.immediate) {
+        clipboard.writePlainText(text)
     }
 }
 
-actual fun readTextFromClipboard(): String? = runCatching {
-    val clipboard = desktopWindowServices().clipboardManager
-    runBlocking(Dispatchers.Main.immediate) { clipboard.getText()?.text }
-}.getOrNull()
+actual suspend fun readTextFromClipboard(): String? = try {
+    val clipboard = desktopWindowServices().clipboard
+    withContext(Dispatchers.Main.immediate) { clipboard.readPlainText() }
+} catch (e: CancellationException) {
+    throw e
+} catch (_: Exception) {
+    null
+}
+
+internal suspend fun Clipboard.writePlainText(text: String) {
+    setClipEntry(ClipEntry(StringSelection(text)))
+}
+
+internal suspend fun Clipboard.readPlainText(): String? {
+    val transferable = getClipEntry()?.asAwtTransferable ?: return null
+    return if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        transferable.getTransferData(DataFlavor.stringFlavor) as? String
+    } else {
+        null
+    }
+}
 
 suspend fun copyImageToClipboard(imageUri: String) {
     val bitmap = try {

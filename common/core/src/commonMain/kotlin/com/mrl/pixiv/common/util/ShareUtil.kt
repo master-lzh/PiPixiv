@@ -1,7 +1,7 @@
 package com.mrl.pixiv.common.util
 
 expect object ShareUtil {
-    fun shareText(text: String)
+    suspend fun shareText(text: String)
 
     /**
      * 生成并分享图片的方法。
@@ -13,4 +13,3 @@ expect object ShareUtil {
      */
     suspend fun shareImage(imageUri: String)
 }
-

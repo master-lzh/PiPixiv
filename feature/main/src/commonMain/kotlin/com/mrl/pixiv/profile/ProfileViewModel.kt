@@ -32,7 +32,7 @@ class ProfileViewModel : BaseMviViewModel<ProfileState, ProfileAction>(
         }
     }
 
-    private fun exportToken() {
+    private suspend fun exportToken() {
         val token = AuthManager.userRefreshToken
         copyToClipboard(token)
         ToastUtil.safeShortToast(RStrings.copy_to_clipboard)
@@ -56,5 +56,4 @@ class ProfileViewModel : BaseMviViewModel<ProfileState, ProfileAction>(
         }
     }
 }
-
 

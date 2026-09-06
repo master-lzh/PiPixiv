@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.core.net.toUri
 
 actual object ShareUtil {
-    actual fun shareText(text: String) {
+    actual suspend fun shareText(text: String) {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
         shareIntent.putExtra(Intent.EXTRA_TEXT, text)

@@ -4,13 +4,13 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 
-actual fun copyToClipboard(text: String) {
+actual suspend fun copyToClipboard(text: String) {
     // 复制到剪切板
     val clipboardManager = AppUtil.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
     clipboardManager?.setPrimaryClip(ClipData.newPlainText(text, text))
 }
 
-actual fun readTextFromClipboard(): String? = runCatching {
+actual suspend fun readTextFromClipboard(): String? = runCatching {
     val clipboardManager =
         AppUtil.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
     val clip = clipboardManager?.primaryClip ?: return@runCatching null

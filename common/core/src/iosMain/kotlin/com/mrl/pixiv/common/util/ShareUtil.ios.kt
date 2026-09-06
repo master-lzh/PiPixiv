@@ -18,7 +18,7 @@ import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 
 actual object ShareUtil {
-    actual fun shareText(text: String) {
+    actual suspend fun shareText(text: String) {
         val controller = UIActivityViewController(listOf(text), null)
         presentViewController(controller)
     }

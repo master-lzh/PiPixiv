@@ -13,6 +13,7 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import com.mrl.pixiv.strings.block_tags
 import com.mrl.pixiv.strings.bookmark_add_success
 import com.mrl.pixiv.strings.collection
 import com.mrl.pixiv.strings.copy_to_clipboard
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -41,6 +43,7 @@ fun TagItem(
     tag: Tag,
     onClick: () -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     var showCollectionDialog by rememberSaveable { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -113,8 +116,10 @@ fun TagItem(
                             .throttleClick(
                                 indication = indication
                             ) {
-                                copyToClipboard(tag.name)
-                                showCollectionDialog = false
+                                coroutineScope.launch {
+                                    copyToClipboard(tag.name)
+                                    showCollectionDialog = false
+                                }
                             }
                             .then(itemModifier)
                     )

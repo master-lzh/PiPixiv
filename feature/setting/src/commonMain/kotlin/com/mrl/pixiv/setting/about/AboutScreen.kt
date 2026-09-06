@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,6 +61,7 @@ import com.mrl.pixiv.strings.project_url
 import com.mrl.pixiv.strings.recommend_content
 import com.mrl.pixiv.strings.recommend_this_app
 import com.mrl.pixiv.strings.share_app
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -70,6 +72,7 @@ fun AboutScreen(
     navigationManager: NavigationManager = koinInject(),
 ) {
     val uriHandler = LocalUriHandler.current
+    val coroutineScope = rememberCoroutineScope()
     val hasNewVersion by VersionManager.hasNewVersion.collectAsStateWithLifecycle()
     val latestVersionInfo by VersionManager.latestVersionInfo.collectAsStateWithLifecycle()
     var showUpdateDialog by retain { mutableStateOf(false) }
@@ -156,12 +159,14 @@ fun AboutScreen(
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
                         .throttleClick(indication = ripple()) {
-                            ShareUtil.shareText(
-                                AppUtil.getString(
-                                    RStrings.recommend_content,
-                                    Constants.GITHUB_RELEASE_URL
+                            coroutineScope.launch {
+                                ShareUtil.shareText(
+                                    AppUtil.getString(
+                                        RStrings.recommend_content,
+                                        Constants.GITHUB_RELEASE_URL
+                                    )
                                 )
-                            )
+                            }
                         },
                     supportingContent = {
                         Text(text = stringResource(RStrings.recommend_this_app))

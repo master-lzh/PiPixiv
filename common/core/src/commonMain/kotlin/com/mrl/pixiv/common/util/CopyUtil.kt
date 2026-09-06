@@ -1,5 +1,5 @@
 package com.mrl.pixiv.common.util
 
-expect fun copyToClipboard(text: String)
+expect suspend fun copyToClipboard(text: String)
 
-expect fun readTextFromClipboard(): String?
+expect suspend fun readTextFromClipboard(): String?

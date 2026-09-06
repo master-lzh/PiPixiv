@@ -2,8 +2,8 @@ package com.mrl.pixiv.common.util
 
 import platform.UIKit.UIPasteboard
 
-actual fun copyToClipboard(text: String) {
+actual suspend fun copyToClipboard(text: String) {
     UIPasteboard.generalPasteboard.string = text
 }
 
-actual fun readTextFromClipboard(): String? = UIPasteboard.generalPasteboard.string
+actual suspend fun readTextFromClipboard(): String? = UIPasteboard.generalPasteboard.string

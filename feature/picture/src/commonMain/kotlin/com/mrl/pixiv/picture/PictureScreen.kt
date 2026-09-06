@@ -386,7 +386,7 @@ internal fun PictureScreen(
     } else {
         null
     }
-    val saveAsScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     fun saveAsImage(url: String) {
         val (fileName, extension) = extractFileNameAndExtension(url)
         if (mobileSaveAsLauncher != null) {
@@ -394,7 +394,7 @@ internal fun PictureScreen(
             mobileSaveAsLauncher.launch(suggestedName = fileName, defaultExtension = extension)
             return
         }
-        saveAsScope.launch {
+        coroutineScope.launch {
             val file = selectSaveFile(fileName, extension, RStrings.export_failed)
             if (file != null) pictureViewModel.saveAsImage(url, file)
         }
@@ -478,7 +478,9 @@ internal fun PictureScreen(
                                             pictureViewModel.downloadIllust(illust.id, index, url)
                                         },
                                         onSaveAs = ::saveAsImage,
-                                        onCopyLink = { url -> copyToClipboard(url) }
+                                        onCopyLink = { url ->
+                                            coroutineScope.launch { copyToClipboard(url) }
+                                        }
                                     )
                                 }
                             }
@@ -533,7 +535,9 @@ internal fun PictureScreen(
                                         pictureViewModel.downloadIllust(illust.id, 0, url)
                                     },
                                     onSaveAs = ::saveAsImage,
-                                    onCopyLink = { url -> copyToClipboard(url) }
+                                    onCopyLink = { url ->
+                                        coroutineScope.launch { copyToClipboard(url) }
+                                    }
                                 )
                             }
                         }
@@ -1250,6 +1254,7 @@ private fun PictureTopBar(
     modifier: Modifier = Modifier,
 ) {
     var showBottomMenu by rememberSaveable { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
     TopAppBar(
         title = {},
         modifier = modifier,
@@ -1320,10 +1325,12 @@ private fun PictureTopBar(
                 )
                 BottomMenuItem(
                     onClick = {
-                        ShareUtil.shareText(
-                            "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
-                        )
-                        showBottomMenu = false
+                        coroutineScope.launch {
+                            ShareUtil.shareText(
+                                "${illust.title} | ${illust.user.name} #pixiv https://www.pixiv.net/artworks/${illust.id}"
+                            )
+                            showBottomMenu = false
+                        }
                     },
                     text = stringResource(RStrings.share),
                     modifier = Modifier.padding(vertical = 15.dp),

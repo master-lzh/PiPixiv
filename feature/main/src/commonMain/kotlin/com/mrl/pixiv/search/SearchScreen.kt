@@ -42,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,6 +84,7 @@ import com.mrl.pixiv.strings.search_history
 import com.mrl.pixiv.strings.select_pixiv_link
 import com.mrl.pixiv.strings.users
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -136,24 +138,27 @@ fun SearchScreen(
     }
 
     val focusRequester = remember { FocusRequester() }
+    val coroutineScope = rememberCoroutineScope()
     LifecycleResumeEffect(readClipboardOnSearch) {
-        val handledClipboardLink = if (readClipboardOnSearch) {
-            val clipboardText = readTextFromClipboard().orEmpty()
-            viewModel.isClipboardTextChanged(clipboardText) && handlePixivLinks(
-                text = clipboardText,
-                alwaysShowSelection = true,
-            )
-        } else {
-            false
-        }
-        if (!handledClipboardLink) {
-            try {
-                focusRequester.requestFocus()
-            } catch (_: Exception) {
+        val clipboardJob = coroutineScope.launch {
+            val handledClipboardLink = if (readClipboardOnSearch) {
+                val clipboardText = readTextFromClipboard().orEmpty()
+                viewModel.isClipboardTextChanged(clipboardText) && handlePixivLinks(
+                    text = clipboardText,
+                    alwaysShowSelection = true,
+                )
+            } else {
+                false
             }
-            textState = textState.copy(selection = TextRange(textState.text.length))
+            if (!handledClipboardLink) {
+                try {
+                    focusRequester.requestFocus()
+                } catch (_: Exception) {
+                }
+                textState = textState.copy(selection = TextRange(textState.text.length))
+            }
         }
-        onPauseOrDispose { }
+        onPauseOrDispose { clipboardJob.cancel() }
     }
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current

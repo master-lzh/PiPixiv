@@ -408,7 +408,7 @@ class NovelViewModel(
         updateState { copy(showBottomSheet = !showBottomSheet) }
     }
 
-    private fun shareNovel() {
+    private suspend fun shareNovel() {
         val novel = uiState.value.novel ?: return
         val url = "https://www.pixiv.net/novel/show.php?id=${novel.id}"
         ShareUtil.shareText(url)

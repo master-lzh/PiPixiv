@@ -1,7 +1,7 @@
 package com.mrl.pixiv.common.util
 
 actual object ShareUtil {
-    actual fun shareText(text: String) {
+    actual suspend fun shareText(text: String) {
         copyToClipboard(text)
     }
 

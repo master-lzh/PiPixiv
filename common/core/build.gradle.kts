@@ -65,6 +65,9 @@ kotlin {
         jvmMain.dependencies {
             implementation(libs.nucleus.window.tao)
         }
+        jvmTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
 }
 
