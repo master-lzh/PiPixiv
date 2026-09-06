@@ -298,8 +298,9 @@ public static class PiPixivStartupWindow {
 }
 '@
 
-    # Use the MSI's normal per-user installation path, without staging files.
-    $installArguments = '/i "{0}" /qn /norestart /L*V "{1}" ALLUSERS="" MSIINSTALLPERUSER=1' -f $package, $installLog
+    # Use the MSI's authored install scope. Nucleus defaults to ALLUSERS=2 and
+    # MSIINSTALLPERUSER=1; clearing ALLUSERS disables its per-user folder redirection.
+    $installArguments = '/i "{0}" /qn /norestart /L*V "{1}"' -f $package, $installLog
     $installer = Start-Process -FilePath (Join-Path $env:SystemRoot 'System32/msiexec.exe') `
         -ArgumentList $installArguments -PassThru
     if (-not $installer.WaitForExit(300000)) {
