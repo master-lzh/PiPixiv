@@ -18,12 +18,12 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,10 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mikepenz.markdown.m3.Markdown
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.data.Constants
 import com.mrl.pixiv.common.repository.VersionManager
 import com.mrl.pixiv.common.repository.VersionManager.getCurrentFlavorAsset
@@ -46,7 +48,6 @@ import com.mrl.pixiv.common.util.AppUtil
 import com.mrl.pixiv.common.util.RDrawables
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.ShareUtil
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.strings.about
 import com.mrl.pixiv.strings.app_name
 import com.mrl.pixiv.strings.cancel
@@ -129,53 +130,61 @@ fun AboutScreen(
             Column {
                 // Project URL
                 ListItem(
-                    headlineContent = { Text(text = stringResource(RStrings.project_url)) },
+                    onClick = rememberThrottleClick {
+                        uriHandler.openUri(Constants.GITHUB_URL)
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = { Text(text = stringResource(RStrings.project_url)) },
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .throttleClick(indication = ripple()) {
-                            uriHandler.openUri(Constants.GITHUB_URL)
-                        },
+                        .padding(horizontal = 8.dp),
                     supportingContent = {
                         Text(text = Constants.GITHUB_URL)
-                    }
+                    },
                 )
 
                 // Feedback
                 ListItem(
-                    headlineContent = { Text(text = stringResource(RStrings.feedback)) },
+                    onClick = rememberThrottleClick {
+                        uriHandler.openUri(Constants.GITHUB_ISSUE_URL)
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = { Text(text = stringResource(RStrings.feedback)) },
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .throttleClick(indication = ripple()) {
-                            uriHandler.openUri(Constants.GITHUB_ISSUE_URL)
-                        },
+                        .padding(horizontal = 8.dp),
                     supportingContent = {
                         Text(text = stringResource(RStrings.feedback_content))
-                    }
+                    },
                 )
 
                 // Share App
                 ListItem(
-                    headlineContent = { Text(text = stringResource(RStrings.share_app)) },
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .throttleClick(indication = ripple()) {
-                            coroutineScope.launch {
-                                ShareUtil.shareText(
-                                    AppUtil.getString(
-                                        RStrings.recommend_content,
-                                        Constants.GITHUB_RELEASE_URL
-                                    )
+                    onClick = rememberThrottleClick {
+                        coroutineScope.launch {
+                            ShareUtil.shareText(
+                                AppUtil.getString(
+                                    RStrings.recommend_content,
+                                    Constants.GITHUB_RELEASE_URL
                                 )
-                            }
-                        },
+                            )
+                        }
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = { Text(text = stringResource(RStrings.share_app)) },
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp),
                     supportingContent = {
                         Text(text = stringResource(RStrings.recommend_this_app))
-                    }
+                    },
                 )
 
                 // Check Update
                 ListItem(
-                    headlineContent = { Text(text = stringResource(RStrings.check_update)) },
+                    onClick = rememberThrottleClick {
+                        VersionManager.checkUpdate(true)
+                        showUpdateDialog = true
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = { Text(text = stringResource(RStrings.check_update)) },
                     trailingContent = {
                         if (hasNewVersion) {
                             Badge {
@@ -187,11 +196,7 @@ fun AboutScreen(
                         }
                     },
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .throttleClick(indication = ripple()) {
-                            VersionManager.checkUpdate(true)
-                            showUpdateDialog = true
-                        }
+                        .padding(horizontal = 8.dp),
                 )
             }
         }

@@ -20,10 +20,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,8 +32,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.router.NavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.throttleClick
@@ -198,8 +200,9 @@ private fun SettingDestinationItem(
     onClick: () -> Unit,
 ) {
     ListItem(
-        headlineContent = { Text(text = title) },
-        modifier = Modifier.throttleClick(indication = ripple(), onClick = onClick),
+        onClick = rememberThrottleClick(onClick = onClick),
+        shapes = ListItemDefaults.shapes(shape = RectangleShape),
+        content = { Text(text = title) },
         leadingContent = { Icon(imageVector = icon, contentDescription = null) },
         trailingContent = {
             Icon(

@@ -11,17 +11,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.NavigationManager
 import com.mrl.pixiv.common.util.RStrings
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.strings.block_comments
 import com.mrl.pixiv.strings.block_illust
 import com.mrl.pixiv.strings.block_novel
@@ -110,7 +111,9 @@ private fun BlockEntry(
     onClick: () -> Unit,
 ) {
     ListItem(
-        headlineContent = {
+        onClick = rememberThrottleClick(onClick = onClick),
+        shapes = ListItemDefaults.shapes(shape = RectangleShape),
+        content = {
             Text(
                 text = stringResource(title),
                 style = MaterialTheme.typography.titleMedium,
@@ -123,7 +126,6 @@ private fun BlockEntry(
             )
         },
         modifier = Modifier
-            .fillMaxWidth()
-            .throttleClick(indication = ripple(), onClick = onClick),
+            .fillMaxWidth(),
     )
 }

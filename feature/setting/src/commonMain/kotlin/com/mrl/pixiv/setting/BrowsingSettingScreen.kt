@@ -26,12 +26,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,9 +39,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.data.setting.BrowsingSettings
 import com.mrl.pixiv.common.data.setting.PreviewImageQuality
 import com.mrl.pixiv.common.data.setting.SearchResultIllustLayout
@@ -135,21 +137,22 @@ fun BrowsingSettingScreen(
                 }
             )
             ListItem(
-                headlineContent = {
+                onClick = rememberThrottleClick {
+                    SettingRepository.setBrowsingSettings(
+                        browsingSettings.copy(
+                            autoHidePreviewControls = !browsingSettings.autoHidePreviewControls
+                        )
+                    )
+                },
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
                     Text(text = stringResource(RStrings.auto_hide_preview_controls))
                 },
                 supportingContent = {
                     Text(text = stringResource(RStrings.auto_hide_preview_controls_desc))
                 },
                 modifier = Modifier
-                    .height(IntrinsicSize.Min)
-                    .throttleClick(indication = ripple()) {
-                        SettingRepository.setBrowsingSettings(
-                            browsingSettings.copy(
-                                autoHidePreviewControls = !browsingSettings.autoHidePreviewControls
-                            )
-                        )
-                    },
+                    .height(IntrinsicSize.Min),
                 leadingContent = {
                     Column(
                         modifier = Modifier.fillMaxHeight(),
@@ -172,25 +175,26 @@ fun BrowsingSettingScreen(
                             }
                         )
                     }
-                }
+                },
             )
             ListItem(
-                headlineContent = {
+                onClick = rememberThrottleClick {
+                    SettingRepository.setBrowsingSettings(
+                        browsingSettings.copy(
+                            tapImageToOpenFullResolutionPreview =
+                                !browsingSettings.tapImageToOpenFullResolutionPreview
+                        )
+                    )
+                },
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
                     Text(text = stringResource(RStrings.tap_image_to_open_full_resolution_preview))
                 },
                 supportingContent = {
                     Text(text = stringResource(RStrings.tap_image_to_open_full_resolution_preview_desc))
                 },
                 modifier = Modifier
-                    .height(IntrinsicSize.Min)
-                    .throttleClick(indication = ripple()) {
-                        SettingRepository.setBrowsingSettings(
-                            browsingSettings.copy(
-                                tapImageToOpenFullResolutionPreview =
-                                    !browsingSettings.tapImageToOpenFullResolutionPreview
-                            )
-                        )
-                    },
+                    .height(IntrinsicSize.Min),
                 leadingContent = {
                     Column(
                         modifier = Modifier.fillMaxHeight(),
@@ -215,24 +219,25 @@ fun BrowsingSettingScreen(
                             }
                         )
                     }
-                }
+                },
             )
             ListItem(
-                headlineContent = {
+                onClick = rememberThrottleClick {
+                    SettingRepository.setBrowsingSettings(
+                        browsingSettings.copy(
+                            filterLongNovelTags = !browsingSettings.filterLongNovelTags
+                        )
+                    )
+                },
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
                     Text(text = stringResource(RStrings.filter_long_novel_tags))
                 },
                 supportingContent = {
                     Text(text = stringResource(RStrings.filter_long_novel_tags_desc))
                 },
                 modifier = Modifier
-                    .height(IntrinsicSize.Min)
-                    .throttleClick(indication = ripple()) {
-                        SettingRepository.setBrowsingSettings(
-                            browsingSettings.copy(
-                                filterLongNovelTags = !browsingSettings.filterLongNovelTags
-                            )
-                        )
-                    },
+                    .height(IntrinsicSize.Min),
                 leadingContent = {
                     Column(
                         modifier = Modifier.fillMaxHeight(),
@@ -255,7 +260,7 @@ fun BrowsingSettingScreen(
                             }
                         )
                     }
-                }
+                },
             )
             if (browsingSettings.filterLongNovelTags) {
                 NovelTagLimitSetting(

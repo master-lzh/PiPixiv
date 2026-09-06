@@ -27,12 +27,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,9 +41,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.data.setting.HistorySettings
 import com.mrl.pixiv.common.repository.BrowsingHistoryRepository
 import com.mrl.pixiv.common.repository.SettingRepository
@@ -51,7 +53,6 @@ import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
 import com.mrl.pixiv.common.router.NavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.ToastUtil
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.strings.clear_local_history
 import com.mrl.pixiv.strings.clear_local_history_desc
 import com.mrl.pixiv.strings.enable_cloud_history
@@ -159,20 +160,21 @@ fun HistorySettingScreen(
                         )
                     }
                     ListItem(
-                        headlineContent = {
+                        onClick = rememberThrottleClick {
+                            scope.launch {
+                                browsingHistoryRepository.clearAllLocalHistory()
+                                ToastUtil.safeShortToast(RStrings.local_history_cleared)
+                            }
+                        },
+                        shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                        content = {
                             Text(text = stringResource(RStrings.clear_local_history))
                         },
                         supportingContent = {
                             Text(text = stringResource(RStrings.clear_local_history_desc))
                         },
                         modifier = Modifier
-                            .height(IntrinsicSize.Min)
-                            .throttleClick(indication = ripple()) {
-                                scope.launch {
-                                    browsingHistoryRepository.clearAllLocalHistory()
-                                    ToastUtil.safeShortToast(RStrings.local_history_cleared)
-                                }
-                            },
+                            .height(IntrinsicSize.Min),
                         leadingContent = {
                             Column(
                                 modifier = Modifier.fillMaxHeight(),
@@ -197,17 +199,18 @@ private fun HistorySwitchItem(
     icon: (@Composable () -> Unit)? = null,
 ) {
     ListItem(
-        headlineContent = {
+        onClick = rememberThrottleClick {
+            onCheckedChange(!checked)
+        },
+        shapes = ListItemDefaults.shapes(shape = RectangleShape),
+        content = {
             Text(text = title)
         },
         supportingContent = {
             Text(text = description)
         },
         modifier = Modifier
-            .height(IntrinsicSize.Min)
-            .throttleClick(indication = ripple()) {
-                onCheckedChange(!checked)
-            },
+            .height(IntrinsicSize.Min),
         leadingContent = icon?.let {
             {
                 Column(
@@ -228,7 +231,7 @@ private fun HistorySwitchItem(
                     onCheckedChange = onCheckedChange,
                 )
             }
-        }
+        },
     )
 }
 

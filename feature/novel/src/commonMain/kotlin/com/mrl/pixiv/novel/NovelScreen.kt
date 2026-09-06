@@ -17,8 +17,8 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -79,6 +79,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.compose.ui.BlockSurface
 import com.mrl.pixiv.common.compose.ui.BookmarkIcon
 import com.mrl.pixiv.common.compose.ui.NovelBottomBookmarkSheet
@@ -95,7 +96,6 @@ import com.mrl.pixiv.common.util.Platform
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.StatusBarVisibilityEffect
 import com.mrl.pixiv.common.util.platform
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.strings.ai_translation_setting
 import com.mrl.pixiv.strings.back
@@ -120,6 +120,8 @@ import com.mrl.pixiv.strings.show_novel
 import com.mrl.pixiv.strings.show_original_text
 import com.mrl.pixiv.strings.show_translated_text
 import com.mrl.pixiv.strings.translate_novel
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -129,8 +131,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import kotlin.math.roundToInt
-import kotlin.time.Duration.Companion.milliseconds
 
 internal data class NovelTranslationListAnchor(
     val novelId: Long,
@@ -866,32 +866,34 @@ private fun NovelBottomSheetContent(
 
         // 导出按钮
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.export_txt_button)) },
+            onClick = rememberThrottleClick(onClick = onExport),
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.export_txt_button)) },
             modifier = Modifier
-                .fillMaxWidth()
-                .throttleClick(onClick = onExport),
+                .fillMaxWidth(),
             leadingContent = {
                 Icon(
                     imageVector = Icons.Rounded.FileDownload,
                     contentDescription = stringResource(RStrings.export_txt_button)
                 )
             },
-            colors = colors
+            colors = colors,
         )
 
         // 分享按钮
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.share_link)) },
+            onClick = rememberThrottleClick(onClick = onShare),
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.share_link)) },
             modifier = Modifier
-                .fillMaxWidth()
-                .throttleClick(onClick = onShare),
+                .fillMaxWidth(),
             leadingContent = {
                 Icon(
                     imageVector = Icons.Rounded.Share,
                     contentDescription = stringResource(RStrings.share_link)
                 )
             },
-            colors = colors
+            colors = colors,
         )
 
         state.novel?.let { novel ->
@@ -909,23 +911,26 @@ private fun NovelBottomSheetContent(
 
         if (state.isTranslated && !state.isTranslating) {
             ListItem(
-                headlineContent = {
+                onClick = rememberThrottleClick(onClick = onRegenerateTranslation),
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
                     Text(text = stringResource(RStrings.regenerate_translation))
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .throttleClick(onClick = onRegenerateTranslation),
+                    .fillMaxWidth(),
                 leadingContent = {
                     Icon(
                         imageVector = Icons.Rounded.Refresh,
                         contentDescription = stringResource(RStrings.regenerate_translation)
                     )
                 },
-                colors = colors
+                colors = colors,
             )
 
             ListItem(
-                headlineContent = {
+                onClick = rememberThrottleClick(onClick = onToggleDisplayedText),
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
                     Text(
                         text = stringResource(
                             if (state.isShowingOriginalText) {
@@ -937,8 +942,7 @@ private fun NovelBottomSheetContent(
                     )
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .throttleClick(onClick = onToggleDisplayedText),
+                    .fillMaxWidth(),
                 leadingContent = {
                     Icon(
                         imageVector = if (state.isShowingOriginalText) {
@@ -955,28 +959,31 @@ private fun NovelBottomSheetContent(
                         )
                     )
                 },
-                colors = colors
+                colors = colors,
             )
 
             ListItem(
-                headlineContent = {
+                onClick = rememberThrottleClick(onClick = onDeleteTranslation),
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
                     Text(text = stringResource(RStrings.delete_translation))
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .throttleClick(onClick = onDeleteTranslation),
+                    .fillMaxWidth(),
                 leadingContent = {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
                         contentDescription = stringResource(RStrings.delete_translation)
                     )
                 },
-                colors = colors
+                colors = colors,
             )
         }
 
         ListItem(
-            headlineContent = {
+            onClick = rememberThrottleClick(onClick = onBlockNovel),
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = {
                 Text(
                     text = stringResource(
                         if (isNovelBlocked) RStrings.show_novel else RStrings.hide_novel
@@ -984,8 +991,7 @@ private fun NovelBottomSheetContent(
                 )
             },
             modifier = Modifier
-                .fillMaxWidth()
-                .throttleClick(onClick = onBlockNovel),
+                .fillMaxWidth(),
             leadingContent = {
                 Icon(
                     imageVector = if (isNovelBlocked) Icons.Rounded.Image else Icons.Rounded.HideImage,
@@ -994,21 +1000,22 @@ private fun NovelBottomSheetContent(
                     )
                 )
             },
-            colors = colors
+            colors = colors,
         )
 
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.ai_translation_setting)) },
+            onClick = rememberThrottleClick(onClick = onAiSetting),
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.ai_translation_setting)) },
             modifier = Modifier
-                .fillMaxWidth()
-                .throttleClick(onClick = onAiSetting),
+                .fillMaxWidth(),
             leadingContent = {
                 Icon(
                     imageVector = Icons.Rounded.Settings,
                     contentDescription = stringResource(RStrings.ai_translation_setting)
                 )
             },
-            colors = colors
+            colors = colors,
         )
     }
 }

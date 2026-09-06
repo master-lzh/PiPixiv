@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.data.setting.UserPreference
@@ -252,17 +254,27 @@ fun ProxyEditor(
 
     Column {
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.proxy_host)) },
+            onClick = {
+                showEditHost = true
+            },
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.proxy_host)) },
             supportingContent = { Text(text = setting.host) },
-            modifier = Modifier.clickable { showEditHost = true }
         )
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.proxy_port)) },
+            onClick = {
+                showEditPort = true
+            },
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.proxy_port)) },
             supportingContent = { Text(text = setting.port.toString()) },
-            modifier = Modifier.clickable { showEditPort = true }
         )
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.proxy_type)) },
+            onClick = {
+                showEditType = true
+            },
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.proxy_type)) },
             supportingContent = {
                 Text(
                     text = stringResource(
@@ -273,7 +285,6 @@ fun ProxyEditor(
                     )
                 )
             },
-            modifier = Modifier.clickable { showEditType = true }
         )
     }
 }
@@ -349,14 +360,20 @@ fun SniEditor(
 
     Column {
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.sni_doh_url)) },
+            onClick = {
+                showEditUrl = true
+            },
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.sni_doh_url)) },
             supportingContent = { Text(text = setting.url) },
-            modifier = Modifier.clickable { showEditUrl = true }
         )
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.sni_timeout)) },
+            onClick = {
+                showEditTimeout = true
+            },
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.sni_timeout)) },
             supportingContent = { Text(text = setting.dohTimeout.toString()) },
-            modifier = Modifier.clickable { showEditTimeout = true }
         )
         ListItem(
             headlineContent = { Text(text = stringResource(RStrings.sni_non_strict_ssl)) },
@@ -368,9 +385,12 @@ fun SniEditor(
             }
         )
         ListItem(
-            headlineContent = { Text(text = stringResource(RStrings.internal_ip_pool)) },
+            onClick = {
+                showEditInternalIpPool = true
+            },
+            shapes = ListItemDefaults.shapes(shape = RectangleShape),
+            content = { Text(text = stringResource(RStrings.internal_ip_pool)) },
             supportingContent = { Text(text = stringResource(RStrings.internal_ip_pool_desc)) },
-            modifier = Modifier.clickable { showEditInternalIpPool = true }
         )
     }
 }

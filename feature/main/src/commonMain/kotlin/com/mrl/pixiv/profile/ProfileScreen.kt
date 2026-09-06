@@ -33,12 +33,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,10 +46,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.compose.ui.image.UserAvatar
 import com.mrl.pixiv.common.data.setting.SettingTheme
 import com.mrl.pixiv.common.repository.SettingRepository
@@ -57,7 +59,6 @@ import com.mrl.pixiv.common.repository.VersionManager
 import com.mrl.pixiv.common.repository.requireUserInfoFlow
 import com.mrl.pixiv.common.router.NavigationManager
 import com.mrl.pixiv.common.util.RStrings
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.strings.about
 import com.mrl.pixiv.strings.app_data
 import com.mrl.pixiv.strings.block_settings
@@ -164,39 +165,37 @@ fun ProfileScreen(
             // 偏好设置
             item(key = KEY_PREFERENCE) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToSettingScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.preference),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToSettingScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
-                    }
+                    },
                 )
             }
             // 历史记录
             item(key = KEY_HISTORY) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToHistoryScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.history),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToHistoryScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
@@ -208,16 +207,17 @@ fun ProfileScreen(
             }
             item(key = KEY_READ_LATER) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToNovelReadLaterScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.read_later),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(indication = ripple()) {
-                            navigationManager.navigateToNovelReadLaterScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
@@ -230,18 +230,17 @@ fun ProfileScreen(
             // 收藏
             item(key = KEY_COLLECTION) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToCollectionScreen(userInfo.user.id)
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.collection),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToCollectionScreen(userInfo.user.id)
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
@@ -254,18 +253,17 @@ fun ProfileScreen(
             // 小说阅读书签
             item(key = KEY_NOVEL_MARKERS) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToNovelMarkersScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.novel_markers),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToNovelMarkersScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
@@ -278,18 +276,17 @@ fun ProfileScreen(
             // 收藏标签
             item(key = KEY_BOOKMARK_TAGS) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToBookmarkedTagsScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.bookmark_tags),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToBookmarkedTagsScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
@@ -302,42 +299,40 @@ fun ProfileScreen(
             // 屏蔽设定
             item(key = KEY_BLOCK_SETTINGS) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToBlockSettings()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.block_settings),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToBlockSettings()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Rounded.Block,
                             contentDescription = null
                         )
-                    }
+                    },
                 )
             }
             // 下载管理
             item(key = KEY_DOWNLOAD_MANAGER) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToDownloadScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.download_manager),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToDownloadScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
@@ -350,25 +345,24 @@ fun ProfileScreen(
             // 应用数据
             item(key = KEY_APP_DATA) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToAppDataScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.app_data),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToAppDataScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
                             imageVector = Icons.Rounded.Storage,
                             contentDescription = null
                         )
-                    }
+                    },
                 )
             }
             // 导出Token
@@ -378,18 +372,17 @@ fun ProfileScreen(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                     ListItem(
-                        headlineContent = {
+                        onClick = rememberThrottleClick {
+                            viewModel.dispatch(ProfileAction.ExportToken)
+                        },
+                        shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                        content = {
                             Text(
                                 text = stringResource(RStrings.export_token),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         },
                         modifier = Modifier
-                            .throttleClick(
-                                indication = ripple()
-                            ) {
-                                viewModel.dispatch(ProfileAction.ExportToken)
-                            }
                             .padding(horizontal = 8.dp),
                         leadingContent = {
                             Icon(
@@ -403,18 +396,17 @@ fun ProfileScreen(
             // 关于
             item(key = KEY_ABOUT) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        navigationManager.navigateToAboutScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.about),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            navigationManager.navigateToAboutScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(
@@ -431,25 +423,24 @@ fun ProfileScreen(
                                 )
                             }
                         }
-                    }
+                    },
                 )
             }
             // 退出登录
             item(key = KEY_LOGOUT) {
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        viewModel.logout()
+                        navigationManager.navigateToLoginOptionScreen()
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(
                             text = stringResource(RStrings.sign_out),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            viewModel.logout()
-                            navigationManager.navigateToLoginOptionScreen()
-                        }
                         .padding(horizontal = 8.dp),
                     leadingContent = {
                         Icon(

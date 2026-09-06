@@ -14,14 +14,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddLink
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.util.RStrings
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.strings.allow_open_link
 import com.mrl.pixiv.strings.default_open
 import org.jetbrains.compose.resources.stringResource
@@ -44,28 +45,27 @@ actual fun LazyListScope.appLinkItem() {
         item(KEY_DEFAULT_OPEN_LINK) {
             val context = LocalContext.current
             ListItem(
-                headlineContent = {
+                onClick = rememberThrottleClick {
+                    try {
+                        val intent = Intent().apply {
+                            action = Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
+                            addCategory(Intent.CATEGORY_DEFAULT)
+                            data = "package:${context.packageName}".toUri()
+                            addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                            addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                        }
+                        context.startActivity(intent)
+                    } catch (_: Throwable) {
+                    }
+                },
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
                     Text(
                         text = stringResource(RStrings.default_open),
                     )
                 },
                 modifier = Modifier
-                    .height(IntrinsicSize.Min)
-                    .throttleClick(
-                        indication = ripple()
-                    ) {
-                        try {
-                            val intent = Intent().apply {
-                                action = Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
-                                addCategory(Intent.CATEGORY_DEFAULT)
-                                data = "package:${context.packageName}".toUri()
-                                addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
-                                addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-                            }
-                            context.startActivity(intent)
-                        } catch (_: Throwable) {
-                        }
-                    },
+                    .height(IntrinsicSize.Min),
                 supportingContent = {
                     Text(
                         text = stringResource(RStrings.allow_open_link),

@@ -18,12 +18,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,13 +31,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.router.NavigationManager
 import com.mrl.pixiv.common.util.RStrings
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.strings.cancel
 import com.mrl.pixiv.strings.confirm
 import com.mrl.pixiv.strings.default_private_bookmark
@@ -105,14 +106,15 @@ fun PrivacySettingScreen(
                 .padding(horizontal = 8.dp),
         ) {
             ListItem(
-                headlineContent = { Text(text = stringResource(RStrings.r18)) },
-                modifier = Modifier.throttleClick(indication = ripple()) {
+                onClick = rememberThrottleClick {
                     if (userPreference.isR18Enabled) {
                         SettingRepository.setIsR18Enabled(false)
                     } else {
                         showR18Warning = true
                     }
                 },
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = { Text(text = stringResource(RStrings.r18)) },
                 leadingContent = {
                     Icon(imageVector = Icons.Rounded._18UpRating, contentDescription = null)
                 },
@@ -127,13 +129,14 @@ fun PrivacySettingScreen(
                 },
             )
             ListItem(
-                headlineContent = {
-                    Text(text = stringResource(RStrings.default_private_bookmark))
-                },
-                modifier = Modifier.throttleClick(indication = ripple()) {
+                onClick = rememberThrottleClick {
                     SettingRepository.setDefaultPrivateBookmark(
                         !userPreference.defaultPrivateBookmark
                     )
+                },
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
+                    Text(text = stringResource(RStrings.default_private_bookmark))
                 },
                 leadingContent = {
                     Icon(imageVector = Icons.Rounded.Favorite, contentDescription = null)
@@ -146,19 +149,20 @@ fun PrivacySettingScreen(
                 },
             )
             ListItem(
-                headlineContent = {
+                onClick = rememberThrottleClick {
+                    SettingRepository.setReadClipboardOnSearch(
+                        !userPreference.readClipboardOnSearch
+                    )
+                },
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
                     Text(text = stringResource(RStrings.read_clipboard_on_search))
                 },
                 supportingContent = {
                     Text(text = stringResource(RStrings.read_clipboard_on_search_desc))
                 },
                 modifier = Modifier
-                    .height(IntrinsicSize.Min)
-                    .throttleClick(indication = ripple()) {
-                        SettingRepository.setReadClipboardOnSearch(
-                            !userPreference.readClipboardOnSearch
-                        )
-                    },
+                    .height(IntrinsicSize.Min),
                 leadingContent = {
                     Column(
                         modifier = Modifier.fillMaxHeight(),

@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -35,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.router.NavigationManager
@@ -178,11 +180,12 @@ fun ReportScreen(
                     key = { it.topicId }
                 ) { topic ->
                     ListItem(
-                        headlineContent = { Text(topic.topicTitle) },
-                        modifier = Modifier.clickable {
+                        onClick = {
                             viewModel.selectTopic(topic.topicId)
                             showTopicSheet = false
-                        }
+                        },
+                        shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                        content = { Text(topic.topicTitle) },
                     )
                     HorizontalDivider()
                 }

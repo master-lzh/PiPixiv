@@ -17,19 +17,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.data.search.SearchAiType
 import com.mrl.pixiv.common.data.search.SearchSort
 import com.mrl.pixiv.common.data.search.SearchTarget
@@ -108,15 +110,16 @@ fun SearchSettingScreen(
                 }
             )
             ListItem(
-                headlineContent = {
-                    Text(text = stringResource(RStrings.ai_generate))
-                },
-                modifier = Modifier.throttleClick(indication = ripple()) {
+                onClick = rememberThrottleClick {
                     SettingRepository.setSearchSettings(
                         searchSettings.copy(
                             defaultSearchAiType = searchSettings.defaultSearchAiType.toggled()
                         )
                     )
+                },
+                shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                content = {
+                    Text(text = stringResource(RStrings.ai_generate))
                 },
                 leadingContent = {
                     Icon(Icons.Rounded.AutoAwesome, contentDescription = null)
@@ -136,7 +139,7 @@ fun SearchSettingScreen(
                             )
                         }
                     )
-                }
+                },
             )
             SearchResultDisplayModeSetting(
                 selectedMode = searchSettings.searchResultDisplayMode,

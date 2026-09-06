@@ -13,12 +13,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,14 +27,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.util.AppUtil
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.isImeVisible
-import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.strings.image_source
 import com.mrl.pixiv.strings.label_default
 import com.mrl.pixiv.strings.self_defined_source
@@ -82,7 +83,13 @@ fun PictureSourceWidget(
             )
             map.forEach { (key, value) ->
                 ListItem(
-                    headlineContent = {
+                    onClick = rememberThrottleClick {
+                        focusManager.clearFocus()
+                        savePictureSourceHost(key)
+                        imageHost = imageHost.copy(text = key)
+                    },
+                    shapes = ListItemDefaults.shapes(shape = RectangleShape),
+                    content = {
                         Text(text = value)
                         if (key == currentSelected) {
                             Icon(
@@ -93,13 +100,6 @@ fun PictureSourceWidget(
                         }
                     },
                     modifier = Modifier
-                        .throttleClick(
-                            indication = ripple()
-                        ) {
-                            focusManager.clearFocus()
-                            savePictureSourceHost(key)
-                            imageHost = imageHost.copy(text = key)
-                        }
                         .then(
                             if (key == currentSelected) {
                                 Modifier.background(MaterialTheme.colorScheme.primary)
