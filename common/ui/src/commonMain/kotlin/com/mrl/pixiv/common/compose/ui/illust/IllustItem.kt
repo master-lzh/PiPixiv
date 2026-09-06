@@ -22,12 +22,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -193,7 +194,10 @@ fun SquareIllustItem(
         }
     }
     if (showBottomSheet) {
-        val bottomSheetState = rememberModalBottomSheetState(true)
+        val bottomSheetState = rememberBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
+        )
         IllustBottomBookmarkSheet(
             hideBottomSheet = { showBottomSheet = false },
             illust = illust,
@@ -345,7 +349,10 @@ fun RectangleIllustItem(
         }
     }
     if (showBottomSheet) {
-        val bottomSheetState = rememberModalBottomSheetState(true)
+        val bottomSheetState = rememberBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
+        )
         IllustBottomBookmarkSheet(
             hideBottomSheet = { showBottomSheet = false },
             illust = illust,

@@ -21,8 +21,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -264,7 +265,10 @@ fun NovelItem(
     }
 
     if (showBottomSheet) {
-        val bottomSheetState = rememberModalBottomSheetState(true)
+        val bottomSheetState = rememberBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded),
+        )
         NovelBottomBookmarkSheet(
             hideBottomSheet = { showBottomSheet = false },
             novel = novel,
