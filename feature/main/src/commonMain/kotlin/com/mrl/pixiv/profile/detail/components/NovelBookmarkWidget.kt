@@ -97,16 +97,18 @@ private fun NovelItem(
     val seriesId = novel.series.id?.takeIf { it > 0L }
     val seriesTitle = novel.series.title?.takeIf { it.isNotEmpty() }
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .throttleClick { onNovelClick(novel.id) }
+    ) {
         Row {
             Column(
                 modifier = Modifier.padding(start = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
-                    modifier = Modifier
-                        .height(90.dp)
-                        .throttleClick { onNovelClick(novel.id) },
+                    modifier = Modifier.height(90.dp),
                     model = novel.imageUrls.medium,
                     contentDescription = novel.title
                 )
@@ -150,7 +152,6 @@ private fun NovelItem(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .padding(top = if (seriesTitle == null) 0.dp else 5.dp)
-                        .throttleClick { onNovelClick(novel.id) }
                 )
                 //author
                 Text(
