@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
 }
 
+val platformApiDependency = dependencies.project(":common:platform-api")
+
 kotlin {
     jvmToolchain(25)
 
@@ -19,7 +21,7 @@ kotlin {
         moduleName = "PiPixivKit"
         flattenPackage = "com.mrl.pixiv.ios"
 
-        export(project(":common:platform-api")) {
+        export(platformApiDependency) {
             moduleName = "PiPixivPlatform"
             flattenPackage = "com.mrl.pixiv.common"
         }

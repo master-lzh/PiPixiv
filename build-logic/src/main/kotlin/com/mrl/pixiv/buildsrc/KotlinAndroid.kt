@@ -22,7 +22,6 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -84,7 +83,7 @@ internal fun Project.configureKotlin() {
             jvmTarget.set(JvmTarget.JVM_17)
             // Treat all Kotlin warnings as errors (disabled by default)
             // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
-            val warningsAsErrors: String? by project
+            val warningsAsErrors = project.providers.gradleProperty("warningsAsErrors").orNull
             allWarningsAsErrors.set(warningsAsErrors.toBoolean())
             freeCompilerArgs.addAll(optIns)
         }
