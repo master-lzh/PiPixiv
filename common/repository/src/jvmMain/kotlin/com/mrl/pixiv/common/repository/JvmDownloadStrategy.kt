@@ -15,7 +15,7 @@ import io.github.vinceglb.filekit.absolutePath
 import io.github.vinceglb.filekit.createDirectories
 import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.exists
-import io.github.vinceglb.filekit.pictureDir
+import io.github.vinceglb.filekit.picturesDir
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
@@ -48,7 +48,7 @@ class JvmDownloadStrategy(
     private val scope = CoroutineScope(Dispatchers.IO)
     private val jobs = ConcurrentHashMap<String, Job>()
 
-    override val downloadFolder = (FileKit.pictureDir / "PiPixiv").absolutePath()
+    override val downloadFolder = (FileKit.picturesDir / "PiPixiv").absolutePath()
 
     override suspend fun enqueue(illustId: Long, index: Int, url: String, subFolder: String?) {
         val key = getKey(illustId, index)
