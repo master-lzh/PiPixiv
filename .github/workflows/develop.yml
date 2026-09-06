@@ -9,9 +9,14 @@ on:
       name:
         description: "Dev-Build"
         default: "Generate dev build"
+      windowsArtifactRunId:
+        description: "Existing run ID for Windows startup only; leave empty to build all platforms"
+        type: string
+        default: ""
 
 jobs:
   android-foss:
+    if: ${{ inputs.windowsArtifactRunId == '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -57,6 +62,7 @@ jobs:
             app/release/foss/*.apk
 
   android-default:
+    if: ${{ inputs.windowsArtifactRunId == '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -106,6 +112,7 @@ jobs:
             app/release/default/*.apk
 
   desktop-linux:
+    if: ${{ inputs.windowsArtifactRunId == '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -140,6 +147,9 @@ jobs:
 
   desktop-windows:
     runs-on: windows-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -152,13 +162,24 @@ jobs:
           cache: 'gradle'
 
       - name: Set up gradle
+        if: ${{ inputs.windowsArtifactRunId == '' }}
         uses: gradle/actions/setup-gradle@v5
 
       - name: Build Windows Distribution
+        if: ${{ inputs.windowsArtifactRunId == '' }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: ./gradlew packageReleaseMsi -Pdebug=false
+
+      - name: Download Windows MSI for startup verification
+        if: ${{ inputs.windowsArtifactRunId != '' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: windows-artifacts
+          run-id: ${{ inputs.windowsArtifactRunId }}
+          github-token: ${{ github.token }}
+          path: composeApp/build/compose/binaries/main-release/msi
 
       - name: Verify Windows installation and startup
         timeout-minutes: 8
@@ -185,6 +206,7 @@ jobs:
           if-no-files-found: ignore
 
   desktop-macos:
+    if: ${{ inputs.windowsArtifactRunId == '' }}
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
@@ -213,6 +235,7 @@ jobs:
           path: composeApp/build/compose/binaries/main-release/dmg/*.dmg
 
   ios:
+    if: ${{ inputs.windowsArtifactRunId == '' }}
     runs-on: macos-26
     steps:
       - name: Checkout Repository

@@ -32,6 +32,8 @@ $result = [ordered]@{
     installerExitCode = $null
     nativeLibrary = $null
     processId = $null
+    launcherPid = $null
+    applicationPid = $null
     processExitCode = $null
     windowReadySeconds = $null
     stableSeconds = 30
@@ -39,14 +41,133 @@ $result = [ordered]@{
     window = $null
     screenshot = $null
     screenshotError = $null
+    desktopScreenshot = $null
+    processTree = $null
+    jvmDiagnostics = @()
+    diagnosticErrors = @()
     error = $null
     cleanupError = $null
     finishedAt = $null
 }
 $application = $null
+$launcher = $null
+$launcherStartedAt = $null
+$trackedApplications = [System.Collections.Generic.Dictionary[int, System.Diagnostics.Process]]::new()
 $installer = $null
 $windowHandle = [IntPtr]::Zero
 $checks = [System.Collections.Generic.List[object]]::new()
+
+function Get-ApplicationProcessTree {
+    param([int]$RootProcessId, [DateTime]$RootStartedAt, [string]$FamilyExecutable, [switch]$IncludeJvmModules)
+
+    $records = [System.Collections.Generic.List[object]]::new()
+    $pending = [System.Collections.Generic.Queue[object]]::new()
+    $pending.Enqueue([pscustomobject]@{ processId = $RootProcessId; startedAt = $RootStartedAt; isRoot = $true })
+    $seen = [System.Collections.Generic.HashSet[int]]::new()
+    while ($pending.Count -gt 0) {
+        $expected = $pending.Dequeue()
+        if (-not $seen.Add($expected.processId)) { continue }
+        $row = Get-CimInstance -ClassName Win32_Process -Filter "ProcessId = $($expected.processId)" -OperationTimeoutSec 5
+        if ($null -eq $row) { continue }
+        # A recycled PID must not bring an unrelated process into diagnostics.
+        if ([Math]::Abs(($row.CreationDate.ToUniversalTime() - $expected.startedAt.ToUniversalTime()).TotalSeconds) -gt 1) {
+            continue
+        }
+        $record = [ordered]@{
+            processId = [int]$row.ProcessId
+            parentProcessId = [int]$row.ParentProcessId
+            isRoot = $expected.isRoot
+            name = $row.Name
+            executablePath = $row.ExecutablePath
+            commandLine = $row.CommandLine
+            startedAt = $row.CreationDate.ToUniversalTime().ToString('o')
+            hasExited = $null
+            mainWindowHandle = $null
+            mainWindowTitle = $null
+            mainWindowClass = $null
+            responding = $null
+            visible = $false
+            loadedJvm = $false
+            inspectionError = $null
+        }
+        $current = $null
+        try {
+            $current = Get-Process -Id $record.processId
+            $current.Refresh()
+            $record.hasExited = $current.HasExited
+            $record.mainWindowHandle = $current.MainWindowHandle.ToInt64()
+            $record.mainWindowTitle = $current.MainWindowTitle
+            $record.responding = $current.Responding
+            if ($current.MainWindowHandle -ne [IntPtr]::Zero) {
+                $className = [System.Text.StringBuilder]::new(256)
+                [PiPixivStartupWindow]::GetClassName($current.MainWindowHandle, $className, $className.Capacity) | Out-Null
+                $record.mainWindowClass = $className.ToString()
+                $record.visible = [PiPixivStartupWindow]::IsWindowVisible($current.MainWindowHandle)
+            }
+            if ($IncludeJvmModules) {
+                $record.loadedJvm = @($current.Modules | Where-Object { $_.ModuleName -ieq 'jvm.dll' }).Count -gt 0
+            }
+        }
+        catch { $record.inspectionError = $_.Exception.Message }
+        finally { if ($null -ne $current) { $current.Dispose() } }
+        $records.Add([pscustomobject]$record)
+        # Query each known parent's direct children; never dump all runner processes.
+        $children = @(Get-CimInstance -ClassName Win32_Process -Filter "ParentProcessId = $($record.processId)" -OperationTimeoutSec 5)
+        foreach ($child in $children) {
+            if ($child.CreationDate -ge $row.CreationDate -and
+                (-not $FamilyExecutable -or $child.ExecutablePath -ieq $FamilyExecutable)) {
+                $pending.Enqueue([pscustomobject]@{
+                    processId = [int]$child.ProcessId
+                    startedAt = $child.CreationDate
+                    isRoot = $false
+                })
+            }
+        }
+    }
+    return $records.ToArray()
+}
+
+function Invoke-JvmDiagnostic {
+    param([string]$JcmdPath, [int]$TargetProcessId, [string]$Command, [string]$Directory)
+
+    $stem = 'jcmd-{0}-{1}' -f $TargetProcessId, ($Command -replace '[^A-Za-z0-9_.-]', '_')
+    $diagnostic = [ordered]@{
+        processId = $TargetProcessId
+        command = $Command
+        timeoutSeconds = 12
+        timedOut = $false
+        exitCode = $null
+        stdout = Join-Path $Directory "$stem.stdout.log"
+        stderr = Join-Path $Directory "$stem.stderr.log"
+        error = $null
+    }
+    $probe = $null
+    try {
+        $probe = Start-Process -FilePath $JcmdPath -ArgumentList "$TargetProcessId $Command" `
+            -RedirectStandardOutput $diagnostic.stdout -RedirectStandardError $diagnostic.stderr `
+            -WindowStyle Hidden -PassThru
+        if ($probe.WaitForExit(12000)) {
+            $probe.Refresh()
+            $diagnostic.exitCode = $probe.ExitCode
+        }
+        else { $diagnostic.timedOut = $true }
+    }
+    catch { $diagnostic.error = $_.Exception.Message }
+    finally {
+        if ($null -ne $probe) {
+            try {
+                $probe.Refresh()
+                if (-not $probe.HasExited) {
+                    $probe.Kill()
+                    $probe.WaitForExit(2000) | Out-Null
+                }
+            }
+            catch { $diagnostic.error = $_.Exception.Message }
+            finally { $probe.Dispose() }
+        }
+    }
+    return [pscustomobject]$diagnostic
+}
 
 try {
     $packages = @(Get-Item -Path $MsiPath)
@@ -115,36 +236,53 @@ public static class PiPixivStartupWindow {
     }
 
     $startup = [System.Diagnostics.Stopwatch]::StartNew()
-    $application = Start-Process -FilePath $executable -WorkingDirectory $installDirectory `
+    $launcher = Start-Process -FilePath $executable -WorkingDirectory $installDirectory `
         -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog -PassThru
-    $result.processId = $application.Id
+    $result.launcherPid = $launcher.Id
+    $launcherStartedAt = $launcher.StartTime
+    $trackedApplications.Add($launcher.Id, $launcher)
     while ($startup.Elapsed.TotalSeconds -lt 60) {
-        $application.Refresh()
-        if ($application.HasExited) {
-            $result.processExitCode = $application.ExitCode
-            throw "PiPixiv exited before its main window appeared (exit code $($application.ExitCode))."
+        $launcher.Refresh()
+        if ($launcher.HasExited) {
+            $result.processExitCode = $launcher.ExitCode
+            throw "PiPixiv launcher exited before its main window appeared (exit code $($launcher.ExitCode))."
         }
-        $handle = $application.MainWindowHandle
-        $windowClass = [System.Text.StringBuilder]::new(256)
-        if ($handle -ne [IntPtr]::Zero) {
-            $windowHandle = $handle
-            [PiPixivStartupWindow]::GetClassName($handle, $windowClass, $windowClass.Capacity) | Out-Null
+        # JDK 25's Windows launcher can restart the same EXE as a child and
+        # wait in a parent without an AWT window. Follow only this EXE's chain.
+        $family = @(Get-ApplicationProcessTree -RootProcessId $launcher.Id `
+            -RootStartedAt $launcherStartedAt -FamilyExecutable $executable)
+        foreach ($member in $family) {
+            if (-not $trackedApplications.ContainsKey($member.processId)) {
+                $candidate = Get-Process -Id $member.processId
+                if ([Math]::Abs(($candidate.StartTime.ToUniversalTime() - [DateTime]::Parse($member.startedAt).ToUniversalTime()).TotalSeconds) -gt 1) {
+                    $candidate.Dispose()
+                    continue
+                }
+                $trackedApplications.Add($member.processId, $candidate)
+            }
+            $check = [ordered]@{
+                elapsedSeconds = [Math]::Round($startup.Elapsed.TotalSeconds, 2)
+                processId = $member.processId
+                handle = $member.mainWindowHandle
+                title = $member.mainWindowTitle
+                class = $member.mainWindowClass
+                responding = $member.responding
+                visible = $member.visible
+            }
+            $checks.Add($check)
+            if ($null -ne $check.handle -and $check.handle -ne 0) { $windowHandle = [IntPtr]$check.handle }
+            if ($check.title -ceq 'PiPixiv' -and $check.class -ceq 'SunAwtFrame' -and
+                $check.responding -and $check.visible) {
+                $application = $trackedApplications[$member.processId]
+                $result.processId = $application.Id
+                $result.applicationPid = $application.Id
+                $windowHandle = [IntPtr]$check.handle
+                $result.windowReadySeconds = $check.elapsedSeconds
+                $result.window = $check
+                break
+            }
         }
-        $check = [ordered]@{
-            elapsedSeconds = [Math]::Round($startup.Elapsed.TotalSeconds, 2)
-            handle = $handle.ToInt64()
-            title = $application.MainWindowTitle
-            class = $windowClass.ToString()
-            responding = $application.Responding
-        }
-        $checks.Add($check)
-        if ($handle -ne [IntPtr]::Zero -and $check.title -ceq 'PiPixiv' -and
-            $check.class -ceq 'SunAwtFrame' -and $check.responding -and
-            [PiPixivStartupWindow]::IsWindowVisible($handle)) {
-            $result.windowReadySeconds = $check.elapsedSeconds
-            $result.window = $check
-            break
-        }
+        if ($null -ne $result.window) { break }
         Start-Sleep -Seconds 1
     }
     if ($null -eq $result.window) {
@@ -209,8 +347,63 @@ finally {
         }
     }
 
-    # Keep process objects from Start-Process; never stop processes by name.
-    foreach ($ownedProcess in @($application, $installer)) {
+    if ($result.status -ne 'passed' -and $null -eq $result.screenshot) {
+        $desktopBitmap = $null
+        $desktopGraphics = $null
+        try {
+            # The entry guard limits this fallback to disposable hosted CI.
+            Add-Type -AssemblyName System.Drawing
+            Add-Type -AssemblyName System.Windows.Forms
+            $bounds = [System.Windows.Forms.SystemInformation]::VirtualScreen
+            $desktopBitmap = [System.Drawing.Bitmap]::new($bounds.Width, $bounds.Height)
+            $desktopGraphics = [System.Drawing.Graphics]::FromImage($desktopBitmap)
+            $desktopGraphics.CopyFromScreen($bounds.Left, $bounds.Top, 0, 0, $desktopBitmap.Size)
+            $desktopScreenshot = Join-Path $output 'desktop-at-failure.png'
+            $desktopBitmap.Save($desktopScreenshot, [System.Drawing.Imaging.ImageFormat]::Png)
+            $result.desktopScreenshot = $desktopScreenshot
+        }
+        catch {
+            $result.diagnosticErrors += "Desktop screenshot: $($_.Exception.Message)"
+            Write-Warning $result.diagnosticErrors[-1]
+        }
+        finally {
+            if ($null -ne $desktopGraphics) { $desktopGraphics.Dispose() }
+            if ($null -ne $desktopBitmap) { $desktopBitmap.Dispose() }
+        }
+    }
+
+    if ($null -ne $launcher -and $null -ne $launcherStartedAt) {
+        try {
+            $processTree = @(Get-ApplicationProcessTree -RootProcessId $launcher.Id `
+                -RootStartedAt $launcherStartedAt -IncludeJvmModules)
+            $treePath = Join-Path $output 'application-process-tree.json'
+            ConvertTo-Json -InputObject $processTree -Depth 5 | Set-Content -LiteralPath $treePath -Encoding utf8
+            $result.processTree = $treePath
+            if ($result.status -ne 'passed') {
+                $jcmd = Join-Path $env:JAVA_HOME 'bin/jcmd.exe'
+                if (-not (Test-Path -LiteralPath $jcmd -PathType Leaf)) {
+                    throw "The CI JDK does not provide jcmd: $jcmd"
+                }
+                foreach ($target in ($processTree | Sort-Object loadedJvm -Descending)) {
+                    if ($target.isRoot -or $target.loadedJvm -or $target.name -imatch '^javaw?\.exe$') {
+                        foreach ($command in @('VM.command_line', 'Thread.print -l')) {
+                            $result.jvmDiagnostics += Invoke-JvmDiagnostic -JcmdPath $jcmd `
+                                -TargetProcessId $target.processId -Command $command -Directory $output
+                        }
+                    }
+                }
+            }
+        }
+        catch {
+            $result.diagnosticErrors += "Application process/JVM diagnostics: $($_.Exception.Message)"
+            Write-Warning $result.diagnosticErrors[-1]
+        }
+    }
+
+    # Stop only the recorded same-EXE chain, newest descendants before parents.
+    # Preserve Process objects so cleanup never targets a recycled PID by name.
+    $cleanupProcesses = @($trackedApplications.Values | Sort-Object StartTime -Descending) + @($installer)
+    foreach ($ownedProcess in $cleanupProcesses) {
         if ($null -eq $ownedProcess) { continue }
         try {
             $ownedProcess.Refresh()
