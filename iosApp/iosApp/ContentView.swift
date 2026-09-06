@@ -32,11 +32,15 @@ private struct StatusBarVisibility: ViewModifier {
     let isHidden: Bool
 
     func body(content: Content) -> some View {
+        // ToolbarPlacement.statusBar requires SwiftUI 8 from the iOS 27 SDK.
+        #if canImport(SwiftUI, _version: 8.0)
         if #available(iOS 27.0, *) {
             content.toolbarVisibility(isHidden ? .hidden : .visible, for: .statusBar)
         } else {
-            // The status bar toolbar placement is only available starting with iOS 27.
             content.statusBarHidden(isHidden)
         }
+        #else
+        content.statusBarHidden(isHidden)
+        #endif
     }
 }
