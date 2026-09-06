@@ -1,5 +1,5 @@
 -ignorewarnings
--keepattributes LineNumberTable
+-keepattributes SourceFile,LineNumberTable,SourceDebugExtension
 -allowaccessmodification
 -repackageclasses
 

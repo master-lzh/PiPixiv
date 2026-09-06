@@ -129,11 +129,26 @@ jobs:
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v5
 
+      - name: Setup Sentry CLI
+        run: python .github/scripts/setup-sentry-cli.py
+
       - name: Build Linux Distributions
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: ./gradlew packageReleaseAppImage -Pdebug=false
+          SENTRY_ORG: pipixiv
+          SENTRY_PROJECT: pipixiv
+        run: ./gradlew packageReleaseAppImage :composeApp:uploadDesktopSentryMapping -Pdebug=false
+
+      - name: Save desktop Sentry mapping
+        if: ${{ always() && hashFiles('composeApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-linux-sentry-mapping
+          if-no-files-found: error
+          path: |
+            composeApp/build/compose/binaries/main-release/proguard/mapping.txt
+            composeApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
 
       - name: Package Linux Distribution
         run: |
@@ -162,11 +177,26 @@ jobs:
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v5
 
+      - name: Setup Sentry CLI
+        run: python .github/scripts/setup-sentry-cli.py
+
       - name: Build Windows Distribution
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: ./gradlew packageReleaseMsi -Pdebug=false
+          SENTRY_ORG: pipixiv
+          SENTRY_PROJECT: pipixiv
+        run: ./gradlew packageReleaseMsi :composeApp:uploadDesktopSentryMapping -Pdebug=false
+
+      - name: Save desktop Sentry mapping
+        if: ${{ always() && hashFiles('composeApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-windows-sentry-mapping
+          if-no-files-found: error
+          path: |
+            composeApp/build/compose/binaries/main-release/proguard/mapping.txt
+            composeApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
 
       - name: Verify Windows installation and startup
         timeout-minutes: 8
@@ -208,11 +238,26 @@ jobs:
       - name: Set up gradle
         uses: gradle/actions/setup-gradle@v5
 
+      - name: Setup Sentry CLI
+        run: python .github/scripts/setup-sentry-cli.py
+
       - name: Build MacOS Distribution
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: ./gradlew packageReleaseDmg -Pdebug=false
+          SENTRY_ORG: pipixiv
+          SENTRY_PROJECT: pipixiv
+        run: ./gradlew packageReleaseDmg :composeApp:uploadDesktopSentryMapping -Pdebug=false
+
+      - name: Save desktop Sentry mapping
+        if: ${{ always() && hashFiles('composeApp/build/compose/binaries/main-release/proguard/mapping.txt') != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-macos-sentry-mapping
+          if-no-files-found: error
+          path: |
+            composeApp/build/compose/binaries/main-release/proguard/mapping.txt
+            composeApp/build/compose/binaries/main-release/proguard/sentry-debug-meta.properties
 
       - name: Upload MacOS Artifacts
         uses: actions/upload-artifact@v7

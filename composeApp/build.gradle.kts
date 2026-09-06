@@ -1,4 +1,5 @@
 
+import com.mrl.pixiv.buildsrc.configureDesktopSentryMapping
 import com.mrl.pixiv.buildsrc.configureRemoveKoinMeta
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
@@ -211,13 +212,23 @@ tasks.matching { it.name == "hotRunJvmAsync" || it.name == "hotDevJvmAsync" }.co
 logger.quiet("debug: ${findProperty("debug")}")
 
 if (findProperty("debug") != "true") {
-    gradle.projectsEvaluated {
-        tasks.named("proguardReleaseJars").configure {
+    afterEvaluate {
+        val proguardReleaseJars = tasks.named<AbstractProguardTask>("proguardReleaseJars")
+        proguardReleaseJars.configure {
             doFirst {
                 layout.buildDirectory.file("compose/binaries/main-release/proguard")
                     .get().asFile.mkdirs()
             }
         }
+        configureDesktopSentryMapping(
+            proguardTask = proguardReleaseJars,
+            mappingFile = layout.buildDirectory.file("compose/binaries/main-release/proguard/mapping.txt"),
+            outputJar = proguardReleaseJars.flatMap { task ->
+                task.mainJar.flatMap { jar -> task.destinationDir.file(jar.asFile.name) }
+            },
+            organization = "pipixiv",
+            sentryProject = "pipixiv",
+        )
     }
 
     tasks.withType(AbstractProguardTask::class.java) {
@@ -227,6 +238,7 @@ if (findProperty("debug") != "true") {
         compose.desktop.application.buildTypes.release.proguard {
             configurationFiles.from(proguardFile, file("compose-desktop.pro"))
             optimize = false // fixme(tarsin): proguard internal error
+            // Sentry restores these names using the mapping UUID embedded before packaging.
             obfuscate = true
             joinOutputJars = true
         }

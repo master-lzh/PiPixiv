@@ -28,7 +28,11 @@ import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 import java.util.Locale
 
-fun main() {
+fun main(args: Array<String>) {
+    if ("--sentry-mapping-smoke-test" in args) {
+        runDesktopSentryMappingSmokeTest()
+        return
+    }
     FileKit.init(appId = "PiPixiv")
     Initialization.initKoin()
     setDefaultLocale()

@@ -1,0 +1,2 @@
+com.example.DesktopCrash -> a:
+    17:19:void fail(java.lang.String):17:19 -> b

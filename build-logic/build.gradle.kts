@@ -14,4 +14,6 @@ dependencies {
     implementation(libs.ksp.gradlePlugin)
     implementation(libs.compose.compiler.gradlePlugin)
     implementation(libs.compose.gradlePlugin)
+    testImplementation(kotlin("test-junit"))
+    testImplementation(gradleTestKit())
 }
