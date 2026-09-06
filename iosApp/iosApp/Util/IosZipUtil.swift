@@ -26,7 +26,7 @@ class IosZipUtil: util.ZipUtilBridge {
         entryName: String
     ) -> ExportedKotlinPackages.kotlin.ByteArray? {
         let sourceURL = getValidURL(path: zipFilePath)
-        guard let archive = try? Archive(url: sourceURL, accessMode: .read),
+        guard let archive = try? Archive(url: sourceURL, accessMode: .read, pathEncoding: nil),
               let entry = archive[entryName]
         else {
             return nil
@@ -49,7 +49,7 @@ class IosZipUtil: util.ZipUtilBridge {
 
     override func getZipEntryList(zipFilePath: String) -> [ExportedKotlinPackages.kotlin.Pair] {
         let sourceURL = getValidURL(path: zipFilePath)
-        guard let archive = try? Archive(url: sourceURL, accessMode: .read) else {
+        guard let archive = try? Archive(url: sourceURL, accessMode: .read, pathEncoding: nil) else {
             return []
         }
 
@@ -81,7 +81,7 @@ class IosZipUtil: util.ZipUtilBridge {
         return if path.hasPrefix("file://") {
             URL(string: path)!
         } else {
-            URL(fileURLWithPath: path)
+            URL(filePath: path, directoryHint: .checkFileSystem)
         }
     }
 }

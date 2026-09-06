@@ -19,5 +19,7 @@ object PiPixiv {
         }
     }
 
-    fun makeMainViewController(): UIViewController = MainViewController()
+    fun makeMainViewController(
+        onStatusBarVisibilityChange: (Boolean) -> Unit,
+    ): UIViewController = MainViewController(onStatusBarVisibilityChange)
 }

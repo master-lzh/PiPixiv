@@ -2,6 +2,10 @@ package com.mrl.pixiv.common.util
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
+import kotlinx.cinterop.useContents
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSURL
 import platform.Photos.PHAsset
 import platform.Photos.PHImageContentModeDefault
@@ -10,17 +14,16 @@ import platform.Photos.PHImageManagerMaximumSize
 import platform.Photos.PHImageRequestOptions
 import platform.Photos.PHImageRequestOptionsDeliveryModeHighQualityFormat
 import platform.UIKit.UIActivityViewController
-import platform.UIKit.UIApplication
 import platform.UIKit.UIImage
-import platform.UIKit.UIViewController
-import platform.UIKit.UIWindow
+import platform.UIKit.UIWindowScene
+import platform.UIKit.popoverPresentationController
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 
 actual object ShareUtil {
     actual suspend fun shareText(text: String) {
-        val controller = UIActivityViewController(listOf(text), null)
-        presentViewController(controller)
+        val scene = currentWindowScene() ?: return
+        presentItems(listOf(text), scene)
     }
 
     /**
@@ -30,6 +33,8 @@ actual object ShareUtil {
      */
     @OptIn(ExperimentalForeignApi::class)
     actual suspend fun shareImage(imageUri: String) {
+        // Keep the originating scene even if loading the Photos asset finishes after a scene switch.
+        val scene = currentWindowScene() ?: return
         if (imageUri.startsWith("ph://")) {
             val localIdentifier = imageUri.removePrefix("ph://")
             val fetchResult = PHAsset.fetchAssetsWithLocalIdentifiers(listOf(localIdentifier), null)
@@ -47,30 +52,33 @@ actual object ShareUtil {
                     options = options
                 ) { image, _ ->
                     if (image is UIImage) {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            val controller = UIActivityViewController(listOf(image), null)
-                            presentViewController(controller)
-                        }
+                        presentItems(listOf(image), scene)
                     }
                 }
             }
         } else {
             val url = NSURL.fileURLWithPath(imageUri)
-            val controller = UIActivityViewController(listOf(url), null)
-            presentViewController(controller)
+            presentItems(listOf(url), scene)
         }
     }
 
-    private fun presentViewController(controller: UIViewController) {
-        val window = UIApplication.sharedApplication.keyWindow
-            ?: UIApplication.sharedApplication.windows.firstOrNull { (it as? UIWindow)?.isKeyWindow() == true } as? UIWindow
-            ?: UIApplication.sharedApplication.windows.firstOrNull() as? UIWindow
-
-        var topController = window?.rootViewController
-        while (topController?.presentedViewController != null) {
-            topController = topController.presentedViewController
+    private suspend fun currentWindowScene(): UIWindowScene? =
+        withContext(Dispatchers.Main.immediate) {
+            getCurrentViewController()?.view?.window?.windowScene
         }
 
-        topController?.presentViewController(controller, true, null)
+    @OptIn(ExperimentalForeignApi::class)
+    private fun presentItems(items: List<Any>, scene: UIWindowScene) {
+        dispatch_async(dispatch_get_main_queue()) {
+            val topController = getCurrentViewController(scene) ?: return@dispatch_async
+            val controller = UIActivityViewController(items, null)
+            controller.popoverPresentationController?.apply {
+                sourceView = topController.view
+                sourceRect = topController.view.bounds.useContents {
+                    CGRectMake(origin.x + size.width / 2, origin.y + size.height / 2, 0.0, 0.0)
+                }
+            }
+            topController.presentViewController(controller, true, null)
+        }
     }
 }

@@ -14,17 +14,19 @@ import com.mrl.pixiv.common.network.ImageClient
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.repository.SettingRepository.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.util.AppUtil
+import com.mrl.pixiv.common.util.LocalStatusBarVisibilityController
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 
-fun MainViewController() = run {
+fun MainViewController(onStatusBarVisibilityChange: (Boolean) -> Unit) = run {
     val keyStateFlow = MutableSharedFlow<KeyEvent>()
     AppUtil.init(PlatformContext.INSTANCE, FLAVOR)
     ComposeUIViewController {
         CompositionLocalProvider(
             LocalKeyEventFlow provides keyStateFlow,
+            LocalStatusBarVisibilityController provides onStatusBarVisibilityChange,
         ) {
             val imageHttpClient = koinInject<HttpClient>(named<ImageClient>())
             val theme by SettingRepository.userPreferenceFlow.collectAsStateWithLifecycle { theme }
