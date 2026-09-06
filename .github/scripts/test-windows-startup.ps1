@@ -82,20 +82,22 @@ function Get-MsiLauncherMetadata {
         $comInstaller = New-Object -ComObject WindowsInstaller.Installer
         $database = $comInstaller.OpenDatabase($PackagePath, 0)
         $view = $database.OpenView('SELECT `Value` FROM `Property` WHERE `Property` = ''ProductCode''')
-        $view.Execute()
+        # COM can emit an empty return value into PowerShell's success stream.
+        # Only the launcher metadata object should leave this function.
+        [void]$view.Execute()
         $record = $view.Fetch()
         if ($null -eq $record) { throw 'The MSI does not declare a ProductCode.' }
         $productCode = [string]$record.GetType().InvokeMember('StringData', 'GetProperty', $null, $record, @(1))
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($record) | Out-Null
         $record = $null
-        $view.Close()
+        [void]$view.Close()
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($view) | Out-Null
         $view = $null
 
         # Resolve the launcher's registered component, regardless of whether
         # jpackage or electron-builder authored the MSI directory tree.
         $view = $database.OpenView('SELECT `File`.`File`, `File`.`FileName`, `Component`.`ComponentId`, `Component`.`KeyPath` FROM `File`, `Component` WHERE `File`.`Component_` = `Component`.`Component`')
-        $view.Execute()
+        [void]$view.Execute()
         $launchers = [System.Collections.Generic.List[object]]::new()
         while ($null -ne ($record = $view.Fetch())) {
             $columns = @(foreach ($column in 1..4) {
@@ -115,7 +117,7 @@ function Get-MsiLauncherMetadata {
         return $launchers[0]
     }
     finally {
-        if ($null -ne $view) { $view.Close() }
+        if ($null -ne $view) { [void]$view.Close() }
         foreach ($comObject in @($record, $view, $database, $comInstaller)) {
             if ($null -ne $comObject) {
                 [System.Runtime.InteropServices.Marshal]::ReleaseComObject($comObject) | Out-Null
