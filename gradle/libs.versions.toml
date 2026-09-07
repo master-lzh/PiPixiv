@@ -28,7 +28,7 @@ sentry-plugin = "6.21.0"
 sentry-kmp = "0.27.0"
 hotswan = "2.0.0-beta04"
 webview = "1.0.3"
-nucleus = "2.5.14"
+nucleus = "2.5.15"
 zoomimage = "1.6.0"
 
 # AndroidX
@@ -71,7 +71,7 @@ serialization = "1.11.0"
 coroutines = "1.11.0"
 ktor = "3.5.2"
 ktorfit = "2.7.5"
-datetime = "0.8.0"
+datetime = "0.8.0-0.6.x-compat"
 collections-immutable = "0.5.2"
 
 [libraries]
