@@ -98,7 +98,7 @@ import com.mrl.pixiv.common.compose.IllustGridDefaults
 import com.mrl.pixiv.common.compose.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
 import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
-import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
+import com.mrl.pixiv.common.compose.layout.isWidthAtLeastExpanded
 import com.mrl.pixiv.common.compose.ui.BlockSurface
 import com.mrl.pixiv.common.compose.ui.BookmarkIcon
 import com.mrl.pixiv.common.compose.ui.IllustBottomBookmarkSheet
@@ -252,8 +252,8 @@ internal fun PictureScreen(
     }
 
     val lazyListState = rememberLazyListState()
-    val windowAdaptiveInfo = paneLayoutInfo.sizeClass
-    val isWidthAtLeastMedium = windowAdaptiveInfo.isWidthAtLeastMedium
+    // Keep both image and details panes usable; medium widths need the single-column layout.
+    val useTwoPaneLayout = paneLayoutInfo.sizeClass.isWidthAtLeastExpanded
     val rightListState = rememberLazyListState()
     val currPage by remember {
         derivedStateOf {
@@ -264,7 +264,7 @@ internal fun PictureScreen(
         }
     }
     val isBarVisible by remember { derivedStateOf { lazyListState.firstVisibleItemIndex <= illust.pageCount } }
-    val isUserInfoFullyVisible = if (isWidthAtLeastMedium) true
+    val isUserInfoFullyVisible = if (useTwoPaneLayout) true
     else lazyListState.isItemFullyVisible(KEY_ILLUST_TITLE)
 
     val isBookmarked = illust.isBookmark
@@ -807,7 +807,7 @@ internal fun PictureScreen(
                     )
                 },
             topBar = {
-                if (!isWidthAtLeastMedium) {
+                if (!useTwoPaneLayout) {
                     AnimatedVisibility(
                         visible = showPreviewControls,
                         enter = fadeIn(),
@@ -882,7 +882,7 @@ internal fun PictureScreen(
                         }
                     }
                 )
-            } else if (isWidthAtLeastMedium) {
+            } else if (useTwoPaneLayout) {
                 Row(modifier = Modifier.fillMaxSize()) {
                     // Left pane: image list with PictureTopBar overlaid
                     Box(
