@@ -8,22 +8,22 @@ import kotlin.test.assertNotSame
 class LatestPageTest {
 
     @Test
-    fun novelModeKeepsOriginalPagesAndAppendsNewPages() {
+    fun tabsGroupUserActivityBeforeCollectionAndDiscovery() {
         assertEquals(
             listOf(
                 LatestPage.Trend,
-                LatestPage.Collection,
                 LatestPage.Following,
+                LatestPage.Collection,
             ),
             LatestPage.pagesFor(AppViewMode.ILLUST),
         )
         assertEquals(
             listOf(
                 LatestPage.Trend,
-                LatestPage.Collection,
-                LatestPage.Following,
-                LatestPage.NovelNew,
                 LatestPage.NovelWatchlist,
+                LatestPage.Following,
+                LatestPage.Collection,
+                LatestPage.NovelNew,
             ),
             LatestPage.pagesFor(AppViewMode.NOVEL),
         )
