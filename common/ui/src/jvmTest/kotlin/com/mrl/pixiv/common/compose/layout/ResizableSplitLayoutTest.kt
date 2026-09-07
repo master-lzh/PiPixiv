@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.DesktopComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -30,6 +34,8 @@ import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.doubleClick
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performMouseInput
@@ -166,6 +172,96 @@ class ResizableSplitLayoutTest {
 
         onNodeWithTag("split-source").assertWidthIsEqualTo(1040.dp)
         runOnIdle { assertEquals(0.65f, state.fraction) }
+    }
+
+    @Test
+    fun draggingPictureDividerDoesNotSwipePagerOrResizeOuterSplit() = runDesktopComposeUiTest(
+        width = 1624,
+        height = 760,
+        testTimeout = 30.seconds,
+    ) {
+        val outerState = SplitPaneState(initialFraction = 0.625f)
+        val pictureState = SplitPaneState(initialFraction = 0.5f)
+        lateinit var pagerState: PagerState
+        setContent {
+            MaterialTheme {
+                ResizableSplitLayout(
+                    state = outerState,
+                    minSourceWidth = 840.dp,
+                    minDetailWidth = 420.dp,
+                    source = {
+                        pagerState = rememberPagerState(initialPage = 1) { 3 }
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize().testTag("picture-pager"),
+                        ) { page ->
+                            if (page == 1) {
+                                Box(Modifier.fillMaxSize().testTag("picture-pane")) {
+                                    ResizableSplitLayout(
+                                        state = pictureState,
+                                        minSourceWidth = 320.dp,
+                                        minDetailWidth = 360.dp,
+                                        source = { Text("Images") },
+                                        detail = { Text("Artwork details") },
+                                    )
+                                }
+                            } else {
+                                Text("Another artwork")
+                            }
+                        }
+                    },
+                    detail = {
+                        Box(Modifier.fillMaxSize().testTag("comments-pane")) {
+                            Text("Comments")
+                        }
+                    },
+                )
+            }
+        }
+
+        val inPicture = hasAnyAncestor(hasTestTag("picture-pane"))
+        val divider = onNode(hasTestTag("split-divider") and inPicture)
+        val images = onNode(hasTestTag("split-source") and inPicture)
+        val details = onNode(hasTestTag("split-detail") and inPicture)
+        fun assertOuterSplitAndPagerUnchanged() {
+            onNodeWithTag("picture-pager").assertWidthIsEqualTo(1000.dp)
+            onNodeWithTag("comments-pane").assertWidthIsEqualTo(600.dp)
+            runOnIdle {
+                assertEquals(0.625f, outerState.fraction)
+                assertEquals(1, pagerState.currentPage)
+                assertEquals(1, pagerState.settledPage)
+                assertEquals(0f, pagerState.currentPageOffsetFraction)
+            }
+        }
+
+        images.assertWidthIsEqualTo(488.dp)
+        details.assertWidthIsEqualTo(488.dp)
+        assertOuterSplitAndPagerUnchanged()
+
+        divider.performMouseInput {
+            moveTo(center)
+            press()
+            moveBy(Offset(-260f, 0f))
+            release()
+            // End mouse hover before switching this input stream to touch.
+            exit()
+        }
+        images.assertWidthIsEqualTo(320.dp)
+        details.assertWidthIsEqualTo(656.dp)
+        assertOuterSplitAndPagerUnchanged()
+
+        divider.performTouchInput {
+            swipe(center, center + Offset(500f, 0f))
+        }
+        images.assertWidthIsEqualTo(616.dp)
+        details.assertWidthIsEqualTo(360.dp)
+        assertOuterSplitAndPagerUnchanged()
+
+        divider.performTouchInput { doubleClick() }
+        images.assertWidthIsEqualTo(488.dp)
+        details.assertWidthIsEqualTo(488.dp)
+        runOnIdle { assertEquals(0.5f, pictureState.fraction) }
+        assertOuterSplitAndPagerUnchanged()
     }
 
     private fun DesktopComposeUiTest.setSplitContent(

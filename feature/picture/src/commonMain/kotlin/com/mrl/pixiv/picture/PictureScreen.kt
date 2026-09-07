@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -97,8 +96,10 @@ import com.mrl.pixiv.common.animation.DefaultFloatAnimationSpec
 import com.mrl.pixiv.common.compose.IllustGridDefaults
 import com.mrl.pixiv.common.compose.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
+import com.mrl.pixiv.common.compose.layout.ResizableSplitLayout
 import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastExpanded
+import com.mrl.pixiv.common.compose.layout.rememberSplitPaneState
 import com.mrl.pixiv.common.compose.ui.BlockSurface
 import com.mrl.pixiv.common.compose.ui.BookmarkIcon
 import com.mrl.pixiv.common.compose.ui.IllustBottomBookmarkSheet
@@ -254,6 +255,7 @@ internal fun PictureScreen(
     val lazyListState = rememberLazyListState()
     // Keep both image and details panes usable; medium widths need the single-column layout.
     val useTwoPaneLayout = paneLayoutInfo.sizeClass.isWidthAtLeastExpanded
+    val pictureSplitState = rememberSplitPaneState(key = illust.id, initialFraction = 0.5f)
     val rightListState = rememberLazyListState()
     val currPage by remember {
         derivedStateOf {
@@ -883,82 +885,81 @@ internal fun PictureScreen(
                     }
                 )
             } else if (useTwoPaneLayout) {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    // Left pane: image list with PictureTopBar overlaid
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    ) {
-                        LazyColumn(
-                            state = lazyListState,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            illustImageItems()
-                        }
-                        this@Row.AnimatedVisibility(
-                            visible = showPreviewControls,
-                            enter = fadeIn(),
-                            exit = fadeOut(),
-                        ) {
-                            PictureTopBar(
-                                illust = illust,
-                                currPage = currPage,
-                                isBarVisible = isBarVisible,
-                                isIllustBlocked = isIllustBlocked,
-                                isUserBlocked = isUserBlocked,
-                                onBack = onBack,
-                                popBackToHomeScreen = popBackToHomeScreen,
-                                navToUserDetailScreen = navToUserDetailScreen,
-                                onBlock = pictureViewModel::blockIllust,
-                                onRemoveBlock = pictureViewModel::removeBlockIllust
-                            )
-                        }
-                    }
-                    // Right pane: details and related works
-                    BoxWithConstraints(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    ) {
-                        val rightPaneWidth = maxWidth
-                        val rightRelatedSpanCount = with(relatedLayoutParams.gridCells) {
-                            with(density) {
-                                calculateCrossAxisCellSizes(
-                                    rightPaneWidth.roundToPx(),
-                                    relatedLayoutParams.horizontalArrangement.spacing.roundToPx()
-                                ).size
+                ResizableSplitLayout(
+                    state = pictureSplitState,
+                    minSourceWidth = 320.dp,
+                    minDetailWidth = 360.dp,
+                    source = {
+                        // Left pane: image list with PictureTopBar overlaid
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            LazyColumn(
+                                state = lazyListState,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                illustImageItems()
+                            }
+                            AnimatedVisibility(
+                                visible = showPreviewControls,
+                                enter = fadeIn(),
+                                exit = fadeOut(),
+                            ) {
+                                PictureTopBar(
+                                    illust = illust,
+                                    currPage = currPage,
+                                    isBarVisible = isBarVisible,
+                                    isIllustBlocked = isIllustBlocked,
+                                    isUserBlocked = isUserBlocked,
+                                    onBack = onBack,
+                                    popBackToHomeScreen = popBackToHomeScreen,
+                                    navToUserDetailScreen = navToUserDetailScreen,
+                                    onBlock = pictureViewModel::blockIllust,
+                                    onRemoveBlock = pictureViewModel::removeBlockIllust
+                                )
                             }
                         }
-                        val rightUserSpanCount = with(userLayoutParams.gridCells) {
-                            with(density) {
-                                calculateCrossAxisCellSizes(
-                                    rightPaneWidth.roundToPx(),
-                                    relatedLayoutParams.horizontalArrangement.spacing.roundToPx()
-                                ).size
+                    },
+                    detail = {
+                        // Right pane: details and related works
+                        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                            val rightPaneWidth = maxWidth
+                            val rightRelatedSpanCount = with(relatedLayoutParams.gridCells) {
+                                with(density) {
+                                    calculateCrossAxisCellSizes(
+                                        rightPaneWidth.roundToPx(),
+                                        relatedLayoutParams.horizontalArrangement.spacing.roundToPx()
+                                    ).size
+                                }
+                            }
+                            val rightUserSpanCount = with(userLayoutParams.gridCells) {
+                                with(density) {
+                                    calculateCrossAxisCellSizes(
+                                        rightPaneWidth.roundToPx(),
+                                        relatedLayoutParams.horizontalArrangement.spacing.roundToPx()
+                                    ).size
+                                }
+                            }
+                            val rightRelatedRowCount =
+                                if (relatedIllusts.itemCount % rightRelatedSpanCount == 0) {
+                                    relatedIllusts.itemCount / rightRelatedSpanCount
+                                } else {
+                                    relatedIllusts.itemCount / rightRelatedSpanCount + 1
+                                }
+                            LazyColumn(
+                                state = rightListState,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                illustDetailItems(
+                                    currentUserSpanCount = rightUserSpanCount,
+                                    currentRelatedSpanCount = rightRelatedSpanCount,
+                                    currentRelatedRowCount = rightRelatedRowCount,
+                                )
+                                item(key = KEY_SPACER) {
+                                    Spacer(modifier = Modifier.height(70.dp))
+                                }
                             }
                         }
-                        val rightRelatedRowCount =
-                            if (relatedIllusts.itemCount % rightRelatedSpanCount == 0) {
-                                relatedIllusts.itemCount / rightRelatedSpanCount
-                            } else {
-                                relatedIllusts.itemCount / rightRelatedSpanCount + 1
-                            }
-                        LazyColumn(
-                            state = rightListState,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            illustDetailItems(
-                                currentUserSpanCount = rightUserSpanCount,
-                                currentRelatedSpanCount = rightRelatedSpanCount,
-                                currentRelatedRowCount = rightRelatedRowCount,
-                            )
-                            item(key = KEY_SPACER) {
-                                Spacer(modifier = Modifier.height(70.dp))
-                            }
-                        }
-                    }
-                }
+                    },
+                )
             } else {
                 LazyColumn(
                     state = lazyListState,
