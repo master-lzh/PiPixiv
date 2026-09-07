@@ -3,12 +3,12 @@ package com.mrl.pixiv.home.components
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import com.mrl.pixiv.common.compose.RecommendGridDefaults
+import com.mrl.pixiv.common.compose.layout.AdaptiveVerticalStaggeredGrid
 import com.mrl.pixiv.common.compose.ui.illust.RectangleIllustItem
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.kts.itemIndexKey
@@ -24,7 +24,7 @@ fun RecommendGrid(
 ) {
     val layoutParams = RecommendGridDefaults.coverLayoutParameters()
 
-    LazyVerticalStaggeredGrid(
+    AdaptiveVerticalStaggeredGrid(
         state = lazyStaggeredGridState,
         contentPadding = PaddingValues(5.dp),
         columns = layoutParams.gridCells,

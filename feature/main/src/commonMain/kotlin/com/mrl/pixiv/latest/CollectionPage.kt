@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FilterList
@@ -37,6 +36,7 @@ import com.mrl.pixiv.collection.CollectionAction
 import com.mrl.pixiv.collection.CollectionViewModel
 import com.mrl.pixiv.collection.components.FilterDialog
 import com.mrl.pixiv.common.compose.RecommendGridDefaults
+import com.mrl.pixiv.common.compose.layout.AdaptiveVerticalStaggeredGrid
 import com.mrl.pixiv.common.compose.listener.KeyEventListener
 import com.mrl.pixiv.common.compose.listener.keyboardScrollerController
 import com.mrl.pixiv.common.compose.ui.VerticalScrollbar
@@ -143,7 +143,7 @@ private fun CollectionIllustPage(
         }
     ) {
         Box {
-            LazyVerticalStaggeredGrid(
+            AdaptiveVerticalStaggeredGrid(
                 columns = layoutParams.gridCells,
                 modifier = Modifier.fillMaxSize(),
                 state = lazyGridState,

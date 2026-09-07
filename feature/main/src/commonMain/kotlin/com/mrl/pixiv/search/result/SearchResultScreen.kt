@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -53,6 +52,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.common.analytics.logEvent
 import com.mrl.pixiv.common.compose.IllustGridDefaults
 import com.mrl.pixiv.common.compose.RecommendGridDefaults
+import com.mrl.pixiv.common.compose.layout.AdaptiveVerticalStaggeredGrid
 import com.mrl.pixiv.common.compose.listener.KeyEventListener
 import com.mrl.pixiv.common.compose.listener.keyboardScrollerController
 import com.mrl.pixiv.common.compose.ui.BackToTopButton
@@ -439,7 +439,7 @@ fun SearchResultsScreen(
                                     }
 
                                     SearchResultIllustLayout.ORIGINAL_ASPECT_RATIO -> {
-                                        LazyVerticalStaggeredGrid(
+                                        AdaptiveVerticalStaggeredGrid(
                                             modifier = Modifier.fillMaxSize(),
                                             state = originalAspectRatioIllustGridState,
                                             columns = originalAspectRatioLayoutParams.gridCells,
