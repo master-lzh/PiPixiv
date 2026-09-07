@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">Ajuster la largeur des volets gauche et droit</string>
+    <string name="split_pane_reset">Réinitialiser la taille des volets</string>
+    <string name="split_pane_close">Fermer le volet latéral</string>
+</resources>

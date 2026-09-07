@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">Ajustar el ancho de los paneles izquierdo y derecho</string>
+    <string name="split_pane_reset">Restablecer los tamaños de los paneles</string>
+    <string name="split_pane_close">Cerrar panel lateral</string>
+</resources>

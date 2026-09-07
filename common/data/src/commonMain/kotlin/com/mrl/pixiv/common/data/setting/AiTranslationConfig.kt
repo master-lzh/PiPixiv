@@ -50,7 +50,6 @@ data class AiTranslationConfig(
         const val GENERATION_TIMEOUT_MAX_SECONDS = 1800
         const val MAX_CONCURRENT_REQUESTS_MIN = 1
         const val MAX_CONCURRENT_REQUESTS_DEFAULT = 2
-        const val MAX_CONCURRENT_REQUESTS_MAX = 8
 
         fun defaultEndpoint(provider: AiProvider): String = when (provider) {
             AiProvider.OPENAI -> "https://api.openai.com/v1"

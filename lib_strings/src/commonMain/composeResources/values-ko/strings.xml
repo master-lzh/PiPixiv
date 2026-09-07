@@ -223,6 +223,7 @@
     <string name="save_as">다른 이름으로 저장</string>
     <string name="copy_link">링크 복사</string>
     <string name="novel">소설</string>
+    <string name="novel_work_information">작품 정보</string>
     <string name="illust">일러스트</string>
     <string name="series">시리즈</string>
     <string name="word_count">글자 수</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">생성 시간 제한(초)</string>
     <string name="ai_generation_timeout_desc">각 AI 생성 요청의 시간 제한입니다. 허용 범위: %1$d~%2$d초</string>
     <string name="ai_generation_timeout_invalid">%1$d에서 %2$d 사이의 정수를 입력하세요</string>
+    <string name="ai_max_concurrent_requests">최대 동시 요청 수</string>
+    <string name="ai_max_concurrent_requests_desc">즉시 번역과 나중에 읽기가 공유하는 동시 요청 수의 상한입니다. 최솟값은 %1$d이며, 서비스 제공업체의 할당량에 맞게 설정하세요</string>
+    <string name="ai_max_concurrent_requests_invalid">%1$d 이상의 유효한 정수를 입력하세요</string>
+    <string name="ai_refresh_models">모델 새로고침</string>
     <string name="ai_openai_use_response_api">Response API 사용</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">예: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">보통</string>
     <string name="preview_image_quality_high">높음</string>
     <string name="preview_image_quality_original">원본</string>
+    <string name="search_result_illust_layout">일러스트 검색 결과 배치</string>
+    <string name="search_result_illust_layout_square">정사각형 격자</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">원본 비율 타일</string>
     <string name="auto_hide_preview_controls">미리보기 컨트롤 자동 숨기기</string>
     <string name="auto_hide_preview_controls_desc">작품 상세 페이지의 이미지 영역에 몇 초 머무르면 버튼과 페이지 표시를 숨깁니다</string>
     <string name="tap_image_to_open_full_resolution_preview">이미지를 탭해 전체 해상도 미리보기 열기</string>

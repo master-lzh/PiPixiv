@@ -76,7 +76,7 @@ class AiTranslationConfigSerializationTest {
     fun `custom request settings round trip through json and protobuf`() {
         val config = AiTranslationConfig(
             generationTimeoutSeconds = 900,
-            maxConcurrentRequests = 8,
+            maxConcurrentRequests = 200,
         )
 
         assertEquals(

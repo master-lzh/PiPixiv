@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">ضبط عرض اللوحتين</string>
+    <string name="split_pane_reset">إعادة تعيين نسب اللوحتين</string>
+    <string name="split_pane_close">إغلاق اللوحة الجانبية</string>
+</resources>

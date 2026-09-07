@@ -166,8 +166,7 @@ fun AiTranslationSettingScreen(
     }
     val maxConcurrentRequests = remember(maxConcurrentRequestsInput) {
         maxConcurrentRequestsInput.toIntOrNull()?.takeIf {
-            it in AiTranslationConfig.MAX_CONCURRENT_REQUESTS_MIN..
-                AiTranslationConfig.MAX_CONCURRENT_REQUESTS_MAX
+            it >= AiTranslationConfig.MAX_CONCURRENT_REQUESTS_MIN
         }
     }
     Scaffold(
@@ -331,7 +330,6 @@ fun AiTranslationSettingScreen(
                                 RStrings.ai_max_concurrent_requests_desc
                             },
                             AiTranslationConfig.MAX_CONCURRENT_REQUESTS_MIN,
-                            AiTranslationConfig.MAX_CONCURRENT_REQUESTS_MAX,
                         )
                     )
                 },

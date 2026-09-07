@@ -25,7 +25,7 @@
     <string name="sign_up">S'inscrire</string>
     <string name="sign_in">Se connecter</string>
     <string name="sign_in_with_token">Se connecter avec Token</string>
-    <string name="download_with_size">Télécharger (%21$.fMo)</string>
+    <string name="download_with_size">Télécharger (%1$s)</string>
     <string name="followed">Abonné</string>
     <string name="follow">S'abonner</string>
     <string name="related_artworks">Œuvres connexes</string>
@@ -223,6 +223,7 @@
     <string name="save_as">Enregistrer sous</string>
     <string name="copy_link">Copier le lien</string>
     <string name="novel">Roman</string>
+    <string name="novel_work_information">Informations sur l’œuvre</string>
     <string name="illust">Illustration</string>
     <string name="series">Série</string>
     <string name="word_count">Nombre de mots</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">Délai de génération (secondes)</string>
     <string name="ai_generation_timeout_desc">Délai pour chaque requête de génération IA. Plage autorisée : %1$d–%2$d secondes.</string>
     <string name="ai_generation_timeout_invalid">Saisissez un nombre entier entre %1$d et %2$d.</string>
+    <string name="ai_max_concurrent_requests">Nombre maximal de requêtes simultanées</string>
+    <string name="ai_max_concurrent_requests_desc">Limite commune à la traduction immédiate et à Lire plus tard. Minimum : %1$d. Ajustez cette valeur selon les limites de votre fournisseur.</string>
+    <string name="ai_max_concurrent_requests_invalid">Saisissez un nombre entier valide supérieur ou égal à %1$d.</string>
+    <string name="ai_refresh_models">Actualiser les modèles</string>
     <string name="ai_openai_use_response_api">Utiliser Response API</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">Exemple : {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">Moyenne</string>
     <string name="preview_image_quality_high">Élevée</string>
     <string name="preview_image_quality_original">Originale</string>
+    <string name="search_result_illust_layout">Disposition des résultats de recherche d’illustrations</string>
+    <string name="search_result_illust_layout_square">Grille carrée</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">Mosaïque aux proportions d’origine</string>
     <string name="auto_hide_preview_controls">Masquer automatiquement les contrôles d'aperçu</string>
     <string name="auto_hide_preview_controls_desc">Masque les boutons et l'indicateur de page après quelques secondes sur la zone d'image de la page de détails</string>
     <string name="tap_image_to_open_full_resolution_preview">Toucher l'image pour ouvrir l'aperçu en pleine résolution</string>

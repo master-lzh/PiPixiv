@@ -223,6 +223,7 @@
     <string name="save_as">Save As</string>
     <string name="copy_link">Copy Link</string>
     <string name="novel">Novel</string>
+    <string name="novel_work_information">Work information</string>
     <string name="illust">Illustration</string>
     <string name="series">Series</string>
     <string name="word_count">Word Count</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">Generation timeout (seconds)</string>
     <string name="ai_generation_timeout_desc">Timeout for each AI generation request. Allowed range: %1$d–%2$d seconds.</string>
     <string name="ai_generation_timeout_invalid">Enter a whole number from %1$d to %2$d.</string>
+    <string name="ai_max_concurrent_requests">Maximum concurrent requests</string>
+    <string name="ai_max_concurrent_requests_desc">Shared limit for on-demand translation and Read later. Minimum: %1$d. Set it according to your provider’s limits.</string>
+    <string name="ai_max_concurrent_requests_invalid">Enter a valid whole number of at least %1$d.</string>
+    <string name="ai_refresh_models">Refresh models</string>
     <string name="ai_openai_use_response_api">Use Response API</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">Example: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">Medium</string>
     <string name="preview_image_quality_high">High</string>
     <string name="preview_image_quality_original">Original</string>
+    <string name="search_result_illust_layout">Illustration search results layout</string>
+    <string name="search_result_illust_layout_square">Square grid</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">Masonry with original aspect ratios</string>
     <string name="auto_hide_preview_controls">Auto-hide preview controls</string>
     <string name="auto_hide_preview_controls_desc">Hide buttons and the page indicator after staying on the image area of the artwork detail page for a few seconds</string>
     <string name="tap_image_to_open_full_resolution_preview">Tap image to open full-resolution preview</string>

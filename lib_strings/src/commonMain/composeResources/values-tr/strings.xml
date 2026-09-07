@@ -223,6 +223,7 @@
     <string name="save_as">Farklı kaydet</string>
     <string name="copy_link">Bağlantıyı Kopyala</string>
     <string name="novel">Roman</string>
+    <string name="novel_work_information">Eser bilgileri</string>
     <string name="illust">İllüstrasyon</string>
     <string name="series">Seri</string>
     <string name="word_count">Sözcük sayısı</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">Oluşturma zaman aşımı (saniye)</string>
     <string name="ai_generation_timeout_desc">Her AI oluşturma isteği için zaman aşımı. İzin verilen aralık: %1$d–%2$d saniye.</string>
     <string name="ai_generation_timeout_invalid">%1$d ile %2$d arasında bir tam sayı girin.</string>
+    <string name="ai_max_concurrent_requests">En fazla eşzamanlı istek sayısı</string>
+    <string name="ai_max_concurrent_requests_desc">Anlık çeviri ve Daha sonra oku için ortak eşzamanlı istek sınırı. En düşük değer: %1$d. Sağlayıcınızın sınırlarına göre ayarlayın.</string>
+    <string name="ai_max_concurrent_requests_invalid">En az %1$d olan geçerli bir tam sayı girin.</string>
+    <string name="ai_refresh_models">Modelleri yenile</string>
     <string name="ai_openai_use_response_api">Response API Kullan</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">Örnek: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">Orta</string>
     <string name="preview_image_quality_high">Yüksek</string>
     <string name="preview_image_quality_original">Orijinal</string>
+    <string name="search_result_illust_layout">İllüstrasyon arama sonuçlarının düzeni</string>
+    <string name="search_result_illust_layout_square">Kare ızgara</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">Orijinal en boy oranlı mozaik düzen</string>
     <string name="auto_hide_preview_controls">Önizleme denetimlerini otomatik gizle</string>
     <string name="auto_hide_preview_controls_desc">Eser detay sayfasındaki görüntü alanında birkaç saniye kalınca düğmeleri ve sayfa göstergesini gizler</string>
     <string name="tap_image_to_open_full_resolution_preview">Tam çözünürlük önizlemesini açmak için görüntüye dokun</string>

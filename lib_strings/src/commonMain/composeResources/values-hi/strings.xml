@@ -223,6 +223,7 @@
     <string name="save_as">इस रूप में सहेजें</string>
     <string name="copy_link">लिंक कॉपी करें</string>
     <string name="novel">उपन्यास</string>
+    <string name="novel_work_information">रचना की जानकारी</string>
     <string name="illust">चित्रण</string>
     <string name="series">श्रृंखला</string>
     <string name="word_count">शब्द गणना</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">जनरेशन टाइमआउट (सेकंड)</string>
     <string name="ai_generation_timeout_desc">प्रत्येक AI जनरेशन अनुरोध की टाइमआउट अवधि। अनुमत सीमा: %1$d–%2$d सेकंड।</string>
     <string name="ai_generation_timeout_invalid">%1$d से %2$d के बीच एक पूर्णांक दर्ज करें।</string>
+    <string name="ai_max_concurrent_requests">एक साथ अनुरोधों की अधिकतम संख्या</string>
+    <string name="ai_max_concurrent_requests_desc">तत्काल अनुवाद और «बाद में पढ़ें» के लिए एक साथ अनुरोधों की साझा सीमा। न्यूनतम मान %1$d है। सेवा प्रदाता के कोटे के अनुसार सेट करें।</string>
+    <string name="ai_max_concurrent_requests_invalid">%1$d या उससे बड़ा मान्य पूर्णांक दर्ज करें।</string>
+    <string name="ai_refresh_models">मॉडल रिफ्रेश करें</string>
     <string name="ai_openai_use_response_api">Response API का उपयोग करें</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">उदाहरण: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">मध्यम</string>
     <string name="preview_image_quality_high">उच्च</string>
     <string name="preview_image_quality_original">मूल</string>
+    <string name="search_result_illust_layout">चित्रण खोज परिणामों का लेआउट</string>
+    <string name="search_result_illust_layout_square">वर्गाकार ग्रिड</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">मूल अनुपात वाला मेसनरी ग्रिड</string>
     <string name="auto_hide_preview_controls">पूर्वावलोकन नियंत्रण अपने आप छिपाएं</string>
     <string name="auto_hide_preview_controls_desc">चित्र विवरण पेज के छवि क्षेत्र में कुछ सेकंड रहने के बाद बटन और पेज संकेतक छिपाएं</string>
     <string name="tap_image_to_open_full_resolution_preview">पूर्ण रिज़ॉल्यूशन पूर्वावलोकन खोलने के लिए छवि पर टैप करें</string>

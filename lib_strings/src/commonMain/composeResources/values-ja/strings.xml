@@ -223,6 +223,7 @@
     <string name="save_as">名前を付けて保存</string>
     <string name="copy_link">リンクをコピー</string>
     <string name="novel">小説</string>
+    <string name="novel_work_information">作品情報</string>
     <string name="illust">イラスト</string>
     <string name="series">シリーズ</string>
     <string name="word_count">文字数</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">生成タイムアウト（秒）</string>
     <string name="ai_generation_timeout_desc">AI生成リクエストごとのタイムアウト。設定範囲: %1$d～%2$d秒</string>
     <string name="ai_generation_timeout_invalid">%1$d～%2$dの整数を入力してください</string>
+    <string name="ai_max_concurrent_requests">最大同時リクエスト数</string>
+    <string name="ai_max_concurrent_requests_desc">即時翻訳と「あとで読む」で共有する同時リクエスト数の上限です。最小値は%1$dです。サービス提供元の利用枠に合わせて設定してください</string>
+    <string name="ai_max_concurrent_requests_invalid">%1$d以上の有効な整数を入力してください</string>
+    <string name="ai_refresh_models">モデルを更新</string>
     <string name="ai_openai_use_response_api">Response APIを使用</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">例: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">中</string>
     <string name="preview_image_quality_high">高</string>
     <string name="preview_image_quality_original">オリジナル</string>
+    <string name="search_result_illust_layout">イラスト検索結果のレイアウト</string>
+    <string name="search_result_illust_layout_square">正方形グリッド</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">元の縦横比のタイル表示</string>
     <string name="auto_hide_preview_controls">プレビュー操作部を自動で隠す</string>
     <string name="auto_hide_preview_controls_desc">作品詳細ページの画像エリアに数秒留まると、ボタンとページ表示を隠します</string>
     <string name="tap_image_to_open_full_resolution_preview">画像タップでフル解像度プレビューを開く</string>

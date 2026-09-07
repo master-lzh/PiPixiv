@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">Изменить ширину левой и правой панелей</string>
+    <string name="split_pane_reset">Сбросить пропорции панелей</string>
+    <string name="split_pane_close">Закрыть боковую панель</string>
+</resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">Breite der linken und rechten Bereiche anpassen</string>
+    <string name="split_pane_reset">Bereichsgrößen zurücksetzen</string>
+    <string name="split_pane_close">Seitenbereich schließen</string>
+</resources>

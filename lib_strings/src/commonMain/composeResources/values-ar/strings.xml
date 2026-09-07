@@ -223,6 +223,7 @@
     <string name="save_as">حفظ باسم</string>
     <string name="copy_link">نسخ الرابط</string>
     <string name="novel">رواية</string>
+    <string name="novel_work_information">معلومات العمل</string>
     <string name="illust">رسم توضيحي</string>
     <string name="series">سلسلة</string>
     <string name="word_count">عدد الكلمات</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">مهلة الإنشاء (بالثواني)</string>
     <string name="ai_generation_timeout_desc">المهلة الزمنية لكل طلب إنشاء بالذكاء الاصطناعي. النطاق المسموح: %1$d–%2$d ثانية.</string>
     <string name="ai_generation_timeout_invalid">أدخل عددًا صحيحًا من %1$d إلى %2$d.</string>
+    <string name="ai_max_concurrent_requests">الحد الأقصى للطلبات المتزامنة</string>
+    <string name="ai_max_concurrent_requests_desc">حد الطلبات المتزامنة المشترك بين الترجمة الفورية والقراءة لاحقًا. الحد الأدنى هو %1$d. اضبطه وفقًا لحصة مزوّد الخدمة.</string>
+    <string name="ai_max_concurrent_requests_invalid">أدخل عددًا صحيحًا صالحًا لا يقل عن %1$d.</string>
+    <string name="ai_refresh_models">تحديث النماذج</string>
     <string name="ai_openai_use_response_api">استخدام Response API</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">مثال: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">متوسطة</string>
     <string name="preview_image_quality_high">عالية</string>
     <string name="preview_image_quality_original">أصلية</string>
+    <string name="search_result_illust_layout">تخطيط نتائج البحث عن الرسوم التوضيحية</string>
+    <string name="search_result_illust_layout_square">شبكة مربعة</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">شبكة متدرجة بالنسب الأصلية</string>
     <string name="auto_hide_preview_controls">إخفاء عناصر تحكم المعاينة تلقائيا</string>
     <string name="auto_hide_preview_controls_desc">إخفاء الأزرار ومؤشر الصفحة بعد البقاء في منطقة الصورة في صفحة تفاصيل العمل لبضع ثوان</string>
     <string name="tap_image_to_open_full_resolution_preview">انقر على الصورة لفتح معاينة بالدقة الكاملة</string>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">Panel genişliklerini ayarla</string>
+    <string name="split_pane_reset">Panel oranlarını sıfırla</string>
+    <string name="split_pane_close">Yan paneli kapat</string>
+</resources>

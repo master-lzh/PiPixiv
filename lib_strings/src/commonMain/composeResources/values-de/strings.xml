@@ -223,6 +223,7 @@
     <string name="save_as">Speichern unter</string>
     <string name="copy_link">Link kopieren</string>
     <string name="novel">Roman</string>
+    <string name="novel_work_information">Werkinformationen</string>
     <string name="illust">Illustration</string>
     <string name="series">Serie</string>
     <string name="word_count">Wortanzahl</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">Zeitlimit für Generierung (Sekunden)</string>
     <string name="ai_generation_timeout_desc">Zeitlimit pro AI-Generierungsanfrage. Zulässiger Bereich: %1$d–%2$d Sekunden.</string>
     <string name="ai_generation_timeout_invalid">Gib eine ganze Zahl zwischen %1$d und %2$d ein.</string>
+    <string name="ai_max_concurrent_requests">Maximale Anzahl gleichzeitiger Anfragen</string>
+    <string name="ai_max_concurrent_requests_desc">Gemeinsames Limit für sofortige Übersetzungen und „Später lesen“. Mindestwert: %1$d. Wähle den Wert entsprechend den Limits deines Anbieters.</string>
+    <string name="ai_max_concurrent_requests_invalid">Gib eine gültige ganze Zahl ein, die mindestens %1$d beträgt.</string>
+    <string name="ai_refresh_models">Modelle aktualisieren</string>
     <string name="ai_openai_use_response_api">Response API verwenden</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">Beispiel: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">Mittel</string>
     <string name="preview_image_quality_high">Hoch</string>
     <string name="preview_image_quality_original">Original</string>
+    <string name="search_result_illust_layout">Layout der Illustrationssuchergebnisse</string>
+    <string name="search_result_illust_layout_square">Quadratisches Raster</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">Masonry-Layout mit ursprünglichen Seitenverhältnissen</string>
     <string name="auto_hide_preview_controls">Vorschausteuerung automatisch ausblenden</string>
     <string name="auto_hide_preview_controls_desc">Blendet Schaltflächen und Seitenanzeige aus, nachdem der Bildbereich der Werkdetailseite einige Sekunden angezeigt wurde</string>
     <string name="tap_image_to_open_full_resolution_preview">Bild antippen, um Vollauflösung zu öffnen</string>

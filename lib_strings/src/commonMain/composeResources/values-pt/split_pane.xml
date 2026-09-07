@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">Ajustar a largura dos painéis</string>
+    <string name="split_pane_reset">Redefinir as proporções dos painéis</string>
+    <string name="split_pane_close">Fechar painel lateral</string>
+</resources>

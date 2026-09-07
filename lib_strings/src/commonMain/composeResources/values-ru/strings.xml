@@ -223,6 +223,7 @@
     <string name="save_as">Сохранить как</string>
     <string name="copy_link">Копировать ссылку</string>
     <string name="novel">Роман</string>
+    <string name="novel_work_information">Информация о произведении</string>
     <string name="illust">Иллюстрация</string>
     <string name="series">Серия</string>
     <string name="word_count">Количество слов</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">Тайм-аут генерации (секунды)</string>
     <string name="ai_generation_timeout_desc">Тайм-аут для каждого запроса генерации AI. Допустимый диапазон: %1$d–%2$d секунд.</string>
     <string name="ai_generation_timeout_invalid">Введите целое число от %1$d до %2$d.</string>
+    <string name="ai_max_concurrent_requests">Максимум одновременных запросов</string>
+    <string name="ai_max_concurrent_requests_desc">Общий лимит одновременных запросов для перевода по запросу и «Прочитать позже». Минимум: %1$d. Установите значение в соответствии с квотой провайдера.</string>
+    <string name="ai_max_concurrent_requests_invalid">Введите корректное целое число не меньше %1$d.</string>
+    <string name="ai_refresh_models">Обновить модели</string>
     <string name="ai_openai_use_response_api">Использовать Response API</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">Пример: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">Среднее</string>
     <string name="preview_image_quality_high">Высокое</string>
     <string name="preview_image_quality_original">Оригинал</string>
+    <string name="search_result_illust_layout">Расположение иллюстраций в результатах поиска</string>
+    <string name="search_result_illust_layout_square">Квадратная сетка</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">Плитки с исходными пропорциями</string>
     <string name="auto_hide_preview_controls">Автоматически скрывать элементы предпросмотра</string>
     <string name="auto_hide_preview_controls_desc">Скрывает кнопки и индикатор страницы через несколько секунд в области изображения на странице работы</string>
     <string name="tap_image_to_open_full_resolution_preview">Нажатие на изображение открывает предпросмотр в полном разрешении</string>

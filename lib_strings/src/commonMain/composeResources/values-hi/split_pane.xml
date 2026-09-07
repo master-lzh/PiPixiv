@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">पैनलों की चौड़ाई समायोजित करें</string>
+    <string name="split_pane_reset">पैनलों का अनुपात रीसेट करें</string>
+    <string name="split_pane_close">साइड पैनल बंद करें</string>
+</resources>

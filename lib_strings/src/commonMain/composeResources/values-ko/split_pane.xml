@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">좌우 패널 너비 조절</string>
+    <string name="split_pane_reset">패널 너비 비율 초기화</string>
+    <string name="split_pane_close">사이드 패널 닫기</string>
+</resources>

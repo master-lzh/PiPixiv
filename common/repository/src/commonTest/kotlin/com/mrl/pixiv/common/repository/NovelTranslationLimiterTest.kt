@@ -16,30 +16,33 @@ import kotlin.test.assertTrue
 class NovelTranslationLimiterTest {
     @Test
     fun concurrentRequestsNeverExceedConfiguredLimit() = runTest {
-        val limiter = NovelTranslationLimiter()
-        val release = CompletableDeferred<Unit>()
-        var activeRequests = 0
-        var peakRequests = 0
+        listOf(2, 200).forEach { limit ->
+            val limiter = NovelTranslationLimiter()
+            val release = CompletableDeferred<Unit>()
+            var activeRequests = 0
+            var peakRequests = 0
 
-        val requests = List(6) {
-            async {
-                limiter.withPermit(maxConcurrentRequests = 2) {
-                    activeRequests += 1
-                    peakRequests = maxOf(peakRequests, activeRequests)
-                    try {
-                        release.await()
-                    } finally {
-                        activeRequests -= 1
+            val requests = List(limit + 4) {
+                async {
+                    limiter.withPermit(maxConcurrentRequests = limit) {
+                        activeRequests += 1
+                        peakRequests = maxOf(peakRequests, activeRequests)
+                        try {
+                            release.await()
+                        } finally {
+                            activeRequests -= 1
+                        }
                     }
                 }
             }
-        }
 
-        runCurrent()
-        assertEquals(2, peakRequests)
-        release.complete(Unit)
-        requests.awaitAll()
-        assertEquals(0, activeRequests)
+            runCurrent()
+            assertEquals(limit, activeRequests)
+            release.complete(Unit)
+            requests.awaitAll()
+            assertEquals(limit, peakRequests)
+            assertEquals(0, activeRequests)
+        }
     }
 
     @Test

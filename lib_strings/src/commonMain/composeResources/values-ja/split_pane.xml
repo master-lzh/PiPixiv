@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">左右のペインの幅を調整</string>
+    <string name="split_pane_reset">ペインの幅の比率をリセット</string>
+    <string name="split_pane_close">サイドペインを閉じる</string>
+</resources>

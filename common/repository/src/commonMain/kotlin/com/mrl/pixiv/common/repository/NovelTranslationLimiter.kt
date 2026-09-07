@@ -19,9 +19,8 @@ class NovelTranslationLimiter {
         block: suspend () -> T,
     ): T {
         val ticket = Ticket(
-            limit = maxConcurrentRequests.coerceIn(
+            limit = maxConcurrentRequests.coerceAtLeast(
                 AiTranslationConfig.MAX_CONCURRENT_REQUESTS_MIN,
-                AiTranslationConfig.MAX_CONCURRENT_REQUESTS_MAX,
             ),
         )
         var registered = false

@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">調整左右分欄寬度</string>
+    <string name="split_pane_reset">重設分欄比例</string>
+    <string name="split_pane_close">關閉側欄</string>
+</resources>

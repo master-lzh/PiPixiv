@@ -223,6 +223,7 @@
     <string name="save_as">Salvar como</string>
     <string name="copy_link">Copiar link</string>
     <string name="novel">Romance</string>
+    <string name="novel_work_information">Informações da obra</string>
     <string name="illust">Ilustração</string>
     <string name="series">Série</string>
     <string name="word_count">Contagem de palavras</string>
@@ -281,6 +282,10 @@
     <string name="ai_generation_timeout_seconds">Tempo limite de geração (segundos)</string>
     <string name="ai_generation_timeout_desc">Tempo limite para cada solicitação de geração por IA. Intervalo permitido: %1$d–%2$d segundos.</string>
     <string name="ai_generation_timeout_invalid">Insira um número inteiro entre %1$d e %2$d.</string>
+    <string name="ai_max_concurrent_requests">Número máximo de solicitações simultâneas</string>
+    <string name="ai_max_concurrent_requests_desc">Limite partilhado entre a tradução imediata e Ler mais tarde. Mínimo: %1$d. Ajuste o valor de acordo com os limites do fornecedor.</string>
+    <string name="ai_max_concurrent_requests_invalid">Insira um número inteiro válido maior ou igual a %1$d.</string>
+    <string name="ai_refresh_models">Atualizar modelos</string>
     <string name="ai_openai_use_response_api">Usar Response API</string>
     <string name="ai_extra_body" translatable="false">extra_body JSON</string>
     <string name="ai_extra_body_hint">Exemplo: {"thinking":{"type":"disabled"}}</string>
@@ -322,6 +327,9 @@
     <string name="preview_image_quality_medium">Média</string>
     <string name="preview_image_quality_high">Alta</string>
     <string name="preview_image_quality_original">Original</string>
+    <string name="search_result_illust_layout">Layout dos resultados de busca de ilustrações</string>
+    <string name="search_result_illust_layout_square">Grade quadrada</string>
+    <string name="search_result_illust_layout_original_aspect_ratio">Mosaico com proporções originais</string>
     <string name="auto_hide_preview_controls">Ocultar controles de pré-visualização automaticamente</string>
     <string name="auto_hide_preview_controls_desc">Oculta os botões e o indicador de página após alguns segundos na área de imagem da página de detalhes</string>
     <string name="tap_image_to_open_full_resolution_preview">Tocar na imagem para abrir pré-visualização em resolução completa</string>
