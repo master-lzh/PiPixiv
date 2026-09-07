@@ -72,7 +72,8 @@ inline fun Modifier.conditionally(
     condition: Boolean,
     block: Modifier.() -> Modifier
 ): Modifier = if (condition) {
-    this then block()
+    // Build only the addition; using this as the receiver duplicates the existing chain.
+    this then block(Modifier)
 } else {
     this
 }
