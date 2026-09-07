@@ -40,6 +40,7 @@ fun main(args: Array<String>) {
         runDesktopSentryMappingSmokeTest()
         return
     }
+    configureZoomImageMainThreadChecker()
     FileKit.init(appId = "PiPixiv")
     Initialization.initKoin()
     setDefaultLocale()

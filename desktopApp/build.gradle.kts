@@ -82,9 +82,12 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(platform(libs.coil3.bom))
     implementation(libs.bundles.coil3)
+    implementation(libs.zoomimage.core)
     implementation(libs.kotlinx.ktor.client.core)
     implementation(libs.filekit.core)
     testImplementation(kotlin("test"))
+    testImplementation(project(":feature:image-preview"))
+    testImplementation(libs.bundles.compose.navigation3)
 }
 
 nucleus {
