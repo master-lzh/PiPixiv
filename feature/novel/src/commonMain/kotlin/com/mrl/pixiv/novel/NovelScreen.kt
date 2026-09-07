@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -64,21 +63,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
+import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
 import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.compose.ui.BlockSurface
 import com.mrl.pixiv.common.compose.ui.BookmarkIcon
@@ -87,11 +90,13 @@ import com.mrl.pixiv.common.compose.ui.novel.NovelReadLaterButton
 import com.mrl.pixiv.common.data.AppViewMode
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.repository.BlockingRepositoryV2
+import com.mrl.pixiv.common.repository.NovelReadingProgress
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.isBookmark
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.isPrivateBookmark
 import com.mrl.pixiv.common.router.CommentType
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.Platform
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.StatusBarVisibilityEffect
@@ -120,17 +125,16 @@ import com.mrl.pixiv.strings.show_novel
 import com.mrl.pixiv.strings.show_original_text
 import com.mrl.pixiv.strings.show_translated_text
 import com.mrl.pixiv.strings.translate_novel
-import kotlin.math.roundToInt
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 
 internal data class NovelTranslationListAnchor(
     val novelId: Long,
@@ -162,9 +166,11 @@ fun NovelScreen(
     viewModel: NovelViewModel = koinViewModel {
         parametersOf(novelId, markerPage ?: 0)
     },
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val uriHandler = LocalUriHandler.current
+    val paneInfo = currentPaneLayoutInfo()
+    val density = LocalDensity.current
     val state = viewModel.asState()
     val chapterStateKey = novelChapterStateKey(
         entryNovelId = novelId,
@@ -175,7 +181,19 @@ fun NovelScreen(
     val listState = key(chapterStateKey) {
         rememberLazyListState()
     }
-    val paragraphLayoutCacheKey = state.paragraphLayoutCacheKey()
+    var readerContentWidthPx by remember {
+        mutableIntStateOf(with(density) {
+            (paneInfo.size.width.roundToPx() - 2 * 16.dp.roundToPx()).coerceAtLeast(0)
+        })
+    }
+    var resizeReadingAnchor by remember(chapterStateKey) {
+        mutableStateOf<NovelReadingProgress?>(null)
+    }
+    val paragraphLayoutCacheKey = state.paragraphLayoutCacheKey(
+        contentWidthPx = readerContentWidthPx,
+        density = density.density,
+        fontScale = density.fontScale,
+    )
     val paragraphLayouts = remember(paragraphLayoutCacheKey) {
         mutableStateMapOf<Int, TextLayoutResult>()
     }
@@ -249,7 +267,9 @@ fun NovelScreen(
         }
     }
 
-    StatusBarVisibilityEffect(hidden = state.novel != null && !isNovelBlocked && !showBar)
+    if (!paneInfo.isSplit) {
+        StatusBarVisibilityEffect(hidden = state.novel != null && !isNovelBlocked && !showBar)
+    }
 
     LaunchedEffect(manuallyShowTopBar) {
         if (manuallyShowTopBar) {
@@ -294,7 +314,9 @@ fun NovelScreen(
             .drop(1)
             .filter { !it }
             .collect {
-                saveReadingProgress()
+                if (resizeReadingAnchor == null) {
+                    saveReadingProgress()
+                }
             }
     }
 
@@ -317,10 +339,10 @@ fun NovelScreen(
 
         // 等待目标段落的布局完成。包含图片标记的段落可能没有文本布局，这里做超时兜底。
         val layout = withTimeoutOrNull(500L.milliseconds) {
-            while (paragraphLayouts[resolvedProgress.paragraphIndex] == null) {
+            while (latestParagraphLayouts.value[resolvedProgress.paragraphIndex] == null) {
                 delay(16.milliseconds)
             }
-            paragraphLayouts[resolvedProgress.paragraphIndex]
+            latestParagraphLayouts.value[resolvedProgress.paragraphIndex]
         } ?: run {
             Logger.d(tag = "NovelScreen") {
                 "Restore: paragraphIndex=${resolvedProgress.paragraphIndex} has no text layout, keep item-top restore."
@@ -352,6 +374,38 @@ fun NovelScreen(
 
         // 执行滚动，将目标行的顶部与视口顶部对齐
         listState.scrollToItem(targetItemIndex, offset)
+    }
+
+    // A drag keeps the character that was visible before reflow; it never reapplies the saved bookmark.
+    LaunchedEffect(paragraphLayoutCacheKey) {
+        val anchor = resizeReadingAnchor ?: return@LaunchedEffect
+        val novel = state.novel ?: return@LaunchedEffect
+        delay(80.milliseconds)
+        if (listState.isScrollInProgress || latestState.value.isTranslating) {
+            resizeReadingAnchor = null
+            return@LaunchedEffect
+        }
+        val layout = withTimeoutOrNull(500.milliseconds) {
+            while (paragraphLayouts[anchor.paragraphIndex] == null) {
+                delay(16.milliseconds)
+            }
+            paragraphLayouts[anchor.paragraphIndex]
+        }
+        if (layout != null) {
+            val paragraph = state.paragraphs.getOrNull(anchor.paragraphIndex)
+            if (paragraph != null && paragraph.hashCode() == anchor.paragraphHash) {
+                val line = layout.getLineForOffset(anchor.charIndex.coerceIn(0, paragraph.length))
+                val padding = (-listState.layoutInfo.viewportStartOffset).coerceAtLeast(0)
+                listState.scrollToItem(
+                    index = paragraphStartItemIndex(novel.series.title != null, novel.caption.isNotEmpty()) +
+                            anchor.paragraphIndex,
+                    scrollOffset = (layout.getLineTop(line) + padding).toInt().coerceAtLeast(0),
+                )
+                // Keep the resize marker through the scroll-idle observer's next frame.
+                withFrameNanos { }
+            }
+        }
+        resizeReadingAnchor = null
     }
 
     LaunchedEffect(state.novel?.id, state.isTranslating) {
@@ -516,7 +570,29 @@ fun NovelScreen(
                             listState = listState,
                             readingProgressFraction = readingProgressFraction,
                             onParagraphTextLayout = { paragraphIndex, layout ->
-                                paragraphLayouts[paragraphIndex] = layout
+                                // Keep results isolated until the new width's cache is composed. Keep old
+                                // layouts intact until that callback captures the character anchor.
+                                if (layout.layoutInput.constraints.maxWidth == paragraphLayoutCacheKey.contentWidthPx) {
+                                    paragraphLayouts[paragraphIndex] = layout
+                                }
+                            },
+                            paragraphLayoutCacheKey = paragraphLayoutCacheKey,
+                            onContentWidthChanged = { width ->
+                                if (width != readerContentWidthPx) {
+                                    if (resizeReadingAnchor == null && !state.isTranslating) {
+                                        resizeReadingAnchor = buildVisibleReadingProgress(
+                                            listState = listState,
+                                            paragraphStartIndex = paragraphStartItemIndex(
+                                                state.novel.series.title != null,
+                                                state.novel.caption.isNotEmpty(),
+                                            ),
+                                            paragraphCount = state.paragraphs.size,
+                                            paragraphLayouts = paragraphLayouts,
+                                            paragraphs = state.paragraphs,
+                                        )
+                                    }
+                                    readerContentWidthPx = width
+                                }
                             },
                             onContentClick = {
                                 manuallyShowTopBar = !manuallyShowTopBar

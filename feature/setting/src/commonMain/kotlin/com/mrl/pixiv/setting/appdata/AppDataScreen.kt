@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.strings.app_data
@@ -45,14 +46,13 @@ import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.dialogs.compose.rememberFileSaverLauncher
-import kotlin.time.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock
 
 private data class HistoryImportDialogData(
     val requestId: Long,
@@ -63,7 +63,7 @@ private data class HistoryImportDialogData(
 @Composable
 fun AppDataScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
     viewModel: AppDataViewModel = koinViewModel(),
 ) {
     val state = viewModel.asState()

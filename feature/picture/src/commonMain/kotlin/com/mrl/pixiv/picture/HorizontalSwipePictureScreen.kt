@@ -5,16 +5,15 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.navigationevent.NavigationEventInfo
-import androidx.navigationevent.compose.NavigationEventHandler
-import androidx.navigationevent.compose.rememberNavigationEventState
 import com.mrl.pixiv.common.coroutine.launchProcess
 import com.mrl.pixiv.common.data.Illust
 import com.mrl.pixiv.common.repository.BrowsingHistoryRepository
-import com.mrl.pixiv.common.repository.IllustCacheRepo
-import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -24,15 +23,13 @@ import org.koin.compose.koinInject
 fun HorizontalSwipePictureScreen(
     illusts: ImmutableList<Illust>,
     index: Int,
-    prefix: String,
     enableTransition: Boolean,
     modifier: Modifier = Modifier
 ) {
     val browsedIllusts = remember { mutableMapOf<Long, Illust>() }
-    val navigationManager = koinInject<NavigationManager>()
+    val navigationManager = currentNavigationManager()
     val browsingHistoryRepository = koinInject<BrowsingHistoryRepository>()
     val onBack: () -> Unit = {
-        IllustCacheRepo.removeList(prefix)
         navigationManager.popBackStack()
     }
     if (illusts.isEmpty()) {
@@ -47,6 +44,14 @@ fun HorizontalSwipePictureScreen(
         val current = illusts.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
         browsedIllusts[current.id] = current
     }
+    var selectedIllustId by remember { mutableStateOf<Long?>(null) }
+    LaunchedEffect(pagerState.settledPage, illusts) {
+        val id = illusts.getOrNull(pagerState.settledPage)?.id ?: return@LaunchedEffect
+        if (selectedIllustId != null && selectedIllustId != id) {
+            navigationManager.closeCurrentDetailBranch()
+        }
+        selectedIllustId = id
+    }
     DisposableEffect(Unit) {
         onDispose {
             launchProcess(Dispatchers.IO) {
@@ -54,10 +59,6 @@ fun HorizontalSwipePictureScreen(
             }
         }
     }
-    NavigationEventHandler(
-        state = rememberNavigationEventState(NavigationEventInfo.None),
-        onBackCompleted = onBack
-    )
     HorizontalPager(
         modifier = modifier,
         state = pagerState,

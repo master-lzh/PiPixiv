@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import co.touchlab.kermit.Logger
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.Platform
 import com.mrl.pixiv.common.util.platform
 import com.mrl.pixiv.common.util.throttleClick
@@ -36,7 +37,6 @@ import dev.nucleusframework.webview.web.WebView
 import dev.nucleusframework.webview.web.WebViewNavigator
 import dev.nucleusframework.webview.web.rememberWebViewNavigator
 import dev.nucleusframework.webview.web.rememberWebViewState
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -44,7 +44,7 @@ fun LoginScreen(
     startUrl: String,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val state = viewModel.asState()
     val nativeDesktopOverlay = platform is Platform.Desktop

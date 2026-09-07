@@ -4,21 +4,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.adaptive.WindowAdaptiveInfo
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.mrl.pixiv.common.compose.layout.PaneLayoutInfo
+import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastExpanded
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
 import com.mrl.pixiv.common.compose.layout.isWidthCompact
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.repository.SettingRepository.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
-import com.mrl.pixiv.common.util.Orientation
-import com.mrl.pixiv.common.util.currentOrientation
 
 @Stable
 data class GridLayoutParams(
@@ -38,9 +38,9 @@ data class StaggeredGridLayoutParams(
 
 object RecommendGridDefaults {
     @Composable
-    fun coverLayoutParameters(windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfoV2()): StaggeredGridLayoutParams {
-        val windowSizeClass = windowAdaptiveInfo.windowSizeClass
-        val orientation = currentOrientation()
+    fun coverLayoutParameters(paneInfo: PaneLayoutInfo = currentPaneLayoutInfo()): StaggeredGridLayoutParams {
+        val windowSizeClass = paneInfo.sizeClass
+        val isPortrait = paneInfo.size.height >= paneInfo.size.width
         val spanCountPortrait by requireUserPreferenceFlow.collectAsStateWithLifecycle { spanCountPortrait }
         val spanCountLandscape by requireUserPreferenceFlow.collectAsStateWithLifecycle { spanCountLandscape }
 
@@ -51,15 +51,11 @@ object RecommendGridDefaults {
         }
 
         return StaggeredGridLayoutParams(
-            gridCells = when (orientation) {
-                Orientation.PORTRAIT -> when {
-                    spanCountPortrait < 0 -> StaggeredGridCells.Adaptive(minSize = 150.dp)
-                    else -> StaggeredGridCells.Fixed(spanCountPortrait)
-                }
-
-                else -> when {
-                    spanCountLandscape < 0 -> StaggeredGridCells.Adaptive(minSize = 150.dp)
-                    else -> StaggeredGridCells.Fixed(spanCountLandscape)
+            gridCells = (if (isPortrait) spanCountPortrait else spanCountLandscape).let { count ->
+                if (count < 0) {
+                    StaggeredGridCells.Adaptive(minSize = 150.dp)
+                } else {
+                    ConstrainedStaggeredGridCells(preferredCount = count, minSize = 150.dp)
                 }
             },
             horizontalArrangement = horizontalArrangement,
@@ -71,9 +67,9 @@ object RecommendGridDefaults {
 
 object IllustGridDefaults {
     @Composable
-    fun relatedLayoutParameters(windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfoV2()): GridLayoutParams {
-        val windowSizeClass = windowAdaptiveInfo.windowSizeClass
-        val orientation = currentOrientation()
+    fun relatedLayoutParameters(paneInfo: PaneLayoutInfo = currentPaneLayoutInfo()): GridLayoutParams {
+        val windowSizeClass = paneInfo.sizeClass
+        val isPortrait = paneInfo.size.height >= paneInfo.size.width
         val spanCountPortrait by requireUserPreferenceFlow.collectAsStateWithLifecycle { spanCountPortrait }
         val spanCountLandscape by requireUserPreferenceFlow.collectAsStateWithLifecycle { spanCountLandscape }
 
@@ -83,15 +79,11 @@ object IllustGridDefaults {
             else -> 5f.spaceBy
         }
         return GridLayoutParams(
-            gridCells = when (orientation) {
-                Orientation.PORTRAIT -> when {
-                    spanCountPortrait < 0 -> GridCells.Adaptive(minSize = 150.dp)
-                    else -> GridCells.Fixed(spanCountPortrait)
-                }
-
-                else -> when {
-                    spanCountLandscape < 0 -> GridCells.Adaptive(minSize = 150.dp)
-                    else -> GridCells.Fixed(spanCountLandscape)
+            gridCells = (if (isPortrait) spanCountPortrait else spanCountLandscape).let { count ->
+                if (count < 0) {
+                    GridCells.Adaptive(minSize = 150.dp)
+                } else {
+                    ConstrainedGridCells(preferredCount = count, minSize = 150.dp)
                 }
             },
             horizontalArrangement = horizontalArrangement,
@@ -101,8 +93,8 @@ object IllustGridDefaults {
     }
 
     @Composable
-    fun userLayoutParameters(windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfoV2()): GridLayoutParams {
-        val windowSizeClass = windowAdaptiveInfo.windowSizeClass
+    fun userLayoutParameters(paneInfo: PaneLayoutInfo = currentPaneLayoutInfo()): GridLayoutParams {
+        val windowSizeClass = paneInfo.sizeClass
         val horizontalArrangement = when {
             windowSizeClass.isWidthAtLeastExpanded -> 7f.spaceBy
             windowSizeClass.isWidthAtLeastMedium -> 5f.spaceBy
@@ -110,7 +102,7 @@ object IllustGridDefaults {
         }
         return GridLayoutParams(
             gridCells = when {
-                windowSizeClass.isWidthCompact -> GridCells.Fixed(3)
+                windowSizeClass.isWidthCompact -> ConstrainedGridCells(3, minSize = 96.dp)
                 else -> GridCells.Adaptive(minSize = 120.dp)
             },
             horizontalArrangement = horizontalArrangement,
@@ -120,8 +112,8 @@ object IllustGridDefaults {
     }
 
     @Composable
-    fun userFollowingParameters(windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfoV2()): GridLayoutParams {
-        val windowSizeClass = windowAdaptiveInfo.windowSizeClass
+    fun userFollowingParameters(paneInfo: PaneLayoutInfo = currentPaneLayoutInfo()): GridLayoutParams {
+        val windowSizeClass = paneInfo.sizeClass
         val horizontalArrangement = when {
             windowSizeClass.isWidthAtLeastExpanded -> 7f.spaceBy
             windowSizeClass.isWidthAtLeastMedium -> 5f.spaceBy
@@ -129,8 +121,8 @@ object IllustGridDefaults {
         }
         return GridLayoutParams(
             gridCells = when {
-                windowSizeClass.isWidthAtLeastExpanded -> GridCells.Fixed(3)
-                windowSizeClass.isWidthAtLeastMedium -> GridCells.Fixed(2)
+                windowSizeClass.isWidthAtLeastExpanded -> ConstrainedGridCells(3, minSize = 260.dp)
+                windowSizeClass.isWidthAtLeastMedium -> ConstrainedGridCells(2, minSize = 260.dp)
                 windowSizeClass.isWidthCompact -> GridCells.Fixed(1)
                 else -> GridCells.Fixed(1)
             },
@@ -143,8 +135,8 @@ object IllustGridDefaults {
 
 object BlockingGridDefaults {
     @Composable
-    fun blockingLayoutParameters(windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfoV2()): GridLayoutParams {
-        val windowSizeClass = windowAdaptiveInfo.windowSizeClass
+    fun blockingLayoutParameters(paneInfo: PaneLayoutInfo = currentPaneLayoutInfo()): GridLayoutParams {
+        val windowSizeClass = paneInfo.sizeClass
 
         val horizontalArrangement = when {
             windowSizeClass.isWidthAtLeastExpanded -> 7f.spaceBy
@@ -153,8 +145,8 @@ object BlockingGridDefaults {
         }
         return GridLayoutParams(
             gridCells = when {
-                windowSizeClass.isWidthAtLeastExpanded -> GridCells.Fixed(4)
-                windowSizeClass.isWidthAtLeastMedium -> GridCells.Fixed(2)
+                windowSizeClass.isWidthAtLeastExpanded -> ConstrainedGridCells(4, minSize = 220.dp)
+                windowSizeClass.isWidthAtLeastMedium -> ConstrainedGridCells(2, minSize = 260.dp)
                 windowSizeClass.isWidthCompact -> GridCells.Fixed(1)
                 else -> GridCells.Fixed(1)
             },
@@ -164,3 +156,35 @@ object BlockingGridDefaults {
         )
     }
 }
+
+/** Treat a fixed-column preference as an upper bound when a grid is in a narrower pane. */
+private data class ConstrainedGridCells(
+    val preferredCount: Int,
+    val minSize: Dp,
+) : GridCells {
+    override fun Density.calculateCrossAxisCellSizes(availableSize: Int, spacing: Int): List<Int> {
+        val count = constrainedColumnCount(availableSize, spacing, minSize.roundToPx(), preferredCount)
+        return with(GridCells.Fixed(count)) { calculateCrossAxisCellSizes(availableSize, spacing) }
+    }
+}
+
+private data class ConstrainedStaggeredGridCells(
+    val preferredCount: Int,
+    val minSize: Dp,
+) : StaggeredGridCells {
+    override fun Density.calculateCrossAxisCellSizes(availableSize: Int, spacing: Int): IntArray {
+        val count = constrainedColumnCount(availableSize, spacing, minSize.roundToPx(), preferredCount)
+        return with(StaggeredGridCells.Fixed(count)) {
+            calculateCrossAxisCellSizes(availableSize, spacing)
+        }
+    }
+}
+
+private fun constrainedColumnCount(
+    availableSize: Int,
+    spacing: Int,
+    minSize: Int,
+    preferredCount: Int,
+): Int = ((availableSize + spacing) / (minSize + spacing).coerceAtLeast(1))
+    .coerceAtLeast(1)
+    .coerceAtMost(preferredCount.coerceAtLeast(1))

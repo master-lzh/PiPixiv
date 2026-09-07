@@ -76,6 +76,7 @@ import com.mrl.pixiv.common.repository.BlockingRepositoryV2
 import com.mrl.pixiv.common.repository.isSelf
 import com.mrl.pixiv.common.repository.viewmodel.follow.isFollowing
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RDrawables
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.allowRgb565
@@ -124,7 +125,6 @@ import com.mrl.pixiv.strings.view_all
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.math.pow
@@ -143,7 +143,7 @@ fun ProfileDetailScreen(
     uid: Long,
     modifier: Modifier = Modifier,
     viewModel: ProfileDetailViewModel = koinViewModel { parametersOf(uid) },
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val state = viewModel.asState()
     val coroutineScope = rememberCoroutineScope()

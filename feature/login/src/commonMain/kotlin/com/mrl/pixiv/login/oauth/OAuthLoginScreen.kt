@@ -30,19 +30,19 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.strings.sign_in
 import com.mrl.pixiv.strings.token
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun OAuthLoginScreen(
     modifier: Modifier = Modifier,
     viewModel: OAuthLoginViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     var token by remember { mutableStateOf("") }
     val state = viewModel.asState()

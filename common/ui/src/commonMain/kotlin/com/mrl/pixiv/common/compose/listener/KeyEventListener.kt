@@ -13,6 +13,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import com.mrl.pixiv.common.compose.LocalKeyEventFlow
+import com.mrl.pixiv.common.compose.layout.LocalPaneKeyEventsEnabled
 import kotlinx.coroutines.launch
 
 @Composable
@@ -22,10 +23,13 @@ fun KeyEventListener(
     val flow = LocalKeyEventFlow.current
     val scope = rememberCoroutineScope()
     val updatedBlock by rememberUpdatedState(block)
+    val acceptsEvents by rememberUpdatedState(LocalPaneKeyEventsEnabled.current)
     LaunchedEffect(Unit) {
         flow.collect {
-            scope.launch {
-                updatedBlock(it)
+            if (acceptsEvents) {
+                scope.launch {
+                    updatedBlock(it)
+                }
             }
         }
     }

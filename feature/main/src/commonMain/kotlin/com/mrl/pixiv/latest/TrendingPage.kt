@@ -41,13 +41,13 @@ import com.mrl.pixiv.common.repository.SettingRepository.collectAsStateWithLifec
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.isBookmark
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.all
 import com.mrl.pixiv.strings.word_private
 import com.mrl.pixiv.strings.word_public
 import kotlinx.coroutines.flow.SharedFlow
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private const val KEY_TOP_SPACE = "top_space"
@@ -58,7 +58,7 @@ fun TrendingPage(
     modifier: Modifier = Modifier,
     viewModel: LatestViewModel = koinViewModel(),
 ) {
-    val navigationManager = koinInject<NavigationManager>()
+    val navigationManager = currentNavigationManager()
     val appViewMode by SettingRepository.userPreferenceFlow.collectAsStateWithLifecycle { appViewMode }
 
     when (appViewMode) {
@@ -87,7 +87,7 @@ private fun TrendingIllustPage(
     refreshFlow: SharedFlow<LatestPage>,
     modifier: Modifier = Modifier,
     viewModel: LatestViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val pullRefreshState = rememberPullToRefreshState()
     val illustsFollowing = viewModel.illustsFollowing.collectAsLazyPagingItems()
@@ -204,7 +204,7 @@ private fun TrendingNovelPage(
     refreshFlow: SharedFlow<LatestPage>,
     modifier: Modifier = Modifier,
     viewModel: LatestViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val pullRefreshState = rememberPullToRefreshState()
     val novelsFollowing = viewModel.novelsFollowing.collectAsLazyPagingItems()

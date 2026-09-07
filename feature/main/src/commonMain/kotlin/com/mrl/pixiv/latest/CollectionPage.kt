@@ -51,13 +51,13 @@ import com.mrl.pixiv.common.repository.SettingRepository.collectAsStateWithLifec
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.isBookmark
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.strings.word_private
 import com.mrl.pixiv.strings.word_public
 import kotlinx.coroutines.flow.SharedFlow
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -70,7 +70,7 @@ fun CollectionPage(
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(uid) },
     latestViewModel: LatestViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val appViewMode by SettingRepository.userPreferenceFlow.collectAsStateWithLifecycle { appViewMode }
 
@@ -106,7 +106,7 @@ private fun CollectionIllustPage(
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(uid) },
     latestViewModel: LatestViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val userBookmarksIllusts = viewModel.userBookmarksIllusts.collectAsLazyPagingItems()
     val pullRefreshState = rememberPullToRefreshState()
@@ -253,7 +253,7 @@ private fun CollectionNovelPage(
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(uid) },
     latestViewModel: LatestViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val userBookmarksNovels = viewModel.userBookmarksNovels.collectAsLazyPagingItems()
     val pullRefreshState = rememberPullToRefreshState()

@@ -29,6 +29,11 @@ kotlin {
             implementation(kotlin("test"))
         }
 
+        jvmTest.dependencies {
+            implementation("org.jetbrains.compose.ui:ui-test:${libs.versions.composeMultiplatform.get()}")
+            implementation(compose.desktop.currentOs)
+        }
+
         androidMain.dependencies {
             // Navigation3
             implementation(libs.bundles.compose.navigation3.android)

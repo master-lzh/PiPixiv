@@ -52,6 +52,7 @@ import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.kts.itemIndexKey
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.artworks
 import com.mrl.pixiv.strings.illustrations
@@ -59,7 +60,6 @@ import com.mrl.pixiv.strings.manga
 import com.mrl.pixiv.strings.novels
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -88,7 +88,7 @@ fun ArtworkScreen(
     initialType: Type = Type.Illust,
     modifier: Modifier = Modifier,
     viewModel: ArtworkViewModel = koinViewModel { parametersOf(userId) },
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
     initialNovel: Boolean = false,
 ) {
     val userIllusts = viewModel.userIllusts.collectAsLazyPagingItems()

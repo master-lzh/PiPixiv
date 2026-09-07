@@ -32,6 +32,7 @@ import com.mrl.pixiv.common.compose.ui.novel.NovelItem
 import com.mrl.pixiv.common.kts.itemIndexKey
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.back
 import com.mrl.pixiv.strings.load_failed
@@ -40,14 +41,13 @@ import com.mrl.pixiv.strings.novel_markers
 import com.mrl.pixiv.strings.novel_markers_empty
 import com.mrl.pixiv.strings.retry
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NovelMarkersScreen(
     modifier: Modifier = Modifier,
     viewModel: NovelMarkersViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val markers = viewModel.markers.collectAsLazyPagingItems()
     val listState = rememberLazyListState()

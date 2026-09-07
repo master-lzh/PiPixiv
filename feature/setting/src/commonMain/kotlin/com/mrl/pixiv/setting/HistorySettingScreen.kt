@@ -51,6 +51,7 @@ import com.mrl.pixiv.common.repository.BrowsingHistoryRepository
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.ToastUtil
 import com.mrl.pixiv.strings.clear_local_history
@@ -74,7 +75,7 @@ import org.koin.compose.koinInject
 @Composable
 fun HistorySettingScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
     browsingHistoryRepository: BrowsingHistoryRepository = koinInject(),
 ) {
     val userPreference by requireUserPreferenceFlow.collectAsStateWithLifecycle()

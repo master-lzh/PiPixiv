@@ -1,0 +1,5 @@
+<resources>
+    <string name="split_pane_resize_handle">Resize split panes</string>
+    <string name="split_pane_reset">Reset pane sizes</string>
+    <string name="split_pane_close">Close side pane</string>
+</resources>

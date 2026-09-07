@@ -39,6 +39,7 @@ import com.mrl.pixiv.common.data.setting.SearchResultDisplayMode
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.setting.components.DropDownSelector
@@ -58,12 +59,11 @@ import com.mrl.pixiv.strings.tags_exact_match
 import com.mrl.pixiv.strings.tags_partially_match
 import com.mrl.pixiv.strings.title_and_description
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @Composable
 fun SearchSettingScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val userPreference by requireUserPreferenceFlow.collectAsStateWithLifecycle()
     val searchSettings = userPreference.searchSettings

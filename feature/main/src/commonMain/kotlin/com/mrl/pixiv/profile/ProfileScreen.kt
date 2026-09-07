@@ -58,6 +58,7 @@ import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.repository.VersionManager
 import com.mrl.pixiv.common.repository.requireUserInfoFlow
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.about
 import com.mrl.pixiv.strings.app_data
@@ -76,7 +77,6 @@ import com.mrl.pixiv.strings.theme_dark
 import com.mrl.pixiv.strings.theme_light
 import com.mrl.pixiv.strings.theme_system
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private val options =
@@ -105,7 +105,7 @@ private const val KEY_LOGOUT = "logout"
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val userInfo by requireUserInfoFlow.collectAsStateWithLifecycle()
     val hasNewVersion by VersionManager.hasNewVersion.collectAsStateWithLifecycle()

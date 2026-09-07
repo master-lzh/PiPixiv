@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.compose.LocalToaster
 import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.setting.SettingViewModel
 import com.mrl.pixiv.setting.network.components.BypassSettingEditor
@@ -28,14 +29,13 @@ import com.mrl.pixiv.setting.network.components.PictureSourceWidget
 import com.mrl.pixiv.strings.network_setting
 import com.mrl.pixiv.strings.restart_app_to_take_effect
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NetworkSettingScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val userPreference by requireUserPreferenceFlow.collectAsStateWithLifecycle()
     val toaster = LocalToaster.current

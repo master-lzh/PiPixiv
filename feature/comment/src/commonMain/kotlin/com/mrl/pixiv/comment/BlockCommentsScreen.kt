@@ -24,18 +24,17 @@ import com.mrl.pixiv.common.kts.VSpacer
 import com.mrl.pixiv.common.kts.hPadding
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.repository.BlockingRepositoryV2
-import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.block_comments
 import com.mrl.pixiv.strings.no_blocked_items
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @Composable
 fun BlockCommentsScreen(
     modifier: Modifier = Modifier,
 ) {
-    val navigationManager = koinInject<NavigationManager>()
+    val navigationManager = currentNavigationManager()
     val blockedComments by BlockingRepositoryV2.blockCommentsFlow
         .collectAsStateWithLifecycle(emptyList())
 

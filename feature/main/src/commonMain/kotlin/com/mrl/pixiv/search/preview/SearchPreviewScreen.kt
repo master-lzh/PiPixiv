@@ -42,6 +42,7 @@ import com.mrl.pixiv.common.compose.ui.ViewModeToggleButton
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.repository.SettingRepository.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
@@ -50,14 +51,13 @@ import com.mrl.pixiv.strings.enter_keywords
 import com.mrl.pixiv.strings.popular_tags
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SearchPreviewScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchPreviewViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val state = viewModel.asState()
     val textState by remember { mutableStateOf(TextFieldValue()) }

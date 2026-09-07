@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.setting.components.DropDownSelector
@@ -51,7 +52,6 @@ import com.mrl.pixiv.strings.privacy_setting
 import com.mrl.pixiv.strings.search_setting
 import com.mrl.pixiv.strings.setting
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 const val KEY_LANGUAGE = "language"
 const val KEY_NETWORK_SETTING = "network_setting"
@@ -66,7 +66,7 @@ const val KEY_DEFAULT_OPEN_LINK = "default_open_link"
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val labelDefault = stringResource(RStrings.label_default)
     val languages = remember { getLanguages() }

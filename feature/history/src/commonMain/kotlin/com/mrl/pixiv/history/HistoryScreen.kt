@@ -70,6 +70,7 @@ import com.mrl.pixiv.common.kts.itemIndexKey
 import com.mrl.pixiv.common.repository.SettingRepository.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.strings.cloud_history
@@ -83,7 +84,6 @@ import com.mrl.pixiv.strings.switch_to_illust_mode
 import com.mrl.pixiv.strings.switch_to_novel_mode
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private enum class HistorySource {
@@ -95,7 +95,7 @@ private enum class HistorySource {
 fun HistoryScreen(
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val state = viewModel.asState()
     val isPremium by viewModel.isPremiumFlow.collectAsStateWithLifecycle()

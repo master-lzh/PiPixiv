@@ -41,6 +41,7 @@ import coil3.compose.AsyncImage
 import com.mrl.pixiv.common.datasource.local.entity.DownloadEntity
 import com.mrl.pixiv.common.datasource.local.entity.DownloadStatus
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
@@ -52,13 +53,12 @@ import com.mrl.pixiv.strings.status_completed
 import com.mrl.pixiv.strings.status_failed
 import com.mrl.pixiv.strings.status_running
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DownloadScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
     viewModel: DownloadViewModel = koinViewModel(),
 ) {
     val state = viewModel.asState()

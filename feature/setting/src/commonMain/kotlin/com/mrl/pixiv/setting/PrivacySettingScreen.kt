@@ -38,6 +38,7 @@ import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.cancel
 import com.mrl.pixiv.strings.confirm
@@ -49,12 +50,11 @@ import com.mrl.pixiv.strings.read_clipboard_on_search
 import com.mrl.pixiv.strings.read_clipboard_on_search_desc
 import com.mrl.pixiv.strings.tips
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @Composable
 fun PrivacySettingScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val userPreference by SettingRepository.userPreferenceFlow.collectAsStateWithLifecycle()
     var showR18Warning by rememberSaveable { mutableStateOf(false) }

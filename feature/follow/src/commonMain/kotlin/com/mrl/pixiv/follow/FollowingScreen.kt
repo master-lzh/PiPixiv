@@ -31,7 +31,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -49,6 +48,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.common.analytics.logEvent
 import com.mrl.pixiv.common.compose.IllustGridDefaults
+import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
 import com.mrl.pixiv.common.compose.layout.isWidthCompact
 import com.mrl.pixiv.common.compose.listener.KeyEventListener
@@ -68,6 +68,7 @@ import com.mrl.pixiv.common.repository.viewmodel.follow.FollowState
 import com.mrl.pixiv.common.repository.viewmodel.follow.isFollowing
 import com.mrl.pixiv.common.router.NavigateToHorizontalPictureScreen
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.follow
 import com.mrl.pixiv.strings.followed
@@ -78,7 +79,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -92,13 +92,13 @@ fun FollowingScreen(
     uid: Long,
     modifier: Modifier = Modifier,
     viewModel: FollowingViewModel = koinViewModel { parametersOf(uid) },
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val scope = rememberCoroutineScope()
     val pages = viewModel.pages
     val pagerState = viewModel.pagerState
-    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
-    val isWidthAtLeastMedium = windowAdaptiveInfo.isWidthAtLeastMedium
+    val paneSizeClass = currentPaneLayoutInfo().sizeClass
+    val isWidthAtLeastMedium = paneSizeClass.isWidthAtLeastMedium
     val lazyListStates = viewModel.lazyListState
     val lazyGridStates = viewModel.lazyGridState
     val page = pages[pagerState.currentPage]
@@ -174,7 +174,7 @@ fun FollowingScreen(
             if (pages.size > 1) {
                 PrimaryTabRow(
                     selectedTabIndex = pagerState.currentPage,
-                    modifier = Modifier.fillMaxWidth(if (windowAdaptiveInfo.isWidthCompact) 1f else 0.5f),
+                    modifier = Modifier.fillMaxWidth(if (paneSizeClass.isWidthCompact) 1f else 0.5f),
                 ) {
                     pages.forEachIndexed { index, page ->
                         Tab(
@@ -224,7 +224,7 @@ fun FollowingScreenBody(
     showIllusts: Boolean = true,
 ) {
     val pullRefreshState = rememberPullToRefreshState()
-    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+    val paneSizeClass = currentPaneLayoutInfo().sizeClass
 
     val isRefreshing = followingUsers.loadState.refresh is LoadState.Loading
     PullToRefreshBox(
@@ -240,7 +240,7 @@ fun FollowingScreenBody(
             )
         }
     ) {
-        if (windowAdaptiveInfo.isWidthAtLeastMedium) {
+        if (paneSizeClass.isWidthAtLeastMedium) {
             val layoutParams = IllustGridDefaults.userFollowingParameters()
             LazyVerticalGrid(
                 columns = layoutParams.gridCells,

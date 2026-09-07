@@ -33,4 +33,37 @@ class NovelReaderLayoutCacheTest {
             state.copy(showBottomSheet = true).paragraphLayoutCacheKey(),
         )
     }
+
+    @Test
+    fun `resizing the reader invalidates paragraph layouts`() {
+        assertNotEquals(
+            state.paragraphLayoutCacheKey(contentWidthPx = 760),
+            state.paragraphLayoutCacheKey(contentWidthPx = 420),
+        )
+    }
+
+    @Test
+    fun `moving to a different display density invalidates paragraph layouts`() {
+        assertNotEquals(
+            state.paragraphLayoutCacheKey(contentWidthPx = 760, density = 1f),
+            state.paragraphLayoutCacheKey(contentWidthPx = 760, density = 2f),
+        )
+    }
+
+    @Test
+    fun `changing system font scale invalidates paragraph layouts`() {
+        assertNotEquals(
+            state.paragraphLayoutCacheKey(fontScale = 1f),
+            state.paragraphLayoutCacheKey(fontScale = 1.3f),
+        )
+    }
+
+    @Test
+    fun `unchanged reader dimensions retain paragraph layouts`() {
+        assertEquals(
+            state.paragraphLayoutCacheKey(contentWidthPx = 420, density = 2f, fontScale = 1.1f),
+            state.copy(showBottomSheet = true)
+                .paragraphLayoutCacheKey(contentWidthPx = 420, density = 2f, fontScale = 1.1f),
+        )
+    }
 }

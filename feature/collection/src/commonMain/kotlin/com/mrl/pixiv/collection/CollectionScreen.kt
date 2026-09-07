@@ -26,7 +26,6 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -45,6 +44,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mrl.pixiv.collection.components.FilterDialog
 import com.mrl.pixiv.common.compose.IllustGridDefaults
+import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
 import com.mrl.pixiv.common.compose.listener.KeyEventListener
 import com.mrl.pixiv.common.compose.listener.keyboardScrollerController
@@ -59,6 +59,7 @@ import com.mrl.pixiv.common.kts.itemIndexKey
 import com.mrl.pixiv.common.repository.isSelf
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.strings.collection
@@ -66,7 +67,6 @@ import com.mrl.pixiv.strings.illusts
 import com.mrl.pixiv.strings.novels
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -76,7 +76,7 @@ fun CollectionScreen(
     isNovel: Boolean,
     modifier: Modifier = Modifier,
     viewModel: CollectionViewModel = koinViewModel { parametersOf(uid) },
-    navigationManager: NavigationManager = koinInject()
+    navigationManager: NavigationManager = currentNavigationManager()
 ) {
     val state = viewModel.asState()
     val userBookmarksIllusts = viewModel.userBookmarksIllusts.collectAsLazyPagingItems()
@@ -88,7 +88,7 @@ fun CollectionScreen(
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(if (isNovel) 1 else 0) { 2 }
     val isIllustPage = pagerState.currentPage == 0
-    val useViewModeFab = currentWindowAdaptiveInfoV2().isWidthAtLeastMedium
+    val useViewModeFab = currentPaneLayoutInfo().sizeClass.isWidthAtLeastMedium
 
     val illustController = remember {
         keyboardScrollerController(lazyGridState) {

@@ -109,8 +109,12 @@ class MainActivity : BaseActivity() {
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        scope.launch { flow.emit(ComposeKeyEvent(event)) }
-        return super.dispatchKeyEvent(event)
+        val handled = super.dispatchKeyEvent(event)
+        // Text input, focused controls and the split handle consume their keys first.
+        if (!handled) {
+            scope.launch { flow.emit(ComposeKeyEvent(event)) }
+        }
+        return handled
     }
 
     private fun handleIntent(intent: Intent) {

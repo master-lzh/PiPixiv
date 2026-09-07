@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.compose.lightBlue
 import com.mrl.pixiv.common.repository.BlockingRepositoryV2
-import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.add_tags
 import com.mrl.pixiv.strings.block_illust
@@ -50,7 +50,6 @@ import com.mrl.pixiv.strings.cancel
 import com.mrl.pixiv.strings.confirm
 import com.mrl.pixiv.strings.no_blocked_items
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @Composable
 fun BlockIllustScreen(
@@ -224,7 +223,7 @@ private fun <T> BlockTextScreen(
     modifier: Modifier = Modifier,
     itemContent: @Composable RowScope.(T) -> Unit = {},
 ) {
-    val navigationManager = koinInject<NavigationManager>()
+    val navigationManager = currentNavigationManager()
 
     Scaffold(
         modifier = modifier,

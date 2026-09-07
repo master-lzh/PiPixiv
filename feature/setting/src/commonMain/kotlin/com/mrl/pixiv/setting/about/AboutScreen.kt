@@ -44,6 +44,7 @@ import com.mrl.pixiv.common.data.Constants
 import com.mrl.pixiv.common.repository.VersionManager
 import com.mrl.pixiv.common.repository.VersionManager.getCurrentFlavorAsset
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.AppUtil
 import com.mrl.pixiv.common.util.RDrawables
 import com.mrl.pixiv.common.util.RStrings
@@ -65,12 +66,11 @@ import com.mrl.pixiv.strings.share_app
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @Composable
 fun AboutScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()

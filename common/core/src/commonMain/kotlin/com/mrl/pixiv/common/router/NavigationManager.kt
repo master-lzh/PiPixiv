@@ -2,11 +2,8 @@ package com.mrl.pixiv.common.router
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.navigation3.runtime.NavKey
 import co.touchlab.kermit.Logger
 import com.mrl.pixiv.common.data.AppViewMode
 import com.mrl.pixiv.common.data.Illust
@@ -14,6 +11,7 @@ import com.mrl.pixiv.common.data.Type
 import com.mrl.pixiv.common.repository.IllustCacheRepo
 import org.koin.core.annotation.Single
 import kotlin.time.measureTime
+import kotlin.uuid.Uuid
 
 typealias NavigateToHorizontalPictureScreen = (
     illusts: List<Illust>,
@@ -27,66 +25,134 @@ typealias NavigateToHorizontalPictureScreen = (
 class NavigationManager(
     vararg initialBackStack: Destination
 ) {
-    val backStack = mutableStateListOf(*initialBackStack)
+    private var store = NavigationStore(initialBackStack.toList())
+    private var sourceEntryId: String? = null
 
-    val currentDestination: NavKey
-        get() = backStack.last()
+    val backStack: List<NavigationRecord>
+        get() = store.records
 
-    var currentMainPage by mutableStateOf<MainPage>(MainPage.Home)
+    val currentDestination: Destination
+        get() = backStack.last().destination
 
-    private fun <T : NavKey> SnapshotStateList<T>.addSingleTop(route: T): Boolean {
-        val currentIndex = indexOfFirst { it == route }
-        return if (currentIndex != -1) {
-            add(removeAt(currentIndex))
-        } else {
-            add(route)
-        }
+    val currentMainPage: MainPage
+        get() = store.currentMainPage
+
+    /** The scoped manager shares the root store, but never guesses which visible page was clicked. */
+    fun forEntry(entryId: String): NavigationManager = NavigationManager().also {
+        it.store = store
+        it.sourceEntryId = entryId
     }
 
-    private fun <T : NavKey> SnapshotStateList<T>.navigate(route: T): Boolean {
-        return add(route)
-    }
+    fun saveState(): NavigationStateSnapshot = NavigationStateSnapshot(backStack, currentMainPage)
 
-    private fun <T : NavKey> SnapshotStateList<T>.popBackStack() {
-        if (size > 1) {
-            removeAt(backStack.lastIndex)
-        }
-    }
-
-    private fun <T : NavKey> SnapshotStateList<T>.popBackStack(route: T, inclusive: Boolean) {
-        if (size > 1) {
-            val index = indexOfLast { it == route }
-            if (index != -1) {
-                if (inclusive) {
-                    removeRange(index, size)
-                } else {
-                    removeRange(index + 1, size)
+    /**
+     * Restores identities into the shared store, including managers already scoped to those IDs.
+     * Picture arguments still need the image cache; this is not durable image-data restoration.
+     */
+    fun restoreState(snapshot: NavigationStateSnapshot) {
+        require(snapshot.records.isNotEmpty()) { "Navigation state must contain a root entry" }
+        val seenIds = mutableSetOf<String>()
+        var source: NavigationRecord? = null
+        snapshot.records.forEach { record ->
+            require(record.entryId.isNotBlank() && seenIds.add(record.entryId)) {
+                "Navigation entry IDs must be non-empty and unique"
+            }
+            if (record.ownerEntryId == null) {
+                source = record
+            } else {
+                require(record.ownerEntryId == source?.entryId &&
+                    source.destination.paneSpec.canHostDetail &&
+                    record.destination.paneSpec.canShowAsDetail
+                ) {
+                    "A detail must belong to its preceding source without crossing a full-width entry"
                 }
             }
         }
+        store.records = snapshot.records.toList()
+        store.currentMainPage = snapshot.currentMainPage
     }
 
     fun popBackStack() {
-        backStack.popBackStack()
+        val records = backStack
+        if (records.size <= 1) return
+        val source = activeSource(records) ?: return
+        val sourceIndex = records.indexOf(source)
+        // A source's own back button leaves the source and its entire detail branch.
+        // The root manager and the current detail's back button pop one visit at a time.
+        val keepCount = if (sourceEntryId != null && source.entryId == records.last().ownerEntryId) {
+            sourceIndex.coerceAtLeast(1)
+        } else {
+            records.lastIndex
+        }
+        store.records = records.take(keepCount)
     }
 
     fun navigate(destination: Destination) {
-        backStack.navigate(destination)
+        val records = backStack
+        val source = activeSource(records)
+        if (sourceEntryId != null && source == null) return
+        val spec = destination.paneSpec
+        val ownerEntryId = when {
+            spec.preferredFullWidth -> null
+            source?.ownerEntryId != null && spec.canShowAsDetail -> source.ownerEntryId
+            source != null && source.destination.paneSpec.canHostDetail &&
+                spec.canShowAsDetail && !spec.preferAsSource -> source.entryId
+            else -> null
+        }
+        // Opening Picture (or a preview) preserves the complete previous split context.
+        // Selecting from the source otherwise replaces its old detail branch.
+        val history = if (!spec.preferredFullWidth && source?.ownerEntryId == null &&
+            source != null && records.lastOrNull()?.ownerEntryId == source.entryId
+        ) {
+            records.take(records.indexOf(source) + 1)
+        } else {
+            records
+        }
+        store.records = history + newRecord(destination, ownerEntryId)
+    }
+
+    /** Explicitly opens a new independent visit, for example full-width novel reading. */
+    fun openInMainPane() {
+        val source = activeSource(backStack) ?: return
+        store.records = backStack + newRecord(source.destination)
+    }
+
+    fun closeDetailBranch(ownerEntryId: String) {
+        val records = backStack
+        if (records.lastOrNull()?.ownerEntryId != ownerEntryId) return
+        val ownerIndex = records.indexOfFirst { it.entryId == ownerEntryId }
+        if (ownerIndex >= 0) store.records = records.take(ownerIndex + 1)
+    }
+
+    /** Used when a source changes its selected content without creating a navigation visit. */
+    fun closeCurrentDetailBranch() {
+        val source = activeSource(backStack) ?: return
+        closeDetailBranch(source.ownerEntryId ?: source.entryId)
     }
 
     fun switchMainPage(page: MainPage) {
         if (currentMainPage != page) {
-            currentMainPage = page
+            popBackToMainScreen()
+            store.currentMainPage = page
         }
     }
 
     fun loginToMainScreen() {
-        backStack.clear()
-        backStack.add(Destination.Main)
+        store.records = listOf(newRecord(Destination.Main))
     }
 
     fun popBackToMainScreen() {
-        backStack.popBackStack(route = Destination.Main, inclusive = false)
+        val records = backStack
+        val mainIndex = records.indexOfLast { it.destination == Destination.Main }
+        if (mainIndex >= 0) store.records = records.take(mainIndex + 1)
+    }
+
+    private fun activeSource(records: List<NavigationRecord>): NavigationRecord? {
+        val top = records.lastOrNull() ?: return null
+        val entryId = sourceEntryId ?: return top
+        // Ignore callbacks from disposed or outgoing entries instead of retargeting the top page.
+        if (entryId != top.entryId && entryId != top.ownerEntryId) return null
+        return records.firstOrNull { it.entryId == entryId }
     }
 
     fun navigateToPictureScreen(
@@ -97,14 +163,14 @@ class NavigationManager(
     ) {
         measureTime {
             IllustCacheRepo[prefix] = illusts
-            backStack.navigate(Destination.Picture(index, prefix, enableTransition))
+            navigate(Destination.Picture(index, prefix, enableTransition))
         }.let {
             Logger.i(tag = "Navigation") { "navigateToPictureScreen cost: $it" }
         }
     }
 
     fun navigateToSinglePictureScreen(illustId: Long) {
-        backStack.navigate(Destination.PictureDeeplink(illustId))
+        navigate(Destination.PictureDeeplink(illustId))
     }
 
     fun navigateToImagePreviewScreen(
@@ -113,7 +179,7 @@ class NavigationManager(
         sharedElementKey: String? = null,
     ) {
         if (imageUrls.isEmpty()) return
-        backStack.navigate(
+        navigate(
             Destination.ImagePreview(
                 imageUrls = imageUrls,
                 initialIndex = initialIndex.coerceIn(0, imageUrls.lastIndex),
@@ -127,108 +193,109 @@ class NavigationManager(
         isIdSearch: Boolean = false,
         searchMode: AppViewMode = AppViewMode.ILLUST
     ) {
-        backStack.navigate(route = Destination.SearchResults(searchWord, isIdSearch, searchMode))
+        navigate(destination = Destination.SearchResults(searchWord, isIdSearch, searchMode))
     }
 
     fun navigateToProfileDetailScreen(userId: Long) {
-        backStack.navigate(route = Destination.ProfileDetail(userId))
+        navigate(destination = Destination.ProfileDetail(userId))
     }
 
     fun navigateToFollowingScreen(userId: Long) {
-        backStack.navigate(route = Destination.Following(userId))
+        navigate(destination = Destination.Following(userId))
     }
 
     fun navigateToCollectionScreen(userId: Long, isNovel: Boolean = false) {
-        backStack.navigate(route = Destination.Collection(userId, isNovel))
+        navigate(destination = Destination.Collection(userId, isNovel))
     }
 
     fun navigateToBookmarkedTagsScreen() {
-        backStack.navigate(route = Destination.BookmarkedTags)
+        navigate(destination = Destination.BookmarkedTags)
     }
 
     fun navigateToNovelMarkersScreen() {
-        backStack.navigate(route = Destination.NovelMarkers)
+        navigate(destination = Destination.NovelMarkers)
     }
 
     fun navigateToSearchScreen() {
-        backStack.addSingleTop(route = Destination.Search)
+        if (backStack.lastOrNull()?.destination != Destination.Search) {
+            navigate(Destination.Search)
+        }
     }
 
     fun navigateToHistoryScreen() {
-        backStack.navigate(route = Destination.History)
+        navigate(destination = Destination.History)
     }
 
     fun navigateToNovelReadLaterScreen() {
-        backStack.navigate(route = Destination.NovelReadLater)
+        navigate(destination = Destination.NovelReadLater)
     }
 
     fun navigateToSettingScreen() {
-        backStack.navigate(route = Destination.Setting)
+        navigate(destination = Destination.Setting)
     }
 
     fun navigateToLoginOptionScreen() {
-        backStack.clear()
-        backStack.addSingleTop(route = Destination.LoginOption)
+        store.records = listOf(newRecord(Destination.LoginOption))
     }
 
     fun navigateToUserIllustScreen(userId: Long, initialType: Type = Type.Illust) {
-        backStack.navigate(route = Destination.UserArtwork(userId, initialType))
+        navigate(destination = Destination.UserArtwork(userId, initialType))
     }
 
     fun navigateToUserNovelsScreen(userId: Long) {
-        backStack.navigate(route = Destination.UserNovels(userId))
+        navigate(destination = Destination.UserNovels(userId))
     }
 
     fun navigateToBlockSettings() {
-        backStack.navigate(route = Destination.BlockSettings)
+        navigate(destination = Destination.BlockSettings)
     }
 
     fun navigateToAppDataScreen() {
-        backStack.navigate(route = Destination.AppData)
+        navigate(destination = Destination.AppData)
     }
 
     fun navigateToNetworkSettingScreen() {
-        backStack.navigate(route = Destination.NetworkSetting)
+        navigate(destination = Destination.NetworkSetting)
     }
 
     fun navigateToBrowsingSettingScreen() {
-        backStack.navigate(route = Destination.BrowsingSetting)
+        navigate(destination = Destination.BrowsingSetting)
     }
 
     fun navigateToSearchSettingScreen() {
-        backStack.navigate(route = Destination.SearchSetting)
+        navigate(destination = Destination.SearchSetting)
     }
 
     fun navigateToHistorySettingScreen() {
-        backStack.navigate(route = Destination.HistorySetting)
+        navigate(destination = Destination.HistorySetting)
     }
 
     fun navigateToPrivacySettingScreen() {
-        backStack.navigate(route = Destination.PrivacySetting)
+        navigate(destination = Destination.PrivacySetting)
     }
 
     fun navigateToFileNameFormatScreen() {
-        backStack.navigate(route = Destination.FileNameFormat)
+        navigate(destination = Destination.FileNameFormat)
     }
 
     fun navigateToAiTranslationSettingScreen() {
-        backStack.navigate(route = Destination.AiTranslationSetting)
+        navigate(destination = Destination.AiTranslationSetting)
     }
 
     fun navigateToDownloadScreen() {
-        backStack.navigate(route = Destination.Download)
+        navigate(destination = Destination.Download)
     }
 
     fun navigateToAboutScreen() {
-        backStack.navigate(route = Destination.About)
+        navigate(destination = Destination.About)
     }
 
     fun navigateToCommentScreen(id: Long, type: CommentType) {
-        backStack.navigate(route = Destination.Comment(id, type))
+        navigate(destination = Destination.Comment(id, type))
     }
 
     fun navigateToReportCommentScreen(commentId: Long, type: ReportType) {
-        backStack.navigate(route = Destination.Report(commentId, type))
+        navigate(destination = Destination.Report(commentId, type))
     }
 
     fun navigateToNovelDetailScreen(
@@ -236,8 +303,8 @@ class NavigationManager(
         markerPage: Int? = null,
         readLaterTargetLanguage: String? = null,
     ) {
-        backStack.navigate(
-            route = Destination.NovelDetail(
+        navigate(
+            destination = Destination.NovelDetail(
                 novelId = novelId,
                 markerPage = markerPage,
                 readLaterTargetLanguage = readLaterTargetLanguage,
@@ -246,6 +313,17 @@ class NavigationManager(
     }
 
     fun navigateToNovelSeriesScreen(seriesId: Long) {
-        backStack.navigate(route = Destination.NovelSeries(seriesId))
+        navigate(destination = Destination.NovelSeries(seriesId))
     }
 }
+
+private class NavigationStore(initialDestinations: List<Destination>) {
+    var records by mutableStateOf(initialDestinations.map { newRecord(it) })
+    var currentMainPage by mutableStateOf<MainPage>(MainPage.Home)
+}
+
+private fun newRecord(destination: Destination, ownerEntryId: String? = null) = NavigationRecord(
+    entryId = Uuid.random().toHexString(),
+    destination = destination,
+    ownerEntryId = ownerEntryId,
+)

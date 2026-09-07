@@ -39,8 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.mrl.pixiv.common.router.NavigationManager
 import com.mrl.pixiv.common.router.ReportType
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.ToastUtil
 import com.mrl.pixiv.common.viewmodel.asState
@@ -52,7 +52,6 @@ import com.mrl.pixiv.strings.report_reason
 import com.mrl.pixiv.strings.report_success
 import com.mrl.pixiv.strings.send
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -65,7 +64,7 @@ fun ReportScreen(
     modifier: Modifier = Modifier,
     viewModel: ReportCommentViewModel = koinViewModel { parametersOf(id, type) }
 ) {
-    val navigationManager = koinInject<NavigationManager>()
+    val navigationManager = currentNavigationManager()
     val state = viewModel.asState()
     val reportContent = viewModel.reportContent
     var showTopicSheet by rememberSaveable { mutableStateOf(false) }

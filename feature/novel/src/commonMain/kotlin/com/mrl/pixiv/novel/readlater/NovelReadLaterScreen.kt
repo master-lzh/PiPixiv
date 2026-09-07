@@ -36,6 +36,7 @@ import com.mrl.pixiv.common.repository.NovelReadLaterItem
 import com.mrl.pixiv.common.repository.NovelReadLaterRepository
 import com.mrl.pixiv.common.repository.NovelReadLaterState
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.ToastUtil
 import com.mrl.pixiv.strings.ai_translation_config_required
@@ -59,7 +60,7 @@ import org.koin.compose.koinInject
 fun NovelReadLaterScreen(
     modifier: Modifier = Modifier,
     repository: NovelReadLaterRepository = koinInject(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val items by repository.observeItems()
         .collectAsStateWithLifecycle(initialValue = emptyList())

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.router.Destination
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RDrawables
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.ic_launcher
@@ -34,12 +35,11 @@ import com.mrl.pixiv.strings.sign_in_with_token
 import com.mrl.pixiv.strings.sign_up
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @Composable
 fun LoginOptionScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     Scaffold(
         modifier = modifier,

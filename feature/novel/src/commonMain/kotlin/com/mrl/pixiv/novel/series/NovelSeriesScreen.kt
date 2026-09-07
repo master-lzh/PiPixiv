@@ -43,6 +43,7 @@ import com.mrl.pixiv.common.compose.ui.novel.NovelItem
 import com.mrl.pixiv.common.kts.HSpacer
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.back
 import com.mrl.pixiv.strings.load_failed
@@ -52,7 +53,6 @@ import com.mrl.pixiv.strings.novel_watchlist_added
 import com.mrl.pixiv.strings.retry
 import com.mrl.pixiv.strings.series
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -61,7 +61,7 @@ fun NovelSeriesScreen(
     seriesId: Long,
     modifier: Modifier = Modifier,
     viewModel: NovelSeriesViewModel = koinViewModel { parametersOf(seriesId) },
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val novels = viewModel.novels.collectAsLazyPagingItems()

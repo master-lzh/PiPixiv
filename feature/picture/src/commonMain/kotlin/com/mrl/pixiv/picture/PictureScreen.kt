@@ -56,7 +56,6 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -81,7 +80,6 @@ import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -99,6 +97,7 @@ import com.mrl.pixiv.common.animation.DefaultFloatAnimationSpec
 import com.mrl.pixiv.common.compose.IllustGridDefaults
 import com.mrl.pixiv.common.compose.LocalSharedKeyPrefix
 import com.mrl.pixiv.common.compose.LocalSharedTransitionScope
+import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
 import com.mrl.pixiv.common.compose.ui.BlockSurface
 import com.mrl.pixiv.common.compose.ui.BookmarkIcon
@@ -125,6 +124,8 @@ import com.mrl.pixiv.common.repository.viewmodel.follow.FollowState
 import com.mrl.pixiv.common.repository.viewmodel.follow.isFollowing
 import com.mrl.pixiv.common.router.CommentType
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
+import com.mrl.pixiv.common.util.Platform
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.ShareUtil
 import com.mrl.pixiv.common.util.adaptiveFileSize1
@@ -134,6 +135,7 @@ import com.mrl.pixiv.common.util.copyToClipboard
 import com.mrl.pixiv.common.util.getScreenHeight
 import com.mrl.pixiv.common.util.isDesktop
 import com.mrl.pixiv.common.util.platform
+import com.mrl.pixiv.common.util.selectSaveFile
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.picture.components.UgoiraPlayer
@@ -155,14 +157,11 @@ import com.mrl.pixiv.strings.user_blocked
 import com.mrl.pixiv.strings.view_comments
 import com.mrl.pixiv.strings.view_comments_count
 import com.mrl.pixiv.strings.viewed
-import com.mrl.pixiv.common.util.selectSaveFile
-import com.mrl.pixiv.common.util.Platform
 import io.github.vinceglb.filekit.dialogs.FileKitDialogSettings
 import io.github.vinceglb.filekit.dialogs.compose.rememberFileSaverLauncher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Duration.Companion.seconds
@@ -173,7 +172,7 @@ fun PictureDeeplinkScreen(
     modifier: Modifier = Modifier,
     illustId: Long,
     pictureViewModel: PictureViewModel = koinViewModel { parametersOf(null, illustId) },
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val state = pictureViewModel.asState()
     val illust = state.illust
@@ -217,7 +216,7 @@ internal fun PictureScreen(
     enableTransition: Boolean,
     modifier: Modifier = Modifier,
     pictureViewModel: PictureViewModel = koinViewModel { parametersOf(illust, null) },
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val relatedIllusts = pictureViewModel.relatedIllusts.collectAsLazyPagingItems()
     val navToPictureScreen = navigationManager::navigateToPictureScreen
@@ -229,10 +228,11 @@ internal fun PictureScreen(
     val relatedLayoutParams = IllustGridDefaults.relatedLayoutParameters()
     val userLayoutParams = IllustGridDefaults.userLayoutParameters()
     val density = LocalDensity.current
+    val paneLayoutInfo = currentPaneLayoutInfo()
     val userSpanCount = with(userLayoutParams.gridCells) {
         with(density) {
             density.calculateCrossAxisCellSizes(
-                LocalWindowInfo.current.containerDpSize.width.roundToPx(),
+                paneLayoutInfo.size.width.roundToPx(),
                 relatedLayoutParams.horizontalArrangement.spacing.roundToPx(),
             ).size
         }
@@ -240,7 +240,7 @@ internal fun PictureScreen(
     val relatedSpanCount = with(relatedLayoutParams.gridCells) {
         with(density) {
             density.calculateCrossAxisCellSizes(
-                LocalWindowInfo.current.containerDpSize.width.roundToPx(),
+                paneLayoutInfo.size.width.roundToPx(),
                 relatedLayoutParams.horizontalArrangement.spacing.roundToPx()
             ).size
         }
@@ -252,7 +252,7 @@ internal fun PictureScreen(
     }
 
     val lazyListState = rememberLazyListState()
-    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+    val windowAdaptiveInfo = paneLayoutInfo.sizeClass
     val isWidthAtLeastMedium = windowAdaptiveInfo.isWidthAtLeastMedium
     val rightListState = rememberLazyListState()
     val currPage by remember {

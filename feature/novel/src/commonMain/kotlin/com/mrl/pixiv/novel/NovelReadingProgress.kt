@@ -71,14 +71,24 @@ internal data class ParagraphLayoutCacheKey(
     val paragraphs: List<String>,
     val fontSize: Int,
     val lineSpacingSp: Int,
+    val contentWidthPx: Int,
+    val density: Float,
+    val fontScale: Float,
 )
 
-internal fun NovelState.paragraphLayoutCacheKey(): ParagraphLayoutCacheKey =
+internal fun NovelState.paragraphLayoutCacheKey(
+    contentWidthPx: Int = 0,
+    density: Float = 1f,
+    fontScale: Float = 1f,
+): ParagraphLayoutCacheKey =
     ParagraphLayoutCacheKey(
         novelId = novel?.id,
         paragraphs = paragraphs,
         fontSize = fontSize,
         lineSpacingSp = lineSpacingSp,
+        contentWidthPx = contentWidthPx,
+        density = density,
+        fontScale = fontScale,
     )
 
 internal fun buildVisibleReadingProgress(

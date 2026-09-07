@@ -71,6 +71,7 @@ import com.mrl.pixiv.common.repository.SettingRepository.collectAsStateWithLifec
 import com.mrl.pixiv.common.router.DestinationsDeepLink
 import com.mrl.pixiv.common.router.NavigationManager
 import com.mrl.pixiv.common.router.PixivLinkTarget
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.DebounceUtil
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.readTextFromClipboard
@@ -89,14 +90,13 @@ import com.mrl.pixiv.strings.users
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val dispatch = viewModel::dispatch
     val state = viewModel.asState()

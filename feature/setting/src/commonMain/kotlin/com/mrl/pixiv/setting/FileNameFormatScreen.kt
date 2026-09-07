@@ -42,6 +42,7 @@ import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.data.setting.UserPreference
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.download_single_folder_by_user_desc
 import com.mrl.pixiv.strings.download_single_folder_by_user_title
@@ -54,13 +55,12 @@ import com.mrl.pixiv.strings.legend_title
 import com.mrl.pixiv.strings.legend_user_id
 import com.mrl.pixiv.strings.legend_user_name
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun FileNameFormatScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject()
+    navigationManager: NavigationManager = currentNavigationManager()
 ) {
     val userPreference by SettingRepository.userPreferenceFlow.collectAsStateWithLifecycle()
     val format = rememberTextFieldState(userPreference.fileNameFormat)

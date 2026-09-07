@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,6 +24,7 @@ import com.mrl.pixiv.common.analytics.logEvent
 import com.mrl.pixiv.common.repository.VersionManager
 import com.mrl.pixiv.common.router.MainPage
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.home.HomeScreen
 import com.mrl.pixiv.latest.LatestScreen
@@ -37,15 +39,14 @@ import com.mrl.pixiv.strings.search
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.core.annotation.KoinExperimentalAPI
 
-@OptIn(KoinExperimentalAPI::class, InternalSerializationApi::class)
 @Composable
-fun MainScreen(
-    modifier: Modifier = Modifier,
+fun MainNavigationScaffold(
+    showNavigation: Boolean,
+    navigationManager: NavigationManager,
+    content: @Composable () -> Unit,
 ) {
-    val navigationManager = koinInject<NavigationManager>()
     val page = navigationManager.currentMainPage
     val hasNewVersion by VersionManager.hasNewVersion.collectAsStateWithLifecycle()
     val screens = remember {
@@ -91,23 +92,37 @@ fun MainScreen(
                 )
             }
         },
-        layoutType = NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfoV2())
+        layoutType = if (showNavigation) {
+            NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfoV2())
+        } else {
+            NavigationSuiteType.None
+        }
     ) {
-        AnimatedContent(
-            targetState = page,
-            modifier = modifier,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(220, delayMillis = 90))
-                    .togetherWith(fadeOut(animationSpec = tween(90)))
-            }
-        ) {
-            when (it) {
-                MainPage.Home -> HomeScreen()
-                MainPage.Ranking -> RankingScreen()
-                MainPage.Latest -> LatestScreen()
-                MainPage.Search -> SearchPreviewScreen()
-                MainPage.Profile -> ProfileScreen()
-            }
+        content()
+    }
+}
+
+@OptIn(KoinExperimentalAPI::class, InternalSerializationApi::class)
+@Composable
+fun MainScreen(
+    modifier: Modifier = Modifier,
+) {
+    val navigationManager = currentNavigationManager()
+    val page = navigationManager.currentMainPage
+    AnimatedContent(
+        targetState = page,
+        modifier = modifier,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(220, delayMillis = 90))
+                .togetherWith(fadeOut(animationSpec = tween(90)))
+        }
+    ) {
+        when (it) {
+            MainPage.Home -> HomeScreen()
+            MainPage.Ranking -> RankingScreen()
+            MainPage.Latest -> LatestScreen()
+            MainPage.Search -> SearchPreviewScreen()
+            MainPage.Profile -> ProfileScreen()
         }
     }
     LaunchedEffect(navigationManager.currentMainPage) {

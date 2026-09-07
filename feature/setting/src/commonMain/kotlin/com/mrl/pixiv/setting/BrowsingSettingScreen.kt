@@ -50,6 +50,7 @@ import com.mrl.pixiv.common.data.setting.SearchResultIllustLayout
 import com.mrl.pixiv.common.repository.SettingRepository
 import com.mrl.pixiv.common.repository.requireUserPreferenceFlow
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.util.throttleClick
 import com.mrl.pixiv.setting.components.DropDownSelector
@@ -75,12 +76,11 @@ import com.mrl.pixiv.strings.span_count_portrait
 import com.mrl.pixiv.strings.tap_image_to_open_full_resolution_preview
 import com.mrl.pixiv.strings.tap_image_to_open_full_resolution_preview_desc
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 @Composable
 fun BrowsingSettingScreen(
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val userPreference by requireUserPreferenceFlow.collectAsStateWithLifecycle()
     val browsingSettings = userPreference.browsingSettings

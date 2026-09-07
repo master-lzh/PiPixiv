@@ -48,6 +48,9 @@ kotlin {
                 implementation(libs.bundles.compose.navigation3.android)
             }
         }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
         iosMain {
             dependencies {
 

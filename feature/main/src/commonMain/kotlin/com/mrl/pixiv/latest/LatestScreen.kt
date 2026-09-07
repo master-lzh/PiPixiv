@@ -15,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.analytics.logEvent
+import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
 import com.mrl.pixiv.common.compose.layout.isWidthCompact
 import com.mrl.pixiv.common.compose.ui.BackToTopButton
@@ -52,9 +52,9 @@ fun LatestScreen(
 ) {
     val userInfo by requireUserInfoFlow.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+    val paneSizeClass = currentPaneLayoutInfo().sizeClass
     val refreshFlow = remember { MutableSharedFlow<LatestPage>() }
-    val isWidthAtLeastMedium = windowAdaptiveInfo.isWidthAtLeastMedium
+    val isWidthAtLeastMedium = paneSizeClass.isWidthAtLeastMedium
     val appViewMode by SettingRepository.userPreferenceFlow.collectAsStateWithLifecycle { appViewMode }
     val pages = remember(appViewMode) { LatestPage.pagesFor(appViewMode) }
     val pagerState = viewModel.pagerStateFor(appViewMode)
@@ -129,7 +129,7 @@ fun LatestScreen(
             PrimaryTabRow(
                 selectedTabIndex = pagerState.currentPage,
                 modifier = Modifier
-                    .fillMaxWidth(if (windowAdaptiveInfo.isWidthCompact) 1f else 0.5f)
+                    .fillMaxWidth(if (paneSizeClass.isWidthCompact) 1f else 0.5f)
                     .padding(horizontal = 16.dp)
             ) {
                 pages.forEachIndexed { index, it ->

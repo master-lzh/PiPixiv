@@ -52,6 +52,7 @@ import com.mrl.pixiv.common.data.novel.NovelWatchlistSeries
 import com.mrl.pixiv.common.kts.itemIndexKey
 import com.mrl.pixiv.common.repository.viewmodel.bookmark.BookmarkState
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.load_failed
 import com.mrl.pixiv.strings.novel_series_chapter_count
@@ -61,7 +62,6 @@ import com.mrl.pixiv.strings.switch_to_latest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -86,7 +86,7 @@ private fun NovelFeedPage(
     listState: LazyListState,
     refreshFlow: SharedFlow<LatestPage>,
     modifier: Modifier = Modifier,
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val pagingItems = novels.collectAsLazyPagingItems()
     val pullRefreshState = rememberPullToRefreshState()
@@ -182,7 +182,7 @@ fun NovelWatchlistPage(
     refreshFlow: SharedFlow<LatestPage>,
     modifier: Modifier = Modifier,
     viewModel: LatestViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     val watchlist = viewModel.novelWatchlist.collectAsLazyPagingItems()
     val listState = viewModel.watchlistNovelLazyListState

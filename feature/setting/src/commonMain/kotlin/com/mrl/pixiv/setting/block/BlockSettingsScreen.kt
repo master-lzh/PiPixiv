@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import com.mrl.pixiv.common.compose.rememberThrottleClick
 import com.mrl.pixiv.common.router.Destination
-import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.strings.block_comments
 import com.mrl.pixiv.strings.block_illust
@@ -31,7 +31,6 @@ import com.mrl.pixiv.strings.block_tags
 import com.mrl.pixiv.strings.block_user
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 
 private const val KEY_BLOCK_ILLUST = "block_illust"
 private const val KEY_BLOCK_NOVEL = "block_novel"
@@ -43,7 +42,7 @@ private const val KEY_BLOCK_COMMENTS = "block_comments"
 fun BlockSettingsScreen(
     modifier: Modifier = Modifier,
 ) {
-    val navigationManager = koinInject<NavigationManager>()
+    val navigationManager = currentNavigationManager()
 
     Scaffold(
         modifier = modifier,

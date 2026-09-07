@@ -31,20 +31,20 @@ import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
 import com.mrl.pixiv.common.kts.spaceBy
 import com.mrl.pixiv.common.router.NavigationManager
+import com.mrl.pixiv.common.router.currentNavigationManager
 import com.mrl.pixiv.common.util.RStrings
 import com.mrl.pixiv.common.viewmodel.asState
 import com.mrl.pixiv.strings.cookies
 import com.mrl.pixiv.strings.recommend_cookie_export_plugin
 import com.mrl.pixiv.strings.sign_in
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun WebCookieLoginScreen(
     modifier: Modifier = Modifier,
     viewModel: OAuthLoginViewModel = koinViewModel(),
-    navigationManager: NavigationManager = koinInject(),
+    navigationManager: NavigationManager = currentNavigationManager(),
 ) {
     var phpSessionId by remember { mutableStateOf("") }
     val state = viewModel.asState()
