@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterList
@@ -86,7 +85,7 @@ fun CollectionScreen(
     val lazyGridState = rememberLazyGridState()
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(if (isNovel) 1 else 0) { 2 }
+    val pagerState = rememberCollectionPagerState(if (isNovel) 1 else 0, navigationManager)
     val isIllustPage = pagerState.currentPage == 0
     val useViewModeFab = currentPaneLayoutInfo().sizeClass.isWidthAtLeastMedium
 
