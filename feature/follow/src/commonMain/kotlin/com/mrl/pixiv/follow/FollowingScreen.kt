@@ -331,7 +331,10 @@ fun FollowingUserCard(
     modifier: Modifier = Modifier,
     showIllusts: Boolean = true
 ) {
-    Card(modifier = modifier) {
+    Card(
+        onClick = navToUserProfile,
+        modifier = modifier.fillMaxWidth(),
+    ) {
         if (showIllusts) {
             Row {
                 val preview = illusts.take(PREVIEW_SIZE)
