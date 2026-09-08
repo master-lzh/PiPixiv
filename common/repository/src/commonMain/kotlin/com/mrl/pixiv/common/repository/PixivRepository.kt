@@ -37,7 +37,7 @@ object PixivRepository : KoinComponent {
 
     private val authApi = authKtorfit.createAuthApi()
 
-    private val apiApi = apiKtorfit.createPixivApi()
+    internal val apiApi = apiKtorfit.createPixivApi()
 
     suspend fun refreshToken(authTokenFieldReq: AuthTokenFieldReq) = authApi.refreshToken(
         authTokenFieldReq.clientId,

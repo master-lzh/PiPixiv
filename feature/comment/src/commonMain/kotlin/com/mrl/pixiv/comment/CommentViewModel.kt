@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import org.koin.android.annotation.KoinViewModel
 
 internal const val MAX_COMMENT_LENGTH = 140
@@ -65,9 +66,9 @@ class CommentViewModel(
         .flatMapLatest { commentId ->
             if (commentId == null) flowOf(PagingData.empty())
             else Pager(PagingConfig(pageSize = 5)) {
-                CommentRepliesPagingSource(commentId)
-            }.flow.cachedIn(viewModelScope)
-        }
+                CommentRepliesPagingSource(commentId, type)
+            }.flow.onStart { emit(PagingData.empty()) }
+        }.cachedIn(viewModelScope)
 
     init {
         launchIO {

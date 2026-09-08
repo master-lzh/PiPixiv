@@ -185,6 +185,7 @@
     <string name="view_replies">View replies</string>
     <string name="view_comments_count">View comments (%1$d)</string>
     <string name="no_comments">No comments yet</string>
+    <string name="no_replies">No replies yet</string>
     <string name="add_comment">Add comment</string>
     <string name="reply">Reply</string>
     <string name="block_comment">Block comment</string>

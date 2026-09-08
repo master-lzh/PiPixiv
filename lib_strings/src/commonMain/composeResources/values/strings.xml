@@ -191,6 +191,7 @@
     <string name="view_replies">查看回复</string>
     <string name="view_comments_count">查看评论(%1$d)</string>
     <string name="no_comments">暂无评论</string>
+    <string name="no_replies">暂无回复</string>
     <string name="add_comment">添加评论</string>
     <string name="reply">回复</string>
     <string name="block_comment">屏蔽评论</string>
