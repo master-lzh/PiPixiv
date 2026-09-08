@@ -27,7 +27,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrl.pixiv.common.analytics.logEvent
 import com.mrl.pixiv.common.compose.layout.currentPaneLayoutInfo
 import com.mrl.pixiv.common.compose.layout.isWidthAtLeastMedium
-import com.mrl.pixiv.common.compose.layout.isWidthCompact
 import com.mrl.pixiv.common.compose.ui.BackToTopButton
 import com.mrl.pixiv.common.compose.ui.ViewModeToggleButton
 import com.mrl.pixiv.common.data.AppViewMode
@@ -131,7 +130,7 @@ fun LatestScreen(
                 PrimaryScrollableTabRow(
                     selectedTabIndex = pagerState.currentPage,
                     modifier = Modifier
-                        .fillMaxWidth(if (paneSizeClass.isWidthCompact) 1f else 0.5f)
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     edgePadding = 0.dp,
                     minTabWidth = 48.dp,
