@@ -1,5 +1,6 @@
 import com.android.build.api.artifact.SingleArtifact
 import com.mrl.pixiv.buildsrc.CopyApk
+import com.mrl.pixiv.buildsrc.registerFossDependencyCheck
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import org.gradle.internal.extensions.stdlib.capitalized
 
@@ -150,6 +151,15 @@ dependencies {
     // MMKV
     implementation(libs.mmkv)
     implementation(libs.mmkv.kotlin)
+}
+
+if (project.findProperty("applyFirebasePlugins") != "true") {
+    val verifyFossDependencies = registerFossDependencyCheck(
+        providers.provider { configurations.getByName("releaseRuntimeClasspath") },
+    )
+    tasks.matching { it.name == "preReleaseBuild" || it.name == "check" }.configureEach {
+        dependsOn(verifyFossDependencies)
+    }
 }
 
 if (pluginManager.hasPlugin(libs.plugins.sentry.android.get().pluginId)) {
